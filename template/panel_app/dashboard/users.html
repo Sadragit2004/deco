@@ -1,0 +1,624 @@
+{% extends 'admin_template.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}پنل مدیریت کاربران | ادمین{% endblock %}
+
+{% block mobile_orders %}
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    .responsive-container { width: 100%; padding: 0.75rem; margin: 0 auto; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+    .stat-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: 1rem; padding: 0.875rem; text-align: center; border: 1px solid rgba(102,126,234,0.2); }
+    .stat-number { font-size: 1.2rem; font-weight: 800; color: #fff; }
+    .stat-label { font-size: 0.6rem; color: #94a3b8; margin-top: 0.25rem; }
+    .filter-box { background: #1e293b; border-radius: 1rem; padding: 1rem; margin-bottom: 1rem; }
+    .filter-group { margin-bottom: 0.75rem; }
+    .filter-group label { display: block; color: #94a3b8; font-size: 0.7rem; margin-bottom: 0.25rem; }
+    .filter-group input, .filter-group select { width: 100%; padding: 0.625rem; background: #0f172a; border: 1px solid rgba(102,126,234,0.3); border-radius: 0.75rem; color: #fff; }
+    .filter-buttons { display: flex; gap: 0.625rem; margin-top: 0.75rem; }
+    .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); padding: 0.625rem; border: none; border-radius: 0.75rem; color: white; cursor: pointer; flex: 1; }
+    .btn-reset { background: #ef4444; padding: 0.625rem; border: none; border-radius: 0.75rem; color: white; cursor: pointer; flex: 1; }
+    .users-list { display: flex; flex-direction: column; gap: 0.875rem; margin-bottom: 1rem; }
+    .user-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: 1.125rem; padding: 0.875rem; border: 1px solid rgba(102,126,234,0.2); }
+    .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; padding-bottom: 0.625rem; border-bottom: 1px solid rgba(102,126,234,0.1); }
+    .user-name { font-size: 0.9rem; color: #60a5fa; font-weight: bold; }
+    .user-status { display: inline-block; padding: 0.25rem 0.625rem; border-radius: 1.25rem; font-size: 0.65rem; }
+    .status-active { background: rgba(16,185,129,0.2); color: #34d399; }
+    .status-inactive { background: rgba(239,68,68,0.2); color: #ef4444; }
+    .user-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.25rem; }
+    .user-label { color: #94a3b8; font-size: 0.7rem; }
+    .user-value { color: #fff; font-size: 0.8rem; }
+    .price-value { color: #fbbf24; font-size: 0.8rem; font-weight: bold; }
+    .user-actions { display: flex; gap: 0.625rem; margin-top: 0.75rem; padding-top: 0.625rem; border-top: 1px solid rgba(102,126,234,0.1); flex-wrap: wrap; }
+    .action-btn { flex: 1; padding: 0.5rem; border: none; border-radius: 0.75rem; cursor: pointer; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 0.375rem; }
+    .btn-detail { background: #667eea; color: white; }
+    .btn-ban { background: #ef4444; color: white; }
+    .btn-verified { background: #8b5cf6; color: white; }
+    .btn-payment { background: #f59e0b; color: white; }
+    .pagination { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+    .pagination button { padding: 0.375rem 0.75rem; background: #1e293b; border: 1px solid #334155; border-radius: 0.5rem; color: #94a3b8; cursor: pointer; }
+    .pagination button.active { background: #667eea; color: white; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; padding: 0.75rem; }
+    .modal-content { background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 1.25rem; padding: 1rem; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(102,126,234,0.2); }
+    .modal-header h3 { color: #fff; font-size: 1.1rem; }
+    .close-modal { background: #ef4444; border: none; width: 32px; height: 32px; border-radius: 50%; color: white; cursor: pointer; font-size: 1.2rem; }
+    .detail-section { background: #0f172a; border-radius: 0.875rem; padding: 0.875rem; margin-bottom: 0.875rem; }
+    .detail-title { color: #667eea; font-size: 0.85rem; font-weight: bold; margin-bottom: 0.75rem; border-right: 3px solid #667eea; padding-right: 0.625rem; }
+    .detail-grid { display: grid; grid-template-columns: 1fr; gap: 0.625rem; }
+    .detail-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px dashed rgba(102,126,234,0.1); flex-wrap: wrap; gap: 0.5rem; }
+    .detail-label { color: #94a3b8; font-size: 0.7rem; }
+    .detail-value { color: #fff; font-size: 0.8rem; }
+    .role-badge { display: inline-block; background: #8b5cf6; color: white; padding: 0.2rem 0.5rem; border-radius: 1rem; font-size: 0.7rem; margin: 0.2rem; }
+    .loading { text-align: center; padding: 2rem; color: #94a3b8; }
+    .text-green-400 { color: #34d399; }
+    .text-red-400 { color: #ef4444; }
+    .text-gray-400 { color: #94a3b8; }
+    .text-yellow-400 { color: #fbbf24; }
+    @media (min-width: 768px) { .detail-grid { grid-template-columns: repeat(2, 1fr); } .modal-content { max-width: 600px; } }
+</style>
+
+<div class="responsive-container">
+    <div class="stats-grid">
+        <div class="stat-card"><div class="stat-number" id="mobileStatTotal">-</div><div class="stat-label">کل کاربران</div></div>
+        <div class="stat-card"><div class="stat-number" id="mobileStatActive">-</div><div class="stat-label">فعال</div></div>
+        <div class="stat-card"><div class="stat-number" id="mobileStatOnline">-</div><div class="stat-label">آنلاین</div></div>
+        <div class="stat-card"><div class="stat-number" id="mobileStatBanned">-</div><div class="stat-label">بن شده</div></div>
+        <div class="stat-card"><div class="stat-number" id="mobileStatVerified">-</div><div class="stat-label">تایید مدیر</div></div>
+        <div class="stat-card"><div class="stat-number" id="mobileStatPayment">-</div><div class="stat-label">حق عضویت</div></div>
+    </div>
+
+    <div class="filter-box">
+        <div class="filter-group"><label>جستجو</label><input type="text" id="mobileSearchInput" placeholder="نام / شماره موبایل / ایمیل"></div>
+        <div class="filter-group"><label>وضعیت</label><select id="mobileStatusFilter"><option value="">همه</option><option value="active">فعال</option><option value="inactive">غیرفعال</option><option value="banned">بن شده</option><option value="online">آنلاین</option></select></div>
+        <div class="filter-group"><label>نقش</label><select id="mobileRoleFilter"><option value="">همه</option><option value="staff">ادمین</option><option value="user">کاربر عادی</option></select></div>
+        <div class="filter-group"><label>جنسیت</label><select id="mobileGenderFilter"><option value="">همه</option><option value="M">مرد</option><option value="F">زن</option></select></div>
+        <div class="filter-group"><label>تایید مدیر</label><select id="mobileVerifiedFilter"><option value="">همه</option><option value="verified">تایید شده</option><option value="not_verified">تایید نشده</option></select></div>
+        <div class="filter-group"><label>حق عضویت</label><select id="mobilePaymentFilter"><option value="">همه</option><option value="active">فعال</option><option value="inactive">غیرفعال</option></select></div>
+        <div class="filter-buttons"><button class="btn-primary" onclick="applyMobileFilters()"><i class="fas fa-search"></i> جستجو</button><button class="btn-reset" onclick="resetMobileFilters()"><i class="fas fa-undo"></i> ریست</button></div>
+    </div>
+
+    <div class="users-list" id="mobileUsersList"><div class="loading">در حال بارگذاری...</div></div>
+    <div class="pagination" id="mobilePagination"></div>
+</div>
+
+<div id="mobileUserModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><h3><i class="fas fa-user-circle"></i> جزئیات کامل کاربر</h3><button class="close-modal" onclick="closeMobileModal()">&times;</button></div>
+        <div id="mobileUserDetailContent"></div>
+    </div>
+</div>
+
+<script>
+    let mobilePage = 1, mobileFilters = {}, mobileSearchTimeout = null;
+    let currentUserRoles = [], allRolesList = [];
+
+    function getCSRFToken() { return document.querySelector('[name=csrfmiddlewaretoken]')?.value || document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1]; }
+    function formatNumber(num) { if (num === undefined || num === null) return '۰'; return new Intl.NumberFormat('fa-IR').format(num); }
+    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+
+    async function updateUserStatus(userId, action) {
+        let url = '';
+        if (action === 'ban') url = `/panel/api/users/${userId}/toggle-ban/`;
+        if (action === 'online') url = `/panel/api/users/${userId}/toggle-online/`;
+        if (action === 'active') url = `/panel/api/users/${userId}/toggle-active/`;
+        if (action === 'verified') url = `/panel/api/users/${userId}/toggle-verified/`;
+        if (action === 'payment') url = `/panel/api/users/${userId}/toggle-payment/`;
+        try {
+            const response = await fetch(url, { method: 'POST', headers: { 'X-CSRFToken': getCSRFToken() } });
+            const data = await response.json();
+            if (data.success) { loadMobileUsers(); return true; }
+            else { alert(data.message || 'خطا'); return false; }
+        } catch(e) { alert('خطا'); return false; }
+    }
+
+    async function loadMobileUsers() {
+        const params = new URLSearchParams({ page: mobilePage, page_size: 10, ...mobileFilters });
+        try {
+            const response = await fetch(`/panel/api/users/?${params}`);
+            const data = await response.json();
+            if (data.success) { renderMobileUsers(data.data.users); renderMobilePagination(data.data.pagination); loadMobileStats(); }
+            else { document.getElementById('mobileUsersList').innerHTML = '<div class="loading">خطا</div>'; }
+        } catch(e) { document.getElementById('mobileUsersList').innerHTML = '<div class="loading">خطا</div>'; }
+    }
+
+    async function loadMobileStats() {
+        try {
+            const response = await fetch('/panel/api/dashboard/stats/');
+            const data = await response.json();
+            if (data.success) {
+                document.getElementById('mobileStatTotal').innerText = formatNumber(data.data.users.total);
+                document.getElementById('mobileStatActive').innerText = formatNumber(data.data.users.active);
+                document.getElementById('mobileStatOnline').innerText = formatNumber(data.data.users.online);
+                document.getElementById('mobileStatBanned').innerText = formatNumber(data.data.users.banned);
+                document.getElementById('mobileStatVerified').innerText = formatNumber(data.data.users.verified);
+                document.getElementById('mobileStatPayment').innerText = formatNumber(data.data.users.payment);
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    function renderMobileUsers(users) {
+        const container = document.getElementById('mobileUsersList');
+        if (!users || users.length === 0) { container.innerHTML = '<div class="loading">هیچ کاربری یافت نشد</div>'; return; }
+        container.innerHTML = users.map(user => `
+            <div class="user-card">
+                <div class="user-header"><span class="user-name">${escapeHtml(user.full_name) || 'کاربر بدون نام'}</span><span class="user-status ${user.is_active ? 'status-active' : 'status-inactive'}">${user.is_active ? 'فعال' : 'غیرفعال'}</span></div>
+                <div class="user-row"><span class="user-label"><i class="fas fa-phone"></i> موبایل:</span><span class="user-value" dir="ltr">${escapeHtml(user.mobileNumber)}</span></div>
+                <div class="user-row"><span class="user-label"><i class="fas fa-envelope"></i> ایمیل:</span><span class="user-value">${escapeHtml(user.email) || '-'}</span></div>
+                <div class="user-row"><span class="user-label"><i class="fas fa-wifi"></i> آنلاین:</span><span class="user-value ${user.is_online ? 'text-green-400' : 'text-gray-400'}">${user.is_online ? '🟢 آنلاین' : '⚫ آفلاین'}</span></div>
+                <div class="user-row"><span class="user-label"><i class="fas fa-gavel"></i> بن:</span><span class="user-value ${user.is_banned ? 'text-red-400' : 'text-green-400'}">${user.is_banned ? '🔒 بن شده' : '✅ فعال'}</span></div>
+                <div class="user-row"><span class="user-label"><i class="fas fa-user-check"></i> تایید مدیر:</span><span class="user-value ${user.is_verified_by_manager ? 'text-green-400' : 'text-red-400'}">${user.is_verified_by_manager ? '✅ تایید شده' : '❌ تایید نشده'}</span></div>
+                <div class="user-row"><span class="user-label"><i class="fas fa-credit-card"></i> حق عضویت:</span><span class="user-value ${user.is_payment_user ? 'text-green-400' : 'text-red-400'}">${user.is_payment_user ? '✅ فعال' : '❌ غیرفعال'}</span></div>
+                <div class="user-row"><span class="user-label"><i class="fas fa-wallet"></i> کیف پول:</span><span class="price-value">${formatNumber(user.wallet_balance)} تومان</span></div>
+                <div class="user-row"><span class="user-label"><i class="fas fa-star"></i> امتیاز:</span><span class="user-value">${formatNumber(user.total_points)}</span></div>
+                <div class="user-actions">
+                    <button class="action-btn btn-detail" onclick="showMobileUserDetail('${user.id}')"><i class="fas fa-eye"></i> جزئیات</button>
+                    <button class="action-btn btn-ban" onclick="updateUserStatus('${user.id}', 'ban')"><i class="fas ${user.is_banned ? 'fa-unlock' : 'fa-lock'}"></i> ${user.is_banned ? 'رفع بن' : 'بن'}</button>
+                    <button class="action-btn btn-verified" onclick="updateUserStatus('${user.id}', 'verified')"><i class="fas ${user.is_verified_by_manager ? 'fa-times' : 'fa-check'}"></i> ${user.is_verified_by_manager ? 'لغو تایید' : 'تایید'}</button>
+                    <button class="action-btn btn-payment" onclick="updateUserStatus('${user.id}', 'payment')"><i class="fas ${user.is_payment_user ? 'fa-times-circle' : 'fa-check-circle'}"></i> ${user.is_payment_user ? 'لغو عضویت' : 'فعال‌سازی عضویت'}</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderMobilePagination(pagination) {
+        const container = document.getElementById('mobilePagination');
+        if (!pagination || pagination.total_pages <= 1) { container.innerHTML = ''; return; }
+        let html = '';
+        if (pagination.has_previous) html += `<button onclick="goToMobilePage(${pagination.current_page - 1})">قبلی</button>`;
+        for (let i = Math.max(1, pagination.current_page - 2); i <= Math.min(pagination.total_pages, pagination.current_page + 2); i++)
+            html += `<button onclick="goToMobilePage(${i})" class="${i === pagination.current_page ? 'active' : ''}">${i}</button>`;
+        if (pagination.has_next) html += `<button onclick="goToMobilePage(${pagination.current_page + 1})">بعدی</button>`;
+        container.innerHTML = html;
+    }
+
+    function goToMobilePage(page) { mobilePage = page; loadMobileUsers(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+    function applyMobileFilters() {
+        let status = document.getElementById('mobileStatusFilter').value;
+        let role = document.getElementById('mobileRoleFilter').value;
+        let gender = document.getElementById('mobileGenderFilter').value;
+        let verified = document.getElementById('mobileVerifiedFilter').value;
+        let payment = document.getElementById('mobilePaymentFilter').value;
+        mobileFilters = {
+            search: document.getElementById('mobileSearchInput').value,
+            is_active: status === 'active' ? 'true' : (status === 'inactive' ? 'false' : ''),
+            is_banned: status === 'banned' ? 'true' : '',
+            is_online: status === 'online' ? 'true' : '',
+            is_staff: role === 'staff' ? 'true' : (role === 'user' ? 'false' : ''),
+            gender: gender,
+            is_verified: verified === 'verified' ? 'true' : (verified === 'not_verified' ? 'false' : ''),
+            is_payment: payment === 'active' ? 'true' : (payment === 'inactive' ? 'false' : '')
+        };
+        Object.keys(mobileFilters).forEach(k => { if (!mobileFilters[k]) delete mobileFilters[k]; });
+        mobilePage = 1; loadMobileUsers();
+    }
+
+    function resetMobileFilters() {
+        document.getElementById('mobileSearchInput').value = '';
+        document.getElementById('mobileStatusFilter').value = '';
+        document.getElementById('mobileRoleFilter').value = '';
+        document.getElementById('mobileGenderFilter').value = '';
+        document.getElementById('mobileVerifiedFilter').value = '';
+        document.getElementById('mobilePaymentFilter').value = '';
+        mobileFilters = {}; mobilePage = 1; loadMobileUsers();
+    }
+
+    // ==================== نقش‌های کاربر ====================
+    async function loadUserRoles(userId) {
+        try {
+            const response = await fetch(`/panel/api/users/${userId}/get-roles/`);
+            const data = await response.json();
+            if (data.success) {
+                currentUserRoles = data.user_roles;
+                allRolesList = data.all_roles;
+                renderUserRoles();
+                renderRoleSelect();
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    function renderUserRoles() {
+        const container = document.getElementById('userRolesContainer');
+        if (!container) return;
+        if (!currentUserRoles || currentUserRoles.length === 0) {
+            container.innerHTML = '<div style="color: #94a3b8; padding: 0.5rem; background: #0f172a; border-radius: 0.5rem; text-align: center;">هیچ نقشی برای این کاربر تعریف نشده است</div>';
+            return;
+        }
+        container.innerHTML = currentUserRoles.map(role => `
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 0.5rem; border-radius: 0.5rem; margin-bottom: 0.5rem;">
+                <span style="color: #60a5fa;"><i class="fas fa-tag"></i> ${escapeHtml(role.title)}</span>
+                <button onclick="removeRoleFromUser('${role.id}')" style="background: #ef4444; border: none; padding: 0.2rem 0.5rem; border-radius: 0.3rem; color: white; cursor: pointer;"><i class="fas fa-trash"></i> حذف</button>
+            </div>
+        `).join('');
+    }
+
+    function renderRoleSelect() {
+        const select = document.getElementById('roleSelect');
+        if (!select) return;
+        const currentRoleIds = currentUserRoles.map(r => r.id);
+        const availableRoles = allRolesList.filter(role => !currentRoleIds.includes(role.id));
+        if (availableRoles.length === 0) {
+            select.innerHTML = '<option value="">نقشی برای افزودن وجود ندارد</option>';
+            select.disabled = true;
+        } else {
+            select.innerHTML = '<option value="">انتخاب نقش...</option>';
+            availableRoles.forEach(role => { select.innerHTML += `<option value="${role.id}">${escapeHtml(role.title)}</option>`; });
+            select.disabled = false;
+        }
+    }
+
+    async function addRoleToUser() {
+        const select = document.getElementById('roleSelect');
+        const roleId = select.value;
+        if (!roleId) { alert('لطفاً یک نقش انتخاب کنید'); return; }
+        const roleName = select.options[select.selectedIndex]?.text;
+        if (!confirm(`آیا میخواهید نقش "${roleName}" را به این کاربر اضافه کنید؟`)) return;
+        const newRoleIds = [...currentUserRoles.map(r => r.id), roleId];
+        try {
+            const response = await fetch(`/panel/api/users/${window.currentUserId}/update-roles/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                body: JSON.stringify({ role_ids: newRoleIds })
+            });
+            const data = await response.json();
+            if (data.success) { alert('نقش با موفقیت اضافه شد'); await loadUserRoles(window.currentUserId); }
+            else { alert(data.error || 'خطا'); }
+        } catch(e) { alert('خطا'); }
+    }
+
+    async function removeRoleFromUser(roleId) {
+        const roleName = currentUserRoles.find(r => r.id === roleId)?.title;
+        if (!confirm(`آیا میخواهید نقش "${roleName}" را از این کاربر حذف کنید؟`)) return;
+        const newRoleIds = currentUserRoles.filter(r => r.id !== roleId).map(r => r.id);
+        try {
+            const response = await fetch(`/panel/api/users/${window.currentUserId}/update-roles/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                body: JSON.stringify({ role_ids: newRoleIds })
+            });
+            const data = await response.json();
+            if (data.success) { alert('نقش با موفقیت حذف شد'); await loadUserRoles(window.currentUserId); }
+            else { alert(data.error || 'خطا'); }
+        } catch(e) { alert('خطا'); }
+    }
+
+    async function showMobileUserDetail(userId) {
+        window.currentUserId = userId;
+        try {
+            const response = await fetch(`/panel/api/users/${userId}/`);
+            const data = await response.json();
+            if (data.success) {
+                const u = data.data;
+                const rolesHtml = (u.roles || []).map(r => `<span class="role-badge">${escapeHtml(r.title)}</span>`).join('');
+                const content = `
+                    <div class="detail-section"><div class="detail-title">اطلاعات شخصی</div><div class="detail-grid">
+                        <div class="detail-item"><span class="detail-label">نام کامل:</span><span class="detail-value">${escapeHtml(u.full_name) || '-'}</span></div>
+                        <div class="detail-item"><span class="detail-label">شماره موبایل:</span><span class="detail-value" dir="ltr">${escapeHtml(u.mobileNumber)}</span></div>
+                        <div class="detail-item"><span class="detail-label">ایمیل:</span><span class="detail-value">${escapeHtml(u.email) || '-'}</span></div>
+                        <div class="detail-item"><span class="detail-label">جنسیت:</span><span class="detail-value">${u.gender_display || '-'}</span></div>
+                        <div class="detail-item"><span class="detail-label">سن:</span><span class="detail-value">${u.age || '-'} سال</span></div>
+                        <div class="detail-item"><span class="detail-label">فروشگاه:</span><span class="detail-value">${escapeHtml(u.shop_name) || '-'}</span></div>
+                    </div></div>
+                    <div class="detail-section"><div class="detail-title">وضعیت حساب</div><div class="detail-grid">
+                        <div class="detail-item"><span class="detail-label">وضعیت:</span><span class="detail-value ${u.is_active ? 'text-green-400' : 'text-red-400'}">${u.is_active ? '✅ فعال' : '❌ غیرفعال'}</span></div>
+                        <div class="detail-item"><span class="detail-label">ادمین:</span><span class="detail-value">${u.is_staff ? '✅ بله' : '❌ خیر'}</span></div>
+                        <div class="detail-item"><span class="detail-label">آنلاین:</span><span class="detail-value ${u.is_online ? 'text-green-400' : 'text-gray-400'}">${u.is_online ? '🟢 آنلاین' : '⚫ آفلاین'}</span></div>
+                        <div class="detail-item"><span class="detail-label">بن:</span><span class="detail-value ${u.security?.is_banned ? 'text-red-400' : 'text-green-400'}">${u.security?.is_banned ? '🔒 بن شده' : '🔓 فعال'}</span></div>
+                        <div class="detail-item"><span class="detail-label">تایید مدیر:</span><span class="detail-value ${u.security?.is_verified_by_manager ? 'text-green-400' : 'text-red-400'}">${u.security?.is_verified_by_manager ? '✅ تایید' : '❌ عدم تایید'}</span></div>
+                        <div class="detail-item"><span class="detail-label">حق عضویت:</span><span class="detail-value ${u.security?.is_payment_user ? 'text-green-400' : 'text-red-400'}">${u.security?.is_payment_user ? '✅ فعال' : '❌ غیرفعال'}</span></div>
+                        <div class="detail-item"><span class="detail-label">عضویت:</span><span class="detail-value">${new Date(u.created_at).toLocaleDateString('fa-IR')}</span></div>
+                    </div></div>
+                    <div class="detail-section"><div class="detail-title">نقش‌های کاربر</div><div id="userRolesContainer" style="margin-bottom: 0.75rem;"><div style="color:#94a3b8; text-align:center;">در حال بارگذاری...</div></div>
+                    <div style="display:flex; gap:0.5rem;"><select id="roleSelect" style="flex:2; padding:0.5rem; background:#0f172a; border:1px solid #667eea; border-radius:0.5rem; color:#fff;"><option value="">انتخاب نقش...</option></select><button onclick="addRoleToUser()" style="flex:1; background:#10b981; border:none; padding:0.5rem; border-radius:0.5rem; color:white; cursor:pointer;"><i class="fas fa-plus"></i> افزودن</button></div></div>
+                    <div class="detail-section"><div class="detail-title">کیف پول و امتیازات</div><div class="detail-grid">
+                        <div class="detail-item"><span class="detail-label">کیف پول:</span><span class="detail-value text-yellow-400">${formatNumber(u.wallet?.balance || 0)} تومان</span></div>
+                        <div class="detail-item"><span class="detail-label">امتیاز:</span><span class="detail-value">${formatNumber(u.loyalty?.total_points || 0)}</span></div>
+                        <div class="detail-item"><span class="detail-label">سکه:</span><span class="detail-value">${formatNumber(u.loyalty?.total_coins || 0)}</span></div>
+                        <div class="detail-item"><span class="detail-label">سطح:</span><span class="detail-value">${u.loyalty?.tier_display || 'برنزی'}</span></div>
+                    </div></div>
+                    <div class="detail-section"><div class="detail-title">اقدامات مدیریتی</div><div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                        <button onclick="updateWalletFromModal('${u.id}')" style="flex:1; background:#10b981; border:none; padding:0.6rem; border-radius:0.75rem; color:white; cursor:pointer;"><i class="fas fa-wallet"></i> کیف پول</button>
+                        <button onclick="updatePointsFromModal('${u.id}')" style="flex:1; background:#8b5cf6; border:none; padding:0.6rem; border-radius:0.75rem; color:white; cursor:pointer;"><i class="fas fa-star"></i> امتیاز</button>
+                        <button onclick="toggleUserStatusFromModal('${u.id}', 'active', ${u.is_active})" style="flex:1; background:#3b82f6; border:none; padding:0.6rem; border-radius:0.75rem; color:white; cursor:pointer;"><i class="fas ${u.is_active ? 'fa-ban' : 'fa-check'}"></i> ${u.is_active ? 'غیرفعال' : 'فعال'}</button>
+                    </div></div>
+                `;
+                document.getElementById('mobileUserDetailContent').innerHTML = content;
+                document.getElementById('mobileUserModal').style.display = 'flex';
+                await loadUserRoles(userId);
+            } else { alert(data.message); }
+        } catch(e) { alert('خطا'); }
+    }
+
+    async function toggleUserStatusFromModal(userId, action, currentStatus) {
+        const statusText = action === 'active' ? (currentStatus ? 'غیرفعال' : 'فعال') : (currentStatus ? 'لغو' : 'فعال');
+        if(!confirm(`آیا میخواهید وضعیت را ${statusText} کنید؟`)) return;
+        await updateUserStatus(userId, action);
+        closeMobileModal();
+        setTimeout(() => showMobileUserDetail(userId), 500);
+    }
+
+    async function updateWalletFromModal(userId) {
+        let amount = prompt('مبلغ به تومان را وارد کنید:', '0');
+        if (amount === null) return;
+        let operation = confirm('برای افزایش کلیک OK، برای کاهش کلیک Cancel') ? 'add' : 'subtract';
+        try {
+            const response = await fetch(`/panel/api/users/${userId}/update-wallet/`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                body: JSON.stringify({ amount: parseInt(amount), operation: operation })
+            });
+            const data = await response.json();
+            if (data.success) { alert(data.message); closeMobileModal(); loadMobileUsers(); }
+            else { alert(data.error); }
+        } catch(e) { alert('خطا'); }
+    }
+
+    async function updatePointsFromModal(userId) {
+        let points = prompt('تعداد امتیاز را وارد کنید:', '0');
+        if (points === null) return;
+        let operation = confirm('برای افزایش کلیک OK، برای کاهش کلیک Cancel') ? 'add' : 'subtract';
+        try {
+            const response = await fetch(`/panel/api/users/${userId}/update-points/`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                body: JSON.stringify({ points: parseInt(points), operation: operation })
+            });
+            const data = await response.json();
+            if (data.success) { alert(data.message); closeMobileModal(); loadMobileUsers(); }
+            else { alert(data.error); }
+        } catch(e) { alert('خطا'); }
+    }
+
+    function closeMobileModal() { document.getElementById('mobileUserModal').style.display = 'none'; }
+
+    document.getElementById('mobileSearchInput').addEventListener('input', function() { clearTimeout(mobileSearchTimeout); mobileSearchTimeout = setTimeout(() => applyMobileFilters(), 500); });
+    document.getElementById('mobileStatusFilter').addEventListener('change', applyMobileFilters);
+    document.getElementById('mobileRoleFilter').addEventListener('change', applyMobileFilters);
+    document.getElementById('mobileGenderFilter').addEventListener('change', applyMobileFilters);
+    document.getElementById('mobileVerifiedFilter').addEventListener('change', applyMobileFilters);
+    document.getElementById('mobilePaymentFilter').addEventListener('change', applyMobileFilters);
+
+    loadMobileUsers();
+    setInterval(loadMobileUsers, 30000);
+</script>
+{% endblock %}
+
+{% block pc %}
+<style>
+    .users-container { padding: 1.5rem; }
+    .stats-desktop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-desktop-card { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-radius: 1.25rem; padding: 1rem; border: 1px solid rgba(102,126,234,0.2); }
+    .stat-desktop-card h4 { color: #94a3b8; font-size: 0.7rem; }
+    .stat-desktop-number { color: #fff; font-size: 1.3rem; font-weight: 800; }
+    .filter-desktop-box { background: #1e293b; border-radius: 1.5rem; padding: 1.25rem; margin-bottom: 1.5rem; }
+    .filter-desktop-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; }
+    .filter-desktop-group label { display: block; color: #94a3b8; font-size: 0.7rem; }
+    .filter-desktop-group input, .filter-desktop-group select { width: 100%; padding: 0.625rem; background: #0f172a; border: 1px solid rgba(102,126,234,0.3); border-radius: 0.75rem; color: #fff; }
+    .btn-desktop-primary { background: linear-gradient(135deg, #667eea, #764ba2); padding: 0.625rem 1rem; border: none; border-radius: 0.75rem; color: white; cursor: pointer; }
+    .btn-desktop-reset { background: #ef4444; padding: 0.625rem 1rem; border: none; border-radius: 0.75rem; color: white; cursor: pointer; }
+    .users-table-wrapper { background: #1e293b; border-radius: 1.5rem; overflow-x: auto; }
+    .users-table { width: 100%; border-collapse: collapse; min-width: 1300px; }
+    .users-table th { text-align: right; padding: 0.875rem 1rem; color: #94a3b8; border-bottom: 1px solid rgba(102,126,234,0.15); background: rgba(0,0,0,0.2); cursor: pointer; }
+    .users-table td { padding: 0.75rem 1rem; color: #e2e8f0; border-bottom: 1px solid rgba(102,126,234,0.08); }
+    .users-table tr:hover { background: rgba(102,126,234,0.05); }
+    .badge-active, .badge-online, .badge-verified, .badge-payment { background: rgba(16,185,129,0.2); color: #34d399; padding: 0.25rem 0.75rem; border-radius: 1.875rem; font-size: 0.7rem; display: inline-block; }
+    .badge-inactive, .badge-offline, .badge-banned, .badge-not-verified, .badge-no-payment { background: rgba(239,68,68,0.2); color: #ef4444; padding: 0.25rem 0.75rem; border-radius: 1.875rem; font-size: 0.7rem; display: inline-block; }
+    .btn-table { padding: 0.375rem 0.75rem; border: none; border-radius: 0.625rem; color: white; cursor: pointer; margin: 0.125rem; }
+    .btn-primary-table { background: #667eea; }
+    .btn-warning-table { background: #f59e0b; }
+    .btn-success-table { background: #10b981; }
+    .btn-purple-table { background: #8b5cf6; }
+    .role-badge-pc { display: inline-block; background: #8b5cf6; color: white; padding: 0.2rem 0.5rem; border-radius: 1rem; font-size: 0.65rem; margin: 0.1rem; }
+    .pagination-desktop { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; }
+    .pagination-desktop button { padding: 0.5rem 1rem; background: #1e293b; border: 1px solid #334155; border-radius: 0.5rem; color: #94a3b8; cursor: pointer; }
+    .pagination-desktop button.active { background: #667eea; color: white; }
+    .modal-desktop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-desktop-content { background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 1.75rem; padding: 1.25rem; width: 90%; max-width: 1000px; max-height: 85vh; overflow-y: auto; }
+    .modal-desktop-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(102,126,234,0.2); }
+    .close-modal-desktop { background: #ef4444; border: none; width: 34px; height: 34px; border-radius: 50%; color: white; cursor: pointer; }
+    .pc-detail-section { background: #0f172a; border-radius: 1rem; padding: 1rem; margin-bottom: 1rem; }
+    .pc-detail-section-title { color: #667eea; font-size: 0.85rem; font-weight: bold; margin-bottom: 0.875rem; border-right: 3px solid #667eea; padding-right: 0.75rem; }
+    .pc-detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0.75rem; }
+    .pc-detail-item { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px dashed rgba(102,126,234,0.1); }
+    .pc-detail-label { color: #94a3b8; }
+    .pc-detail-value { color: #fff; }
+    .text-green-400 { color: #34d399; }
+    .text-red-400 { color: #ef4444; }
+    .text-yellow-400 { color: #fbbf24; }
+</style>
+
+<div class="users-container">
+    <div class="stats-desktop-grid">
+        <div class="stat-desktop-card"><h4>کل کاربران</h4><div class="stat-desktop-number" id="statTotal">-</div></div>
+        <div class="stat-desktop-card"><h4>فعال</h4><div class="stat-desktop-number" id="statActive">-</div></div>
+        <div class="stat-desktop-card"><h4>آنلاین</h4><div class="stat-desktop-number" id="statOnline">-</div></div>
+        <div class="stat-desktop-card"><h4>بن شده</h4><div class="stat-desktop-number" id="statBanned">-</div></div>
+        <div class="stat-desktop-card"><h4>تایید مدیر</h4><div class="stat-desktop-number" id="statVerified">-</div></div>
+        <div class="stat-desktop-card"><h4>حق عضویت</h4><div class="stat-desktop-number" id="statPayment">-</div></div>
+    </div>
+
+    <div class="filter-desktop-box">
+        <div class="filter-desktop-row">
+            <div class="filter-desktop-group"><label>وضعیت</label><select id="filterStatus"><option value="">همه</option><option value="active">فعال</option><option value="inactive">غیرفعال</option></select></div>
+            <div class="filter-desktop-group"><label>بن</label><select id="filterBan"><option value="">همه</option><option value="banned">بن شده</option><option value="not_banned">بدون بن</option></select></div>
+            <div class="filter-desktop-group"><label>آنلاین</label><select id="filterOnline"><option value="">همه</option><option value="online">آنلاین</option><option value="offline">آفلاین</option></select></div>
+            <div class="filter-desktop-group"><label>تایید مدیر</label><select id="filterVerified"><option value="">همه</option><option value="verified">تایید شده</option><option value="not_verified">تایید نشده</option></select></div>
+            <div class="filter-desktop-group"><label>حق عضویت</label><select id="filterPayment"><option value="">همه</option><option value="active">فعال</option><option value="inactive">غیرفعال</option></select></div>
+            <div class="filter-desktop-group"><label>جستجو</label><div style="display:flex; gap:0.5rem;"><input type="text" id="searchInput" placeholder="موبایل / نام"><button class="btn-desktop-primary" onclick="applyFilters()">جستجو</button><button class="btn-desktop-reset" onclick="resetFilters()">ریست</button></div></div>
+        </div>
+    </div>
+
+    <div class="users-table-wrapper">
+        <table class="users-table"><thead><tr><th onclick="sortUsers('full_name')">نام کاربر</th><th>موبایل</th><th>ایمیل</th><th>کیف پول</th><th>امتیاز</th><th>وضعیت</th><th>آنلاین</th><th>بن</th><th>تایید مدیر</th><th>حق عضویت</th><th>نقش</th><th>عملیات</th></tr></thead><tbody id="usersTableBody"><tr><td colspan="12" class="loading">در حال بارگذاری...</td></tr></tbody></table>
+    </div>
+    <div class="pagination-desktop" id="paginationDesktop"></div>
+</div>
+
+<div id="userDetailModal" class="modal-desktop"><div class="modal-desktop-content"><div class="modal-desktop-header"><h3>جزئیات کامل کاربر</h3><button class="close-modal-desktop" onclick="closeModal('userDetailModal')">&times;</button></div><div id="userDetailContent"></div></div></div>
+
+<script>
+    let currentPage = 1, currentSort = '-createAt', currentFilters = {}, searchTimeoutDesktop = null;
+    let pcUserRoles = [], pcAllRoles = [];
+
+    function getCSRFToken() { return document.querySelector('[name=csrfmiddlewaretoken]')?.value || document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1]; }
+    function formatNumber(n) { if (n === undefined || n === null) return '۰'; return new Intl.NumberFormat('fa-IR').format(n); }
+    function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+
+    async function updateUserStatus(userId, action) {
+        let url = `/panel/api/users/${userId}/toggle-${action}/`;
+        try { const res = await fetch(url, { method: 'POST', headers: { 'X-CSRFToken': getCSRFToken() } }); const data = await res.json(); if (data.success) loadUsers(); else alert(data.message); } catch(e) { alert('خطا'); }
+    }
+
+    async function loadUsers() {
+        const params = new URLSearchParams({ page: currentPage, sort_by: currentSort, ...currentFilters });
+        try { const res = await fetch(`/panel/api/users/?${params}`); const data = await res.json(); if (data.success) { updateStats(); updateTable(data.data.users); updatePagination(data.data.pagination); } } catch(e) { console.error(e); }
+    }
+
+    async function updateStats() {
+        try { const res = await fetch('/panel/api/dashboard/stats/'); const data = await res.json(); if (data.success) {
+            document.getElementById('statTotal').innerText = formatNumber(data.data.users.total);
+            document.getElementById('statActive').innerText = formatNumber(data.data.users.active);
+            document.getElementById('statOnline').innerText = formatNumber(data.data.users.online);
+            document.getElementById('statBanned').innerText = formatNumber(data.data.users.banned);
+            document.getElementById('statVerified').innerText = formatNumber(data.data.users.verified);
+            document.getElementById('statPayment').innerText = formatNumber(data.data.users.payment);
+        } } catch(e) { console.error(e); }
+    }
+
+    function updateTable(users) {
+        const tbody = document.getElementById('usersTableBody');
+        if (!users || users.length === 0) { tbody.innerHTML = '<tr><td colspan="12" class="loading">هیچ کاربری یافت نشد</td></tr>'; return; }
+        tbody.innerHTML = users.map(u => `<tr><td><strong>${escapeHtml(u.full_name)}</strong><br><small>${u.shop_name ? '🏪 ' + escapeHtml(u.shop_name) : ''}</small></td><td dir="ltr">${escapeHtml(u.mobileNumber)}</td><td>${escapeHtml(u.email) || '-'}</td><td class="text-yellow-400">${formatNumber(u.wallet_balance)} تومان</td><td>${formatNumber(u.total_points)}</td><td><span class="${u.is_active ? 'badge-active' : 'badge-inactive'}">${u.is_active ? 'فعال' : 'غیرفعال'}</span></td><td><span class="${u.is_online ? 'badge-online' : 'badge-offline'}">${u.is_online ? '🟢 آنلاین' : '⚫ آفلاین'}</span></td><td><span class="${u.is_banned ? 'badge-banned' : 'badge-active'}">${u.is_banned ? '🔒 بن' : '✅ آزاد'}</span></td><td><span class="${u.is_verified_by_manager ? 'badge-verified' : 'badge-not-verified'}">${u.is_verified_by_manager ? '✅ تایید' : '❌ عدم تایید'}</span></td><td><span class="${u.is_payment_user ? 'badge-payment' : 'badge-no-payment'}">${u.is_payment_user ? '✅ فعال' : '❌ غیرفعال'}</span></td><td>${(u.roles || []).map(r => `<span class="role-badge-pc">${escapeHtml(r.title)}</span>`).join('') || '-'}</td><td><div style="display:flex; gap:4px;"><button class="btn-table btn-primary-table" onclick="showUserDetail('${u.id}')"><i class="fas fa-eye"></i></button><button class="btn-table btn-warning-table" onclick="updateUserStatus('${u.id}', 'ban')"><i class="fas ${u.is_banned ? 'fa-unlock' : 'fa-lock'}"></i></button><button class="btn-table btn-purple-table" onclick="updateUserStatus('${u.id}', 'verified')"><i class="fas ${u.is_verified_by_manager ? 'fa-times' : 'fa-check'}"></i></button><button class="btn-table btn-warning-table" onclick="updateUserStatus('${u.id}', 'payment')"><i class="fas ${u.is_payment_user ? 'fa-times-circle' : 'fa-check-circle'}"></i></button></div></td></tr>`).join('');
+    }
+
+    function updatePagination(pagination) {
+        const container = document.getElementById('paginationDesktop');
+        if (!pagination || pagination.total_pages <= 1) { container.innerHTML = ''; return; }
+        let html = '';
+        if (pagination.has_previous) html += `<button onclick="goToPage(${pagination.current_page - 1})">قبلی</button>`;
+        for (let i = Math.max(1, pagination.current_page - 2); i <= Math.min(pagination.total_pages, pagination.current_page + 2); i++)
+            html += `<button onclick="goToPage(${i})" class="${i === pagination.current_page ? 'active' : ''}">${i}</button>`;
+        if (pagination.has_next) html += `<button onclick="goToPage(${pagination.current_page + 1})">بعدی</button>`;
+        container.innerHTML = html;
+    }
+
+    function applyFilters() {
+        currentFilters = {
+            search: document.getElementById('searchInput').value,
+            is_active: (s=document.getElementById('filterStatus').value) === 'active' ? 'true' : (s === 'inactive' ? 'false' : ''),
+            is_banned: (b=document.getElementById('filterBan').value) === 'banned' ? 'true' : (b === 'not_banned' ? 'false' : ''),
+            is_online: (o=document.getElementById('filterOnline').value) === 'online' ? 'true' : (o === 'offline' ? 'false' : ''),
+            is_verified: (v=document.getElementById('filterVerified').value) === 'verified' ? 'true' : (v === 'not_verified' ? 'false' : ''),
+            is_payment: (p=document.getElementById('filterPayment').value) === 'active' ? 'true' : (p === 'inactive' ? 'false' : '')
+        };
+        Object.keys(currentFilters).forEach(k => { if (!currentFilters[k]) delete currentFilters[k]; });
+        currentPage = 1; loadUsers();
+    }
+
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterBan').value = '';
+        document.getElementById('filterOnline').value = '';
+        document.getElementById('filterVerified').value = '';
+        document.getElementById('filterPayment').value = '';
+        currentFilters = {}; currentPage = 1; loadUsers();
+    }
+
+    function sortUsers(field) { currentSort = currentSort === field ? `-${field}` : field; loadUsers(); }
+    function goToPage(page) { currentPage = page; loadUsers(); window.scrollTo({ top: 0 }); }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    async function loadPCRoles(userId) {
+        try { const res = await fetch(`/panel/api/users/${userId}/get-roles/`); const data = await res.json(); if (data.success) { pcUserRoles = data.user_roles; pcAllRoles = data.all_roles; renderPCRoles(); renderPCRoleSelect(); } } catch(e) { console.error(e); }
+    }
+
+    function renderPCRoles() {
+        const container = document.getElementById('pcRolesContainer');
+        if (!container) return;
+        if (!pcUserRoles || pcUserRoles.length === 0) { container.innerHTML = '<div style="color:#94a3b8; padding:0.5rem; background:#0f172a; border-radius:0.5rem; text-align:center;">هیچ نقشی تعریف نشده</div>'; return; }
+        container.innerHTML = pcUserRoles.map(r => `<div style="display:flex; justify-content:space-between; background:#0f172a; padding:0.5rem; border-radius:0.5rem; margin-bottom:0.5rem;"><span style="color:#60a5fa;">${escapeHtml(r.title)}</span><button onclick="removePCRole('${r.id}')" style="background:#ef4444; border:none; padding:0.2rem 0.5rem; border-radius:0.3rem; color:white; cursor:pointer;">حذف</button></div>`).join('');
+    }
+
+    function renderPCRoleSelect() {
+        const select = document.getElementById('pcRoleSelect');
+        if (!select) return;
+        const currentIds = pcUserRoles.map(r => r.id);
+        const available = pcAllRoles.filter(r => !currentIds.includes(r.id));
+        if (available.length === 0) { select.innerHTML = '<option value="">نقشی برای افزودن نیست</option>'; select.disabled = true; }
+        else { select.innerHTML = '<option value="">انتخاب نقش...</option>'; available.forEach(r => { select.innerHTML += `<option value="${r.id}">${escapeHtml(r.title)}</option>`; }); select.disabled = false; }
+    }
+
+    async function addPCRole() {
+        const select = document.getElementById('pcRoleSelect');
+        const roleId = select.value;
+        if (!roleId) { alert('نقش را انتخاب کنید'); return; }
+        const newIds = [...pcUserRoles.map(r => r.id), roleId];
+        try { const res = await fetch(`/panel/api/users/${window.pcUserId}/update-roles/`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() }, body: JSON.stringify({ role_ids: newIds }) }); const data = await res.json(); if (data.success) { alert('نقش اضافه شد'); await loadPCRoles(window.pcUserId); } else { alert(data.error); } } catch(e) { alert('خطا'); }
+    }
+
+    async function removePCRole(roleId) {
+        if (!confirm('حذف شود؟')) return;
+        const newIds = pcUserRoles.filter(r => r.id !== roleId).map(r => r.id);
+        try { const res = await fetch(`/panel/api/users/${window.pcUserId}/update-roles/`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() }, body: JSON.stringify({ role_ids: newIds }) }); const data = await res.json(); if (data.success) { alert('نقش حذف شد'); await loadPCRoles(window.pcUserId); } else { alert(data.error); } } catch(e) { alert('خطا'); }
+    }
+
+    async function showUserDetail(userId) {
+        window.pcUserId = userId;
+        try { const res = await fetch(`/panel/api/users/${userId}/`); const data = await res.json(); if (data.success) {
+            const u = data.data;
+            document.getElementById('userDetailContent').innerHTML = `
+                <div class="pc-detail-section"><div class="pc-detail-section-title">اطلاعات شخصی</div><div class="pc-detail-grid">
+                    <div class="pc-detail-item"><span class="pc-detail-label">نام:</span><span class="pc-detail-value">${escapeHtml(u.full_name) || '-'}</span></div>
+                    <div class="pc-detail-item"><span class="pc-detail-label">موبایل:</span><span class="pc-detail-value" dir="ltr">${escapeHtml(u.mobileNumber)}</span></div>
+                    <div class="pc-detail-item"><span class="pc-detail-label">ایمیل:</span><span class="pc-detail-value">${escapeHtml(u.email) || '-'}</span></div>
+                    <div class="pc-detail-item"><span class="pc-detail-label">جنسیت:</span><span class="pc-detail-value">${u.gender_display || '-'}</span></div>
+                    <div class="pc-detail-item"><span class="pc-detail-label">سن:</span><span class="pc-detail-value">${u.age || '-'} سال</span></div>
+                    <div class="pc-detail-item"><span class="pc-detail-label">فروشگاه:</span><span class="pc-detail-value">${escapeHtml(u.shop_name) || '-'}</span></div>
+                </div></div>
+                <div class="pc-detail-section"><div class="pc-detail-section-title">وضعیت حساب</div><div class="pc-detail-grid">
+                    <div class="pc-detail-item"><span class="pc-detail-label">فعال:</span><span class="pc-detail-value ${u.is_active ? 'text-green-400' : 'text-red-400'}">${u.is_active ? '✅ فعال' : '❌ غیرفعال'}</span></div>
+                    <div class="pc-detail-item"><span class="pc-detail-label">آنلاین:</span><span class="pc-detail-value ${u.is_online ? 'text-green-400' : 'text-gray-400'}">${u.is_online ? '🟢 آنلاین' : '⚫ آفلاین'}</span></div>
+                    <div class="pc-detail-item"><span class="pc-detail-label">بن:</span><span class="pc-detail-value ${u.security?.is_banned ? 'text-red-400' : 'text-green-400'}">${u.security?.is_banned ? '🔒 بن شده' : '🔓 آزاد'}</span></div>
+                    <div class="pc-detail-item"><span class="pc-detail-label">تایید مدیر:</span><span class="pc-detail-value ${u.security?.is_verified_by_manager ? 'text-green-400' : 'text-red-400'}">${u.security?.is_verified_by_manager ? '✅ تایید' : '❌ عدم تایید'}</span></div>
+                    <div class="pc-detail-item"><span class="pc-detail-label">حق عضویت:</span><span class="pc-detail-value ${u.security?.is_payment_user ? 'text-green-400' : 'text-red-400'}">${u.security?.is_payment_user ? '✅ فعال' : '❌ غیرفعال'}</span></div>
+                    <div class="pc-detail-item"><span class="pc-detail-label">عضویت:</span><span class="pc-detail-value">${new Date(u.created_at).toLocaleDateString('fa-IR')}</span></div>
+                </div></div>
+                <div class="pc-detail-section"><div class="pc-detail-section-title">نقش‌های کاربر</div><div id="pcRolesContainer" style="margin-bottom:0.75rem;"><div style="text-align:center;">در حال بارگذاری...</div></div><div style="display:flex; gap:0.5rem;"><select id="pcRoleSelect" style="flex:2; padding:0.5rem; background:#0f172a; border:1px solid #667eea; border-radius:0.5rem; color:#fff;"><option value="">انتخاب نقش...</option></select><button onclick="addPCRole()" style="flex:1; background:#10b981; border:none; padding:0.5rem; border-radius:0.5rem; color:white; cursor:pointer;"><i class="fas fa-plus"></i> افزودن</button></div></div>
+                <div class="pc-detail-section"><div class="pc-detail-section-title">کیف پول و امتیازات</div><div class="pc-detail-grid">
+                    <div class="pc-detail-item"><span class="pc-detail-label">کیف پول:</span><span class="pc-detail-value text-yellow-400">${formatNumber(u.wallet?.balance || 0)} تومان</span></div>
+                    <div class="pc-detail-item"><span class="pc-detail-label">امتیاز:</span><span class="pc-detail-value">${formatNumber(u.loyalty?.total_points || 0)}</span></div>
+                    <div class="pc-detail-item"><span class="pc-detail-label">سکه:</span><span class="pc-detail-value">${formatNumber(u.loyalty?.total_coins || 0)}</span></div>
+                    <div class="pc-detail-item"><span class="pc-detail-label">سطح:</span><span class="pc-detail-value">${u.loyalty?.tier_display || 'برنزی'}</span></div>
+                </div></div>
+                <div class="pc-detail-section"><div class="pc-detail-section-title">اقدامات</div><div style="display:flex; gap:0.5rem;"><button onclick="updateWalletDesktop('${u.id}')" style="background:#10b981; padding:0.5rem 1rem; border:none; border-radius:0.5rem; color:white; cursor:pointer;"><i class="fas fa-wallet"></i> کیف پول</button><button onclick="updatePointsDesktop('${u.id}')" style="background:#8b5cf6; padding:0.5rem 1rem; border:none; border-radius:0.5rem; color:white; cursor:pointer;"><i class="fas fa-star"></i> امتیاز</button><button onclick="updateUserStatus('${u.id}', 'active')" style="background:#3b82f6; padding:0.5rem 1rem; border:none; border-radius:0.5rem; color:white; cursor:pointer;"><i class="fas ${u.is_active ? 'fa-ban' : 'fa-check'}"></i> ${u.is_active ? 'غیرفعال' : 'فعال'}</button></div></div>
+            `;
+            document.getElementById('userDetailModal').style.display = 'flex';
+            await loadPCRoles(userId);
+        } else { alert(data.message); } } catch(e) { alert('خطا'); }
+    }
+
+    async function updateWalletDesktop(userId) {
+        let amount = prompt('مبلغ (تومان):', '0'); if (!amount) return;
+        let operation = confirm('افزایش: OK، کاهش: Cancel') ? 'add' : 'subtract';
+        try { const res = await fetch(`/panel/api/users/${userId}/update-wallet/`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() }, body: JSON.stringify({ amount: parseInt(amount), operation }) }); const data = await res.json(); if (data.success) { alert(data.message); loadUsers(); closeModal('userDetailModal'); } else { alert(data.error); } } catch(e) { alert('خطا'); }
+    }
+
+    async function updatePointsDesktop(userId) {
+        let points = prompt('تعداد امتیاز:', '0'); if (!points) return;
+        let operation = confirm('افزایش: OK، کاهش: Cancel') ? 'add' : 'subtract';
+        try { const res = await fetch(`/panel/api/users/${userId}/update-points/`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() }, body: JSON.stringify({ points: parseInt(points), operation }) }); const data = await res.json(); if (data.success) { alert(data.message); loadUsers(); closeModal('userDetailModal'); } else { alert(data.error); } } catch(e) { alert('خطا'); }
+    }
+
+    document.getElementById('searchInput').addEventListener('input', function() { clearTimeout(searchTimeoutDesktop); searchTimeoutDesktop = setTimeout(() => applyFilters(), 500); });
+    document.getElementById('filterStatus').addEventListener('change', applyFilters);
+    document.getElementById('filterBan').addEventListener('change', applyFilters);
+    document.getElementById('filterOnline').addEventListener('change', applyFilters);
+    document.getElementById('filterVerified').addEventListener('change', applyFilters);
+    document.getElementById('filterPayment').addEventListener('change', applyFilters);
+    window.onclick = function(e) { if (e.target.classList.contains('modal-desktop')) e.target.style.display = 'none'; };
+
+    loadUsers();
+    setInterval(loadUsers, 30000);
+</script>
+{% endblock %}

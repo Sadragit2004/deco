@@ -1,0 +1,1559 @@
+{% extends 'main_template.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+    فروشگاه | Deco B2B
+{% endblock %}
+
+{% block content %}
+
+{% if is_pay != True %}
+    <!-- صفحه مسدود: عضویت کامل نشده -->
+    <div style="display: flex; align-items: center; justify-content: center; min-height: 60vh; text-align: center; padding: 30px;">
+        <div style="background: #fff; border-radius: 24px; padding: 40px 30px; max-width: 500px; width: 100%; box-shadow: 0 20px 35px -10px rgba(0,0,0,0.05); border: 1px solid #eef2f7;">
+            <div style="background: #fef2e8; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                <i class="fas fa-lock" style="font-size: 38px; color: #d25f00;"></i>
+            </div>
+            <h2 style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-bottom: 12px;">فعالسازی اشتراک</h2>
+            <p style="color: #475569; margin-bottom: 24px; line-height: 1.6;">
+                برای مشاهده محصولات و قیمت‌ها، لطفاً ابتدا عضویت خود را تکمیل کنید.
+            </p>
+            <a href="/peyment/membership/pay/page/" style="display: inline-flex; align-items: center; gap: 10px; background: #d25f00; color: white; text-decoration: none; padding: 12px 28px; border-radius: 50px; font-weight: 700; transition: all 0.2s;">
+                <i class="fas fa-wallet"></i> شارژ کیف پول
+                <i class="fas fa-arrow-left" style="font-size: 0.8rem;"></i>
+            </a>
+        </div>
+    </div>
+{% else %}
+    <!-- محتوای اصلی فروشگاه (فقط در صورت is_pay == True نمایش داده می‌شود) -->
+    <style>
+
+        @media (max-width: 768px) {
+      .content-container {
+        padding: 1px 1px 10px;
+      }
+    }
+        /* همه کلاس‌ها با shp_ شروع شدن */
+        .shp_container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .shp_filter_sidebar {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #eef2f7;
+            margin-bottom: 20px;
+        }
+
+        .shp_filter_title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #d25f00;
+            display: inline-block;
+        }
+
+        .shp_price_box {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .shp_price_inputs {
+            display: flex;
+            gap: 12px;
+        }
+
+        .shp_price_input {
+            flex: 1;
+        }
+
+        .shp_price_input label {
+            font-size: 0.7rem;
+            color: #64748b;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .shp_price_input input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+
+        .shp_brands_list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 16px 0;
+        }
+
+        .shp_brand_item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+        }
+
+        .shp_brand_item input {
+            width: 16px;
+            height: 16px;
+            accent-color: #d25f00;
+        }
+
+        .shp_brand_item label {
+            font-size: 0.8rem;
+            color: #334155;
+        }
+
+        .shp_filter_actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #eef2f7;
+        }
+
+        .shp_apply_btn {
+            flex: 1;
+            background: #d25f00;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .shp_reset_btn {
+            flex: 1;
+            background: #f1f5f9;
+            color: #64748b;
+            border: none;
+            border-radius: 12px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .shp_search_sort {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #eef2f7;
+        }
+
+        .shp_search_box {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .shp_search_box input {
+            width: 100%;
+            padding: 12px 45px 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .shp_search_box input:focus {
+            border-color: #d25f00;
+        }
+
+        .shp_search_box i {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .shp_sort_wrapper {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .shp_sort_btn {
+            padding: 6px 14px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #475569;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .shp_sort_btn.active {
+            background: #d25f00;
+            color: white;
+        }
+
+        /* گرید محصولات */
+        .shp_products_grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .shp_product_card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            text-decoration: none;
+            border: 1px solid #eef2f7;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .shp_product_card:active {
+            transform: scale(0.98);
+        }
+
+        .shp_product_img {
+            position: relative;
+            height: 160px;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .shp_product_img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .shp_discount_badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ef4444;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 30px;
+            z-index: 2;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .shp_product_code {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            color: white;
+            font-size: 0.55rem;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 20px;
+            z-index: 2;
+        }
+
+        .shp_product_info {
+            padding: 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .shp_product_brand {
+            font-size: 0.65rem;
+            color: #d25f00;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .shp_product_title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 6px 0;
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .shp_price_meter_row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .shp_current_price {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #d25f00;
+        }
+
+        .shp_current_price small {
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        .shp_old_price {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            text-decoration: line-through;
+            margin-right: 8px;
+        }
+
+        .shp_discount_percent {
+            font-size: 0.65rem;
+            color: #22c55e;
+            font-weight: 600;
+            background: #dcfce7;
+            padding: 2px 6px;
+            border-radius: 20px;
+        }
+
+        .shp_product_meter {
+            font-size: 0.65rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 30px;
+        }
+
+        /* بخش مقدار و دکمه - چیدمان جدید */
+        .shp_bottom_section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eef2f7;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .shp_total_price {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #0f172a;
+            white-space: nowrap;
+        }
+
+        .shp_total_price span {
+            color: #d25f00;
+            font-size: 0.85rem;
+            font-weight: 800;
+        }
+
+        .shp_quantity_control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f5f9;
+            border-radius: 40px;
+            padding: 3px;
+            flex-shrink: 0;
+        }
+
+        .shp_qty_btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #d25f00;
+            transition: all 0.2s;
+        }
+
+        .shp_qty_btn:active {
+            transform: scale(0.95);
+            background: #d25f00;
+            color: white;
+            border-color: #d25f00;
+        }
+
+        .shp_qty_value {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #0f172a;
+            min-width: 28px;
+            text-align: center;
+        }
+
+        /* دکمه افزودن به سبد خرید - چیدمان جدید */
+        .shp_add_to_cart_btn {
+            background: linear-gradient(135deg, #d25f00, #a84c00);
+            border: none;
+            border-radius: 40px;
+            padding: 8px 12px;
+            color: white;
+            font-weight: 700;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .shp_add_to_cart_btn i {
+            font-size: 0.8rem;
+        }
+
+        .shp_add_to_cart_btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(210, 95, 0, 0.3);
+        }
+
+        .shp_add_to_cart_btn:active {
+            transform: scale(0.97);
+        }
+
+        .shp_add_to_cart_btn.loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        /* ========== استایل بهبود یافته پیشنهادات جستجو ========== */
+        .shp_suggestions {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.03);
+            z-index: 1000;
+            max-height: 380px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .shp_suggestions.show {
+            display: block;
+        }
+
+        .shp_suggestion_item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .shp_suggestion_item:last-child {
+            border-bottom: none;
+        }
+
+        .shp_suggestion_item:hover {
+            background: linear-gradient(95deg, #fef9f0 0%, #fef5e8 100%);
+            padding-right: 20px;
+        }
+
+        .shp_suggestion_img {
+            width: 44px;
+            height: 44px;
+            background: #f8fafc;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid #eef2f7;
+        }
+
+        .shp_suggestion_img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .shp_suggestion_img i {
+            font-size: 22px;
+            color: #cbd5e1;
+        }
+
+        .shp_suggestion_info {
+            flex: 1;
+        }
+
+        .shp_suggestion_title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #0f172a;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .shp_suggestion_meta {
+            font-size: 0.65rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .shp_suggestion_badge {
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            color: #d25f00;
+            font-weight: 600;
+        }
+
+        .shp_suggestion_price {
+            font-weight: 700;
+            color: #d25f00;
+            font-size: 0.7rem;
+        }
+
+        /* اسکرول بار پیشنهادات */
+        .shp_suggestions::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .shp_suggestions::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        .shp_suggestions::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        /* موبایل */
+        @media (max-width: 767px) {
+            .shp_products_grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .shp_product_card {
+                flex-direction: row;
+                border-radius: 16px;
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .shp_product_img {
+                width: 95px;
+                height: 95px;
+                border-radius: 12px;
+                flex-shrink: 0;
+            }
+
+            .shp_product_info {
+                padding: 0;
+                flex: 1;
+            }
+
+            .shp_product_brand {
+                font-size: 0.55rem;
+            }
+
+            .shp_product_title {
+                font-size: 0.7rem;
+                margin-bottom: 4px;
+                -webkit-line-clamp: 2;
+            }
+
+            .shp_price_meter_row {
+                margin-bottom: 6px;
+            }
+
+            .shp_current_price {
+                font-size: 0.85rem;
+            }
+
+            .shp_product_meter {
+                font-size: 0.55rem;
+                padding: 2px 6px;
+            }
+
+            .shp_bottom_section {
+                margin-top: 6px;
+                padding-top: 6px;
+                gap: 6px;
+            }
+
+            .shp_total_price {
+                font-size: 0.65rem;
+            }
+
+            .shp_total_price span {
+                font-size: 0.7rem;
+            }
+
+            .shp_quantity_control {
+                padding: 2px;
+            }
+
+            .shp_qty_btn {
+                width: 22px;
+                height: 22px;
+                font-size: 0.8rem;
+            }
+
+            .shp_qty_value {
+                font-size: 0.7rem;
+                min-width: 22px;
+            }
+
+            .shp_add_to_cart_btn {
+                padding: 6px 10px;
+                font-size: 0.65rem;
+                margin-top: 8px;
+            }
+
+            .shp_add_to_cart_btn i {
+                font-size: 0.7rem;
+            }
+
+            .shp_discount_badge {
+                top: 5px;
+                right: 5px;
+                font-size: 0.55rem;
+                padding: 2px 6px;
+            }
+
+            .shp_filter_sidebar {
+                display: none;
+            }
+
+            .shp_suggestion_img {
+                width: 35px;
+                height: 35px;
+            }
+
+            .shp_suggestion_title {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* دسکتاپ */
+        @media (min-width: 768px) {
+            .shp_products_grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+
+            .shp_product_img {
+                height: 200px;
+            }
+
+            .shp_product_card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            }
+
+            .shp_mobile_filter_btn {
+                display: none;
+            }
+
+            .shp_filter_sidebar {
+                width: 280px;
+                position: sticky;
+                top: 90px;
+                margin-bottom: 0;
+            }
+
+            .shp_container {
+                display: flex;
+                gap: 24px;
+                align-items: flex-start;
+            }
+
+            .shp_products_main {
+                flex: 1;
+            }
+
+            .shp_add_to_cart_btn {
+                font-size: 0.75rem;
+                padding: 8px 12px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .shp_products_grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 24px;
+            }
+        }
+
+        .shp_loading {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+
+        .shp_loading.show {
+            display: block;
+        }
+
+        .shp_spinner {
+            width: 35px;
+            height: 35px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #d25f00;
+            border-radius: 50%;
+            animation: shp_spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes shp_spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* مودال موبایل */
+        .shp_modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shp_modal.show {
+            display: flex;
+        }
+
+        .shp_modal_content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            max-height: 85vh;
+            border-radius: 24px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .shp_modal_header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #eef2f7;
+        }
+
+        .shp_modal_header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .shp_modal_close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+        }
+
+        .shp_modal_body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .shp_acc_item {
+            border: 1px solid #eef2f7;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .shp_acc_header {
+            padding: 14px 16px;
+            background: #f8fafc;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .shp_acc_header .shp_chevron {
+            transition: transform 0.3s;
+        }
+
+        .shp_acc_header.active .shp_chevron {
+            transform: rotate(180deg);
+        }
+
+        .shp_acc_body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s;
+        }
+
+        .shp_acc_body.active {
+            max-height: 300px;
+        }
+
+        .shp_acc_content {
+            padding: 16px;
+            border-top: 1px solid #eef2f7;
+        }
+
+        .shp_mobile_brands {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .shp_mobile_brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .shp_mobile_brand input {
+            width: 18px;
+            height: 18px;
+            accent-color: #d25f00;
+        }
+
+        .shp_mobile_brand label {
+            font-size: 0.85rem;
+            color: #334155;
+        }
+
+        .shp_mobile_actions {
+            display: flex;
+            gap: 12px;
+            padding: 16px 20px;
+            border-top: 1px solid #eef2f7;
+        }
+
+        .shp_mobile_apply {
+            flex: 1;
+            background: #d25f00;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .shp_mobile_reset {
+            flex: 1;
+            background: #f1f5f9;
+            color: #64748b;
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+        }
+
+        .shp_mobile_filter_btn {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 50px;
+            padding: 12px 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        /* پیام نوتیفیکیشن */
+        .shp_toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            z-index: 10001;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            white-space: nowrap;
+            font-weight: 600;
+        }
+        .shp_toast.show {
+            opacity: 1;
+        }
+        .shp_toast.error {
+            background: #ef4444;
+        }
+        .shp_toast.success {
+            background: #10b981;
+        }
+    </style>
+
+    <div class="shp_container">
+        <!-- فیلتر دسکتاپ -->
+        <div class="shp_filter_sidebar">
+            <div class="shp_filter_title"><i class="fas fa-filter"></i> فیلترها</div>
+
+            <div class="shp_price_box">
+                <div class="shp_price_inputs">
+                    <div class="shp_price_input">
+                        <label>از (تومان)</label>
+                        <input type="number" id="shp_min_price" value="{{ min_price|default:0 }}">
+                    </div>
+                    <div class="shp_price_input">
+                        <label>تا (تومان)</label>
+                        <input type="number" id="shp_max_price" value="{{ max_price|default:price_max }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="shp_filter_title" style="font-size:0.85rem;"><i class="fas fa-trademark"></i> برندها</div>
+            <div class="shp_brands_list">
+                {% for brand in brands %}
+                <div class="shp_brand_item">
+                    <input type="checkbox" id="shp_brand_{{ brand.slug }}" value="{{ brand.slug }}" {% if selected_brand == brand.slug %}checked{% endif %}>
+                    <label for="shp_brand_{{ brand.slug }}">{{ brand.title }}</label>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="shp_filter_actions">
+                <button class="shp_reset_btn" id="shp_reset_btn">حذف</button>
+                <button class="shp_apply_btn" id="shp_apply_btn">اعمال</button>
+            </div>
+        </div>
+
+        <!-- بخش اصلی -->
+        <div class="shp_products_main">
+
+            <button class="shp_mobile_filter_btn" id="shp_mobile_filter_btn">
+                <i class="fas fa-sliders-h"></i> فیلتر محصولات
+                <i class="fas fa-chevron-left"></i>
+            </button>
+
+            <div class="shp_search_sort">
+                <div class="shp_search_box">
+                    <input type="text" id="shp_search_input" placeholder="جستجوی محصول، برند..." value="{{ search_query }}">
+                    <i class="fas fa-search"></i>
+                    <div id="shp_suggestions" class="shp_suggestions"></div>
+                </div>
+                <div class="shp_sort_wrapper">
+                    <button class="shp_sort_btn {% if sort_by == 'newest' %}active{% endif %}" data-sort="newest">جدیدترین</button>
+                    <button class="shp_sort_btn {% if sort_by == 'expensive' %}active{% endif %}" data-sort="expensive">گران‌ترین</button>
+                    <button class="shp_sort_btn {% if sort_by == 'cheapest' %}active{% endif %}" data-sort="cheapest">ارزان‌ترین</button>
+                    <button class="shp_sort_btn {% if sort_by == 'bestseller' %}active{% endif %}" data-sort="bestseller">پرفروش‌ترین</button>
+                </div>
+            </div>
+
+            <div class="shp_products_grid" id="shp_products_grid">
+                {% for product in products %}
+                <div class="shp_product_card" data-product-id="{{ product.id }}" data-price="{{ product.final_price }}" data-product-slug="{{ product.slug }}" data-product-name="{{ product.title|escapejs }}">
+                    <div class="shp_product_img">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.title }}" loading="lazy">
+                        {% else %}
+                            <i class="fas fa-box" style="font-size: 50px; color: #cbd5e1;"></i>
+                        {% endif %}
+                        {% if product.has_discount %}
+                            <div class="shp_discount_badge">-{{ product.discount_percent }}%</div>
+                        {% endif %}
+                        {% if product.code %}
+                            <div class="shp_product_code">{{ product.code }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="shp_product_info">
+                        {% if product.brand %}
+                            <div class="shp_product_brand">{{ product.brand.title }}</div>
+                        {% endif %}
+                        <h3 class="shp_product_title">{{ product.title|truncatechars:45 }}</h3>
+                        <div class="shp_price_meter_row">
+                            <div class="shp_product_price">
+                                {% if product.has_discount %}
+                                    <span class="shp_current_price">{{ product.final_price_display }} <small>تومان</small></span>
+                                    <span class="shp_old_price">{{ product.old_price_display }}</span>
+                                    <span class="shp_discount_percent">٪{{ product.discount_percent }} تخفیف</span>
+                                {% else %}
+                                    <span class="shp_current_price">{{ product.final_price_display }} <small>تومان</small></span>
+                                {% endif %}
+                            </div>
+                            <div class="shp_product_meter">
+                                <i class="fas fa-ruler-combined"></i> {{ product.sales_unit_symbol|default:'متر مربع' }}
+                            </div>
+                        </div>
+
+                        <div class="shp_bottom_section">
+                            <div class="shp_total_price">
+                                هزینه نهایی: <span class="shp_total_amount">0</span> تومان
+                            </div>
+                            <div class="shp_quantity_control">
+                                <button class="shp_qty_btn shp_qty_minus">-</button>
+                                <span class="shp_qty_value">1</span>
+                                <button class="shp_qty_btn shp_qty_plus">+</button>
+                            </div>
+                        </div>
+
+                        <button class="shp_add_to_cart_btn" onclick="addProductToCart(event, {{ product.id }}, {{ product.final_price }}, '{{ product.sales_unit_symbol|default:'متر مربع'|escapejs }}', '{{ product.title|escapejs }}')">
+                            <i class="fas fa-plus-circle"></i> افزودن به سبد خرید
+                        </button>
+                    </div>
+                </div>
+                {% empty %}
+                <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
+                    <i class="fas fa-box-open" style="font-size: 50px; color: #cbd5e1;"></i>
+                    <h3 style="margin-top: 16px;">محصولی یافت نشد</h3>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="shp_loading" id="shp_loading">
+                <div class="shp_spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال فیلتر موبایل -->
+    <div id="shp_modal" class="shp_modal">
+        <div class="shp_modal_content">
+            <div class="shp_modal_header">
+                <h3><i class="fas fa-filter"></i> فیلتر محصولات</h3>
+                <button class="shp_modal_close" id="shp_modal_close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="shp_modal_body">
+                <div class="shp_acc_item">
+                    <div class="shp_acc_header" id="shp_price_header">
+                        <span><i class="fas fa-money-bill-wave"></i> محدوده قیمت</span>
+                        <i class="fas fa-chevron-down shp_chevron"></i>
+                    </div>
+                    <div class="shp_acc_body" id="shp_price_body">
+                        <div class="shp_acc_content">
+                            <div class="shp_price_inputs">
+                                <div class="shp_price_input">
+                                    <label>از (تومان)</label>
+                                    <input type="number" id="shp_mobile_min" value="{{ min_price|default:0 }}">
+                                </div>
+                                <div class="shp_price_input">
+                                    <label>تا (تومان)</label>
+                                    <input type="number" id="shp_mobile_max" value="{{ max_price|default:price_max }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="shp_acc_item">
+                    <div class="shp_acc_header" id="shp_brands_header">
+                        <span><i class="fas fa-trademark"></i> برندها</span>
+                        <i class="fas fa-chevron-down shp_chevron"></i>
+                    </div>
+                    <div class="shp_acc_body" id="shp_brands_body">
+                        <div class="shp_acc_content">
+                            <div class="shp_mobile_brands">
+                                {% for brand in brands %}
+                                <div class="shp_mobile_brand">
+                                    <input type="checkbox" id="shp_mobile_brand_{{ brand.slug }}" value="{{ brand.slug }}" {% if selected_brand == brand.slug %}checked{% endif %}>
+                                    <label for="shp_mobile_brand_{{ brand.slug }}">{{ brand.title }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="shp_mobile_actions">
+                <button class="shp_mobile_reset" id="shp_mobile_reset">حذف فیلتر</button>
+                <button class="shp_mobile_apply" id="shp_mobile_apply">اعمال فیلتر</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Message -->
+    <div id="shpToast" class="shp_toast"></div>
+
+    <script>
+        // ============================================
+        // توابع کمکی
+        // ============================================
+        function getCsrfToken() {
+            const cookieValue = document.cookie.match('(^|; )csrftoken=([^;]*)');
+            return cookieValue ? cookieValue[2] : '';
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('shpToast');
+            toast.textContent = message;
+            toast.className = 'shp_toast ' + (isError ? 'error' : 'success');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // ============================================
+        // تابع آپدیت کامل سبد خرید (شمارنده + لیست)
+        // ============================================
+        async function refreshCart() {
+            try {
+                // آپدیت شمارنده
+                const countResponse = await fetch('/order/cart/data/');
+                const countData = await countResponse.json();
+
+                if (countData.success && countData.items) {
+                    let totalQuantity = 0;
+                    countData.items.forEach(item => {
+                        totalQuantity += item.quantity;
+                    });
+
+                    const cartCountElem = document.getElementById('cartCount');
+                    if (cartCountElem) {
+                        cartCountElem.innerText = totalQuantity;
+                        cartCountElem.style.transform = 'scale(1.2)';
+                        setTimeout(() => {
+                            if (cartCountElem) cartCountElem.style.transform = 'scale(1)';
+                        }, 200);
+                    }
+
+                    // آپدیت متغیر سراسری cart و رندر سبد خرید اگر پنل باز است
+                    if (typeof window.loadCartFromAPI === 'function') {
+                        await window.loadCartFromAPI();
+                    } else if (typeof window.cart !== 'undefined') {
+                        window.cart = countData.items.map(item => ({
+                            id: item.product_id,
+                            name: item.name,
+                            price: parseFloat(item.price),
+                            priceStr: item.price_display,
+                            meter: "متر مربع",
+                            code: item.code || "PRO-" + item.product_id,
+                            brand: item.brand || "برند",
+                            guarantee: "۱۲ ماه",
+                            img: item.image,
+                            qty: item.quantity,
+                            slug: item.slug,
+                            has_discount: item.has_discount,
+                            original_price: item.original_price,
+                            original_price_display: item.original_price_display
+                        }));
+
+                        if (typeof window.renderCart === 'function') {
+                            window.renderCart();
+                        }
+                    }
+                } else if (countData.success && (!countData.items || countData.items.length === 0)) {
+                    const cartCountElem = document.getElementById('cartCount');
+                    if (cartCountElem) cartCountElem.innerText = '0';
+
+                    if (typeof window.cart !== 'undefined') {
+                        window.cart = [];
+                        if (typeof window.renderCart === 'function') {
+                            window.renderCart();
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error refreshing cart:', error);
+            }
+        }
+
+        // ============================================
+        // تابع اضافه کردن به سبد خرید با تعداد انتخابی
+        // ============================================
+        window.addProductToCart = async function(event, productId, price, unitSymbol, productName) {
+            // جلوگیری از propagation به کارت محصول
+            event.stopPropagation();
+
+            // پیدا کردن کارت محصول و گرفتن تعداد انتخابی
+            const card = event.target.closest('.shp_product_card');
+            if (!card) return;
+
+            const qtySpan = card.querySelector('.shp_qty_value');
+            const quantity = parseInt(qtySpan?.textContent) || 1;
+
+            // نمایش حالت لودینگ روی دکمه
+            const btn = event.currentTarget;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.classList.add('loading');
+
+            try {
+                const response = await fetch('/order/cart/add/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken(),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        quantity: quantity
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast(`✅ ${quantity} ${unitSymbol} "${productName}" به سبد اضافه شد`);
+
+                    // رفرش کامل سبد خرید (شمارنده و لیست)
+                    await refreshCart();
+
+                    // انیمیشن روی دکمه
+                    btn.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        btn.style.transform = '';
+                    }, 200);
+                } else {
+                    showToast(data.message || 'خطا در افزودن محصول', true);
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                showToast('خطا در ارتباط با سرور', true);
+            } finally {
+                btn.innerHTML = originalHtml;
+                btn.classList.remove('loading');
+            }
+        };
+
+        // ============================================
+        // متغیرهای صفحه
+        // ============================================
+        let shp_page = 1;
+        let shp_loading = false;
+        let shp_has_next = {{ products_page_obj.has_next|lower }};
+        let shp_price_max = {{ price_max|default:10000000 }};
+
+        function shp_toggle(header, body) {
+            header.classList.toggle('active');
+            body.classList.toggle('active');
+        }
+
+        const shp_price_header = document.getElementById('shp_price_header');
+        const shp_price_body = document.getElementById('shp_price_body');
+        const shp_brands_header = document.getElementById('shp_brands_header');
+        const shp_brands_body = document.getElementById('shp_brands_body');
+
+        if (shp_price_header) shp_price_header.onclick = () => shp_toggle(shp_price_header, shp_price_body);
+        if (shp_brands_header) shp_brands_header.onclick = () => shp_toggle(shp_brands_header, shp_brands_body);
+
+        setTimeout(() => {
+            if (shp_price_header && shp_price_body) shp_price_header.click();
+        }, 100);
+
+        // مودال
+        const shp_modal_btn = document.getElementById('shp_mobile_filter_btn');
+        const shp_modal = document.getElementById('shp_modal');
+        const shp_modal_close = document.getElementById('shp_modal_close');
+
+        if (shp_modal_btn) {
+            shp_modal_btn.onclick = () => shp_modal.classList.add('show');
+        }
+
+        function shp_close_modal() {
+            shp_modal.classList.remove('show');
+        }
+
+        if (shp_modal_close) shp_modal_close.onclick = shp_close_modal;
+        if (shp_modal) shp_modal.onclick = (e) => { if (e.target === shp_modal) shp_close_modal(); };
+
+        // فیلتر موبایل
+        const shp_mobile_apply = document.getElementById('shp_mobile_apply');
+        if (shp_mobile_apply) {
+            shp_mobile_apply.onclick = () => {
+                let brand = '';
+                document.querySelectorAll('.shp_mobile_brand input:checked').forEach(cb => { brand = cb.value; });
+                let min_price = document.getElementById('shp_mobile_min').value;
+                let max_price = document.getElementById('shp_mobile_max').value;
+                let url = window.location.pathname + '?';
+                if (brand) url += `brand=${brand}&`;
+                if (min_price && min_price > 0) url += `min_price=${min_price}&`;
+                if (max_price && max_price < shp_price_max) url += `max_price=${max_price}`;
+                window.location.href = url;
+                shp_close_modal();
+            };
+        }
+
+        const shp_mobile_reset = document.getElementById('shp_mobile_reset');
+        if (shp_mobile_reset) {
+            shp_mobile_reset.onclick = () => {
+                window.location.href = window.location.pathname;
+                shp_close_modal();
+            };
+        }
+
+        // فیلتر دسکتاپ
+        function shp_get_brand() {
+            let brand = '';
+            document.querySelectorAll('.shp_brand_item input:checked').forEach(cb => { brand = cb.value; });
+            return brand;
+        }
+
+        const shp_apply = document.getElementById('shp_apply_btn');
+        if (shp_apply) {
+            shp_apply.onclick = () => {
+                const brand = shp_get_brand();
+                const min_price = document.getElementById('shp_min_price').value;
+                const max_price = document.getElementById('shp_max_price').value;
+                let url = window.location.pathname + '?';
+                if (brand) url += `brand=${brand}&`;
+                if (min_price && min_price > 0) url += `min_price=${min_price}&`;
+                if (max_price && max_price < shp_price_max) url += `max_price=${max_price}`;
+                window.location.href = url;
+            };
+        }
+
+        const shp_reset = document.getElementById('shp_reset_btn');
+        if (shp_reset) {
+            shp_reset.onclick = () => {
+                window.location.href = window.location.pathname;
+            };
+        }
+
+        // مرتب‌سازی
+        document.querySelectorAll('.shp_sort_btn').forEach(btn => {
+            btn.onclick = () => {
+                const sort = btn.dataset.sort;
+                let url = window.location.pathname + `?sort=${sort}`;
+                const brand = shp_get_brand();
+                const min_price = document.getElementById('shp_min_price')?.value;
+                const max_price = document.getElementById('shp_max_price')?.value;
+                if (brand) url += `&brand=${brand}`;
+                if (min_price && min_price > 0) url += `&min_price=${min_price}`;
+                if (max_price && max_price < shp_price_max) url += `&max_price=${max_price}`;
+                window.location.href = url;
+            };
+        });
+
+        // جستجو با پیشنهادات
+        const shp_search = document.getElementById('shp_search_input');
+        const shp_suggestions = document.getElementById('shp_suggestions');
+        let shp_timeout;
+
+        if (shp_search) {
+            shp_search.oninput = function() {
+                const query = this.value.trim();
+                if (query.length < 2) {
+                    shp_suggestions.classList.remove('show');
+                    return;
+                }
+                clearTimeout(shp_timeout);
+                shp_timeout = setTimeout(() => {
+                    fetch(`/product/search-suggestions/?q=${encodeURIComponent(query)}`)
+                        .then(res => res.json())
+                        .then(result => {
+                            if (result.status === 'success' && result.data.length > 0) {
+                                shp_suggestions.innerHTML = result.data.map(item => `
+                                    <div class="shp_suggestion_item" onclick="location.href='${item.url}'">
+                                        <div class="shp_suggestion_img">
+                                            ${item.image ? `<img src="${item.image}" alt="${item.title}">` : '<i class="fas fa-box"></i>'}
+                                        </div>
+                                        <div class="shp_suggestion_info">
+                                            <div class="shp_suggestion_title">${item.title}</div>
+                                            <div class="shp_suggestion_meta">
+                                                <span class="shp_suggestion_badge">${item.type_name}</span>
+                                                ${item.price ? `<span class="shp_suggestion_price">${item.price} تومان</span>` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('');
+                                shp_suggestions.classList.add('show');
+                            } else {
+                                shp_suggestions.innerHTML = `<div style="padding: 16px; text-align: center; color: #94a3b8;">نتیجه‌ای یافت نشد</div>`;
+                                shp_suggestions.classList.add('show');
+                            }
+                        })
+                        .catch(() => {
+                            shp_suggestions.innerHTML = `<div style="padding: 16px; text-align: center; color: #ef4444;">خطا در ارتباط با سرور</div>`;
+                            shp_suggestions.classList.add('show');
+                        });
+                }, 350);
+            };
+
+            shp_search.onkeypress = function(e) {
+                if (e.key === 'Enter') {
+                    shp_suggestions.classList.remove('show');
+                    window.location.href = window.location.pathname + `?search=${encodeURIComponent(this.value)}`;
+                }
+            };
+        }
+
+        document.onclick = function(e) {
+            if (!e.target.closest('.shp_search_box')) {
+                if (shp_suggestions) shp_suggestions.classList.remove('show');
+            }
+        };
+
+        // کنترل تعداد و محاسبه هزینه نهایی
+        function initQuantityControls() {
+            document.querySelectorAll('.shp_product_card').forEach(card => {
+                let priceText = card.dataset.price;
+                let price = parseInt(priceText) || 0;
+
+                const minusBtn = card.querySelector('.shp_qty_minus');
+                const plusBtn = card.querySelector('.shp_qty_plus');
+                const qtySpan = card.querySelector('.shp_qty_value');
+                const totalSpan = card.querySelector('.shp_total_amount');
+
+                let qty = 1;
+
+                function updateTotal() {
+                    const total = price * qty;
+                    totalSpan.textContent = total.toLocaleString('fa-IR');
+                }
+
+                if (minusBtn) {
+                    minusBtn.onclick = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (qty > 1) {
+                            qty--;
+                            qtySpan.textContent = qty;
+                            updateTotal();
+                        }
+                    };
+                }
+
+                if (plusBtn) {
+                    plusBtn.onclick = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        qty++;
+                        qtySpan.textContent = qty;
+                        updateTotal();
+                    };
+                }
+
+                updateTotal();
+
+                // کلیک روی کارت برای رفتن به صفحه محصول (فقط اگر روی دکمه ها کلیک نشده)
+                card.addEventListener('click', (e) => {
+                    if (!e.target.closest('.shp_quantity_control') &&
+                        !e.target.closest('.shp_qty_btn') &&
+                        !e.target.closest('.shp_add_to_cart_btn')) {
+                        window.location.href = `/product/${card.dataset.productSlug}/`;
+                    }
+                });
+            });
+        }
+
+        // لود مور
+        function shp_load_more() {
+            if (shp_loading || !shp_has_next) return;
+            shp_loading = true;
+            const spinner = document.getElementById('shp_loading');
+            if (spinner) spinner.classList.add('show');
+            const next = shp_page + 1;
+            const url = new URL(window.location.href);
+            url.searchParams.set('page', next);
+            fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success' && data.data.length > 0) {
+                        const grid = document.getElementById('shp_products_grid');
+                        data.data.forEach(p => {
+                            const priceNum = parseInt(p.price.replace(/,/g, '')) || 0;
+                            const html = `
+                                <div class="shp_product_card" data-product-id="${p.id}" data-price="${priceNum}" data-product-slug="${p.slug}" data-product-name="${p.title.replace(/'/g, "\\'")}">
+                                    <div class="shp_product_img">
+                                        ${p.image ? `<img src="${p.image}" loading="lazy">` : '<i class="fas fa-box" style="font-size:50px;color:#cbd5e1;"></i>'}
+                                        ${p.has_discount ? `<div class="shp_discount_badge">-${p.discount_percent}%</div>` : ''}
+                                        ${p.code ? `<div class="shp_product_code">${p.code}</div>` : ''}
+                                    </div>
+                                    <div class="shp_product_info">
+                                        ${p.brand ? `<div class="shp_product_brand">${p.brand}</div>` : ''}
+                                        <h3 class="shp_product_title">${p.title}</h3>
+                                        <div class="shp_price_meter_row">
+                                            <div class="shp_product_price">
+                                                ${p.has_discount ?
+                                                    `<span class="shp_current_price">${p.price} <small>تومان</small></span>
+                                                     <span class="shp_old_price">${p.old_price}</span>
+                                                     <span class="shp_discount_percent">٪${p.discount_percent} تخفیف</span>` :
+                                                    `<span class="shp_current_price">${p.price} <small>تومان</small></span>`
+                                                }
+                                            </div>
+                                            <div class="shp_product_meter"><i class="fas fa-ruler-combined"></i> ${p.sales_unit || 'متر مربع'}</div>
+                                        </div>
+                                        <div class="shp_bottom_section">
+                                            <div class="shp_total_price">هزینه نهایی: <span class="shp_total_amount">0</span> تومان</div>
+                                            <div class="shp_quantity_control">
+                                                <button class="shp_qty_btn shp_qty_minus">-</button>
+                                                <span class="shp_qty_value">1</span>
+                                                <button class="shp_qty_btn shp_qty_plus">+</button>
+                                            </div>
+                                        </div>
+                                        <button class="shp_add_to_cart_btn" onclick="addProductToCart(event, ${p.id}, ${priceNum}, '${p.sales_unit || 'متر مربع'}', '${p.title.replace(/'/g, "\\'")}')">
+                                            <i class="fas fa-plus-circle"></i> افزودن به سبد خرید
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            grid.insertAdjacentHTML('beforeend', html);
+                        });
+                        initQuantityControls();
+                        shp_page = next;
+                        shp_has_next = data.has_next;
+                    }
+                    shp_loading = false;
+                    if (spinner) spinner.classList.remove('show');
+                }).catch(() => {
+                    shp_loading = false;
+                    if (spinner) spinner.classList.remove('show');
+                });
+        }
+
+        window.onscroll = function() {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+                shp_load_more();
+            }
+        };
+
+        initQuantityControls();
+
+        // بارگذاری اولیه شمارنده و سبد
+        refreshCart();
+    </script>
+{% endif %}
+
+{% endblock %}

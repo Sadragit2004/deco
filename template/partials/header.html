@@ -1,0 +1,1092 @@
+<header class="main-header">
+    <div class="header-right-side">
+        <div class="menu-toggle-mobile" id="mobileMenuBtn"><i class="fas fa-bars"></i></div>
+        <div class="header-logo">
+            <div class="logo-icon-side">
+                <img src="/media/images/logo1.jpg" alt="Logo">
+            </div>
+            <div class="header-logo-text"><strong>Deco B2B</strong><span>تخصصی B2B</span></div>
+        </div>
+
+        <div class="desktop-nav-accordion" id="desktopNavAccordion">
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <i class="fas fa-cube"></i> محصولات
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="accordion-content categories-list" id="categoriesListMenu">
+                    <div class="loading-menu">⏳ در حال بارگذاری دسته‌بندی‌ها...</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <a style="color: #333; text-decoration: none;" href="/"><i class="fas fa-home"></i> خانه</a>
+                </div>
+            </div>
+
+
+             <div class="accordion-item">
+                <div class="accordion-header">
+                    <a style="color: #333; text-decoration: none;" href="/pro"><i class="fas fa-chalkboard-user"> </i> سفارش چاپی</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-wrapper">
+        <div class="search-box-header">
+            <i class="fas fa-search search-icon-header"></i>
+            <input type="text" id="globalSearchInput" placeholder="جستجوی محصول، برند، کاتالوگ..." autocomplete="off">
+            <button class="search-btn-header" id="searchBtnHeader"><i class="fas fa-arrow-left"></i></button>
+        </div>
+        <div class="search-suggestions" id="searchSuggestions"></div>
+    </div>
+
+    <div class="header-actions">
+        <div class="icon-btn-header" id="cartIcon"><i class="fas fa-shopping-bag"></i><span class="badge-count" id="cartCount">0</span></div>
+        <div class="icon-btn-header" id="notifIcon"><i class="far fa-bell"></i><span class="badge-count">0</span></div>
+    </div>
+</header>
+
+<style>
+/* ========== RESET & BASE ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.main-header {
+    background: white;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.header-right-side {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 0 0 auto;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-icon-side img {
+    height: 45px;
+    width: auto;
+    border-radius: 8px;
+}
+
+.header-logo-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.header-logo-text strong {
+    font-size: 1.2rem;
+    color: #1e293b;
+}
+
+.header-logo-text span {
+    font-size: 0.7rem;
+    color: #64748b;
+}
+
+/* ========== جستجو ========== */
+.search-wrapper {
+    position: relative;
+    flex: 1;
+    max-width: 500px;
+}
+
+.search-box-header {
+    display: flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #c8ccd1;
+    border-radius: 60px;
+    padding: 4px 4px 4px 8px;
+    transition: all 0.3s;
+}
+
+.search-box-header:focus-within {
+    border-color: #d25f00;
+    box-shadow: 0 0 0 3px rgba(210,95,0,0.1);
+    background: white;
+}
+
+.search-icon-header {
+    padding: 10px 8px;
+    color: #94a3b8;
+}
+
+.search-box-header input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 10px 8px;
+    font-size: 0.85rem;
+    outline: none;
+}
+
+.search-btn-header {
+    background: linear-gradient(135deg, #d25f00, #a84a00);
+    border: none;
+    border-radius: 50px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    color: white;
+    transition: all 0.2s;
+}
+
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    display: none;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1001;
+    margin-top: 8px;
+    padding: 8px 0;
+}
+
+.search-suggestions.show {
+    display: block;
+}
+
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.suggestion-item:not(:last-child) {
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.suggestion-item:hover {
+    background: #fef5ed;
+}
+
+.suggestion-img {
+    width: 45px;
+    height: 45px;
+    background: #f8fafc;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid #eef2f7;
+}
+
+.suggestion-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* ========== منوی اصلی - کاملاً ریسپانسیو ========== */
+.desktop-nav-accordion {
+    display: flex;
+    gap: 8px;
+}
+
+.accordion-item {
+    position: relative;
+}
+
+.accordion-header {
+    padding: 8px 16px;
+    background: #f1f5f9;
+    border-radius: 40px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.accordion-header:hover {
+    background: #e2e8f0;
+}
+
+.accordion-header i:first-child {
+    color: #d25f00;
+}
+
+/* لیست دسته بندی سطح اول */
+.accordion-content {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    min-width: 260px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+    padding: 8px 0;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s;
+}
+
+.accordion-item:hover .accordion-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* آیتم دسته بندی */
+.category-item-menu {
+    position: relative;
+}
+
+.category-main-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    color: #334155;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.category-main-link:hover {
+    background: #fef5ed;
+    color: #d25f00;
+}
+
+.category-main-link i:first-child {
+    width: 24px;
+    color: #94a3b8;
+}
+
+.chevron-left {
+    font-size: 0.7rem;
+    color: #cbd5e1;
+}
+
+/* ========== منوی 3 ستونه ========== */
+.mega-3col-menu {
+    position: absolute;
+    top: 0;
+    right: 100%;
+    width: 750px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.15);
+    display: none;
+    margin-right: 8px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.category-item-menu:hover .mega-3col-menu {
+    display: block;
+}
+
+.mega-3col-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mega-3col-menu::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.mega-3col-menu::-webkit-scrollbar-thumb {
+    background: #d25f00;
+    border-radius: 10px;
+}
+
+.mega-3col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    padding: 20px;
+}
+
+.mega-col {
+    padding: 0 10px;
+    border-right: 1px solid #eef2f7;
+    display: flex;
+    flex-direction: column;
+    max-height: 460px;
+    overflow-y: auto;
+}
+
+.mega-col:last-child {
+    border-right: none;
+}
+
+.mega-col::-webkit-scrollbar {
+    width: 4px;
+}
+
+.mega-col::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.mega-col::-webkit-scrollbar-thumb {
+    background: #d25f00;
+    border-radius: 10px;
+}
+
+.mega-col-title {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #d25f00;
+    display: inline-block;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 5;
+    width: 100%;
+}
+
+/* ========== استایل برندها ========== */
+.brands-list-mega {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.brand-item-mega {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: #fafcff;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.25s;
+    border: 1px solid #f0f2f5;
+}
+
+.brand-item-mega:hover {
+    background: #fff6ef;
+    border-color: #ffe0cc;
+    transform: translateX(-2px);
+}
+
+.brand-img-mega {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid #eef2f7;
+    padding: 4px;
+}
+
+.brand-img-mega img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.brand-img-mega i {
+    font-size: 22px;
+    color: #94a3b8;
+}
+
+.brand-name-mega {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 0.8rem;
+    margin-bottom: 2px;
+}
+
+.brand-count-mega {
+    font-size: 0.55rem;
+    color: #64748b;
+}
+
+/* ========== کاتالوگ‌ها ========== */
+.catalogs-list-mega {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.catalog-item-mega {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: #fafcff;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.25s;
+    border: 1px solid #f0f2f5;
+}
+
+.catalog-item-mega:hover {
+    background: #fff6ef;
+    border-color: #ffe0cc;
+    transform: translateX(-2px);
+}
+
+.catalog-item-mega i {
+    font-size: 28px;
+    color: #ef4444;
+    flex-shrink: 0;
+}
+
+.catalog-info-mega {
+    flex: 1;
+}
+
+.catalog-title-mega {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 0.75rem;
+    margin-bottom: 3px;
+    line-height: 1.3;
+}
+
+.catalog-date-mega {
+    font-size: 0.5rem;
+    color: #94a3b8;
+}
+
+/* ========== پرفروش‌ها ========== */
+.bestsellers-list-mega {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bestseller-item-mega {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: #fafcff;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.25s;
+    border: 1px solid #f0f2f5;
+}
+
+.bestseller-item-mega:hover {
+    background: #fff6ef;
+    border-color: #ffe0cc;
+    transform: translateX(-2px);
+}
+
+.bestseller-img-mega {
+    width: 48px;
+    height: 48px;
+    background: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid #eef2f7;
+    padding: 4px;
+}
+
+.bestseller-img-mega img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.bestseller-img-mega i {
+    font-size: 26px;
+    color: #94a3b8;
+}
+
+.bestseller-info-mega {
+    flex: 1;
+}
+
+.bestseller-title-mega {
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.bestseller-price-mega {
+    font-size: 0.65rem;
+    color: #d25f00;
+    font-weight: 700;
+}
+
+/* ========== اکشن هدر ========== */
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.icon-btn-header {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.icon-btn-header:hover {
+    background: #e2e8f0;
+}
+
+.badge-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ef4444;
+    color: white;
+    font-size: 0.55rem;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-menu {
+    padding: 30px;
+    text-align: center;
+    color: #64748b;
+    font-size: 0.8rem;
+}
+
+.menu-toggle-mobile {
+    display: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+}
+
+/* ========== ریسپانسیو بهبود یافته ========== */
+
+/* لپ‌تاپ بزرگ (1280px تا 1400px) - منو کوچک‌تر می‌شود ولی مخفی نمی‌شود */
+@media (max-width: 1280px) {
+    .mega-3col-menu {
+        width: 680px;
+    }
+
+    .mega-3col {
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .accordion-header {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+}
+
+/* لپ‌تاپ متوسط (1150px تا 1280px) */
+@media (max-width: 1150px) {
+    .mega-3col-menu {
+        width: 600px;
+        right: auto;
+        left: -50px;
+    }
+
+    .accordion-header {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
+
+    .header-right-side {
+        gap: 12px;
+    }
+}
+
+/* لپ‌تاپ کوچک (تا 1050px) - منوی دسکتاپ هنوز نمایش داده می‌شود */
+@media (max-width: 1050px) {
+    .mega-3col-menu {
+        width: 550px;
+        left: -80px;
+    }
+
+    .accordion-header {
+        padding: 5px 8px;
+        font-size: 0.7rem;
+    }
+}
+
+/* نقطه شکست اصلی - فقط در عرض کمتر از 992px منوی همبرگر نمایش داده می‌شود */
+@media (max-width: 992px) {
+    .desktop-nav-accordion {
+        display: none;
+    }
+
+    .menu-toggle-mobile {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+
+    .mega-3col-menu {
+        width: 95vw;
+        right: auto;
+        left: 0;
+        position: fixed;
+        top: auto;
+        max-height: 70vh;
+        z-index: 2000;
+    }
+
+    .mega-3col {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+
+    .mega-col {
+        border-right: none;
+        border-bottom: 1px solid #eef2f7;
+        padding-bottom: 12px;
+        margin-bottom: 5px;
+        max-height: 250px;
+    }
+
+    .mega-col:last-child {
+        border-bottom: none;
+    }
+
+    .accordion-content {
+        position: fixed;
+        top: 70px;
+        right: 0;
+        left: 0;
+        width: 100%;
+        max-height: 80vh;
+        overflow-y: auto;
+        border-radius: 0;
+    }
+}
+
+/* تبلت (768px تا 992px) */
+@media (max-width: 768px) {
+    .main-header {
+        padding: 10px 12px;
+        gap: 10px;
+    }
+
+    .header-right-side {
+        gap: 10px;
+    }
+
+    .menu-toggle-mobile {
+        width: 34px;
+        height: 34px;
+    }
+    .menu-toggle-mobile i {
+        font-size: 1.1rem;
+    }
+
+    .logo-icon-side img {
+        height: 32px;
+    }
+
+    .header-logo-text strong {
+        font-size: 0.9rem;
+    }
+
+    .header-logo-text span {
+        font-size: 0.5rem;
+    }
+
+    .search-wrapper {
+        order: 3;
+        width: 100%;
+        max-width: none;
+        flex: auto;
+        margin-top: 6px;
+    }
+
+
+    .search-icon-header {
+        padding: 7px 5px;
+        font-size: 0.75rem;
+    }
+
+    .search-box-header input {
+        padding: 7px 5px;
+        font-size: 0.75rem;
+    }
+
+    .search-btn-header {
+        width: 30px;
+        height: 30px;
+    }
+
+    .search-btn-header i {
+        font-size: 0.75rem;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+
+    .icon-btn-header {
+        width: 34px;
+        height: 34px;
+    }
+
+    .icon-btn-header i {
+        font-size: 20px;
+    }
+
+    .badge-count {
+        width: 16px;
+        height: 16px;
+        font-size: 0.5rem;
+        top: -4px;
+        right: -4px;
+    }
+
+    .search-suggestions {
+        max-height: 300px;
+        border-radius: 12px;
+    }
+
+    .suggestion-item {
+        padding: 8px 12px;
+        gap: 10px;
+    }
+
+    .suggestion-img {
+        width: 38px;
+        height: 38px;
+    }
+}
+
+/* موبایل خیلی کوچک */
+@media (max-width: 480px) {
+    .main-header {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .header-right-side {
+        gap: 8px;
+    }
+
+    .menu-toggle-mobile {
+        width: 30px;
+        height: 30px;
+    }
+    .menu-toggle-mobile i {
+        font-size: 1rem;
+    }
+
+    .logo-icon-side img {
+        height: 28px;
+    }
+
+    .header-logo-text strong {
+        font-size: 0.8rem;
+    }
+
+    .header-logo-text span {
+        font-size: 0.45rem;
+    }
+
+    .icon-btn-header {
+        width: 30px;
+        height: 30px;
+    }
+
+    .icon-btn-header i {
+        font-size:20px;
+    }
+
+    .search-box-header input {
+        font-size: 0.7rem;
+        padding: 6px 4px;
+    }
+
+    .search-icon-header {
+        font-size: 0.7rem;
+        padding: 5px 3px;
+    }
+
+    .search-btn-header {
+        width: 28px;
+        height: 28px;
+    }
+
+    .search-btn-header i {
+        font-size: 0.65rem;
+    }
+}
+
+/* سایدبار موبایل */
+.sidebar {
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 992px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 280px;
+        transform: translateX(100%);
+        z-index: 1100;
+        background: white;
+        box-shadow: -2px 0 20px rgba(0,0,0,0.1);
+    }
+
+    .sidebar.open-mobile {
+        transform: translateX(0);
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetchCategoriesForMenu();
+    setupSearch();
+});
+
+async function fetchCategoriesForMenu() {
+    const container = document.getElementById('categoriesListMenu');
+    if (!container) return;
+    try {
+        const response = await fetch('/product/noneParentCategory/');
+        const result = await response.json();
+        if (result.status === 'success' && result.data && result.data.length > 0) {
+            container.innerHTML = result.data.map(cat => `
+                <div class="category-item-menu" data-category-id="${cat.id}" data-category-slug="${cat.slug}">
+                    <div class="category-main-link">
+                        <a href="/product/shop/?category=${cat.slug}" style="color: inherit; text-decoration: none; display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <i class="fas ${getCategoryIcon(cat.name)}"></i>
+                                <span>${escapeHtml(cat.name)}</span>
+                            </div>
+                            <i class="fas fa-chevron-left chevron-left"></i>
+                        </a>
+                    </div>
+                    <div class="mega-3col-menu" id="megaMenu-${cat.id}">
+                        <div class="loading-menu">⏳ بارگذاری...</div>
+                    </div>
+                </div>
+            `).join('');
+            for (const cat of result.data) {
+                fetchMegaMenuData(cat.id, cat.slug);
+            }
+        } else {
+            container.innerHTML = '<div style="padding:20px;text-align:center;">دسته‌بندی موجود نیست</div>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        container.innerHTML = '<div style="padding:20px;text-align:center;">خطا در بارگذاری</div>';
+    }
+}
+
+async function fetchMegaMenuData(categoryId, categorySlug) {
+    const megaContainer = document.getElementById(`megaMenu-${categoryId}`);
+    if (!megaContainer) return;
+    try {
+        const response = await fetch(`/product/category-mega-menu/${categorySlug}/`);
+        const result = await response.json();
+        if (result.status === 'success') {
+            const data = result.data;
+            const brandsHtml = data.brands && data.brands.length > 0 ? data.brands.map(brand => `
+                <a href="/product/shop/?brand=${brand.slug}" class="brand-item-mega">
+                    <div class="brand-img-mega">${brand.image ? `<img src="${brand.image}" alt="${escapeHtml(brand.name)}" onerror="this.parentElement.innerHTML='<i class=\'fas fa-building\'></i>'">` : '<i class="fas fa-building"></i>'}</div>
+                    <div><div class="brand-name-mega">${escapeHtml(brand.name)}</div><div class="brand-count-mega">${brand.product_count || 0} محصول</div></div>
+                </a>
+            `).join('') : '<div style="padding:12px; color:#94a3b8; font-size:0.7rem;">برندی یافت نشد</div>';
+
+            const catalogsHtml = data.catalogs && data.catalogs.length > 0 ? data.catalogs.map(catalog => `
+                <a href="/product/shop/?catalog=${catalog.slug}" class="catalog-item-mega">
+                    <i class="fas fa-file-pdf"></i>
+                    <div class="catalog-info-mega">
+                        <div class="catalog-title-mega">${escapeHtml(catalog.title)}</div>
+                        <div class="catalog-date-mega">${catalog.date || ''}</div>
+                    </div>
+                </a>
+            `).join('') : '<div style="padding:12px; color:#94a3b8; font-size:0.7rem;">کاتالوگی یافت نشد</div>';
+
+            const bestsellersHtml = data.bestsellers && data.bestsellers.length > 0 ? data.bestsellers.map(product => `
+                <a href="/product/${product.slug}/" class="bestseller-item-mega">
+                    <div class="bestseller-img-mega">${product.image ? `<img src="${product.image}" alt="${escapeHtml(product.name)}" onerror="this.parentElement.innerHTML='<i class=\'fas fa-box\'></i>'">` : '<i class="fas fa-box"></i>'}</div>
+                    <div class="bestseller-info-mega">
+                        <div class="bestseller-title-mega">${escapeHtml(product.name)}</div>
+                        <div class="bestseller-price-mega">${Number(product.price).toLocaleString()} تومان</div>
+                    </div>
+                </a>
+            `).join('') : '<div style="padding:12px; color:#94a3b8; font-size:0.7rem;">محصولی یافت نشد</div>';
+
+            megaContainer.innerHTML = `<div class="mega-3col">
+                <div class="mega-col">
+                    <div class="mega-col-title"><i class="fas fa-trademark"></i> برندهای ${escapeHtml(data.category_name)}</div>
+                    <div class="brands-list-mega">${brandsHtml}</div>
+                </div>
+                <div class="mega-col">
+                    <div class="mega-col-title"><i class="fas fa-book-open"></i> کاتالوگ‌های ${escapeHtml(data.category_name)}</div>
+                    <div class="catalogs-list-mega">${catalogsHtml}</div>
+                </div>
+                <div class="mega-col">
+                    <div class="mega-col-title"><i class="fas fa-fire"></i> پرفروش‌های ${escapeHtml(data.category_name)}</div>
+                    <div class="bestsellers-list-mega">${bestsellersHtml}</div>
+                </div>
+            </div>`;
+        } else {
+            megaContainer.innerHTML = '<div style="padding:20px;text-align:center;">خطا</div>';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        megaContainer.innerHTML = '<div style="padding:20px;text-align:center;">خطا</div>';
+    }
+}
+
+function getCategoryIcon(name) {
+    if (name.includes('پارکت') || name.includes('لمینت')) return 'fa-tree';
+    if (name.includes('کاغذ دیواری')) return 'fa-palette';
+    if (name.includes('سنگ')) return 'fa-gem';
+    return 'fa-folder';
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function setupSearch() {
+    const searchInput = document.getElementById('globalSearchInput');
+    const searchBtn = document.getElementById('searchBtnHeader');
+    const suggestionsBox = document.getElementById('searchSuggestions');
+    let lastQuery = '';
+
+    async function performSearch() {
+        const query = searchInput.value.trim();
+
+        if (query === lastQuery && suggestionsBox.classList.contains('show')) return;
+        lastQuery = query;
+
+        if (query.length < 2) {
+            suggestionsBox.classList.remove('show');
+            return;
+        }
+
+        suggestionsBox.innerHTML = '<div style="padding:20px;text-align:center;color:#94a3b8;">در حال جستجو...</div>';
+        suggestionsBox.classList.add('show');
+
+        try {
+            const response = await fetch(`/search/search-suggestions/?q=${encodeURIComponent(query)}`);
+            const result = await response.json();
+
+            if (result.status === 'success' && result.data && result.data.length > 0) {
+                suggestionsBox.innerHTML = result.data.map(item => {
+                    let defaultIcon = 'fa-tag';
+                    if (item.type === 'product') defaultIcon = 'fa-box-open';
+                    if (item.type === 'brand') defaultIcon = 'fa-building';
+                    if (item.type === 'category') defaultIcon = 'fa-folder-open';
+                    if (item.type === 'catalog') defaultIcon = 'fa-file-pdf';
+
+                    return `
+                    <a href="${item.url}" class="suggestion-item">
+                        <div class="suggestion-img">
+                            ${item.image && !item.image.includes('placeholder') ?
+                                `<img src="${item.image}" alt="${escapeHtml(item.title)}" onerror="this.parentElement.innerHTML='<i class=\'fas ${defaultIcon}\' style=\'font-size: 22px; color: #cbd5e1;\'></i>'">` :
+                                `<i class="fas ${defaultIcon}" style="font-size: 22px; color: #cbd5e1;"></i>`
+                            }
+                        </div>
+                        <div class="suggestion-info" style="flex: 1;">
+                            <h4 style="margin:0 0 4px; font-size:0.8rem; color: #1e293b;">${escapeHtml(item.title)}</h4>
+                            <p style="margin:0; font-size:0.65rem; color:#64748b; font-weight: 500;">${escapeHtml(item.type_name || item.type)}</p>
+                        </div>
+                    </a>`;
+                }).join('');
+            } else {
+                suggestionsBox.innerHTML = `<div style="padding:20px;text-align:center;color:#94a3b8;">نتیجه‌ای برای "${escapeHtml(query)}" یافت نشد</div>`;
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            suggestionsBox.innerHTML = '<div style="padding:20px;text-align:center;color:#ef4444;">خطا در ارتباط با سرور</div>';
+        }
+    }
+
+    let searchTimeout;
+    searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(performSearch, 300);
+    });
+
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
+            clearTimeout(searchTimeout);
+            performSearch();
+        });
+    }
+
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            clearTimeout(searchTimeout);
+            performSearch();
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-wrapper')) {
+            suggestionsBox.classList.remove('show');
+        }
+    });
+}
+</script>

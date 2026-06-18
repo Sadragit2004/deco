@@ -1,0 +1,515 @@
+<!-- templates/peyment_app/payment_detail.html -->
+{% extends 'main_template.html' %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}جزئیات پرداخت #{{ payment.id }}{% endblock %}
+
+{% block content %}
+<style>
+    .payment-detail-container {
+        max-width: 100%;
+        padding: 16px;
+        background: #f5f7fb;
+        min-height: 100vh;
+    }
+
+    .detail-card {
+        background: white;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    /* هدر */
+    .detail-header {
+        padding: 20px;
+        border-bottom: 1px solid #f0f2f5;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .detail-header h1 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1a2c3e;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .detail-header h1 i {
+        color: #10b981;
+    }
+
+    .back-btn {
+        background: #f1f5f9;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #475569;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .back-btn:hover {
+        background: #e2e8f0;
+    }
+
+    /* وضعیت */
+    .status-section {
+        text-align: center;
+        padding: 32px 20px;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+
+    .status-icon {
+        width: 80px;
+        height: 80px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .status-icon i {
+        font-size: 48px;
+    }
+
+    .status-icon.success i { color: #10b981; }
+    .status-icon.failed i { color: #ef4444; }
+
+    .status-title {
+        font-size: 22px;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+
+    .status-title.success { color: #10b981; }
+    .status-title.failed { color: #ef4444; }
+
+    .status-message {
+        font-size: 13px;
+        color: #6c7a8e;
+    }
+
+    /* بخش اطلاعات */
+    .info-section {
+        padding: 20px;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1a2c3e;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f2f5;
+    }
+
+    .section-title i {
+        color: #10b981;
+        font-size: 18px;
+    }
+
+    .info-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 8px 0;
+        border-bottom: 1px dashed #f0f2f5;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-size: 13px;
+        color: #8a99b0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .info-label i {
+        font-size: 12px;
+        color: #cbd5e1;
+    }
+
+    .info-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1a2c3e;
+        text-align: left;
+        word-break: break-word;
+    }
+
+    .info-value.amount {
+        font-size: 18px;
+        color: #10b981;
+    }
+
+    .info-value.monospace {
+        font-family: monospace;
+        direction: ltr;
+        background: #f8fafc;
+        padding: 4px 8px;
+        border-radius: 8px;
+        font-size: 12px;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-online {
+        background: #eef2ff;
+        color: #4f46e5;
+    }
+
+    .badge-card {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .jalali-date {
+        font-size: 11px;
+        color: #94a3b8;
+        margin-top: 4px;
+        display: block;
+    }
+
+    /* بخش تصویر رسید */
+    .receipt-section {
+        padding: 0 20px 20px;
+    }
+
+    .receipt-image {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 16px;
+        text-align: center;
+    }
+
+    .receipt-image img {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 12px;
+        margin-bottom: 12px;
+    }
+
+    .view-receipt-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .view-receipt-btn:hover {
+        background: #059669;
+    }
+
+    /* دکمه‌ها */
+    .action-buttons {
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        border-top: 1px solid #f0f2f5;
+        background: #fafcfc;
+    }
+
+    .btn-order {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 30px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-order:hover {
+        background: #059669;
+        transform: translateY(-2px);
+    }
+
+    .btn-print {
+        background: #f1f5f9;
+        color: #475569;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 30px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+    }
+
+    .btn-print:hover {
+        background: #e2e8f0;
+    }
+
+    /* دسکتاپ */
+    @media (min-width: 768px) {
+        .payment-detail-container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .info-grid {
+            gap: 12px;
+        }
+    }
+
+    /* چاپ */
+    @media print {
+        .payment-detail-container {
+            padding: 0;
+            background: white;
+        }
+        .back-btn, .action-buttons, .btn-print, .btn-order {
+            display: none !important;
+        }
+        .detail-card {
+            box-shadow: none;
+        }
+        .status-section {
+            background: white;
+            border: 1px solid #e0e0e0;
+        }
+    }
+
+    /* انیمیشن */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .detail-card {
+        animation: fadeIn 0.3s ease;
+    }
+</style>
+
+<div class="payment-detail-container">
+    <div class="detail-card">
+        <div class="detail-header">
+            <h1>
+                <i class="fas fa-receipt"></i>
+                جزئیات پرداخت
+            </h1>
+            <a href="{% url 'peyment:payment_list' %}" class="back-btn">
+                <i class="fas fa-arrow-right"></i>
+                بازگشت
+            </a>
+        </div>
+
+        <!-- وضعیت -->
+        <div class="status-section">
+            <div class="status-icon {% if payment.isFinaly %}success{% else %}failed{% endif %}">
+                {% if payment.isFinaly %}
+                    <i class="fas fa-check-circle"></i>
+                {% else %}
+                    <i class="fas fa-times-circle"></i>
+                {% endif %}
+            </div>
+            <div class="status-title {% if payment.isFinaly %}success{% else %}failed{% endif %}">
+                {% if payment.isFinaly %}
+                    پرداخت موفق
+                {% else %}
+                    پرداخت ناموفق
+                {% endif %}
+            </div>
+            <div class="status-message">
+                {% if payment.isFinaly %}
+                    پرداخت شما با موفقیت انجام شد
+                {% else %}
+                    پرداخت انجام نشده است
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- اطلاعات تراکنش -->
+        <div class="info-section">
+            <div class="section-title">
+                <i class="fas fa-info-circle"></i>
+                اطلاعات تراکنش
+            </div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-hashtag"></i> شماره سفارش
+                    </span>
+                    <span class="info-value">#{{ payment.order.order_number }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-coin"></i> مبلغ پرداخت
+                    </span>
+                    <span class="info-value amount">{{ payment.amount|intcomma }} تومان</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-credit-card"></i> روش پرداخت
+                    </span>
+                    <span class="info-value">
+                        {% if payment.payment_method == 'online' %}
+                            <span class="badge badge-online">
+                                <i class="fas fa-globe"></i> درگاه پرداخت آنلاین
+                            </span>
+                        {% else %}
+                            <span class="badge badge-card">
+                                <i class="fas fa-exchange-alt"></i> کارت به کارت
+                            </span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-calendar"></i> تاریخ و زمان
+                    </span>
+                    <span class="info-value">
+                        {{ payment.createAt|date:"Y/m/d H:i:s" }}
+                        <span class="jalali-date">{{ payment.get_jalali_register_date }}</span>
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-barcode"></i> کد پیگیری
+                    </span>
+                    <span class="info-value monospace">{{ payment.refId|default:'---' }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-align-right"></i> توضیحات
+                    </span>
+                    <span class="info-value">{{ payment.description|default:'---' }}</span>
+                </div>
+                {% if payment.statusCode %}
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-code"></i> کد وضعیت
+                    </span>
+                    <span class="info-value">{{ payment.statusCode }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- اطلاعات کارت به کارت -->
+        {% if payment.payment_method == 'card_to_card' %}
+        <div class="info-section">
+            <div class="section-title">
+                <i class="fas fa-credit-card"></i>
+                اطلاعات کارت به کارت
+            </div>
+            <div class="info-grid">
+                {% if payment.card_number %}
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-credit-card"></i> شماره کارت مبدا
+                    </span>
+                    <span class="info-value monospace">{{ payment.card_number }}</span>
+                </div>
+                {% endif %}
+                {% if payment.card_holder_name %}
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-user"></i> نام دارنده کارت
+                    </span>
+                    <span class="info-value">{{ payment.card_holder_name }}</span>
+                </div>
+                {% endif %}
+                {% if payment.tracking_number %}
+                <div class="info-row">
+                    <span class="info-label">
+                        <i class="fas fa-truck"></i> شماره پیگیری
+                    </span>
+                    <span class="info-value monospace">{{ payment.tracking_number }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- تصویر رسید -->
+        {% if payment.receipt_image %}
+        <div class="receipt-section">
+            <div class="receipt-image">
+                <img src="{{ payment.receipt_image.url }}" alt="رسید پرداخت">
+                <a href="{{ payment.receipt_image.url }}" target="_blank" class="view-receipt-btn">
+                    <i class="fas fa-eye"></i> مشاهده رسید در اندازه اصلی
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <!-- دکمه‌ها -->
+        <div class="action-buttons">
+            <a href="{% url 'order:order_detail' payment.order.id %}" class="btn-order">
+                <i class="fas fa-shopping-bag"></i> مشاهده سفارش
+            </a>
+            <button onclick="window.print()" class="btn-print">
+                <i class="fas fa-print"></i> چاپ فاکتور
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

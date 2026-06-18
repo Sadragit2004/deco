@@ -1,0 +1,616 @@
+<!-- templates/peyment_app/payment_list.html -->
+{% extends 'main_template.html' %}
+{% load humanize %}
+
+{% load static %}
+
+{% block title %}لیست پرداخت‌ها{% endblock %}
+
+{% block content %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .payments-container {
+        max-width: 100%;
+        padding: 16px;
+        background: #f5f7fb;
+        min-height: 100vh;
+    }
+
+    /* هدر */
+    .payments-header {
+        margin-bottom: 20px;
+    }
+
+    .payments-header h1 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1a2c3e;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .payments-header h1 i {
+        color: #10b981;
+        font-size: 24px;
+    }
+
+    .payments-header p {
+        font-size: 13px;
+        color: #6c7a8e;
+    }
+
+    /* کارت آمار */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 16px 12px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .stat-card i {
+        font-size: 28px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .stat-card .stat-value {
+        font-size: 22px;
+        font-weight: 800;
+        color: #1a2c3e;
+        line-height: 1.2;
+    }
+
+    .stat-card .stat-label {
+        font-size: 11px;
+        color: #8a99b0;
+        margin-top: 4px;
+    }
+
+    .stat-card.success i { color: #10b981; }
+    .stat-card.danger i { color: #ef4444; }
+    .stat-card.info i { color: #3b82f6; }
+    .stat-card.primary i { color: #8b5cf6; }
+
+    /* فیلترها */
+    .filters-bar {
+        background: white;
+        border-radius: 20px;
+        padding: 16px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .filter-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .filter-select, .filter-search {
+        flex: 1;
+        min-width: 120px;
+        padding: 10px 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 13px;
+        font-family: inherit;
+        background: #f8fafc;
+        color: #1a2c3e;
+    }
+
+    .filter-search {
+        flex: 2;
+    }
+
+    .filter-search input {
+        width: 100%;
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 13px;
+    }
+
+    .filter-search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+    }
+
+    .filter-search i {
+        color: #94a3b8;
+        font-size: 14px;
+    }
+
+    .reset-btn {
+        background: #f1f5f9;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #ef4444;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .reset-btn:hover {
+        background: #fee2e2;
+    }
+
+    /* لیست کارتی */
+    .payments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .payment-card {
+        background: white;
+        border-radius: 20px;
+        padding: 16px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: all 0.2s;
+        border: 1px solid #f0f2f5;
+    }
+
+    .payment-card:active {
+        transform: scale(0.99);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .order-number {
+        font-weight: 700;
+        font-size: 15px;
+        color: #1a2c3e;
+        background: #f1f5f9;
+        padding: 4px 12px;
+        border-radius: 30px;
+        display: inline-block;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .status-badge.success {
+        background: #e8faf0;
+        color: #10b981;
+    }
+
+    .status-badge.failed {
+        background: #fef2f2;
+        color: #ef4444;
+    }
+
+    .card-body {
+        margin-bottom: 12px;
+    }
+
+    .amount-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .amount-label {
+        font-size: 12px;
+        color: #8a99b0;
+    }
+
+    .amount-value {
+        font-size: 20px;
+        font-weight: 800;
+        color: #1a2c3e;
+    }
+
+    .amount-value small {
+        font-size: 11px;
+        font-weight: 400;
+        color: #8a99b0;
+    }
+
+    .payment-method {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    .payment-method.online {
+        background: #eef2ff;
+        color: #4f46e5;
+    }
+
+    .payment-method.card {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 12px;
+        border-top: 1px solid #f0f2f5;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .ref-id {
+        font-size: 11px;
+        color: #8a99b0;
+        font-family: monospace;
+        direction: ltr;
+        display: inline-block;
+        background: #f8fafc;
+        padding: 4px 8px;
+        border-radius: 8px;
+    }
+
+    .date-info {
+        font-size: 11px;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .detail-btn {
+        background: none;
+        border: none;
+        color: #10b981;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 30px;
+        transition: all 0.2s;
+    }
+
+    .detail-btn:hover {
+        background: #e8faf0;
+    }
+
+    /* صفحه‌بندی */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-top: 24px;
+        flex-wrap: wrap;
+    }
+
+    .page-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        height: 38px;
+        padding: 0 12px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        color: #1a2c3e;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .page-link:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+
+    .page-link.active {
+        background: #10b981;
+        border-color: #10b981;
+        color: white;
+    }
+
+    .page-link.disabled {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+
+    /* حالت خالی */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 24px;
+    }
+
+    .empty-state i {
+        font-size: 64px;
+        color: #cbd5e1;
+        margin-bottom: 16px;
+        display: block;
+    }
+
+    .empty-state h4 {
+        font-size: 18px;
+        color: #475569;
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        font-size: 13px;
+        color: #94a3b8;
+    }
+
+    /* دسکتاپ */
+    @media (min-width: 768px) {
+        .payments-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .filters-bar {
+            padding: 20px;
+        }
+
+        .filter-row {
+            flex-wrap: nowrap;
+        }
+    }
+
+    /* انیمیشن لودینگ */
+    .loading {
+        text-align: center;
+        padding: 40px;
+    }
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #e2e8f0;
+        border-top-color: #10b981;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        margin: 0 auto;
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+<div class="payments-container">
+    <div class="payments-header">
+        <h1>
+            <i class="fas fa-credit-card"></i>
+            پرداخت‌های من
+        </h1>
+        <p>کلیه تراکنش‌های مالی شما</p>
+    </div>
+
+    <!-- کارت آمار -->
+    <div class="stats-grid">
+        <div class="stat-card success">
+            <i class="fas fa-check-circle"></i>
+            <div class="stat-value">{{ total_payments|intcomma }}</div>
+            <div class="stat-label">پرداخت موفق</div>
+        </div>
+        <div class="stat-card danger">
+            <i class="fas fa-times-circle"></i>
+            <div class="stat-value">{{ failed_payments|intcomma }}</div>
+            <div class="stat-label">پرداخت ناموفق</div>
+        </div>
+        <div class="stat-card info">
+            <i class="fas fa-wallet"></i>
+            <div class="stat-value">{{ total_amount|intcomma|intcomma }}</div>
+            <div class="stat-label">مجموع مبلغ</div>
+        </div>
+        <div class="stat-card primary">
+            <i class="fas fa-chart-line"></i>
+            <div class="stat-value">{{ success_payments|intcomma }}</div>
+            <div class="stat-label">تعداد تراکنش‌ها</div>
+        </div>
+    </div>
+
+    <!-- فیلترها -->
+    <div class="filters-bar">
+        <div class="filter-row">
+            <select class="filter-select" id="statusFilter">
+                <option value="">همه وضعیت‌ها</option>
+                <option value="success" {% if current_status == 'success' %}selected{% endif %}>✓ موفق</option>
+                <option value="failed" {% if current_status == 'failed' %}selected{% endif %}>✗ ناموفق</option>
+                <option value="online" {% if current_status == 'online' %}selected{% endif %}>🌐 درگاه آنلاین</option>
+                <option value="card_to_card" {% if current_status == 'card_to_card' %}selected{% endif %}>💳 کارت به کارت</option>
+            </select>
+
+            <select class="filter-select" id="dateFilter">
+                <option value="">همه تاریخ‌ها</option>
+                <option value="today" {% if current_date == 'today' %}selected{% endif %}>امروز</option>
+                <option value="week" {% if current_date == 'week' %}selected{% endif %}>هفته گذشته</option>
+                <option value="month" {% if current_date == 'month' %}selected{% endif %}>ماه گذشته</option>
+            </select>
+        </div>
+        <div class="filter-row">
+            <div class="filter-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="جستجوی شماره سفارش یا کد پیگیری..." value="{{ search_query }}">
+            </div>
+            <button class="reset-btn" id="resetFilter">
+                <i class="fas fa-undo-alt"></i> حذف
+            </button>
+        </div>
+    </div>
+
+    <!-- لیست کارتی پرداخت‌ها -->
+    <div class="payments-list" id="paymentsList">
+        {% if payments %}
+            {% for payment in payments %}
+            <div class="payment-card" onclick="window.location.href='{% url 'peyment:payment_detail' payment.id %}'" style="cursor: pointer;">
+                <div class="card-header">
+                    <span class="order-number">#{{ payment.order.order_number }}</span>
+                    {% if payment.isFinaly %}
+                        <span class="status-badge success">
+                            <i class="fas fa-check-circle"></i> موفق
+                        </span>
+                    {% else %}
+                        <span class="status-badge failed">
+                            <i class="fas fa-times-circle"></i> ناموفق
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="card-body">
+                    <div class="amount-row">
+                        <span class="amount-label">مبلغ پرداختی</span>
+                        <span class="amount-value">{{ payment.amount|intcomma }}<small> تومان</small></span>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        {% if payment.payment_method == 'online' %}
+                            <span class="payment-method online">
+                                <i class="fas fa-globe"></i> درگاه آنلاین
+                            </span>
+                        {% else %}
+                            <span class="payment-method card">
+                                <i class="fas fa-credit-card"></i> کارت به کارت
+                            </span>
+                        {% endif %}
+
+                        <span class="date-info">
+                            <i class="fas fa-calendar-alt"></i>
+                            {{ payment.createAt|date:"Y/m/d" }}
+                            <i class="fas fa-clock ms-1"></i>
+                            {{ payment.createAt|date:"H:i" }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <div class="ref-id">
+                        <i class="fas fa-barcode"></i>
+                        <span dir="ltr">{{ payment.refId|default:'---' }}</span>
+                    </div>
+                    <button class="detail-btn" onclick="event.stopPropagation(); window.location.href='{% url 'peyment:payment_detail' payment.id %}'">
+                        جزئیات <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-receipt"></i>
+                <h4>هیچ پرداختی یافت نشد</h4>
+                <p>شما هنوز هیچ تراکنشی انجام نداده‌اید</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- صفحه‌بندی -->
+    {% if payments.has_other_pages %}
+    <div class="pagination">
+        {% if payments.has_previous %}
+            <a href="?page={{ payments.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_date %}&date={{ current_date }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-link">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        {% else %}
+            <span class="page-link disabled"><i class="fas fa-chevron-right"></i></span>
+        {% endif %}
+
+        {% for num in payments.paginator.page_range %}
+            {% if payments.number == num %}
+                <span class="page-link active">{{ num }}</span>
+            {% elif num > payments.number|add:'-3' and num < payments.number|add:'3' %}
+                <a href="?page={{ num }}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_date %}&date={{ current_date }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-link">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if payments.has_next %}
+            <a href="?page={{ payments.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_date %}&date={{ current_date }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-link">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        {% else %}
+            <span class="page-link disabled"><i class="fas fa-chevron-left"></i></span>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // فیلترها
+    function applyFilters() {
+        const status = document.getElementById('statusFilter').value;
+        const date = document.getElementById('dateFilter').value;
+        const search = document.getElementById('searchInput').value;
+
+        let url = new URL(window.location.href);
+        if (status) url.searchParams.set('status', status);
+        else url.searchParams.delete('status');
+
+        if (date) url.searchParams.set('date', date);
+        else url.searchParams.delete('date');
+
+        if (search) url.searchParams.set('search', search);
+        else url.searchParams.delete('search');
+
+        url.searchParams.set('page', '1');
+        window.location.href = url.toString();
+    }
+
+    document.getElementById('statusFilter')?.addEventListener('change', applyFilters);
+    document.getElementById('dateFilter')?.addEventListener('change', applyFilters);
+    document.getElementById('searchBtn')?.addEventListener('click', applyFilters);
+    document.getElementById('searchInput')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') applyFilters();
+    });
+    document.getElementById('resetFilter')?.addEventListener('click', function() {
+        window.location.href = window.location.pathname;
+    });
+</script>
+{% endblock %}

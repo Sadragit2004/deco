@@ -1,0 +1,773 @@
+{% extends 'main_template.html' %}
+{% load static %}
+
+{% block title %}
+    برندهای {{ category.title }} | فروشگاه
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+      @media (max-width: 768px) {
+  .content-container {
+    padding: 1px 1px 10px;
+  }
+}
+    /* استایل اختصاصی این صفحه - بدون بک‌گراند اضافی */
+    .brands-page-custom {
+        min-height: 100vh;
+    }
+
+    .brands-content-custom {
+        max-width: 100%;
+        padding: 16px;
+    }
+
+    /* ========== هدر ========== */
+    .brands-head-custom {
+        background: #1e293b;
+        border-radius: 20px;
+        padding: 20px 16px;
+        text-align: center;
+        margin-bottom: 16px;
+    }
+
+    .brands-head-custom h1 {
+        color: white;
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin: 0 0 8px 0;
+    }
+
+    .brands-head-custom .badge-custom {
+        background: #334155;
+        color: #94a3b8;
+        font-size: 0.7rem;
+        padding: 4px 12px;
+        border-radius: 50px;
+        display: inline-block;
+    }
+
+    /* ========== جستجو ========== */
+    .search-wrap-custom {
+        background: white;
+        border-radius: 16px;
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+
+    .search-box-custom {
+        position: relative;
+    }
+
+    .search-box-custom input {
+        width: 100%;
+        padding: 12px 45px 12px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        background: #f8fafc;
+        outline: none;
+    }
+
+    .search-box-custom input:focus {
+        border-color: #d25f00;
+    }
+
+    .search-box-custom .search-icon-custom {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .result-count-custom {
+        font-size: 0.7rem;
+        color: #64748b;
+        text-align: center;
+        margin-top: 8px;
+    }
+
+    /* ========== فیلترها ========== */
+    .filter-wrap-custom {
+        background: white;
+        border-radius: 16px;
+        padding: 12px;
+        margin-bottom: 12px;
+        overflow-x: auto;
+    }
+
+    .filter-list-custom {
+        display: flex;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+    .filter-btn-custom {
+        padding: 6px 14px;
+        background: #f1f5f9;
+        border: none;
+        border-radius: 30px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        color: #475569;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .filter-btn-custom.active {
+        background: #d25f00;
+        color: white;
+    }
+
+    /* ========== زیردسته‌ها ========== */
+    .subcat-wrap-custom {
+        background: white;
+        border-radius: 16px;
+        padding: 12px;
+        margin-bottom: 16px;
+        overflow-x: auto;
+    }
+
+    .subcat-title-custom {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .subcat-list-custom {
+        display: flex;
+        gap: 16px;
+        white-space: nowrap;
+    }
+
+    .subcat-item-custom {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        width: 65px;
+    }
+
+    .subcat-icon-custom {
+        width: 50px;
+        height: 50px;
+        background: #f1f5f9;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 6px;
+    }
+
+    .subcat-icon-custom i {
+        font-size: 24px;
+        color: #d25f00;
+    }
+
+    .subcat-icon-custom img {
+        width: 35px;
+        height: 35px;
+        object-fit: contain;
+    }
+
+    .subcat-name-custom {
+        font-size: 0.65rem;
+        font-weight: 500;
+        color: #334155;
+    }
+
+    /* ========== لیست برندها (موبایل - عمودی) ========== */
+    .brands-list-custom {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .brand-item-custom {
+        background: white;
+        border-radius: 14px;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        border: 1px solid #eef2f7;
+    }
+
+    .brand-avatar-custom {
+        width: 45px;
+        height: 45px;
+        background: #f8fafc;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .brand-avatar-custom img {
+        width: 35px;
+        height: 35px;
+        object-fit: contain;
+    }
+
+    .brand-avatar-custom .no-img-custom {
+        font-size: 28px;
+        color: #cbd5e1;
+    }
+
+    .brand-details-custom {
+        flex: 1;
+    }
+
+    .brand-details-custom h3 {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 3px 0;
+    }
+
+    .brand-meta-custom {
+        display: flex;
+        gap: 10px;
+        font-size: 0.6rem;
+        color: #64748b;
+    }
+
+    .brand-meta-custom span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .brand-arrow-custom {
+        color: #cbd5e1;
+        font-size: 12px;
+    }
+
+    /* ========== پیشنهادات جستجو ========== */
+    .suggestions-custom {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        z-index: 1000;
+        max-height: 280px;
+        overflow-y: auto;
+        display: none;
+        margin-top: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .suggestions-custom.show {
+        display: block;
+    }
+
+    .suggestion-custom {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .suggestion-custom:active {
+        background: #f1f5f9;
+    }
+
+    .suggestion-img-custom {
+        width: 40px;
+        height: 40px;
+        background: #f1f5f9;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .suggestion-img-custom img {
+        width: 30px;
+        height: 30px;
+        object-fit: contain;
+    }
+
+    .suggestion-info-custom h4 {
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin: 0 0 3px 0;
+        color: #0f172a;
+    }
+
+    .suggestion-info-custom p {
+        font-size: 0.65rem;
+        margin: 0;
+        color: #64748b;
+    }
+
+    .highlight-custom {
+        background: #dbeafe;
+        color: #d25f00;
+        border-radius: 3px;
+        padding: 0 2px;
+    }
+
+    /* ========== حالت خالی ========== */
+    .empty-custom {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 20px;
+    }
+
+    .empty-custom i {
+        font-size: 50px;
+        color: #cbd5e1;
+        margin-bottom: 12px;
+    }
+
+    .empty-custom h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0 0 6px 0;
+        color: #0f172a;
+    }
+
+    .empty-custom p {
+        font-size: 0.8rem;
+        margin: 0;
+        color: #64748b;
+    }
+
+    /* ========== دسکتاپ (گرید چند ستونه) ========== */
+    @media (min-width: 768px) {
+        .brands-content-custom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .brands-head-custom {
+            border-radius: 24px;
+            padding: 40px 32px;
+            margin-bottom: 32px;
+        }
+
+        .brands-head-custom h1 {
+            font-size: 2.2rem;
+        }
+
+        .brands-head-custom .badge-custom {
+            font-size: 0.85rem;
+            padding: 8px 20px;
+        }
+
+        .search-wrap-custom {
+            border-radius: 20px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+        }
+
+        .search-box-custom input {
+            padding: 16px 55px 16px 24px;
+            font-size: 1rem;
+            border-radius: 60px;
+        }
+
+        .result-count-custom {
+            font-size: 0.85rem;
+            margin-top: 12px;
+        }
+
+        .filter-wrap-custom {
+            border-radius: 20px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            overflow-x: visible;
+        }
+
+        .filter-list-custom {
+            justify-content: center;
+            flex-wrap: wrap;
+            white-space: normal;
+            gap: 12px;
+        }
+
+        .filter-btn-custom {
+            padding: 10px 24px;
+            font-size: 0.9rem;
+        }
+
+        .subcat-wrap-custom {
+            border-radius: 20px;
+            padding: 20px 24px;
+            margin-bottom: 32px;
+        }
+
+        .subcat-title-custom {
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .subcat-list-custom {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            white-space: normal;
+        }
+
+        .subcat-item-custom {
+            width: auto;
+            min-width: 80px;
+        }
+
+        .subcat-icon-custom {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+        }
+
+        .subcat-icon-custom i {
+            font-size: 32px;
+        }
+
+        .subcat-icon-custom img {
+            width: 45px;
+            height: 45px;
+        }
+
+        .subcat-name-custom {
+            font-size: 0.8rem;
+        }
+
+        /* گرید چند ستونه برای برندها */
+        .brands-list-custom {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .brand-item-custom {
+            flex-direction: column;
+            text-align: center;
+            padding: 28px 20px;
+            gap: 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .brand-item-custom:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-color: #d25f00;
+        }
+
+        .brand-avatar-custom {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+            border-radius: 24px;
+        }
+
+        .brand-avatar-custom img {
+            width: 70px;
+            height: 70px;
+        }
+
+        .brand-avatar-custom .no-img-custom {
+            font-size: 55px;
+        }
+
+        .brand-details-custom h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .brand-meta-custom {
+            justify-content: center;
+            font-size: 0.75rem;
+            gap: 16px;
+        }
+
+        .brand-arrow-custom {
+            display: none;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .brands-list-custom {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 28px;
+        }
+        .brand-avatar-custom {
+            width: 120px;
+            height: 120px;
+        }
+        .brand-avatar-custom img {
+            width: 85px;
+            height: 85px;
+        }
+    }
+
+    @media (min-width: 1400px) {
+        .brands-list-custom {
+            grid-template-columns: repeat(5, 1fr);
+            gap: 32px;
+        }
+    }
+
+    @keyframes fadeInCustom {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .brand-item-custom {
+        animation: fadeInCustom 0.3s ease forwards;
+        opacity: 0;
+    }
+</style>
+
+<div class="brands-page-custom">
+    <div class="brands-content-custom">
+
+        <!-- هدر -->
+        <div class="brands-head-custom">
+            <h1>{{ category.title }}</h1>
+            <div class="badge-custom">
+                <i class="fas fa-building"></i> {{ total_brands }} برند
+            </div>
+        </div>
+
+        <!-- جستجو -->
+        <div class="search-wrap-custom">
+            <div class="search-box-custom">
+                <input type="text" id="searchInputCustom" placeholder="جستجوی برند..." value="{{ search_query }}">
+                <i class="fas fa-search search-icon-custom"></i>
+                <div id="suggestionsListCustom" class="suggestions-custom"></div>
+            </div>
+            <div class="result-count-custom" id="resultsCountCustom">{{ total_brands }} برند</div>
+        </div>
+
+        <!-- فیلترها -->
+        <div class="filter-wrap-custom">
+            <div class="filter-list-custom">
+                <button class="filter-btn-custom {% if sort_by == 'default' %}active{% endif %}" data-sort="default">
+                    <i class="fas fa-star"></i> پیش‌فرض
+                </button>
+                <button class="filter-btn-custom {% if sort_by == 'newest' %}active{% endif %}" data-sort="newest">
+                    <i class="fas fa-clock"></i> جدیدترین
+                </button>
+                <button class="filter-btn-custom {% if sort_by == 'most_content' %}active{% endif %}" data-sort="most_content">
+                    <i class="fas fa-fire"></i> پرمحتوا
+                </button>
+                <button class="filter-btn-custom {% if sort_by == 'most_products' %}active{% endif %}" data-sort="most_products">
+                    <i class="fas fa-box"></i> بیشترین محصول
+                </button>
+                <button class="filter-btn-custom {% if sort_by == 'most_catalogs' %}active{% endif %}" data-sort="most_catalogs">
+                    <i class="fas fa-book"></i> بیشترین کاتالوگ
+                </button>
+                <button class="filter-btn-custom {% if sort_by == 'alphabetical' %}active{% endif %}" data-sort="alphabetical">
+                    <i class="fas fa-sort-alpha-down"></i> الفبا
+                </button>
+            </div>
+        </div>
+
+        <!-- زیردسته‌ها -->
+        {% if subcategories %}
+        <div class="subcat-wrap-custom">
+            <div class="subcat-title-custom">
+                <i class="fas fa-layer-group"></i>
+                <span>دسته‌های مرتبط</span>
+            </div>
+            <div class="subcat-list-custom">
+                {% for subcat in subcategories %}
+                <a href="{% url 'product:category_brands' subcat.slug %}" class="subcat-item-custom">
+                    <div class="subcat-icon-custom">
+                        {% if subcat.image %}
+                            <img src="{{ subcat.image.url }}" alt="{{ subcat.title }}">
+                        {% else %}
+                            <i class="fas fa-folder-open"></i>
+                        {% endif %}
+                    </div>
+                    <span class="subcat-name-custom">{{ subcat.title|truncatechars:12 }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- لیست برندها -->
+        <div class="brands-list-custom" id="brandsListCustom">
+            {% if brands %}
+                {% for brand in brands %}
+                <a href="{% url 'product:brand_catalogs' brand.slug %}" class="brand-item-custom" data-name="{{ brand.title|lower }}">
+                    <div class="brand-avatar-custom">
+                        {% if brand.image %}
+                            <img src="{{ brand.image.url }}" alt="{{ brand.title }}" loading="lazy">
+                        {% else %}
+                            <i class="fas fa-building no-img-custom"></i>
+                        {% endif %}
+                    </div>
+                    <div class="brand-details-custom">
+                        <h3>{{ brand.title }}</h3>
+                        <div class="brand-meta-custom">
+                            <span><i class="fas fa-box"></i> {{ brand.product_count|default:0 }}</span>
+                            <span><i class="fas fa-book"></i> {{ brand.catalog_count|default:0 }}</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-left brand-arrow-custom"></i>
+                </a>
+                {% endfor %}
+            {% else %}
+                <div class="empty-custom">
+                    <i class="fas fa-box-open"></i>
+                    <h3>برندی یافت نشد!</h3>
+                    <p>متاسفانه هیچ برندی برای {{ category.title }} وجود ندارد.</p>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const allBrandsCustom = [
+        {% for brand in brands %}
+        {
+            id: {{ brand.id }},
+            title: "{{ brand.title|escapejs }}",
+            slug: "{{ brand.slug|escapejs }}",
+            image: "{% if brand.image %}{{ brand.image.url }}{% endif %}",
+            products: {{ brand.product_count|default:0 }},
+            catalogs: {{ brand.catalog_count|default:0 }}
+        },
+        {% endfor %}
+    ];
+
+    const searchInputCustom = document.getElementById('searchInputCustom');
+    const suggestionsListCustom = document.getElementById('suggestionsListCustom');
+    const resultsCountCustom = document.getElementById('resultsCountCustom');
+
+    function highlightMatchCustom(text, query) {
+        if (!query) return text;
+        const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        return text.replace(regex, '<span class="highlight-custom">$1</span>');
+    }
+
+    function showSuggestionsCustom(query) {
+        if (!query.trim()) {
+            suggestionsListCustom.classList.remove('show');
+            return;
+        }
+
+        const filtered = allBrandsCustom.filter(b =>
+            b.title.toLowerCase().includes(query.toLowerCase())
+        ).slice(0, 5);
+
+        if (filtered.length === 0) {
+            suggestionsListCustom.classList.remove('show');
+            return;
+        }
+
+        suggestionsListCustom.innerHTML = filtered.map(b => `
+            <div class="suggestion-custom" data-slug="${b.slug}">
+                <div class="suggestion-img-custom">
+                    ${b.image ?
+                        `<img src="${b.image}" alt="${b.title}">` :
+                        `<i class="fas fa-building" style="font-size: 24px; color: #d25f00;"></i>`
+                    }
+                </div>
+                <div class="suggestion-info-custom">
+                    <h4>${highlightMatchCustom(b.title, query)}</h4>
+                    <p><i class="fas fa-box"></i> ${b.products} محصول | <i class="fas fa-book"></i> ${b.catalogs} کاتالوگ</p>
+                </div>
+            </div>
+        `).join('');
+
+        suggestionsListCustom.classList.add('show');
+
+        document.querySelectorAll('.suggestion-custom').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const slug = item.dataset.slug;
+                window.location.href = `/product/brand/${slug}/catalogs/`;
+            });
+        });
+    }
+
+    function filterBrandsListCustom(query) {
+        const cards = document.querySelectorAll('.brand-item-custom');
+
+        if (!query.trim()) {
+            cards.forEach(card => card.style.display = 'flex');
+            if (window.innerWidth >= 768) {
+                cards.forEach(card => card.style.display = 'flex');
+            }
+            resultsCountCustom.innerHTML = `${cards.length} برند`;
+            return;
+        }
+
+        let visible = 0;
+        cards.forEach(card => {
+            const name = card.dataset.name;
+            if (name && name.includes(query.toLowerCase())) {
+                card.style.display = 'flex';
+                visible++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        resultsCountCustom.innerHTML = `${visible} برند`;
+    }
+
+    let typingTimerCustom;
+    searchInputCustom.addEventListener('input', (e) => {
+        const val = e.target.value;
+        clearTimeout(typingTimerCustom);
+        typingTimerCustom = setTimeout(() => {
+            showSuggestionsCustom(val);
+            filterBrandsListCustom(val);
+        }, 200);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!searchInputCustom.contains(e.target) && !suggestionsListCustom.contains(e.target)) {
+            suggestionsListCustom.classList.remove('show');
+        }
+    });
+
+    document.querySelectorAll('.filter-btn-custom').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const sort = btn.dataset.sort;
+            const url = new URL(window.location.href);
+            url.searchParams.set('sort', sort);
+            url.searchParams.set('search', searchInputCustom.value);
+            window.location.href = url.toString();
+        });
+    });
+
+    document.querySelectorAll('.brand-item-custom').forEach(item => {
+        const name = item.querySelector('.brand-details-custom h3')?.textContent;
+        if (name) item.dataset.name = name.toLowerCase();
+    });
+</script>
+
+{% endblock %}

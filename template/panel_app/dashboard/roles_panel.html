@@ -1,0 +1,647 @@
+{% extends 'admin_template.html' %}
+{% load static %}
+
+{% block title %}مدیریت نقش‌ها{% endblock %}
+
+{% block mobile_content %}
+<div style="padding: 1rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="color: #fff; font-size: 1.2rem;"><i class="fas fa-shield-alt"></i> نقش‌ها</h2>
+        <button onclick="openCreateRoleModal()" style="background: linear-gradient(135deg, #667eea, #764ba2); border: none; padding: 0.5rem 1rem; border-radius: 0.75rem; color: white; cursor: pointer;">
+            <i class="fas fa-plus"></i> جدید
+        </button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.5rem;">
+        <div style="background: #1e293b; border-radius: 0.75rem; padding: 0.75rem; text-align: center;">
+            <div style="font-size: 1.2rem; font-weight: 800; color: #fff;" id="mobileTotalRoles">0</div>
+            <div style="font-size: 0.6rem; color: #94a3b8;">کل نقش‌ها</div>
+        </div>
+        <div style="background: #1e293b; border-radius: 0.75rem; padding: 0.75rem; text-align: center;">
+            <div style="font-size: 1.2rem; font-weight: 800; color: #10b981;" id="mobileActiveRoles">0</div>
+            <div style="font-size: 0.6rem; color: #94a3b8;">فعال</div>
+        </div>
+        <div style="background: #1e293b; border-radius: 0.75rem; padding: 0.75rem; text-align: center;">
+            <div style="font-size: 1.2rem; font-weight: 800; color: #f59e0b;" id="mobileTotalBanUrls">0</div>
+            <div style="font-size: 0.6rem; color: #94a3b8;">URL ممنوع</div>
+        </div>
+    </div>
+
+    <div style="background: #1e293b; border-radius: 1rem; padding: 0.75rem; margin-bottom: 1rem;">
+        <input type="text" id="mobileSearchInput" placeholder="جستجو..." style="width: 100%; padding: 0.6rem; background: #0f172a; border: 1px solid rgba(102,126,234,0.3); border-radius: 0.5rem; color: #fff; margin-bottom: 0.5rem;">
+        <select id="mobileStatusFilter" style="width: 100%; padding: 0.6rem; background: #0f172a; border: 1px solid rgba(102,126,234,0.3); border-radius: 0.5rem; color: #fff;">
+            <option value="">همه</option>
+            <option value="true">فعال</option>
+            <option value="false">غیرفعال</option>
+        </select>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+            <button onclick="applyFilters()" style="flex:1; background: #667eea; border: none; padding: 0.5rem; border-radius: 0.5rem; color: white; cursor: pointer;">جستجو</button>
+            <button onclick="resetFilters()" style="flex:1; background: #ef4444; border: none; padding: 0.5rem; border-radius: 0.5rem; color: white; cursor: pointer;">ریست</button>
+        </div>
+    </div>
+
+    <div id="rolesList" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+    <div id="pagination" style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 1rem; margin-bottom: 5rem;"></div>
+</div>
+
+<!-- مودال ایجاد/ویرایش -->
+<div id="roleModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; padding: 1rem;">
+    <div style="background: #1e293b; border-radius: 1rem; width: 100%; max-width: 400px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid rgba(102,126,234,0.2);">
+            <h3 style="color: #fff;" id="modalTitle">ایجاد نقش</h3>
+            <button onclick="closeModal()" style="background: #ef4444; border: none; width: 30px; height: 30px; border-radius: 50%; color: white; cursor: pointer;">&times;</button>
+        </div>
+        <div style="padding: 1rem;">
+            <form id="roleForm" onsubmit="return false;">
+                <input type="hidden" id="roleId">
+                <div style="margin-bottom: 1rem;">
+                    <label style="color: #94a3b8; font-size: 0.75rem;">عنوان نقش *</label>
+                    <input type="text" id="roleTitle" required style="width: 100%; padding: 0.6rem; background: #0f172a; border: 1px solid rgba(102,126,234,0.3); border-radius: 0.5rem; color: #fff;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="color: #94a3b8; font-size: 0.75rem;">اسلاگ</label>
+                    <input type="text" id="roleSlug" style="width: 100%; padding: 0.6rem; background: #0f172a; border: 1px solid rgba(102,126,234,0.3); border-radius: 0.5rem; color: #fff;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="color: #94a3b8; font-size: 0.75rem;">وضعیت</label>
+                    <select id="roleIsActive" style="width: 100%; padding: 0.6rem; background: #0f172a; border: 1px solid rgba(102,126,234,0.3); border-radius: 0.5rem; color: #fff;">
+                        <option value="true">فعال</option>
+                        <option value="false">غیرفعال</option>
+                    </select>
+                </div>
+                <button type="submit" style="width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); border: none; padding: 0.75rem; border-radius: 0.5rem; color: white; cursor: pointer;">ذخیره</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- مودال URL های ممنوع -->
+<div id="banUrlsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; padding: 1rem;">
+    <div style="background: #1e293b; border-radius: 1rem; width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid rgba(102,126,234,0.2);">
+            <h3 style="color: #fff;">URL‌های ممنوع</h3>
+            <button onclick="closeBanUrlsModal()" style="background: #ef4444; border: none; width: 30px; height: 30px; border-radius: 50%; color: white; cursor: pointer;">&times;</button>
+        </div>
+        <div style="padding: 1rem;">
+            <div id="banUrlsList"></div>
+            <hr style="margin: 1rem 0; border-color: rgba(102,126,234,0.2);">
+            <h4 style="color: #fff; margin-bottom: 0.5rem;">افزودن URL جدید</h4>
+            <form id="banUrlForm" onsubmit="return false;">
+                <input type="hidden" id="currentRoleId">
+                <div style="margin-bottom: 0.75rem;">
+                    <input type="text" id="banUrlPattern" placeholder="الگوی URL *" required style="width: 100%; padding: 0.6rem; background: #0f172a; border: 1px solid rgba(102,126,234,0.3); border-radius: 0.5rem; color: #fff;">
+                </div>
+                <div style="margin-bottom: 0.75rem;">
+                    <textarea id="banUrlDescription" rows="2" placeholder="توضیحات" style="width: 100%; padding: 0.6rem; background: #0f172a; border: 1px solid rgba(102,126,234,0.3); border-radius: 0.5rem; color: #fff;"></textarea>
+                </div>
+                <button type="submit" style="width: 100%; background: linear-gradient(135deg, #10b981, #059669); border: none; padding: 0.75rem; border-radius: 0.5rem; color: white; cursor: pointer;">افزودن</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentPage = 1;
+    let currentFilters = {};
+
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+               document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+    }
+
+    function formatNumber(num) {
+        return new Intl.NumberFormat('fa-IR').format(num || 0);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    async function loadRoles() {
+        const params = new URLSearchParams({ page: currentPage, page_size: 10, ...currentFilters });
+        try {
+            const response = await fetch(`/panel/api/roles/?${params}`);
+            const data = await response.json();
+            if (data.success) {
+                renderRoles(data.data.roles);
+                renderPagination(data.data.pagination);
+                updateStats(data.data.roles);
+            } else {
+                document.getElementById('rolesList').innerHTML = `<div style="text-align: center; padding: 2rem; color: #ef4444;">خطا</div>`;
+            }
+        } catch(e) {
+            console.error(e);
+            document.getElementById('rolesList').innerHTML = '<div style="text-align: center; padding: 2rem; color: #ef4444;">خطا در ارتباط</div>';
+        }
+    }
+
+    function renderRoles(roles) {
+        const container = document.getElementById('rolesList');
+        if (!roles || roles.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 2rem; color: #94a3b8;">نقشی یافت نشد</div>';
+            return;
+        }
+        container.innerHTML = roles.map(role => `
+            <div style="background: #1e293b; border-radius: 1rem; padding: 0.75rem; border: 1px solid rgba(102,126,234,0.2);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="color: #60a5fa; font-weight: bold;">${escapeHtml(role.title)}</span>
+                    <span style="background: ${role.isActive ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}; color: ${role.isActive ? '#34d399' : '#ef4444'}; padding: 0.2rem 0.5rem; border-radius: 1rem; font-size: 0.65rem;">${role.isActive ? 'فعال' : 'غیرفعال'}</span>
+                </div>
+                <div style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 0.5rem;">
+                    <div>اسلاگ: ${escapeHtml(role.slug) || '-'}</div>
+                    <div>کاربران: ${formatNumber(role.users_count)} | URL: ${role.ban_urls?.length || 0}</div>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button onclick="editRole('${role.id}')" style="flex:1; background: #f59e0b; border: none; padding: 0.4rem; border-radius: 0.5rem; color: white; cursor: pointer;"><i class="fas fa-edit"></i> ویرایش</button>
+                    <button onclick="deleteRole('${role.id}')" style="flex:1; background: #ef4444; border: none; padding: 0.4rem; border-radius: 0.5rem; color: white; cursor: pointer;"><i class="fas fa-trash"></i> حذف</button>
+                    <button onclick="manageBanUrls('${role.id}')" style="flex:1; background: #8b5cf6; border: none; padding: 0.4rem; border-radius: 0.5rem; color: white; cursor: pointer;"><i class="fas fa-ban"></i> URL</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderPagination(pagination) {
+        const container = document.getElementById('pagination');
+        if (!pagination || pagination.total_pages <= 1) { container.innerHTML = ''; return; }
+        let html = '';
+        if (pagination.has_previous) html += `<button onclick="goToPage(${pagination.current_page - 1})" style="background: #1e293b; border: 1px solid #334155; padding: 0.3rem 0.7rem; border-radius: 0.5rem; color: #fff; cursor: pointer;">قبلی</button>`;
+        for (let i = Math.max(1, pagination.current_page - 2); i <= Math.min(pagination.total_pages, pagination.current_page + 2); i++)
+            html += `<button onclick="goToPage(${i})" style="background: ${i === pagination.current_page ? '#667eea' : '#1e293b'}; border: 1px solid #334155; padding: 0.3rem 0.7rem; border-radius: 0.5rem; color: #fff; cursor: pointer;">${i}</button>`;
+        if (pagination.has_next) html += `<button onclick="goToPage(${pagination.current_page + 1})" style="background: #1e293b; border: 1px solid #334155; padding: 0.3rem 0.7rem; border-radius: 0.5rem; color: #fff; cursor: pointer;">بعدی</button>`;
+        container.innerHTML = html;
+    }
+
+    function updateStats(roles) {
+        document.getElementById('mobileTotalRoles').innerText = formatNumber(roles.length);
+        document.getElementById('mobileActiveRoles').innerText = formatNumber(roles.filter(r => r.isActive).length);
+        const totalBanUrls = roles.reduce((sum, r) => sum + (r.ban_urls?.length || 0), 0);
+        document.getElementById('mobileTotalBanUrls').innerText = formatNumber(totalBanUrls);
+    }
+
+    function goToPage(page) { currentPage = page; loadRoles(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function applyFilters() {
+        currentFilters = { search: document.getElementById('mobileSearchInput').value, is_active: document.getElementById('mobileStatusFilter').value };
+        Object.keys(currentFilters).forEach(k => { if (!currentFilters[k]) delete currentFilters[k]; });
+        currentPage = 1; loadRoles();
+    }
+    function resetFilters() {
+        document.getElementById('mobileSearchInput').value = '';
+        document.getElementById('mobileStatusFilter').value = '';
+        currentFilters = {}; currentPage = 1; loadRoles();
+    }
+
+    function openCreateRoleModal() {
+        document.getElementById('modalTitle').innerText = 'ایجاد نقش جدید';
+        document.getElementById('roleId').value = '';
+        document.getElementById('roleTitle').value = '';
+        document.getElementById('roleSlug').value = '';
+        document.getElementById('roleIsActive').value = 'true';
+        document.getElementById('roleModal').style.display = 'flex';
+    }
+
+    async function editRole(roleId) {
+        try {
+            const response = await fetch(`/panel/api/roles/${roleId}/`);
+            const data = await response.json();
+            if (data.success) {
+                document.getElementById('modalTitle').innerText = 'ویرایش نقش';
+                document.getElementById('roleId').value = roleId;
+                document.getElementById('roleTitle').value = data.data.title;
+                document.getElementById('roleSlug').value = data.data.slug || '';
+                document.getElementById('roleIsActive').value = data.data.isActive ? 'true' : 'false';
+                document.getElementById('roleModal').style.display = 'flex';
+            }
+        } catch(e) { alert('خطا'); }
+    }
+
+    document.getElementById('roleForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const roleId = document.getElementById('roleId').value;
+        const data = {
+            title: document.getElementById('roleTitle').value,
+            slug: document.getElementById('roleSlug').value,
+            isActive: document.getElementById('roleIsActive').value === 'true'
+        };
+        const url = roleId ? `/panel/api/roles/${roleId}/update/` : '/panel/api/roles/create/';
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            alert(result.message);
+            if (result.success) {
+                closeModal();
+                loadRoles();
+            }
+        } catch(e) { alert('خطا'); }
+    });
+
+    async function deleteRole(roleId) {
+        if (!confirm('آیا از حذف اطمینان دارید؟')) return;
+        try {
+            const response = await fetch(`/panel/api/roles/${roleId}/delete/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCSRFToken() }
+            });
+            const result = await response.json();
+            alert(result.message);
+            if (result.success) loadRoles();
+        } catch(e) { alert('خطا'); }
+    }
+
+    async function manageBanUrls(roleId) {
+        document.getElementById('currentRoleId').value = roleId;
+        document.getElementById('banUrlPattern').value = '';
+        document.getElementById('banUrlDescription').value = '';
+        try {
+            const response = await fetch(`/panel/api/roles/${roleId}/`);
+            const data = await response.json();
+            if (data.success) {
+                renderBanUrls(data.data.ban_urls);
+                document.getElementById('banUrlsModal').style.display = 'flex';
+            }
+        } catch(e) { alert('خطا'); }
+    }
+
+    function renderBanUrls(banUrls) {
+        const container = document.getElementById('banUrlsList');
+        if (!banUrls || banUrls.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 1rem; color: #94a3b8;">هیچ URL ممنوعی ثبت نشده</div>';
+            return;
+        }
+        container.innerHTML = banUrls.map(ban => `
+            <div style="background: #0f172a; border-radius: 0.5rem; padding: 0.5rem; margin-bottom: 0.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <code style="color: #60a5fa; font-size: 0.7rem;">${escapeHtml(ban.url_pattern)}</code>
+                    <button onclick="deleteBanUrl('${ban.id}')" style="background: #ef4444; border: none; padding: 0.2rem 0.5rem; border-radius: 0.3rem; color: white; cursor: pointer;"><i class="fas fa-trash"></i></button>
+                </div>
+                <div style="font-size: 0.65rem; color: #94a3b8;">${escapeHtml(ban.description) || '-'}</div>
+            </div>
+        `).join('');
+    }
+
+    document.getElementById('banUrlForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const roleId = document.getElementById('currentRoleId').value;
+        const data = {
+            url_pattern: document.getElementById('banUrlPattern').value,
+            description: document.getElementById('banUrlDescription').value,
+            isActive: true
+        };
+        try {
+            const response = await fetch(`/panel/api/roles/${roleId}/ban-urls/create/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            alert(result.message);
+            if (result.success) manageBanUrls(roleId);
+        } catch(e) { alert('خطا'); }
+    });
+
+    async function deleteBanUrl(banUrlId) {
+        if (!confirm('حذف شود؟')) return;
+        try {
+            const response = await fetch(`/panel/api/ban-urls/${banUrlId}/delete/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCSRFToken() }
+            });
+            const result = await response.json();
+            if (result.success) {
+                const roleId = document.getElementById('currentRoleId').value;
+                manageBanUrls(roleId);
+            }
+        } catch(e) { alert('خطا'); }
+    }
+
+    function closeModal() { document.getElementById('roleModal').style.display = 'none'; }
+    function closeBanUrlsModal() { document.getElementById('banUrlsModal').style.display = 'none'; }
+
+    document.getElementById('mobileSearchInput').addEventListener('input', function() { setTimeout(applyFilters, 500); });
+    document.getElementById('mobileStatusFilter').addEventListener('change', applyFilters);
+
+    loadRoles();
+</script>
+{% endblock %}
+
+{% block pc %}
+<div style="padding: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="color: #fff; font-size: 1.5rem;"><i class="fas fa-shield-alt"></i> مدیریت نقش‌ها</h2>
+        <button onclick="openCreateRoleModalPC()" style="background: linear-gradient(135deg, #667eea, #764ba2); border: none; padding: 0.6rem 1.2rem; border-radius: 0.5rem; color: white; cursor: pointer;">
+            <i class="fas fa-plus"></i> نقش جدید
+        </button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+        <div style="background: #1e293b; border-radius: 1rem; padding: 1rem;">
+            <div style="color: #94a3b8;">کل نقش‌ها</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #fff;" id="pcTotalRoles">0</div>
+        </div>
+        <div style="background: #1e293b; border-radius: 1rem; padding: 1rem;">
+            <div style="color: #94a3b8;">نقش‌های فعال</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #10b981;" id="pcActiveRoles">0</div>
+        </div>
+        <div style="background: #1e293b; border-radius: 1rem; padding: 1rem;">
+            <div style="color: #94a3b8;">URL ممنوع</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #f59e0b;" id="pcTotalBanUrls">0</div>
+        </div>
+    </div>
+
+    <div style="background: #1e293b; border-radius: 1rem; overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
+            <thead>
+                <tr style="background: #0f172a;">
+                    <th style="padding: 1rem; text-align: right; color: #94a3b8;">عنوان</th>
+                    <th style="padding: 1rem; text-align: right; color: #94a3b8;">اسلاگ</th>
+                    <th style="padding: 1rem; text-align: right; color: #94a3b8;">وضعیت</th>
+                    <th style="padding: 1rem; text-align: right; color: #94a3b8;">کاربران</th>
+                    <th style="padding: 1rem; text-align: right; color: #94a3b8;">URL</th>
+                    <th style="padding: 1rem; text-align: right; color: #94a3b8;">عملیات</th>
+                 </tr>
+            </thead>
+            <tbody id="pcRolesTableBody">
+                <tr><td colspan="6" style="padding: 2rem; text-align: center; color: #94a3b8;">در حال بارگذاری...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="pcPagination" style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem;"></div>
+</div>
+
+<!-- مودال PC -->
+<div id="pcRoleModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background: #1e293b; border-radius: 1rem; width: 90%; max-width: 500px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid rgba(102,126,234,0.2);">
+            <h3 style="color: #fff;" id="pcModalTitle">ایجاد نقش</h3>
+            <button onclick="closePcModal()" style="background: #ef4444; border: none; width: 30px; height: 30px; border-radius: 50%; color: white; cursor: pointer;">&times;</button>
+        </div>
+        <div style="padding: 1rem;">
+            <form id="pcRoleForm" onsubmit="return false;">
+                <input type="hidden" id="pcRoleId">
+                <div style="margin-bottom: 1rem;">
+                    <label style="color: #94a3b8;">عنوان نقش *</label>
+                    <input type="text" id="pcRoleTitle" required style="width: 100%; padding: 0.6rem; background: #0f172a; border: 1px solid rgba(102,126,234,0.3); border-radius: 0.5rem; color: #fff;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="color: #94a3b8;">اسلاگ</label>
+                    <input type="text" id="pcRoleSlug" style="width: 100%; padding: 0.6rem; background: #0f172a; border: 1px solid rgba(102,126,234,0.3); border-radius: 0.5rem; color: #fff;">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="color: #94a3b8;">وضعیت</label>
+                    <select id="pcRoleIsActive" style="width: 100%; padding: 0.6rem; background: #0f172a; border: 1px solid rgba(102,126,234,0.3); border-radius: 0.5rem; color: #fff;">
+                        <option value="true">فعال</option>
+                        <option value="false">غیرفعال</option>
+                    </select>
+                </div>
+                <button type="submit" style="width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); border: none; padding: 0.75rem; border-radius: 0.5rem; color: white; cursor: pointer;">ذخیره</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="pcBanUrlsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background: #1e293b; border-radius: 1rem; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid rgba(102,126,234,0.2);">
+            <h3 style="color: #fff;">URL‌های ممنوع</h3>
+            <button onclick="closePcBanModal()" style="background: #ef4444; border: none; width: 30px; height: 30px; border-radius: 50%; color: white; cursor: pointer;">&times;</button>
+        </div>
+        <div style="padding: 1rem;">
+            <div id="pcBanUrlsList"></div>
+            <hr style="margin: 1rem 0;">
+            <h4 style="color: #fff;">افزودن URL جدید</h4>
+            <form id="pcBanUrlForm" onsubmit="return false;">
+                <input type="hidden" id="pcCurrentRoleId">
+                <div style="margin-bottom: 0.75rem;">
+                    <input type="text" id="pcBanUrlPattern" placeholder="الگوی URL" required style="width: 100%; padding: 0.6rem; background: #0f172a; border: 1px solid rgba(102,126,234,0.3); border-radius: 0.5rem; color: #fff;">
+                </div>
+                <div style="margin-bottom: 0.75rem;">
+                    <textarea id="pcBanUrlDescription" rows="2" placeholder="توضیحات" style="width: 100%; padding: 0.6rem; background: #0f172a; border: 1px solid rgba(102,126,234,0.3); border-radius: 0.5rem; color: #fff;"></textarea>
+                </div>
+                <button type="submit" style="width: 100%; background: #10b981; border: none; padding: 0.75rem; border-radius: 0.5rem; color: white; cursor: pointer;">افزودن</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let pcPage = 1;
+    let pcFilters = {};
+
+    function formatNumberPC(num) {
+        return new Intl.NumberFormat('fa-IR').format(num || 0);
+    }
+
+    function escapeHtmlPC(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function getCSRFTokenPC() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+               document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+    }
+
+    async function loadPCRoles() {
+        const params = new URLSearchParams({ page: pcPage, page_size: 10, ...pcFilters });
+        try {
+            const response = await fetch(`/panel/api/roles/?${params}`);
+            const data = await response.json();
+            if (data.success) {
+                renderPCRoles(data.data.roles);
+                renderPCPagination(data.data.pagination);
+                updatePCStats(data.data.roles);
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    function renderPCRoles(roles) {
+        const tbody = document.getElementById('pcRolesTableBody');
+        if (!roles || roles.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="padding: 2rem; text-align: center; color: #94a3b8;">نقشی یافت نشد</td></tr>';
+            return;
+        }
+        tbody.innerHTML = roles.map(role => `
+            <tr style="border-bottom: 1px solid rgba(102,126,234,0.1);">
+                <td style="padding: 1rem; color: #fff;">${escapeHtmlPC(role.title)}</td>
+                <td style="padding: 1rem; color: #94a3b8;">${escapeHtmlPC(role.slug) || '-'}</td>
+                <td style="padding: 1rem;"><span style="background: ${role.isActive ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}; color: ${role.isActive ? '#34d399' : '#ef4444'}; padding: 0.2rem 0.6rem; border-radius: 1rem;">${role.isActive ? 'فعال' : 'غیرفعال'}</span></td>
+                <td style="padding: 1rem; color: #fff;">${formatNumberPC(role.users_count)}</td>
+                <td style="padding: 1rem; color: #fff;">${role.ban_urls?.length || 0}</td>
+                <td style="padding: 1rem;">
+                    <button onclick="editPCRole('${role.id}')" style="background: #f59e0b; border: none; padding: 0.3rem 0.7rem; border-radius: 0.3rem; color: white; cursor: pointer;"><i class="fas fa-edit"></i></button>
+                    <button onclick="deletePCRole('${role.id}')" style="background: #ef4444; border: none; padding: 0.3rem 0.7rem; border-radius: 0.3rem; color: white; cursor: pointer;"><i class="fas fa-trash"></i></button>
+                    <button onclick="managePCBanUrls('${role.id}')" style="background: #8b5cf6; border: none; padding: 0.3rem 0.7rem; border-radius: 0.3rem; color: white; cursor: pointer;"><i class="fas fa-ban"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderPCPagination(pagination) {
+        const container = document.getElementById('pcPagination');
+        if (!pagination || pagination.total_pages <= 1) { container.innerHTML = ''; return; }
+        let html = '';
+        if (pagination.has_previous) html += `<button onclick="goToPCPage(${pagination.current_page - 1})" style="background: #1e293b; border: 1px solid #334155; padding: 0.4rem 0.8rem; border-radius: 0.5rem; color: #fff; cursor: pointer;">قبلی</button>`;
+        for (let i = Math.max(1, pagination.current_page - 2); i <= Math.min(pagination.total_pages, pagination.current_page + 2); i++)
+            html += `<button onclick="goToPCPage(${i})" style="background: ${i === pagination.current_page ? '#667eea' : '#1e293b'}; border: 1px solid #334155; padding: 0.4rem 0.8rem; border-radius: 0.5rem; color: #fff; cursor: pointer;">${i}</button>`;
+        if (pagination.has_next) html += `<button onclick="goToPCPage(${pagination.current_page + 1})" style="background: #1e293b; border: 1px solid #334155; padding: 0.4rem 0.8rem; border-radius: 0.5rem; color: #fff; cursor: pointer;">بعدی</button>`;
+        container.innerHTML = html;
+    }
+
+    function updatePCStats(roles) {
+        document.getElementById('pcTotalRoles').innerText = formatNumberPC(roles.length);
+        document.getElementById('pcActiveRoles').innerText = formatNumberPC(roles.filter(r => r.isActive).length);
+        const totalBanUrls = roles.reduce((sum, r) => sum + (r.ban_urls?.length || 0), 0);
+        document.getElementById('pcTotalBanUrls').innerText = formatNumberPC(totalBanUrls);
+    }
+
+    function goToPCPage(page) { pcPage = page; loadPCRoles(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+    function openCreateRoleModalPC() {
+        document.getElementById('pcModalTitle').innerText = 'ایجاد نقش جدید';
+        document.getElementById('pcRoleId').value = '';
+        document.getElementById('pcRoleTitle').value = '';
+        document.getElementById('pcRoleSlug').value = '';
+        document.getElementById('pcRoleIsActive').value = 'true';
+        document.getElementById('pcRoleModal').style.display = 'flex';
+    }
+
+    async function editPCRole(roleId) {
+        try {
+            const response = await fetch(`/panel/api/roles/${roleId}/`);
+            const data = await response.json();
+            if (data.success) {
+                document.getElementById('pcModalTitle').innerText = 'ویرایش نقش';
+                document.getElementById('pcRoleId').value = roleId;
+                document.getElementById('pcRoleTitle').value = data.data.title;
+                document.getElementById('pcRoleSlug').value = data.data.slug || '';
+                document.getElementById('pcRoleIsActive').value = data.data.isActive ? 'true' : 'false';
+                document.getElementById('pcRoleModal').style.display = 'flex';
+            }
+        } catch(e) { alert('خطا'); }
+    }
+
+    document.getElementById('pcRoleForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const roleId = document.getElementById('pcRoleId').value;
+        const data = {
+            title: document.getElementById('pcRoleTitle').value,
+            slug: document.getElementById('pcRoleSlug').value,
+            isActive: document.getElementById('pcRoleIsActive').value === 'true'
+        };
+        const url = roleId ? `/panel/api/roles/${roleId}/update/` : '/panel/api/roles/create/';
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFTokenPC() },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            alert(result.message);
+            if (result.success) {
+                closePcModal();
+                loadPCRoles();
+                location.reload();
+            }
+        } catch(e) { alert('خطا'); }
+    });
+
+    async function deletePCRole(roleId) {
+        if (!confirm('آیا از حذف اطمینان دارید؟')) return;
+        try {
+            const response = await fetch(`/panel/api/roles/${roleId}/delete/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCSRFTokenPC() }
+            });
+            const result = await response.json();
+            alert(result.message);
+            if (result.success) loadPCRoles();
+        } catch(e) { alert('خطا'); }
+    }
+
+    async function managePCBanUrls(roleId) {
+        document.getElementById('pcCurrentRoleId').value = roleId;
+        document.getElementById('pcBanUrlPattern').value = '';
+        document.getElementById('pcBanUrlDescription').value = '';
+        try {
+            const response = await fetch(`/panel/api/roles/${roleId}/`);
+            const data = await response.json();
+            if (data.success) {
+                renderPCBanUrls(data.data.ban_urls);
+                document.getElementById('pcBanUrlsModal').style.display = 'flex';
+            }
+        } catch(e) { alert('خطا'); }
+    }
+
+    function renderPCBanUrls(banUrls) {
+        const container = document.getElementById('pcBanUrlsList');
+        if (!banUrls || banUrls.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 1rem; color: #94a3b8;">هیچ URL ممنوعی ثبت نشده</div>';
+            return;
+        }
+        container.innerHTML = banUrls.map(ban => `
+            <div style="background: #0f172a; border-radius: 0.5rem; padding: 0.5rem; margin-bottom: 0.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <code style="color: #60a5fa;">${escapeHtmlPC(ban.url_pattern)}</code>
+                    <button onclick="deletePCBanUrl('${ban.id}')" style="background: #ef4444; border: none; padding: 0.2rem 0.5rem; border-radius: 0.3rem; color: white; cursor: pointer;">حذف</button>
+                </div>
+                <div style="font-size: 0.7rem; color: #94a3b8;">${escapeHtmlPC(ban.description) || '-'}</div>
+            </div>
+        `).join('');
+    }
+
+    document.getElementById('pcBanUrlForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const roleId = document.getElementById('pcCurrentRoleId').value;
+        const data = {
+            url_pattern: document.getElementById('pcBanUrlPattern').value,
+            description: document.getElementById('pcBanUrlDescription').value,
+            isActive: true
+        };
+        try {
+            const response = await fetch(`/panel/api/roles/${roleId}/ban-urls/create/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFTokenPC() },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            alert(result.message);
+            if (result.success) managePCBanUrls(roleId);
+        } catch(e) { alert('خطا'); }
+    });
+
+    async function deletePCBanUrl(banUrlId) {
+        if (!confirm('حذف شود؟')) return;
+        try {
+            const response = await fetch(`/panel/api/ban-urls/${banUrlId}/delete/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCSRFTokenPC() }
+            });
+            const result = await response.json();
+            if (result.success) {
+                const roleId = document.getElementById('pcCurrentRoleId').value;
+                managePCBanUrls(roleId);
+            }
+        } catch(e) { alert('خطا'); }
+    }
+
+    function closePcModal() { document.getElementById('pcRoleModal').style.display = 'none'; }
+    function closePcBanModal() { document.getElementById('pcBanUrlsModal').style.display = 'none'; }
+
+    loadPCRoles();
+</script>
+{% endblock %}

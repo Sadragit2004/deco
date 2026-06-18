@@ -1,0 +1,1993 @@
+{% load static %}
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>تسویه حساب - سفارش {{ order.order_number }}</title>
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+    <link rel="stylesheet" href="https://lib.arvancloud.ir/font-awesome/6.3.0/css/all.css">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #ecfdf5;
+            --gold: #d4af37;
+            --gold-dark: #b8960c;
+            --gold-light: #fef9e6;
+            --bg-color: #e8ecf1;
+            --surface: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            --border-color: #cbd5e1;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
+            --shadow-md: 0 8px 24px rgba(100, 116, 139, 0.12);
+            --shadow-lg: 0 12px 32px rgba(16, 185, 129, 0.2);
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'IRANYekan', Tahoma, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            padding: 0;
+            padding-bottom: 110px;
+            line-height: 1.5;
+        }
+
+        .mobile-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 14px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .mobile-header h1 { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .mobile-header h1 i { color: var(--primary); }
+        .mobile-header .order-code { font-size: 12px; font-weight: 600; color: var(--text-muted); background: #f1f5f9; padding: 4px 12px; border-radius: 20px; }
+
+        .container { max-width: 1280px; margin: 0 auto; padding: 24px 20px; }
+
+        .floating-payment-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            box-shadow: 0 -4px 24px rgba(0,0,0,0.08);
+            padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
+            z-index: 1000;
+            display: none;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .floating-content { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+        .floating-total { flex: 1; }
+        .floating-total-label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+        .floating-total-amount { font-size: 20px; font-weight: 800; }
+        .floating-total-amount small { font-size: 12px; font-weight: 500; color: var(--text-muted); }
+
+        .floating-pay-btn, .desktop-pay-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: var(--shadow-lg);
+            border-radius: 100px;
+        }
+
+        .floating-pay-btn { padding: 12px 24px; font-size: 14px; }
+        .desktop-pay-btn { width: 100%; padding: 14px; font-size: 15px; margin-top: 16px; border-radius: var(--radius-md); }
+        .desktop-pay-btn:hover, .floating-pay-btn:hover { transform: translateY(-1px); }
+
+        .secure-payment-badge { text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+        @media (min-width: 992px) {
+            body { padding-bottom: 0; }
+            .floating-payment-bar { display: none !important; }
+            .checkout-wrapper { display: grid; grid-template-columns: 1fr 380px; gap: 28px; align-items: start; }
+            .order-summary { position: sticky; top: 20px; }
+            .mobile-accordion-section .accordion-toggle { display: none !important; }
+            .mobile-accordion-section .accordion-content { display: block !important; padding: 0 !important; }
+            .checkout-form { background: transparent; padding: 0; }
+        }
+
+        @media (max-width: 991px) {
+            .floating-payment-bar { display: block; }
+            .desktop-pay-btn, .secure-payment-badge { display: none; }
+            .checkout-wrapper { display: flex; flex-direction: column; gap: 20px; }
+            .container { padding: 16px; }
+            .mobile-accordion-section {
+                background: var(--surface);
+                border-radius: var(--radius-lg);
+                margin-bottom: 12px;
+                overflow: hidden;
+                box-shadow: var(--shadow-md);
+            }
+            .accordion-toggle {
+                width: 100%;
+                padding: 18px 20px;
+                background: var(--surface);
+                border: none;
+                text-align: right;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                cursor: pointer;
+                font-weight: 800;
+                font-size: 15px;
+                color: var(--text-main);
+                font-family: inherit;
+                transition: var(--transition);
+            }
+            .accordion-toggle i:first-child {
+                color: var(--primary);
+                margin-left: 10px;
+            }
+            .accordion-toggle .toggle-icon {
+                transition: transform 0.3s ease;
+                color: var(--text-muted);
+            }
+            .accordion-toggle.active .toggle-icon {
+                transform: rotate(180deg);
+            }
+            .accordion-content {
+                display: none;
+                padding: 0 20px 20px 20px;
+                border-top: 1px solid var(--border-color);
+                background: var(--surface);
+            }
+            .accordion-content.active {
+                display: block;
+            }
+            .checkout-form {
+                background: transparent;
+                padding: 0;
+                box-shadow: none;
+            }
+            .checkout-form .section-title {
+                display: none;
+            }
+        }
+
+        .checkout-form, .order-summary {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 8px;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #334155;
+        }
+        .form-group label i { color: #94a3b8; font-size: 13px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: inherit;
+            transition: var(--transition);
+            background: #f8fafc;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--surface);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .check-section-gold {
+            background: linear-gradient(135deg, var(--gold-light), #fff8e7);
+            border: 2px solid var(--gold);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        .check-section-gold::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--gold), transparent);
+            opacity: 0.1;
+            border-radius: 0 0 0 60px;
+        }
+        .check-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        .check-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            color: #b8960c;
+            font-size: 16px;
+        }
+        .check-title i { font-size: 20px; color: var(--gold); }
+        .check-percent-badge {
+            background: var(--gold);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .check-info-note {
+            background: rgba(212, 175, 55, 0.15);
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #856404;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .check-info-note i { color: var(--gold); }
+
+        .check-owner-info {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #e2d5a8;
+        }
+        .check-owner-info .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed #f0e6c5;
+        }
+        .check-owner-info .info-row:last-child {
+            border-bottom: none;
+        }
+        .check-owner-info .info-label {
+            font-size: 12px;
+            color: #856404;
+            font-weight: 600;
+        }
+        .check-owner-info .info-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: #5c3d00;
+            font-family: monospace;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .check-upload-area {
+            border: 2px dashed var(--gold);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(212, 175, 55, 0.05);
+        }
+        .check-upload-area:hover {
+            border-color: var(--gold-dark);
+            background: rgba(212, 175, 55, 0.1);
+        }
+        .check-upload-area i { font-size: 35px; color: var(--gold); margin-bottom: 8px; display: block; }
+        .check-preview {
+            display: none;
+            margin-top: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 12px;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid var(--gold);
+        }
+        .check-preview img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--gold);
+        }
+        .check-confirm-box {
+            background: #f0fdf4;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            border: 1px solid #bbf7d0;
+        }
+        .check-confirm-box input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+        .check-confirm-box label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #065f46;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .check-fixed-percent {
+            background: #fff3cd;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .check-fixed-percent .percent-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #b8960c;
+        }
+        .check-fixed-percent .amount-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #856404;
+            margin-top: 8px;
+        }
+
+        .check-enable-box {
+            background: linear-gradient(135deg, #fef9e6, #fff8e7);
+            border: 2px solid var(--gold);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .check-enable-box:hover {
+            background: #fef3c7;
+            border-color: var(--gold-dark);
+        }
+        .check-enable-box input {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: var(--gold);
+        }
+        .check-enable-box label {
+            flex: 1;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            color: #b8960c;
+            margin: 0;
+        }
+        .check-details-wrapper {
+            display: none;
+            margin-top: 15px;
+        }
+        .check-details-wrapper.active {
+            display: block;
+        }
+        .check-status-msg {
+            background: #f0fdf4;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 12px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .check-status-msg.success {
+            background: #f0fdf4;
+            color: #059669;
+            display: flex;
+        }
+        .check-status-msg.error {
+            background: #fef2f2;
+            color: #dc2626;
+            display: flex;
+        }
+        .check-status-msg.loading {
+            background: #e0f2fe;
+            color: #0284c7;
+            display: flex;
+        }
+        .check-status-msg i { font-size: 14px; }
+
+        .wallet-section {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            border: 1px solid #bbf7d0;
+        }
+        .wallet-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #bbf7d0;
+        }
+        .wallet-header .wallet-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            color: #065f46;
+        }
+        .wallet-header .wallet-title i { font-size: 20px; }
+        .wallet-balance {
+            background: #065f46;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .info-box-wallet {
+            background: #fef9c3;
+            padding: 10px 15px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #854d0e;
+        }
+        .use-wallet-input { margin-top: 10px; }
+        .use-wallet-input label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px; color: #065f46; }
+        .input-group-wallet {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .input-group-wallet input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            font-size: 14px;
+            background: white;
+        }
+        .btn-wallet-use {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 0 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .suggest-amounts {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .suggest-btn {
+            background: white;
+            border: 1px solid #bbf7d0;
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .suggest-btn:hover {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+        .wallet-used-section {
+            background: #ecfdf5;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .used-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: #d1fae5;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .used-info i { color: #059669; }
+        .btn-cancel-wallet {
+            margin-right: auto;
+            background: #fee2e2;
+            border: none;
+            padding: 5px 16px;
+            border-radius: 20px;
+            color: #dc2626;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .payment-methods { display: flex; gap: 12px; margin-top: 5px; flex-wrap: wrap; }
+        .payment-option { flex: 1; min-width: 140px; position: relative; }
+        .payment-option input { position: absolute; opacity: 0; width: 0; height: 0; }
+        .payment-option label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            font-size: 14px;
+            margin: 0;
+        }
+        .payment-option label i { font-size: 18px; color: #94a3b8; }
+        .payment-option input:checked + label {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+        .payment-option input:checked + label i { color: var(--primary); }
+
+        .address-item {
+            position: relative;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            background: #f8fafc;
+        }
+        .address-item:hover { border-color: #94a3b8; background: var(--surface); }
+        .address-item.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        .address-item.selected::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary);
+            border-radius: 0 4px 4px 0;
+        }
+        .address-content { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .address-details { flex: 1; }
+        .address-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+        .address-title strong { font-size: 14px; font-weight: 800; }
+        .badge-default { background: var(--text-main); color: white; font-size: 10px; padding: 2px 8px; border-radius: 6px; }
+        .address-text { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 5px; }
+        .address-meta { font-size: 11px; color: #64748b; display: inline-flex; align-items: center; gap: 5px; background: white; padding: 3px 8px; border-radius: 6px; border: 1px solid #e2e8f0; }
+        .check-icon { color: var(--primary); font-size: 20px; display: none; }
+        .check-icon.show { display: block; }
+
+        .btn-add-address {
+            width: 100%;
+            margin-top: 12px;
+            padding: 12px;
+            background: white;
+            border: 2px dashed var(--primary);
+            color: var(--primary);
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-add-address:hover { background: var(--primary-light); border-color: var(--primary); }
+
+        .shipping-select {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: #f8fafc;
+            cursor: pointer;
+        }
+
+        .shipping-option-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: var(--radius-sm);
+            margin-top: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            border: 1px dashed var(--border-color);
+        }
+
+        .order-items { margin-bottom: 20px; max-height: 350px; overflow-y: auto; }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        .order-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .order-item-info { flex: 1; padding-left: 10px; }
+        .order-item-title { font-weight: 700; font-size: 13px; margin-bottom: 5px; }
+        .order-item-meta { font-size: 11px; color: var(--text-muted); background: #f1f5f9; padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px; }
+        .order-item-price { text-align: left; min-width: 85px; }
+        .final-price { font-weight: 800; font-size: 14px; }
+        .original-price { text-decoration: line-through; color: #94a3b8; font-size: 11px; }
+        .discount-badge { background: #fef2f2; color: #ef4444; font-size: 10px; padding: 2px 6px; border-radius: 6px; display: inline-block; margin-top: 4px; }
+
+        .summary-totals { background: #f8fafc; border-radius: var(--radius-md); padding: 18px; }
+        .total-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px; font-weight: 600; color: var(--text-muted); }
+        .total-row span:last-child { color: var(--text-main); font-weight: 700; }
+        .total-row.discount-row { color: #ef4444; }
+        .total-row.discount-row span:last-child { color: #ef4444; }
+        .total-row.wallet-row { color: #059669; }
+        .total-row.wallet-row span:last-child { color: #059669; }
+        .total-row.grand-total { font-size: 16px; font-weight: 800; border-top: 2px dashed #cbd5e1; margin-top: 12px; padding-top: 14px; }
+        .total-row.grand-total span:last-child { color: var(--primary-dark); font-size: 20px; }
+
+        .alert { padding: 14px; border-radius: var(--radius-sm); margin-bottom: 20px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .alert-error { background: #fef2f2; color: #b91c1c; border-right: 4px solid #ef4444; }
+        .alert-success { background: #f0fdf4; color: #15803d; border-right: 4px solid #10b981; }
+        .alert-info { background: #e0f2fe; color: #0369a1; border-right: 4px solid #0ea5e9; }
+
+        .empty-state { text-align: center; padding: 24px; color: var(--text-muted); background: #f8fafc; border-radius: var(--radius-sm); border: 2px dashed #cbd5e1; }
+        .empty-state i { font-size: 40px; color: #cbd5e1; margin-bottom: 12px; display: block; }
+        .row-2cols { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        @media (max-width: 560px) {
+            .row-2cols { grid-template-columns: 1fr; gap: 10px; }
+            .payment-methods { flex-direction: column; }
+            .payment-option { min-width: auto; }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-container {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 450px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .modal-header h3 { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .modal-header h3 i { color: var(--primary); }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        .modal-close:hover { background: #f1f5f9; }
+        .modal-body { padding: 20px; }
+        .modal-footer { padding: 16px 20px; border-top: 1px solid var(--border-color); display: flex; gap: 12px; justify-content: flex-end; }
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-family: inherit;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: #f1f5f9; color: var(--text-main); }
+        .btn-secondary:hover { background: #e2e8f0; }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 100px;
+            font-size: 14px;
+            z-index: 3000;
+            transition: all 0.3s;
+            opacity: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .receipt-preview-large {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            margin: 10px 0;
+        }
+
+        .success-message-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            z-index: 4000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .success-message-modal.active { display: flex; }
+        .success-card {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 32px;
+            padding: 40px 30px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            animation: scaleIn 0.5s ease;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+        }
+        .success-icon i { font-size: 55px; color: #10b981; }
+        .success-title { color: white; font-size: 26px; font-weight: 800; margin-bottom: 15px; }
+        .success-message { color: rgba(255,255,255,0.95); font-size: 16px; line-height: 1.8; margin-bottom: 20px; }
+        .success-order-number {
+            background: rgba(255,255,255,0.2);
+            border-radius: 50px;
+            padding: 10px 20px;
+            display: inline-block;
+            margin: 15px 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .success-note {
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        .success-btn {
+            background: white;
+            color: #10b981;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: all 0.3s;
+        }
+        .success-btn:hover { transform: scale(1.05); }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-header">
+        <h1><i class="fas fa-shield-check"></i>تسویه حساب</h1>
+        <div class="order-code">#{{ order.order_number }}</div>
+    </div>
+
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}info{% endif %}">
+                    <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %}"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="checkout-wrapper">
+            <div class="checkout-form">
+                <form method="post" id="checkoutForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" id="formAction" value="save">
+                    <input type="hidden" name="selected_address" id="selected_address" value="">
+                    <input type="hidden" name="shipping_method" id="selected_shipping_method" value="">
+                    <input type="hidden" name="used_from_wallet" id="usedFromWallet" value="0">
+                    <input type="hidden" name="check_id" id="checkId" value="">
+
+                    <div class="mobile-accordion-section" data-section="personal">
+                        <button type="button" class="accordion-toggle">
+                            <span><i class="fas fa-user-shield"></i> اطلاعات شخصی</span>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="row-2cols">
+                                <div class="form-group">
+                                    <label><i class="fas fa-user"></i> نام *</label>
+                                    <input type="text" name="name" value="{{ checkout_data.name|default:request.user.name|default:'' }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fas fa-users"></i> نام خانوادگی *</label>
+                                    <input type="text" name="family" value="{{ checkout_data.family|default:request.user.family|default:'' }}" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-mobile-alt"></i> تلفن همراه *</label>
+                                <input type="tel" name="phone" value="{{ checkout_data.phone|default:request.user.mobileNumber|default:'' }}" placeholder="09xxxxxxxxx" required dir="ltr">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mobile-accordion-section" data-section="wallet">
+                        <button type="button" class="accordion-toggle">
+                            <span><i class="fas fa-wallet"></i> کیف پول</span>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="wallet-section">
+                                <div class="wallet-header">
+                                    <div class="wallet-title">
+                                        <i class="fas fa-wallet"></i>
+                                        <span>کیف پول</span>
+                                    </div>
+                                    <div class="wallet-balance" id="walletBalance">{{ wallet_balance_display|default:"۰" }} تومان</div>
+                                </div>
+                                <div id="walletUseSection" style="{% if used_from_wallet > 0 %}display:none;{% endif %}">
+                                    <div class="info-box-wallet">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span>با استفاده از کیف پول، مبلغ از حساب شما کسر می‌شود.</span>
+                                    </div>
+                                    <div class="use-wallet-input">
+                                        <label>مبلغ مورد نظر (تومان):</label>
+                                        <div class="input-group-wallet">
+                                            <input type="number" id="walletAmount" placeholder="مثال: 100000" min="1000" step="1000">
+                                            <button type="button" id="useWalletBtn" class="btn-wallet-use">استفاده از کیف پول</button>
+                                        </div>
+                                        <div class="suggest-amounts">
+                                            <button type="button" class="suggest-btn" data-amount="100000">۱۰۰٬۰۰۰</button>
+                                            <button type="button" class="suggest-btn" data-amount="200000">۲۰۰٬۰۰۰</button>
+                                            <button type="button" class="suggest-btn" data-amount="500000">۵۰۰٬۰۰۰</button>
+                                            <button type="button" class="suggest-btn" data-amount="1000000">۱٬۰۰۰٬۰۰۰</button>
+                                            <button type="button" class="suggest-btn max-btn" data-amount="{{ wallet_balance|default:0 }}">حداکثر</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="walletUsedSection" style="{% if used_from_wallet == 0 %}display:none;{% endif %}">
+                                    <div class="wallet-used-section">
+                                        <div class="used-info">
+                                            <i class="fas fa-check-circle"></i>
+                                            <span>استفاده از کیف پول:</span>
+                                            <strong id="usedAmountDisplay">{{ used_from_wallet_display|default:"۰" }} تومان</strong>
+                                            <button type="button" id="cancelWalletBtn" class="btn-cancel-wallet">لغو</button>
+                                        </div>
+                                        <div class="used-info" style="background: #fff3cd; margin-bottom: 0;">
+                                            <i class="fas fa-info-circle" style="color: #856404;"></i>
+                                            <span>مانده کیف پول پس از کسر:</span>
+                                            <strong id="remainingWallet">{{ remaining_wallet_display|default:wallet_balance_display|default:"۰" }} تومان</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if user_tier != 'select' and user_tier %}
+                    <div class="mobile-accordion-section" data-section="check">
+                        <button type="button" class="accordion-toggle">
+                            <span><i class="fas fa-money-check-alt" style="color: var(--gold);"></i> پرداخت با چک</span>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="check-enable-box" id="checkEnableBox">
+                                <input type="checkbox" id="enableCheckPayment">
+                                <label for="enableCheckPayment">
+                                    <i class="fas fa-percent" style="color: var(--gold);"></i>
+                                    پرداخت با چک ({% if user_tier == 'premium' %}۱۵٪{% elif user_tier == 'elite' %}۲۵٪{% else %}۵۰٪{% endif %} از مبلغ سفارش)
+                                </label>
+                            </div>
+                            <div class="check-details-wrapper" id="checkDetailsWrapper">
+                                <div class="check-section-gold">
+                                    <div class="check-header">
+                                        <div class="check-title">
+                                            <i class="fas fa-money-check-alt"></i>
+                                            <span>مشخصات چک</span>
+                                        </div>
+                                        <div class="check-percent-badge">
+                                            <i class="fas fa-percent"></i>
+                                            {% if user_tier == 'premium' %}۱۵٪{% elif user_tier == 'elite' %}۲۵٪{% else %}۵۰٪{% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="check-info-note">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>طبق سطح {{ user_tier_display|default:user_tier }} شما، {% if user_tier == 'premium' %}۱۵٪{% elif user_tier == 'elite' %}۲۵٪{% else %}۵۰٪{% endif %} از مبلغ سفارش را با چک پرداخت می‌کنید.</span>
+                                    </div>
+
+                                    <div class="check-fixed-percent">
+                                        <div>درصد پرداخت با چک (ثابت)</div>
+                                        <div class="percent-value" id="fixedPercentDisplay">{% if user_tier == 'premium' %}۱۵{% elif user_tier == 'elite' %}۲۵{% else %}۵۰{% endif %}%</div>
+                                        <div class="amount-value" id="fixedCheckAmountDisplay">مبلغ چک: ۰ تومان</div>
+                                    </div>
+
+                                    <div class="check-owner-info">
+                                        <div class="info-row">
+                                            <span class="info-label">کد ملی گیرنده چک:</span>
+                                            <span class="info-value">۱۲۳۴۵۶۷۸۹۰</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">شناسه چک / شماره سریال:</span>
+                                            <span class="info-value">CHK-{{ order.order_number|slice:":8" }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="check-form-group">
+                                        <label><i class="fas fa-image"></i> عکس چک (الزامی)</label>
+                                        <div class="check-upload-area" id="checkUploadArea">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <div style="font-size: 13px;">کلیک کنید یا بکشید رها کنید</div>
+                                            <div style="font-size: 11px; color: #b8960c;">JPG, PNG (حداکثر 2 مگابایت)</div>
+                                            <input type="file" id="checkImageInput" accept="image/jpeg,image/png,image/jpg" style="display: none;">
+                                        </div>
+                                        <div id="checkPreview" class="check-preview">
+                                            <img id="checkPreviewImg" src="">
+                                            <div style="flex: 1;">
+                                                <div id="checkPreviewName" style="font-size: 13px; font-weight: 500;"></div>
+                                                <div id="checkPreviewSize" style="font-size: 11px; color: #64748b;"></div>
+                                            </div>
+                                            <button type="button" id="removeCheckImage" style="background: #fee2e2; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; color: #ef4444;">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div id="checkStatusMsg" class="check-status-msg"></div>
+
+                                    <div class="check-confirm-box" id="checkConfirmBox">
+                                        <input type="checkbox" id="checkConfirmCheckbox">
+                                        <label for="checkConfirmCheckbox">
+                                            <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                                            تأیید می‌کنم که اطلاعات چک صحیح است و عکس آن را آپلود کرده‌ام
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mobile-accordion-section" data-section="address">
+                        <button type="button" class="accordion-toggle">
+                            <span><i class="fas fa-map-marker-alt"></i> آدرس تحویل</span>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <div id="addressesList">
+                                {% if addresses %}
+                                    {% for address in addresses %}
+                                        <div class="address-item" data-id="{{ address.id }}">
+                                            <div class="address-content">
+                                                <div class="address-details">
+                                                    <div class="address-title">
+                                                        <strong>{{ address.recipient_name|default:address.user.name|default:'' }}</strong>
+                                                        {% if address.is_default %}
+                                                            <span class="badge-default">پیش‌فرض</span>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="address-text">{{ address.address }}</div>
+                                                    {% if address.postal_code %}
+                                                        <div class="address-meta"><i class="fas fa-envelope"></i> {{ address.postal_code }}</div>
+                                                    {% endif %}
+                                                </div>
+                                                <i class="fas fa-check-circle check-icon"></i>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="empty-state" id="emptyAddressState">
+                                        <i class="fas fa-map-marked-alt"></i>
+                                        <p>هیچ آدرسی ثبت نشده است.</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <button type="button" class="btn-add-address" id="openAddressModalBtn">
+                                <i class="fas fa-plus-circle"></i> افزودن آدرس جدید
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mobile-accordion-section" data-section="shipping">
+                        <button type="button" class="accordion-toggle">
+                            <span><i class="fas fa-truck-fast"></i> روش ارسال</span>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </button>
+                        <div class="accordion-content">
+                            {% if shipping_methods %}
+                                <select class="shipping-select" id="shippingSelect">
+                                    <option value="">انتخاب روش ارسال</option>
+                                    {% for method in shipping_methods %}
+                                        <option value="{{ method.id }}" data-cost="{{ method.base_cost }}">
+                                            {{ method.name }} - {{ method.base_cost|floatformat:0 }} تومان
+                                            {% if method.delivery_time %} | {{ method.delivery_time }}{% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="shipping-option-preview" id="shippingPreview">
+                                    <span>روش انتخاب شده:</span>
+                                    <span id="selectedShippingName"></span>
+                                    <span id="selectedShippingCost"></span>
+                                </div>
+                            {% else %}
+                                <div class="empty-state"><i class="fas fa-box-open"></i><p>هیچ روش ارسالی فعال نیست</p></div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mobile-accordion-section" data-section="payment">
+                        <button type="button" class="accordion-toggle">
+                            <span><i class="fas fa-credit-card"></i> روش پرداخت</span>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="payment-methods">
+                                <div class="payment-option">
+                                    <input type="radio" name="payment_method" id="payment_online" value="online">
+                                    <label for="payment_online"><i class="fas fa-shield-alt"></i> درگاه پرداخت آنلاین</label>
+                                </div>
+                                <div class="payment-option">
+                                    <input type="radio" name="payment_method" id="payment_card" value="card_to_card" checked>
+                                    <label for="payment_card"><i class="fas fa-money-bill-wave"></i> کارت به کارت</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mobile-accordion-section" data-section="description">
+                        <button type="button" class="accordion-toggle">
+                            <span><i class="fas fa-pen-alt"></i> توضیحات (اختیاری)</span>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="form-group">
+                                <textarea name="description" rows="2" placeholder="توضیحات اضافی...">{{ checkout_data.description|default:'' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="order-summary">
+                <div class="section-title">
+                    <i class="fas fa-shopping-bag"></i> خلاصه سفارش
+                </div>
+                <div class="order-items">
+                    {% for item in order_items %}
+                        <div class="order-item">
+                            <div class="order-item-info">
+                                <div class="order-item-title">{{ item.product_title }}</div>
+                                <div class="order-item-meta"><i class="fas fa-cube"></i> تعداد: {{ item.quantity|floatformat:0 }} {% if item.sales_unit_name %} {{ item.sales_unit_name }}{% endif %}</div>
+                                {% if item.discount_percent > 0 %}
+                                    <div class="discount-badge">{{ item.discount_percent }}٪ تخفیف</div>
+                                {% endif %}
+                            </div>
+                            <div class="order-item-price">
+                                {% if item.discount_percent > 0 %}<div class="original-price">{{ item.unit_price_before_discount|floatformat:0 }}</div>{% endif %}
+                                <div class="final-price">{{ item.total|floatformat:0 }} تومان</div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="empty-state"><i class="fas fa-box"></i><p>سبد خرید خالی است</p></div>
+                    {% endfor %}
+                </div>
+
+                <div class="summary-totals">
+                    <div class="total-row"><span>مبلغ کل کالاها</span><span>{{ order.subtotal|floatformat:0 }} تومان</span></div>
+                    {% if order.discount_amount > 0 %}
+                    <div class="total-row discount-row"><span><i class="fas fa-tag"></i> سود شما از خرید</span><span>{{ order.discount_amount|floatformat:0 }} تومان</span></div>
+                    {% endif %}
+                    <div class="total-row"><span><i class="fas fa-motorcycle"></i> هزینه ارسال</span><span id="shippingCost">{{ order.shipping_cost|floatformat:0 }} تومان</span></div>
+                    <div class="total-row wallet-row" id="walletRow" style="{% if used_from_wallet == 0 %}display:none;{% endif %}">
+                        <span><i class="fas fa-wallet"></i> استفاده از کیف پول</span>
+                        <span id="usedWalletAmount">- {{ used_from_wallet_display|default:"۰" }} تومان</span>
+                    </div>
+                    <div class="total-row" id="checkRow" style="display:none;">
+                        <span><i class="fas fa-money-check-alt"></i> پرداخت با چک</span>
+                        <span id="checkDeductAmount">- ۰ تومان</span>
+                    </div>
+                    <div class="total-row grand-total"><span>مبلغ قابل پرداخت</span><span id="grandTotal">{{ final_total|default:order.total|floatformat:0 }} تومان</span></div>
+                </div>
+
+                <button type="button" class="desktop-pay-btn" id="submitOrderBtn">
+                    <i class="fas fa-money-bill-wave"></i> ثبت سفارش و پرداخت
+                </button>
+                <div class="secure-payment-badge"><i class="fas fa-lock"></i> پرداخت امن</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="cardModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-money-bill-wave"></i> پرداخت کارت به کارت</h3>
+                <button class="modal-close" id="closeCardModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 20px; border-radius: 16px; text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 13px; opacity: 0.9;">مبلغ قابل پرداخت</div>
+                    <div style="font-size: 28px; font-weight: 800; margin-top: 5px;" id="modalTotal">{{ final_total|default:order.total|floatformat:0 }} <span style="font-size: 14px;">تومان</span></div>
+                </div>
+                <div style="background: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
+                        <div><div style="font-size: 12px; color: #64748b;">شماره کارت</div><div style="font-size: 16px; font-weight: 700; font-family: monospace; direction: ltr;">6104-3378-9123-4567</div></div>
+                        <button class="copy-btn" onclick="copyCardNumber('6104337891234567')" style="background: #10b981; border: none; color: white; width: 36px; height: 36px; border-radius: 10px; cursor: pointer;"><i class="fas fa-copy"></i></button>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0;">
+                        <div><div style="font-size: 12px; color: #64748b;">شماره شبا</div><div style="font-size: 13px; font-weight: 700; font-family: monospace; direction: ltr;">IR820120000000123456789001</div></div>
+                        <button class="copy-btn" onclick="copyIBAN('IR820120000000123456789001')" style="background: #10b981; border: none; color: white; width: 36px; height: 36px; border-radius: 10px; cursor: pointer;"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 10px;"><i class="fas fa-image"></i> تصویر رسید پرداخت</label>
+                    <div id="receiptUploadArea" style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 25px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 40px; color: #10b981; margin-bottom: 10px; display: block;"></i>
+                        <div style="font-size: 14px; color: #475569;">کلیک کنید یا بکشید رها کنید</div>
+                        <div style="font-size: 11px; color: #94a3b8; margin-top: 5px;">JPG, PNG (حداکثر 2 مگابایت)</div>
+                        <input type="file" id="receiptInput" accept="image/jpeg,image/png,image/jpg" style="display: none;">
+                    </div>
+                    <div id="receiptPreview" style="display: none; margin-top: 15px; padding: 12px; background: #f8fafc; border-radius: 12px; align-items: center; gap: 12px;">
+                        <img id="previewImg" src="" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                        <div style="flex: 1;"><div id="previewName" style="font-size: 13px; font-weight: 500;"></div><div id="previewSize" style="font-size: 11px; color: #64748b;"></div></div>
+                        <button type="button" id="removeReceipt" style="background: #fee2e2; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; color: #ef4444;"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div id="modalCardError" style="color: #ef4444; font-size: 13px; display: none; text-align: center;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelCardModalBtn">انصراف</button>
+                <button class="btn btn-primary" id="showConfirmBtn">تأیید و ادامه</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-container" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-question-circle"></i> تأیید نهایی</h3>
+                <button class="modal-close" id="closeConfirmModalBtn">&times;</button>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <div style="background: #f0fdf4; border-radius: 16px; padding: 20px; margin-bottom: 20px;">
+                    <i class="fas fa-image" style="font-size: 48px; color: #10b981; margin-bottom: 15px; display: block;"></i>
+                    <div style="font-weight: 700; margin-bottom: 10px;">آیا از صحت اطلاعات زیر مطمئن هستید؟</div>
+                    <div id="confirmReceiptPreview" style="margin-top: 15px;"></div>
+                    <div style="margin-top: 15px; padding: 12px; background: #f8fafc; border-radius: 12px;">
+                        <div><strong>نام فایل:</strong> <span id="confirmFileName"></span></div>
+                        <div><strong>حجم:</strong> <span id="confirmFileSize"></span></div>
+                        <div><strong>مبلغ قابل پرداخت:</strong> <span id="confirmAmount" style="color: #10b981; font-weight: 800;"></span></div>
+                    </div>
+                </div>
+                <div id="confirmError" style="color: #ef4444; font-size: 13px; display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelConfirmBtn">بازگشت</button>
+                <button class="btn btn-primary" id="finalSubmitBtn">تأیید و ثبت نهایی</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="success-message-modal" id="successModal">
+        <div class="success-card">
+            <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="success-title">✓ ثبت شد!</div>
+            <div class="success-message">اطلاعات و پرداخت شما با موفقیت ذخیره شد.</div>
+            <div class="success-order-number" id="successOrderNumber">{{ order.order_number }}</div>
+            <div class="success-message">منتظر پیامک تأیید فاکتور و هزینه باشید.</div>
+            <div class="success-note"><i class="fas fa-clock"></i> پس از تأیید، سفارش شما پردازش خواهد شد</div>
+            <button class="success-btn" id="goToOrderDetailBtn"><i class="fas fa-arrow-left"></i> مشاهده جزئیات سفارش</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="addressModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fas fa-map-marker-alt"></i> آدرس جدید</h3>
+                <button class="modal-close" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group"><label><i class="fas fa-user"></i> نام گیرنده *</label><input type="text" id="addr_recipient_name" placeholder="نام کامل گیرنده"></div>
+                <div class="form-group"><label><i class="fas fa-globe"></i> استان *</label><select id="addr_province"><option value="">انتخاب استان</option></select></div>
+                <div class="form-group"><label><i class="fas fa-city"></i> شهر *</label><select id="addr_city" disabled><option value="">ابتدا استان را انتخاب کنید</option></select></div>
+                <div class="form-group"><label><i class="fas fa-location-dot"></i> آدرس کامل *</label><textarea id="addr_address_text" rows="3" placeholder="خیابان، کوچه، پلاک، واحد..."></textarea></div>
+                <div class="form-group"><label><i class="fas fa-mail-bulk"></i> کد پستی</label><input type="text" id="addr_postal_code" placeholder="کد پستی ۱۰ رقمی"></div>
+                <div class="form-group"><label style="display: flex; align-items: center; gap: 8px; cursor: pointer;"><input type="checkbox" id="addr_is_default"> <span><i class="fas fa-star"></i> آدرس پیش‌فرض</span></label></div>
+                <div id="modalError" style="color: #ef4444; font-size: 12px; display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelModalBtn">انصراف</button>
+                <button class="btn btn-primary" id="saveAddressBtn">ذخیره آدرس</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="floating-payment-bar">
+        <div class="floating-content">
+            <div class="floating-total">
+                <div class="floating-total-label">مبلغ قابل پرداخت</div>
+                <div class="floating-total-amount" id="floatingGrandTotal">{{ final_total|default:order.total|floatformat:0 }} <small>تومان</small></div>
+            </div>
+            <button class="floating-pay-btn" id="floatingSubmitBtn"><i class="fas fa-money-bill-wave"></i> پرداخت</button>
+        </div>
+    </div>
+
+    <div id="toast"><i class="fas fa-check-circle" style="color: #10b981;"></i><span>کپی شد!</span></div>
+
+    <script>
+        // ========== متغیرهای اصلی ==========
+        let selectedAddressId = null;
+        let selectedShippingId = null;
+        let currentShippingCost = {{ order.shipping_cost|default:0 }};
+        let orderSubtotal = {{ order.subtotal|default:0 }};
+        let orderDiscount = {{ order.discount_amount|default:0 }};
+        let usedFromWallet = {{ used_from_wallet|default:0 }};
+        let walletBalance = {{ wallet_balance|default:0 }};
+        let selectedReceiptFile = null;
+        let currentOrderId = "{{ order.id }}";
+
+        let checkEnabled = false;
+        let checkPercent = {% if user_tier == 'premium' %}15{% elif user_tier == 'elite' %}25{% elif user_tier == 'private' %}50{% else %}0{% endif %};
+        let checkAmountValue = 0;
+        let checkId = null;
+        let checkImageUploaded = false;
+
+        function getCSRFToken() {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, 10) === 'csrftoken=') {
+                        cookieValue = decodeURIComponent(cookie.substring(10));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function getTotalBeforeCheck() {
+            return orderSubtotal - orderDiscount + currentShippingCost - usedFromWallet;
+        }
+
+        function updateTotal() {
+            let totalBeforeCheck = getTotalBeforeCheck();
+            let finalTotal = totalBeforeCheck - checkAmountValue;
+            if (finalTotal < 0) finalTotal = 0;
+            document.getElementById('grandTotal').innerHTML = finalTotal.toLocaleString() + ' تومان';
+            document.getElementById('floatingGrandTotal').innerHTML = finalTotal.toLocaleString() + ' <small>تومان</small>';
+            if (document.getElementById('modalTotal')) {
+                document.getElementById('modalTotal').innerHTML = finalTotal.toLocaleString() + ' <span style="font-size: 14px;">تومان</span>';
+            }
+            if (document.getElementById('confirmAmount')) {
+                document.getElementById('confirmAmount').innerHTML = finalTotal.toLocaleString() + ' تومان';
+            }
+            return finalTotal;
+        }
+
+        function updateCheckDisplay() {
+            const totalBeforeCheck = getTotalBeforeCheck();
+            if (checkEnabled && checkPercent > 0) {
+                checkAmountValue = Math.floor(totalBeforeCheck * checkPercent / 100);
+                document.getElementById('fixedCheckAmountDisplay').innerHTML = `مبلغ چک: ${checkAmountValue.toLocaleString()} تومان`;
+                document.getElementById('checkDeductAmount').innerHTML = `- ${checkAmountValue.toLocaleString()} تومان`;
+                document.getElementById('checkRow').style.display = 'flex';
+            } else {
+                checkAmountValue = 0;
+                document.getElementById('fixedCheckAmountDisplay').innerHTML = `مبلغ چک: ۰ تومان`;
+                document.getElementById('checkRow').style.display = 'none';
+            }
+            updateTotal();
+        }
+
+        async function createCheckPayment() {
+            try {
+                const response = await fetch(`/order/api/check/create/${currentOrderId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCSRFToken(),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    checkId = data.data.check_id;
+                    checkAmountValue = data.data.check_amount;
+                    checkPercent = data.data.check_percent;
+                    document.getElementById('checkId').value = checkId;
+                    updateCheckDisplay();
+                    showCheckStatus('اطلاعات چک با موفقیت ثبت شد', 'success');
+                    return true;
+                } else {
+                    showCheckStatus(data.error || 'خطا در ثبت اطلاعات چک', 'error');
+                    return false;
+                }
+            } catch (error) {
+                showCheckStatus('خطا در ارتباط با سرور', 'error');
+                return false;
+            }
+        }
+
+        async function uploadCheckImage(file) {
+            if (!file) return false;
+            if (!file.type.startsWith('image/')) {
+                showCheckStatus('فقط فایل تصویر مجاز است', 'error');
+                return false;
+            }
+            if (file.size > 2 * 1024 * 1024) {
+                showCheckStatus('حجم فایل نباید بیشتر از 2 مگابایت باشد', 'error');
+                return false;
+            }
+
+            showCheckStatus('در حال آپلود عکس چک...', 'loading');
+
+            try {
+                const base64 = await fileToBase64(file);
+                const formData = new FormData();
+                formData.append('check_image_base64', base64);
+
+                const response = await fetch(`/order/api/check/upload/${currentOrderId}/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCSRFToken() },
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.success) {
+                    checkImageUploaded = true;
+                    checkAmountValue = data.data.check_amount;
+                    updateCheckDisplay();
+                    showCheckStatus('عکس چک با موفقیت آپلود شد', 'success');
+                    updatePayButtonState();
+                    return true;
+                } else {
+                    showCheckStatus(data.error || 'خطا در آپلود عکس چک', 'error');
+                    return false;
+                }
+            } catch (error) {
+                showCheckStatus('خطا در ارتباط با سرور', 'error');
+                return false;
+            }
+        }
+
+        async function cancelCheckPayment() {
+            try {
+                const response = await fetch(`/order/api/check/cancel/${currentOrderId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCSRFToken(),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    checkId = null;
+                    checkImageUploaded = false;
+                    checkAmountValue = 0;
+                    updateCheckDisplay();
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function showCheckStatus(message, type) {
+            const statusDiv = document.getElementById('checkStatusMsg');
+            if (!statusDiv) return;
+            statusDiv.className = 'check-status-msg ' + type;
+            statusDiv.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-spinner fa-spin'}"></i> ${message}`;
+            setTimeout(() => {
+                if (statusDiv.className === 'check-status-msg ' + type) {
+                    statusDiv.style.display = 'none';
+                }
+            }, 5000);
+            statusDiv.style.display = 'flex';
+        }
+
+        function updatePayButtonState() {
+            const submitBtn = document.getElementById('submitOrderBtn');
+            const floatingBtn = document.getElementById('floatingSubmitBtn');
+            if (checkEnabled && !checkImageUploaded) {
+                if (submitBtn) { submitBtn.disabled = true; submitBtn.style.opacity = '0.5'; }
+                if (floatingBtn) { floatingBtn.disabled = true; floatingBtn.style.opacity = '0.5'; }
+            } else {
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = '1'; }
+                if (floatingBtn) { floatingBtn.disabled = false; floatingBtn.style.opacity = '1'; }
+            }
+        }
+
+        function updateWalletUI(used, remaining) {
+            usedFromWallet = used;
+            if (used > 0) {
+                document.getElementById('walletUseSection').style.display = 'none';
+                document.getElementById('walletUsedSection').style.display = 'block';
+                document.getElementById('usedAmountDisplay').innerHTML = used.toLocaleString() + ' تومان';
+                document.getElementById('remainingWallet').innerHTML = remaining.toLocaleString() + ' تومان';
+                document.getElementById('walletRow').style.display = 'flex';
+                document.getElementById('usedWalletAmount').innerHTML = '- ' + used.toLocaleString() + ' تومان';
+                document.getElementById('usedFromWallet').value = used;
+            } else {
+                document.getElementById('walletUseSection').style.display = 'block';
+                document.getElementById('walletUsedSection').style.display = 'none';
+                document.getElementById('walletRow').style.display = 'none';
+                document.getElementById('usedFromWallet').value = 0;
+            }
+            updateCheckDisplay();
+        }
+
+        // ========== Event Listeners ==========
+        document.getElementById('useWalletBtn')?.addEventListener('click', async function() {
+            let amount = parseInt(document.getElementById('walletAmount').value);
+            const maxAmount = walletBalance;
+            const currentTotal = getTotalBeforeCheck();
+            if (!amount || amount <= 0) { alert('لطفاً مبلغ معتبر وارد کنید'); return; }
+            if (amount > maxAmount) { alert(`موجودی کیف پول شما ${maxAmount.toLocaleString()} تومان است`); return; }
+            if (amount > currentTotal) { alert(`مبلغ سفارش ${currentTotal.toLocaleString()} تومان است`); return; }
+            if (!confirm(`آیا از استفاده ${amount.toLocaleString()} تومان از کیف پول مطمئن هستید؟`)) return;
+            const formData = new FormData();
+            formData.append('action', 'use_wallet');
+            formData.append('use_amount', amount);
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCSRFToken() }
+            });
+            const result = await response.json();
+            if (result.success) {
+                walletBalance = result.wallet_remaining;
+                updateWalletUI(result.used_amount, result.wallet_remaining);
+                document.getElementById('walletBalance').innerHTML = result.wallet_remaining_display + ' تومان';
+                alert(`✓ مبلغ ${result.used_amount_display} تومان از کیف پول کسر شد`);
+            } else { alert(result.error); }
+        });
+
+        document.getElementById('cancelWalletBtn')?.addEventListener('click', async function() {
+            if (!confirm('آیا از لغو استفاده از کیف پول مطمئن هستید؟')) return;
+            const formData = new FormData();
+            formData.append('action', 'cancel_wallet');
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCSRFToken() }
+            });
+            const result = await response.json();
+            if (result.success) { updateWalletUI(0, walletBalance); alert('استفاده از کیف پول لغو شد'); }
+        });
+
+        document.querySelectorAll('.suggest-btn').forEach(btn => {
+            btn.addEventListener('click', function() { document.getElementById('walletAmount').value = this.dataset.amount; });
+        });
+
+        // Address
+        function updateAddressSelection() {
+            document.querySelectorAll('.address-item').forEach(item => {
+                item.querySelector('.check-icon').classList.toggle('show', item.classList.contains('selected'));
+            });
+        }
+
+        function setDefaultAddress() {
+            const savedAddressId = "{{ checkout_data.selected_address_id|default:'' }}";
+            if (savedAddressId) {
+                const savedAddress = document.querySelector(`.address-item[data-id="${savedAddressId}"]`);
+                if (savedAddress) { savedAddress.click(); return; }
+            }
+            const defaultAddress = document.querySelector('.address-item .badge-default');
+            if (defaultAddress) { defaultAddress.closest('.address-item').click(); return; }
+            const firstAddress = document.querySelector('.address-item');
+            if (firstAddress) firstAddress.click();
+        }
+
+        document.querySelectorAll('.address-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.address-item').forEach(addr => addr.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedAddressId = this.dataset.id;
+                document.getElementById('selected_address').value = selectedAddressId;
+                updateAddressSelection();
+            });
+        });
+
+        // Shipping
+        const shippingSelect = document.getElementById('shippingSelect');
+        if (shippingSelect) {
+            function setDefaultShipping() {
+                if (shippingSelect.options.length <= 1) { setTimeout(setDefaultShipping, 100); return; }
+                const savedShippingId = "{{ checkout_data.shipping_method_id|default:'' }}";
+                if (savedShippingId && shippingSelect.querySelector(`option[value="${savedShippingId}"]`)) {
+                    shippingSelect.value = savedShippingId;
+                } else {
+                    for(let i = 0; i < shippingSelect.options.length; i++) {
+                        if(shippingSelect.options[i].value) { shippingSelect.selectedIndex = i; break; }
+                    }
+                }
+                const changeEvent = new Event('change', { bubbles: true });
+                shippingSelect.dispatchEvent(changeEvent);
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setDefaultShipping);
+            else setDefaultShipping();
+            shippingSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (this.value) {
+                    selectedShippingId = parseInt(this.value);
+                    const cost = parseInt(selectedOption.dataset.cost) || 0;
+                    currentShippingCost = cost;
+                    document.getElementById('selected_shipping_method').value = selectedShippingId;
+                    document.getElementById('shippingCost').innerHTML = cost === 0 ? 'رایگان' : cost.toLocaleString() + ' تومان';
+                    document.getElementById('selectedShippingName').innerHTML = selectedOption.text.split(' - ')[0];
+                    document.getElementById('selectedShippingCost').innerHTML = cost === 0 ? 'رایگان' : cost.toLocaleString() + ' تومان';
+                    updateCheckDisplay();
+                }
+            });
+        }
+
+        // Check logic with API
+        const enableCheckCheckbox = document.getElementById('enableCheckPayment');
+        const checkDetailsWrapper = document.getElementById('checkDetailsWrapper');
+
+        if (enableCheckCheckbox && checkDetailsWrapper) {
+            enableCheckCheckbox.addEventListener('change', async function() {
+                if (this.checked) {
+                    checkDetailsWrapper.classList.add('active');
+                    checkEnabled = true;
+                    const success = await createCheckPayment();
+                    if (!success) {
+                        this.checked = false;
+                        checkDetailsWrapper.classList.remove('active');
+                        checkEnabled = false;
+                    }
+                } else {
+                    checkDetailsWrapper.classList.remove('active');
+                    checkEnabled = false;
+                    await cancelCheckPayment();
+                    checkImageUploaded = false;
+                    updateCheckDisplay();
+                    updatePayButtonState();
+                }
+            });
+        }
+
+        // Check image upload
+        const checkUploadArea = document.getElementById('checkUploadArea');
+        const checkImageInput = document.getElementById('checkImageInput');
+        const checkPreview = document.getElementById('checkPreview');
+        const checkPreviewImg = document.getElementById('checkPreviewImg');
+        const checkPreviewName = document.getElementById('checkPreviewName');
+        const checkPreviewSize = document.getElementById('checkPreviewSize');
+        const removeCheckImage = document.getElementById('removeCheckImage');
+        const checkConfirmCheckbox = document.getElementById('checkConfirmCheckbox');
+
+        if (checkUploadArea) {
+            checkUploadArea.addEventListener('click', () => checkImageInput.click());
+            checkUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                checkUploadArea.style.borderColor = '#d4af37';
+                checkUploadArea.style.background = '#fef9e6';
+            });
+            checkUploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                checkUploadArea.style.borderColor = '#d4af37';
+                checkUploadArea.style.background = 'rgba(212, 175, 55, 0.05)';
+            });
+            checkUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                checkUploadArea.style.borderColor = '#d4af37';
+                checkUploadArea.style.background = 'rgba(212, 175, 55, 0.05)';
+                if (e.dataTransfer.files.length) handleCheckFile(e.dataTransfer.files[0]);
+            });
+            checkImageInput.addEventListener('change', (e) => { if (e.target.files.length) handleCheckFile(e.target.files[0]); });
+        }
+
+        async function handleCheckFile(file) {
+            if (!file.type.startsWith('image/')) { alert('فقط فایل تصویر مجاز است'); return; }
+            if (file.size > 2 * 1024 * 1024) { alert('حجم فایل نباید بیشتر از 2 مگابایت باشد'); return; }
+
+            const reader = new FileReader();
+            reader.onload = (e) => { checkPreviewImg.src = e.target.result; };
+            reader.readAsDataURL(file);
+            checkPreviewName.textContent = file.name;
+            checkPreviewSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+            checkUploadArea.style.display = 'none';
+            checkPreview.style.display = 'flex';
+
+            const success = await uploadCheckImage(file);
+            if (!success) {
+                checkUploadArea.style.display = 'block';
+                checkPreview.style.display = 'none';
+            }
+        }
+
+        removeCheckImage?.addEventListener('click', () => {
+            checkImageInput.value = '';
+            checkUploadArea.style.display = 'block';
+            checkPreview.style.display = 'none';
+            checkPreviewImg.src = '';
+            checkImageUploaded = false;
+            updatePayButtonState();
+        });
+
+        // Payment
+        async function submitOnlinePayment() {
+            const submitBtn = document.querySelector('.desktop-pay-btn, .floating-pay-btn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> در حال هدایت به درگاه...';
+            try {
+                const formData = new FormData();
+                formData.append('action', 'pay');
+                formData.append('payment_method_value', 'online');
+                formData.append('name', document.querySelector('input[name="name"]')?.value || '');
+                formData.append('family', document.querySelector('input[name="family"]')?.value || '');
+                formData.append('phone', document.querySelector('input[name="phone"]')?.value || '');
+                formData.append('selected_address', document.getElementById('selected_address')?.value || '');
+                formData.append('shipping_method', document.getElementById('selected_shipping_method')?.value || '');
+                formData.append('description', document.querySelector('textarea[name="description"]')?.value || '');
+                formData.append('used_from_wallet', usedFromWallet);
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCSRFToken() }
+                });
+                const data = await response.json();
+                if (data.success && data.redirect_url) { window.location.href = data.redirect_url; }
+                else { alert(data.error || 'خطا در ثبت سفارش'); submitBtn.disabled = false; submitBtn.innerHTML = originalText; }
+            } catch (error) { alert('خطا در ارتباط با سرور'); submitBtn.disabled = false; submitBtn.innerHTML = originalText; }
+        }
+
+        function checkAndOpenModal() {
+            const address = document.getElementById('selected_address').value;
+            const shipping = document.getElementById('selected_shipping_method').value;
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+            if (!address) { alert('لطفاً آدرس تحویل را انتخاب کنید'); return false; }
+            if (!shipping) { alert('لطفاً روش ارسال را انتخاب کنید'); return false; }
+            if (!paymentMethod) { alert('لطفاً روش پرداخت را انتخاب کنید'); return false; }
+            if (checkEnabled && (!checkImageUploaded || !checkConfirmCheckbox?.checked)) {
+                alert('لطفاً عکس چک را آپلود کرده و تأیید کنید');
+                return false;
+            }
+            if (paymentMethod.value === 'card_to_card') { cardModal.classList.add('active'); return false; }
+            if (paymentMethod.value === 'online') { submitOnlinePayment(); return false; }
+            return true;
+        }
+
+        document.getElementById('submitOrderBtn')?.addEventListener('click', checkAndOpenModal);
+        document.getElementById('floatingSubmitBtn')?.addEventListener('click', checkAndOpenModal);
+
+        // Card modal
+        const cardModal = document.getElementById('cardModal');
+        function closeCardModal() { cardModal.classList.remove('active'); resetReceiptUpload(); }
+        document.getElementById('closeCardModalBtn')?.addEventListener('click', closeCardModal);
+        document.getElementById('cancelCardModalBtn')?.addEventListener('click', closeCardModal);
+        cardModal?.addEventListener('click', (e) => { if (e.target === cardModal) closeCardModal(); });
+
+        const receiptUploadArea = document.getElementById('receiptUploadArea');
+        const receiptInput = document.getElementById('receiptInput');
+        const receiptPreview = document.getElementById('receiptPreview');
+        const previewImg = document.getElementById('previewImg');
+        const previewName = document.getElementById('previewName');
+        const previewSize = document.getElementById('previewSize');
+        const removeReceipt = document.getElementById('removeReceipt');
+        const modalCardError = document.getElementById('modalCardError');
+        const showConfirmBtn = document.getElementById('showConfirmBtn');
+
+        receiptUploadArea?.addEventListener('click', () => receiptInput.click());
+        receiptInput?.addEventListener('change', (e) => { if (e.target.files.length) handleReceiptFile(e.target.files[0]); });
+        function handleReceiptFile(file) {
+            if (!file.type.startsWith('image/')) { alert('فقط فایل تصویر مجاز است'); return; }
+            if (file.size > 2 * 1024 * 1024) { alert('حجم فایل نباید بیشتر از 2 مگابایت باشد'); return; }
+            selectedReceiptFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => { previewImg.src = e.target.result; };
+            reader.readAsDataURL(file);
+            previewName.textContent = file.name;
+            previewSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+            receiptUploadArea.style.display = 'none';
+            receiptPreview.style.display = 'flex';
+            modalCardError.style.display = 'none';
+        }
+        function resetReceiptUpload() {
+            selectedReceiptFile = null;
+            if (receiptInput) receiptInput.value = '';
+            if (receiptUploadArea) receiptUploadArea.style.display = 'block';
+            if (receiptPreview) receiptPreview.style.display = 'none';
+            if (previewImg) previewImg.src = '';
+            if (modalCardError) modalCardError.style.display = 'none';
+        }
+        removeReceipt?.addEventListener('click', resetReceiptUpload);
+
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmReceiptPreview = document.getElementById('confirmReceiptPreview');
+        const confirmFileName = document.getElementById('confirmFileName');
+        const confirmFileSize = document.getElementById('confirmFileSize');
+        const confirmAmount = document.getElementById('confirmAmount');
+        const finalSubmitBtn = document.getElementById('finalSubmitBtn');
+        const cancelConfirmBtn = document.getElementById('cancelConfirmBtn');
+        const closeConfirmModalBtn = document.getElementById('closeConfirmModalBtn');
+        const confirmError = document.getElementById('confirmError');
+
+        showConfirmBtn?.addEventListener('click', () => {
+            if (!selectedReceiptFile) {
+                modalCardError.textContent = 'لطفاً تصویر رسید را آپلود کنید';
+                modalCardError.style.display = 'block';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => { confirmReceiptPreview.innerHTML = `<img src="${e.target.result}" class="receipt-preview-large" style="max-width: 100%; max-height: 250px; border-radius: 12px;">`; };
+            reader.readAsDataURL(selectedReceiptFile);
+            confirmFileName.textContent = selectedReceiptFile.name;
+            confirmFileSize.textContent = (selectedReceiptFile.size / 1024).toFixed(1) + ' KB';
+            const totalAmount = updateTotal();
+            confirmAmount.textContent = totalAmount.toLocaleString() + ' تومان';
+            cardModal.classList.remove('active');
+            confirmModal.classList.add('active');
+            confirmError.style.display = 'none';
+        });
+
+        function closeConfirmModal() { confirmModal.classList.remove('active'); }
+        cancelConfirmBtn?.addEventListener('click', () => { closeConfirmModal(); cardModal.classList.add('active'); });
+        closeConfirmModalBtn?.addEventListener('click', closeConfirmModal);
+        confirmModal?.addEventListener('click', (e) => { if (e.target === confirmModal) closeConfirmModal(); });
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function showSuccessMessage() {
+            confirmModal.classList.remove('active');
+            const successModal = document.getElementById('successModal');
+            successModal.classList.add('active');
+            setTimeout(() => { window.location.href = '/order/order-detail/' + currentOrderId + '/'; }, 5000);
+        }
+
+        document.getElementById('goToOrderDetailBtn')?.addEventListener('click', function() {
+            window.location.href = '/order/order-detail/' + currentOrderId + '/';
+        });
+
+        finalSubmitBtn?.addEventListener('click', async function() {
+            if (!selectedReceiptFile) {
+                confirmError.textContent = 'لطفاً تصویر رسید را آپلود کنید';
+                confirmError.style.display = 'block';
+                return;
+            }
+            finalSubmitBtn.disabled = true;
+            finalSubmitBtn.innerHTML = '<span class="spinner"></span> در حال ثبت...';
+            try {
+                const receiptBase64 = await fileToBase64(selectedReceiptFile);
+                const formData = new FormData();
+                formData.append('action', 'pay');
+                formData.append('payment_method_value', 'card_to_card');
+                formData.append('receipt_file_base64', receiptBase64);
+                formData.append('name', document.querySelector('input[name="name"]')?.value || '');
+                formData.append('family', document.querySelector('input[name="family"]')?.value || '');
+                formData.append('phone', document.querySelector('input[name="phone"]')?.value || '');
+                formData.append('selected_address', document.getElementById('selected_address')?.value || '');
+                formData.append('shipping_method', document.getElementById('selected_shipping_method')?.value || '');
+                formData.append('description', document.querySelector('textarea[name="description"]')?.value || '');
+                formData.append('used_from_wallet', usedFromWallet);
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': getCSRFToken() }
+                });
+                const data = await response.json();
+                if (data.success) { showSuccessMessage(); }
+                else { confirmError.textContent = data.error || 'خطا در ثبت رسید'; confirmError.style.display = 'block'; finalSubmitBtn.disabled = false; finalSubmitBtn.innerHTML = 'تأیید و ثبت نهایی'; }
+            } catch (error) { confirmError.textContent = 'خطا در ارتباط با سرور'; confirmError.style.display = 'block'; finalSubmitBtn.disabled = false; finalSubmitBtn.innerHTML = 'تأیید و ثبت نهایی'; }
+        });
+
+        // Address modal
+        const addressModal = document.getElementById('addressModal');
+        const openAddressBtn = document.getElementById('openAddressModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const cancelModalBtn = document.getElementById('cancelModalBtn');
+        const saveAddressBtn = document.getElementById('saveAddressBtn');
+        const modalError = document.getElementById('modalError');
+
+        openAddressBtn?.addEventListener('click', () => addressModal.classList.add('active'));
+        closeModalBtn?.addEventListener('click', () => addressModal.classList.remove('active'));
+        cancelModalBtn?.addEventListener('click', () => addressModal.classList.remove('active'));
+        addressModal?.addEventListener('click', (e) => { if (e.target === addressModal) addressModal.classList.remove('active'); });
+
+        saveAddressBtn?.addEventListener('click', async function() {
+            const recipientName = document.getElementById('addr_recipient_name').value.trim();
+            const provinceId = document.getElementById('addr_province').value;
+            const cityId = document.getElementById('addr_city').value;
+            const addressText = document.getElementById('addr_address_text').value.trim();
+            const postalCode = document.getElementById('addr_postal_code').value.trim();
+            const isDefault = document.getElementById('addr_is_default').checked;
+            if (!recipientName) { modalError.textContent = 'لطفاً نام گیرنده را وارد کنید'; modalError.style.display = 'block'; return; }
+            if (!provinceId) { modalError.textContent = 'لطفاً استان را انتخاب کنید'; modalError.style.display = 'block'; return; }
+            if (!cityId) { modalError.textContent = 'لطفاً شهر را انتخاب کنید'; modalError.style.display = 'block'; return; }
+            if (!addressText) { modalError.textContent = 'لطفاً آدرس را وارد کنید'; modalError.style.display = 'block'; return; }
+            modalError.style.display = 'none';
+            saveAddressBtn.disabled = true;
+            saveAddressBtn.innerHTML = 'در حال ذخیره...';
+            try {
+                const response = await fetch('{% url "account:add-address-api" %}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                    body: JSON.stringify({ address_type: 'home', province_id: provinceId, city_id: cityId, address_text: addressText, postal_code: postalCode, is_default: isDefault, recipient_name: recipientName })
+                });
+                const data = await response.json();
+                if (data.success) { window.location.reload(); }
+                else { modalError.textContent = data.error || 'خطا در ثبت آدرس'; modalError.style.display = 'block'; saveAddressBtn.disabled = false; saveAddressBtn.innerHTML = 'ذخیره آدرس'; }
+            } catch (error) { modalError.textContent = 'خطا در ارتباط با سرور'; modalError.style.display = 'block'; saveAddressBtn.disabled = false; saveAddressBtn.innerHTML = 'ذخیره آدرس'; }
+        });
+
+        function copyCardNumber(num) { navigator.clipboard.writeText(num).then(() => showToast('شماره کارت کپی شد!')); }
+        function copyIBAN(iban) { navigator.clipboard.writeText(iban).then(() => showToast('شماره شبا کپی شد!')); }
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.querySelector('span').textContent = msg;
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.transform = 'translateX(-50%) translateY(100px)'; toast.style.opacity = '0'; }, 2000);
+        }
+
+        setDefaultAddress();
+        updateAddressSelection();
+        document.querySelector('input[name="phone"]')?.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if(this.value.length > 11) this.value = this.value.slice(0,11);
+        });
+
+        async function loadProvinces() {
+            try {
+                const response = await fetch('{% url "account:provinces-cities-api" %}');
+                const data = await response.json();
+                if (data.success) {
+                    const provinceSelect = document.getElementById('addr_province');
+                    provinceSelect.innerHTML = '<option value="">انتخاب استان</option>';
+                    data.provinces.forEach(province => { provinceSelect.innerHTML += `<option value="${province.id}">${province.name}</option>`; });
+                    window.provincesData = data.provinces;
+                }
+            } catch (error) { console.error('خطا:', error); }
+        }
+        document.getElementById('addr_province')?.addEventListener('change', function() {
+            const citySelect = document.getElementById('addr_city');
+            const provinceId = this.value;
+            citySelect.innerHTML = '<option value="">ابتدا شهر را انتخاب کنید</option>';
+            citySelect.disabled = true;
+            if (provinceId && window.provincesData) {
+                const province = window.provincesData.find(p => p.id == provinceId);
+                if (province && province.cities) {
+                    citySelect.disabled = false;
+                    province.cities.forEach(city => { citySelect.innerHTML += `<option value="${city.id}">${city.name}</option>`; });
+                }
+            }
+        });
+        loadProvinces();
+        updateCheckDisplay();
+
+        if (window.innerWidth <= 991) initMobileAccordion();
+        window.addEventListener('resize', function() { if (window.innerWidth <= 991) initMobileAccordion(); });
+    </script>
+</body>
+</html>

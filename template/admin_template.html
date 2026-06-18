@@ -1,0 +1,204 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>{% block title %}پنل مدیریت{% endblock %}</title>
+    <link rel="stylesheet" href="https://lib.arvancloud.ir/font-awesome/6.3.0/css/all.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/panel.css' %}">
+    <style>
+        /* تمام استایل‌ها به همین صورت بمونه */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0f172a; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+        .mobile-app { display: block; width: 100%; min-height: 100vh; background: #0a0f1c; padding-bottom: 85px; }
+        .app-header { background: linear-gradient(135deg, #0d1222, #080c18); padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(102,126,234,0.2); position: sticky; top: 0; z-index: 100; }
+        .header-info { display: flex; align-items: center; gap: 12px; }
+        .mobile-avatar { width: 48px; height: 48px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
+        .mobile-avatar i { font-size: 1.4rem; color: white; }
+        .online-dot-mobile { position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: #10b981; border-radius: 50%; border: 2px solid #0d1222; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.7); } 70% { box-shadow: 0 0 0 6px rgba(16,185,129,0); } 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); } }
+        .header-text h3 { color: white; font-size: 1rem; font-weight: 600; }
+        .header-text p { color: #8b92b0; font-size: 0.7rem; }
+        .icon-btn { background: rgba(102,126,234,0.15); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #667eea; cursor: pointer; border: none; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(13,18,34,0.95); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 12px 16px 20px; border-top: 1px solid rgba(102,126,234,0.15); z-index: 200; }
+        .nav-item-mobile { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; color: #8b92b0; font-size: 0.7rem; cursor: pointer; padding: 4px 12px; border-radius: 30px; transition: all 0.3s; }
+        .nav-item-mobile i { font-size: 1.3rem; }
+        .nav-item-mobile.active { color: #667eea; background: rgba(102,126,234,0.15); }
+
+        .mobile-content {  min-height: calc(100vh - 120px); }
+
+        /* ========== استایل دسکتاپ اصلاح شده ========== */
+        @media (min-width: 1024px) {
+            .mobile-app { display: none !important; }
+            .desktop-wrapper {
+                display: flex !important;
+                min-height: 100vh;
+                background: #0f172a;
+                direction: rtl;
+            }
+
+            /* سایدبار - fixed در سمت راست */
+            .desktop-wrapper .desktop-sidebar {
+                position: fixed;
+                right: 0;
+                top: 0;
+                width: 280px;
+                height: 100vh;
+                z-index: 100;
+            }
+
+            /* محتوای اصلی - با فاصله از سایدبار */
+            .desktop-wrapper .desktop-main {
+                flex: 1;
+                margin-right: 280px;  /* فاصله از سایدبار */
+                width: calc(100% - 280px);
+                min-height: 100vh;
+                background: linear-gradient(135deg, #0f0c29 0%, #1a1a3e 50%, #0f0c29 100%);
+            }
+
+            /* هدر دسکتاپ */
+            .desktop-wrapper .desktop-header {
+                background: rgba(30, 41, 59, 0.8);
+                backdrop-filter: blur(10px);
+                padding: 16px 24px;
+                border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+                position: sticky;
+                top: 0;
+                z-index: 99;
+            }
+
+            /* کانتینر محتوا */
+            .desktop-wrapper .dashboard-container {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 1023px) {
+            .desktop-wrapper { display: none !important; }
+        }
+
+        .loading { text-align: center; padding: 50px; color: #94a3b8; }
+
+        /* ریسپانسیو برای صفحه‌های متوسط */
+        @media (min-width: 1024px) and (max-width: 1200px) {
+            .desktop-wrapper .desktop-sidebar {
+                width: 250px;
+            }
+            .desktop-wrapper .desktop-main {
+                margin-right: 250px;
+                width: calc(100% - 250px);
+            }
+        }
+
+        @media (min-width: 1024px) and (max-width: 768px) {
+            .desktop-wrapper .desktop-sidebar {
+                width: 220px;
+            }
+            .desktop-wrapper .desktop-main {
+                margin-right: 220px;
+                width: calc(100% - 220px);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- نسخه موبایل -->
+<div class="mobile-app">
+    <div class="app-header">
+        <div class="header-info">
+            <div class="mobile-avatar">
+                <i class="fas fa-user-shield"></i>
+                <div class="online-dot-mobile"></div>
+            </div>
+            <div class="header-text">
+                <h3>پنل مدیریت</h3>
+                <p>خوش آمدید ادمین</p>
+            </div>
+        </div>
+        <div class="icon-btn" id="mobileNotificationBtn">
+            <i class="fas fa-bell"></i>
+        </div>
+    </div>
+
+    <div class="mobile-content">
+        {% block mobile_content %}
+        {% endblock %}
+
+        {% block mobile_dashboard %}{% endblock %}
+        {% block mobile_orders %}{% endblock %}
+        {% block mobile_print %}{% endblock %}
+        {% block mobile_payments %}{% endblock %}
+        {% block mobile_settings %}{% endblock %}
+    </div>
+
+    <div class="bottom-nav">
+        <button class="nav-item-mobile" data-page="dashboard">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>داشبورد</span>
+        </button>
+        <button class="nav-item-mobile" data-page="orders">
+            <i class="fas fa-shopping-cart"></i>
+            <span>سفارشات</span>
+        </button>
+        <button class="nav-item-mobile" data-page="printOrders">
+            <i class="fas fa-print"></i>
+            <span>چاپی</span>
+        </button>
+        <button class="nav-item-mobile" data-page="payments">
+            <i class="fas fa-credit-card"></i>
+            <span>پرداختی</span>
+        </button>
+        <button class="nav-item-mobile" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span>تنظیمات</span>
+        </button>
+    </div>
+</div>
+
+<!-- نسخه دسکتاپ -->
+<div class="desktop-wrapper">
+    {% include "partials/panel/desktop/sidebar.html" %}
+    <div class="desktop-main">
+        {% include "partials/panel/desktop/header.html" %}
+        {% block pc %}{% endblock pc %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const navItems = document.querySelectorAll('.nav-item-mobile');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const pageId = this.getAttribute('data-page');
+                if (pageId === 'dashboard') window.location.href = '/panel/';
+                else if (pageId === 'printOrders') window.location.href = '/panel/admin/print-orders/';
+                else if (pageId === 'orders') window.location.href = '/panel/admin/orders/';
+                else if (pageId === 'payments') window.location.href = '/panel/admin/payments/';
+                else if (pageId === 'settings') window.location.href = '/panel/admin/slider/';
+            });
+        });
+
+        const currentPath = window.location.pathname;
+        navItems.forEach(item => {
+            const pageId = item.getAttribute('data-page');
+            if ((pageId === 'dashboard' && (currentPath === '/panel/' || currentPath === '/panel')) ||
+                (pageId === 'orders' && currentPath.includes('orders')) ||
+                (pageId === 'printOrders' && currentPath.includes('print-orders')) ||
+                (pageId === 'payments' && currentPath.includes('payments')) ||
+                (pageId === 'settings' && currentPath.includes('slider'))) {
+                item.classList.add('active');
+            }
+        });
+    });
+</script>
+
+<script src='{% static "js/panel11.js" %}'></script>
+</body>
+</html>

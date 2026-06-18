@@ -1,0 +1,25 @@
+{% load humanize %}
+{% for product in products %}
+<a href="{% url 'product:product_detail' product.slug %}" class="product-card">
+    <div class="product-image">
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.title }}" loading="lazy">
+        {% else %}
+            <i class="fas fa-box" style="font-size: 50px; color: #cbd5e1;"></i>
+        {% endif %}
+        {% if product.code %}
+            <div class="product-code">کد: {{ product.code }}</div>
+        {% endif %}
+    </div>
+    <div class="product-info">
+        {% if product.brand %}
+            <div class="product-brand">{{ product.brand.title }}</div>
+        {% endif %}
+        <h3 class="product-title">{{ product.title|truncatechars:35 }}</h3>
+        <div class="current-price">{{ product.price|floatformat:0|intcomma }} <small>تومان</small></div>
+        <div class="product-meta">
+            <span class="product-meter"><i class="fas fa-ruler-combined"></i> متر مربع</span>
+        </div>
+    </div>
+</a>
+{% endfor %}

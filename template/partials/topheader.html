@@ -1,0 +1,1065 @@
+<!-- بخش آدرس بالای top-info-bar -->
+<div class="top-address-bar">
+    <div class="address-info">
+        <i class="fas fa-map-marker-alt"></i>
+        <span id="selectedAddress">در حال بارگذاری...</span>
+    </div>
+    <button id="openAddressModal" class="edit-address-btn">
+        <i class="fas fa-pencil-alt"></i>
+        <span>ویرایش</span>
+    </button>
+</div>
+
+<!-- top-info-bar اصلی با طراحی جدید -->
+<div class="top-info-bar">
+    <div class="user-info" id="profileTriggerTop">
+        <div class="user-avatar">
+            <img src="/media/images/profile.jpg" onerror="this.src='/media/images/p1.jpg'" alt="پروفایل">
+            <div class="verified-badge">
+                <i class="fas fa-check-circle"></i>
+            </div>
+        </div>
+        <div class="user-details">
+            <div class="user-name-row">
+                <span class="user-name" id="userName">محسن کیوانی</span>
+                <span class="shop-badge" id="shopNameBadge">
+                    <i class="fas fa-store"></i>
+                    <span id="shopNameText">بارگذاری...</span>
+                </span>
+                <span class="tier-badge" id="tierName">
+                    <i class="fas fa-gem"></i>
+                    <span id="tierValue">برنزی</span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="points-info">
+        <div class="coins-section">
+            <i class="fas fa-coins"></i>
+            <span>B2B</span>
+            <span id="coinsValue">۰</span>
+            <span>سکه</span>
+        </div>
+        <div class="wallet-section">
+            <i class="fas fa-wallet"></i>
+            <span id="walletValue">۰</span>
+            <span>تومان</span>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ========== RESET & BASE ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ========== TOP ADDRESS BAR ========== */
+.top-address-bar {
+    background: linear-gradient(135deg, #2c3e50 0%, #1a1a2e 100%);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.address-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.address-info i {
+    color: #e74c3c;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.address-info span {
+    font-size: 13px;
+    color: #ecf0f1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.edit-address-btn {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 8px 18px;
+    border-radius: 24px;
+    color: #74b9ff;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    backdrop-filter: blur(4px);
+}
+
+.edit-address-btn:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-1px);
+    border-color: rgba(255,255,255,0.4);
+    color: #0984e3;
+}
+
+.edit-address-btn i {
+    font-size: 12px;
+}
+
+/* ========== TOP INFO BAR - مرتب و کلاسیک ========== */
+.top-info-bar {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    border-bottom: 1px solid #e9ecef;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    flex: 1;
+    min-width: 200px;
+}
+
+.user-avatar {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.user-avatar img {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+}
+
+.verified-badge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.verified-badge i {
+    font-size: 11px;
+    color: white;
+}
+
+.user-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-name-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.user-name {
+    font-weight: 700;
+    font-size: 16px;
+    color: #2d3436;
+    letter-spacing: -0.2px;
+}
+
+.shop-badge {
+    background: linear-gradient(135deg, #e8f4fd, #d6eeff);
+    color: #0984e3;
+    padding: 5px 14px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.shop-badge i {
+    font-size: 11px;
+}
+
+.tier-badge {
+    background: linear-gradient(135deg, #fff3e0, #ffe6c7);
+    padding: 5px 14px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.tier-badge i {
+    font-size: 11px;
+    color: #f39c12;
+}
+
+.points-info {
+    background: linear-gradient(135deg, #fff9ed, #fff4e0);
+    padding: 8px 22px;
+    border-radius: 48px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #e67e22;
+    flex-shrink: 0;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid rgba(230,126,34,0.15);
+}
+
+.points-info i {
+    font-size: 15px;
+}
+
+.points-info span:not(:first-child) {
+    color: #d35400;
+}
+
+.points-info span:nth-child(3) {
+    font-weight: 800;
+    font-size: 17px;
+    color: #e67e22;
+    margin: 0 2px;
+}
+
+.coins-section, .wallet-section {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.coins-section {
+    padding-left: 12px;
+    border-left: 1px solid rgba(230,126,34,0.2);
+}
+
+/* ========== TIER COLORS ========== */
+.tier-bronze {
+    background: linear-gradient(135deg, #cd7f32, #b87333);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+}
+.tier-silver {
+    background: linear-gradient(135deg, #a0a0a0, #c0c0c0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+}
+.tier-gold {
+    background: linear-gradient(135deg, #f39c12, #f1c40f);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+}
+.tier-platinum {
+    background: linear-gradient(135deg, #b0c4de, #e5e4e2);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+}
+
+/* ========== MODAL STYLES (بدون تغییر) ========== */
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 9998;
+    animation: modalFadeIn 0.2s ease;
+}
+
+.address-modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: modalFadeIn 0.2s ease;
+    padding: 16px;
+}
+
+.address-modal-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 550px;
+    max-height: 85vh;
+    border-radius: 28px;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3);
+    animation: modalSlideIn 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header-custom {
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header-custom h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-close-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: white;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.modal-close-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: rotate(90deg);
+}
+
+.address-list-custom {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #f8f9fa;
+}
+
+.address-item-custom {
+    background: white;
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 14px;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+    cursor: pointer;
+}
+
+.address-item-custom:hover {
+    transform: translateX(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border-color: #3498db;
+}
+
+.address-item-custom.selected {
+    border: 2px solid #3498db;
+    background: linear-gradient(135deg, #f0f9ff, #e8f4fd);
+}
+
+.address-badge-custom {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-default {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.badge-home {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+}
+
+.badge-work {
+    background: linear-gradient(135deg, #6f42c1, #6610f2);
+    color: white;
+}
+
+.badge-other {
+    background: linear-gradient(135deg, #6c757d, #5a6268);
+    color: white;
+}
+
+.btn-primary-custom {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 14px;
+    border-radius: 14px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-primary-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+}
+
+.btn-outline-custom {
+    background: white;
+    border: 1px solid #dee2e6;
+    padding: 12px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.btn-outline-custom:hover {
+    background: #f8f9fa;
+    border-color: #3498db;
+}
+
+.form-input-custom {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #dee2e6;
+    border-radius: 14px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    background: white;
+}
+
+.form-input-custom:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+}
+
+.float-btn {
+    position: sticky;
+    bottom: 16px;
+    margin: 0 20px 20px 20px;
+    width: calc(100% - 40px);
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .top-address-bar {
+        padding: 10px 16px;
+    }
+
+    .address-info span {
+        font-size: 12px;
+    }
+
+    .edit-address-btn span {
+        display: none;
+    }
+
+    .edit-address-btn {
+        padding: 8px 12px;
+    }
+
+    .edit-address-btn i {
+        margin: 0;
+    }
+
+    .top-info-bar {
+        padding: 14px 16px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    .user-info {
+        width: 100%;
+    }
+
+    .user-avatar img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .user-name {
+        font-size: 15px;
+    }
+
+    .shop-badge, .tier-badge {
+        padding: 4px 12px;
+        font-size: 11px;
+        white-space: nowrap;
+    }
+
+    .user-name-row {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .points-info {
+        width: 100%;
+        justify-content: space-between;
+        padding: 8px 18px;
+    }
+
+    .coins-section {
+        padding-left: 0;
+        border-left: none;
+    }
+
+    .address-modal-card {
+        max-height: 90vh;
+        border-radius: 20px;
+    }
+
+    .modal-header-custom {
+        padding: 16px 20px;
+    }
+
+    .modal-header-custom h3 {
+        font-size: 1rem;
+    }
+
+    .address-list-custom {
+        padding: 16px;
+    }
+
+    .address-item-custom {
+        padding: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-name-row {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .shop-badge, .tier-badge {
+        white-space: nowrap;
+    }
+
+    .address-info span {
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.4;
+    }
+
+    .points-info {
+        font-size: 12px;
+        gap: 8px;
+        padding: 6px 14px;
+    }
+
+    .points-info span:nth-child(3) {
+        font-size: 15px;
+    }
+
+    .float-btn {
+        margin: 0 12px 12px 12px;
+        width: calc(100% - 24px);
+    }
+}
+</style>
+
+<!-- مودال آدرس (همان کد اصلی) -->
+<div id="addressModal" style="display:none;">
+    <div class="modal-backdrop"></div>
+    <div class="address-modal-container">
+        <div class="address-modal-card">
+            <div class="modal-header-custom">
+                <h3><i class="fas fa-map-marked-alt"></i> مدیریت آدرس‌ها</h3>
+                <button class="modal-close-btn" id="closeModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="address-list-custom" id="addressListContainer">
+                <div id="addressList"></div>
+            </div>
+
+            <button id="showAddBtn" class="btn-primary-custom float-btn">
+                <i class="fas fa-plus-circle"></i> افزودن آدرس جدید
+            </button>
+
+            <div id="addFormContainer" style="display:none; border-top: 1px solid #e9ecef; background: white;">
+                <div style="padding: 20px;">
+                    <h4 style="margin: 0 0 16px; font-size: 18px; font-weight: 600;">
+                        <i class="fas fa-location-dot"></i> آدرس جدید
+                    </h4>
+
+                    <select id="province" class="form-input-custom" style="margin-bottom: 12px;">
+                        <option value="">🏛 انتخاب استان</option>
+                    </select>
+
+                    <select id="city" class="form-input-custom" style="margin-bottom: 12px;">
+                        <option value="">🌆 انتخاب شهر</option>
+                    </select>
+
+                    <input type="text" id="addressText" class="form-input-custom" placeholder="📍 آدرس کامل" style="margin-bottom: 12px;">
+
+                    <input type="text" id="postalCode" class="form-input-custom" placeholder="📮 کد پستی (اختیاری)" style="margin-bottom: 12px;">
+
+                    <select id="addrType" class="form-input-custom" style="margin-bottom: 12px;">
+                        <option value="home">🏠 منزل</option>
+                        <option value="work">💼 محل کار</option>
+                        <option value="other">📍 سایر</option>
+                    </select>
+
+                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; cursor: pointer;">
+                        <input type="checkbox" id="isDefault" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span style="font-size: 14px;">⭐ تنظیم به عنوان آدرس پیش‌فرض</span>
+                    </label>
+
+                    <div style="display: flex; gap: 12px;">
+                        <button id="saveAddr" class="btn-primary-custom" style="flex: 1;">ذخیره آدرس</button>
+                        <button id="cancelForm" class="btn-outline-custom" style="flex: 1;">انصراف</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==================== تابع تنظیم رنگ و متن پلن ====================
+function updateTier(tier) {
+    const tierSpan = document.getElementById('tierValue');
+    if (!tierSpan) return;
+
+    tierSpan.classList.remove('tier-bronze', 'tier-silver', 'tier-gold', 'tier-platinum');
+
+    if (tier === 'bronze') {
+        tierSpan.innerText = 'برنزی';
+        tierSpan.classList.add('tier-bronze');
+    } else if (tier === 'silver') {
+        tierSpan.innerText = 'نقره‌ای';
+        tierSpan.classList.add('tier-silver');
+    } else if (tier === 'gold') {
+        tierSpan.innerText = 'طلایی';
+        tierSpan.classList.add('tier-gold');
+    } else if (tier === 'platinum') {
+        tierSpan.innerText = 'پلاتینیوم';
+        tierSpan.classList.add('tier-platinum');
+    }
+}
+
+// ==================== API CALLS ====================
+async function getUserInfo() {
+    try {
+        const res = await fetch('/accounts/api/user/dashboard/');
+        const result = await res.json();
+
+        if (result.success) {
+            const data = result.data;
+
+            if (data.loyalty && data.loyalty.total_points_display) {
+                document.getElementById('pointsValue').innerText = data.loyalty.total_points_display;
+            }
+
+            if (data.user && data.user.full_name) {
+                document.getElementById('userName').innerText = data.user.full_name;
+            }
+
+            if (data.loyalty && data.loyalty.current_tier) {
+                updateTier(data.loyalty.current_tier);
+            }
+        }
+    } catch(e) {
+        console.error(e);
+    }
+}
+
+async function getAddresses() {
+    try {
+        const res = await fetch('/accounts/api/user/addresses/');
+        const data = await res.json();
+        if (data.success) {
+            return data.addresses || [];
+        }
+        return [];
+    } catch(e) {
+        console.error(e);
+        return [];
+    }
+}
+
+async function loadProvinces() {
+    try {
+        const res = await fetch('/accounts/api/provinces-cities/');
+        const data = await res.json();
+        if (data.success) {
+            return data.provinces || [];
+        }
+        return [];
+    } catch(e) {
+        console.error(e);
+        return [];
+    }
+}
+
+async function addAddress(addrData) {
+    const res = await fetch('/accounts/api/address/add/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(addrData)
+    });
+    return res.json();
+}
+
+async function setDefaultAddress(addressId) {
+    const res = await fetch('/accounts/api/address/set-default/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({address_id: addressId})
+    });
+    return res.json();
+}
+
+async function deleteAddress(addressId) {
+    const res = await fetch('/accounts/api/address/delete/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({address_id: addressId})
+    });
+    return res.json();
+}
+
+async function getShopName() {
+    try {
+        const res = await fetch('/accounts/api/shop_name/');
+        const data = await res.json();
+        const shopNameText = document.getElementById('shopNameText');
+        const shopNameBadge = document.getElementById('shopNameBadge');
+
+        if (!shopNameText) return;
+
+        if (data.shop_name && data.shop_name.trim() !== '') {
+            shopNameText.innerText = data.shop_name;
+            shopNameBadge.style.display = 'inline-flex';
+        } else {
+            shopNameText.innerText = 'نام فروشگاه';
+            shopNameBadge.style.opacity = '0.6';
+        }
+    } catch(e) {
+        console.error('خطا در دریافت نام فروشگاه:', e);
+        const shopNameText = document.getElementById('shopNameText');
+        if (shopNameText) {
+            shopNameText.innerText = 'نام فروشگاه';
+        }
+    }
+}
+
+// ==================== VARIABLES ====================
+let allAddresses = [];
+let allProvinces = [];
+
+function getAddressBadge(type) {
+    const badges = {
+        'home': '<span class="address-badge-custom badge-home"><i class="fas fa-home"></i> منزل</span>',
+        'work': '<span class="address-badge-custom badge-work"><i class="fas fa-briefcase"></i> محل کار</span>',
+        'other': '<span class="address-badge-custom badge-other"><i class="fas fa-map-marker"></i> سایر</span>'
+    };
+    return badges[type] || badges['other'];
+}
+
+async function refreshAddressList() {
+    allAddresses = await getAddresses();
+
+    const defaultAddr = allAddresses.find(a => a.is_default) || allAddresses[0];
+    if (defaultAddr) {
+        let addressText = defaultAddr.address_text || '';
+        if (addressText.length > 45) addressText = addressText.substring(0, 45) + '...';
+        document.getElementById('selectedAddress').innerHTML = `${addressText} (${defaultAddr.city_name || ''})`;
+    } else {
+        document.getElementById('selectedAddress').innerHTML = 'آدرسی ثبت نشده است';
+    }
+
+    const container = document.getElementById('addressList');
+    if (!container) return;
+
+    if (allAddresses.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px;">
+                <i class="fas fa-map-marked-alt" style="font-size: 48px; color: #dee2e6; margin-bottom: 16px;"></i>
+                <p style="color: #6c757d;">هیچ آدرسی ثبت نشده است</p>
+                <p style="color: #adb5bd; font-size: 13px;">برای افزودن آدرس جدید، دکمه پایین را بزنید</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = allAddresses.map(addr => `
+        <div class="address-item-custom ${addr.is_default ? 'selected' : ''}" data-id="${addr.id}" onclick="window.selectAddressItem('${addr.id}')">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    ${addr.is_default ? '<span class="address-badge-custom badge-default"><i class="fas fa-star"></i> پیش‌فرض</span>' : ''}
+                    ${getAddressBadge(addr.address_type)}
+                </div>
+                <div style="font-size: 11px; color: #6c757d;">
+                    ${addr.province_name || ''} - ${addr.city_name || ''}
+                </div>
+            </div>
+            <div style="font-size: 13px; color: #495057; margin-bottom: 10px; line-height: 1.5;">
+                ${escapeHtml(addr.address_text || '')}
+            </div>
+            ${addr.postal_code ? `<div style="font-size: 11px; color: #adb5bd;"><i class="fas fa-mail-bulk"></i> ${addr.postal_code}</div>` : ''}
+            <div style="display: flex; gap: 12px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #f1f3f5;">
+                ${!addr.is_default ? `<button onclick="window.makeDefault('${addr.id}'); event.stopPropagation();" style="background: none; border: none; color: #28a745; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 4px;"><i class="fas fa-check-circle"></i> تنظیم پیش‌فرض</button>` : ''}
+                <button onclick="window.removeAddress('${addr.id}'); event.stopPropagation();" style="background: none; border: none; color: #dc3545; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 4px;"><i class="fas fa-trash-alt"></i> حذف</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+window.selectAddressItem = function(addressId) {
+    const address = allAddresses.find(a => a.id == addressId);
+    if (address) {
+        let addressText = address.address_text || '';
+        if (addressText.length > 45) addressText = addressText.substring(0, 45) + '...';
+        document.getElementById('selectedAddress').innerHTML = `${addressText} (${address.city_name || ''})`;
+        document.getElementById('addressModal').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
+window.makeDefault = async function(id) {
+    const result = await setDefaultAddress(id);
+    if (result.success) {
+        await refreshAddressList();
+        alert('✓ آدرس پیش‌فرض تغییر کرد');
+    } else {
+        alert('خطا: ' + (result.error || 'مشکلی پیش آمد'));
+    }
+}
+
+window.removeAddress = async function(id) {
+    if (!confirm('آیا از حذف این آدرس اطمینان دارید؟')) return;
+    const result = await deleteAddress(id);
+    if (result.success) {
+        await refreshAddressList();
+        alert('✓ آدرس با موفقیت حذف شد');
+    } else {
+        alert('خطا: ' + (result.error || 'مشکلی پیش آمد'));
+    }
+}
+
+async function initForm() {
+    allProvinces = await loadProvinces();
+    const provinceSelect = document.getElementById('province');
+    if (!provinceSelect) return;
+
+    provinceSelect.innerHTML = '<option value="">🏛 انتخاب استان</option>';
+    allProvinces.forEach(p => {
+        provinceSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+    });
+}
+
+function resetFormFields() {
+    document.getElementById('province').value = '';
+    document.getElementById('city').innerHTML = '<option value="">🌆 انتخاب شهر</option>';
+    document.getElementById('addressText').value = '';
+    document.getElementById('postalCode').value = '';
+    document.getElementById('addrType').value = 'home';
+    document.getElementById('isDefault').checked = false;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    getUserInfo();
+    getShopName();
+    refreshAddressList();
+
+    const modal = document.getElementById('addressModal');
+    const openBtn = document.getElementById('openAddressModal');
+    const closeBtn = document.getElementById('closeModalBtn');
+    const showAddBtn = document.getElementById('showAddBtn');
+    const cancelFormBtn = document.getElementById('cancelForm');
+    const saveAddrBtn = document.getElementById('saveAddr');
+    const addFormContainer = document.getElementById('addFormContainer');
+
+    if (openBtn) {
+        openBtn.onclick = () => {
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            refreshAddressList();
+            if (addFormContainer) addFormContainer.style.display = 'none';
+            resetFormFields();
+        };
+    }
+
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+            if (addFormContainer) addFormContainer.style.display = 'none';
+        };
+    }
+
+    if (showAddBtn) {
+        showAddBtn.onclick = () => {
+            if (addFormContainer) {
+                addFormContainer.style.display = 'block';
+                initForm();
+                resetFormFields();
+                addFormContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        };
+    }
+
+    if (cancelFormBtn) {
+        cancelFormBtn.onclick = () => {
+            if (addFormContainer) {
+                addFormContainer.style.display = 'none';
+                resetFormFields();
+            }
+        };
+    }
+
+    const provinceSelect = document.getElementById('province');
+    if (provinceSelect) {
+        provinceSelect.onchange = function() {
+            const province = allProvinces.find(p => p.id == this.value);
+            const citySelect = document.getElementById('city');
+            if (!province || !citySelect) return;
+
+            citySelect.innerHTML = '<option value="">🌆 انتخاب شهر</option>';
+            if (province.cities && province.cities.length > 0) {
+                province.cities.forEach(c => {
+                    citySelect.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+                });
+            }
+        };
+    }
+
+    if (saveAddrBtn) {
+        saveAddrBtn.onclick = async function() {
+            const provinceId = document.getElementById('province').value;
+            const cityId = document.getElementById('city').value;
+            const addressText = document.getElementById('addressText').value.trim();
+            const postalCode = document.getElementById('postalCode').value.trim();
+            const addressType = document.getElementById('addrType').value;
+            const isDefault = document.getElementById('isDefault').checked;
+
+            if (!provinceId || !cityId || !addressText) {
+                alert('⚠ لطفاً استان، شهر و آدرس را وارد کنید');
+                return;
+            }
+
+            const result = await addAddress({
+                province_id: provinceId,
+                city_id: cityId,
+                address_text: addressText,
+                postal_code: postalCode || '',
+                address_type: addressType,
+                is_default: isDefault
+            });
+
+            if (result.success) {
+                alert('✓ آدرس با موفقیت اضافه شد');
+                if (addFormContainer) {
+                    addFormContainer.style.display = 'none';
+                    resetFormFields();
+                }
+                await refreshAddressList();
+            } else {
+                alert('⚠ خطا: ' + (result.error || 'مشکلی پیش آمد'));
+            }
+        };
+    }
+
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal || e.target.classList?.contains('modal-backdrop')) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+                if (addFormContainer) addFormContainer.style.display = 'none';
+            }
+        });
+    }
+});
+
+setInterval(() => {
+    getUserInfo();
+    if (document.getElementById('addressModal')?.style.display === 'block') {
+        refreshAddressList();
+    }
+}, 30000);
+</script>

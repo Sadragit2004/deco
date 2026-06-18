@@ -1,0 +1,1650 @@
+{% extends 'admin_template.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}مدیریت حرفه‌ای پرداخت‌ها{% endblock %}
+
+{% block mobile_orders %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    /* استایل‌های پایه ریسپانسیو */
+    .responsive-container {
+        width: 100%;
+        padding: 0.75rem;
+        margin: 0 auto;
+    }
+
+    /* گرید آمار با ریسپانسیو کامل */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border-radius: 1rem;
+        padding: 0.875rem;
+        text-align: center;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        transition: transform 0.2s;
+    }
+
+    .stat-card:active {
+        transform: scale(0.98);
+    }
+
+    .stat-number {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #fff;
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        margin-top: 0.25rem;
+    }
+
+    /* باکس فیلتر */
+    .filter-box {
+        background: #1e293b;
+        border-radius: 1rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .filter-group {
+        margin-bottom: 0.75rem;
+    }
+
+    .filter-group label {
+        display: block;
+        color: #94a3b8;
+        font-size: 0.7rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .filter-group input,
+    .filter-group select {
+        width: 100%;
+        padding: 0.625rem 0.75rem;
+        background: #0f172a;
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        border-radius: 0.75rem;
+        color: #fff;
+        font-size: 0.8rem;
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: 0.625rem;
+        margin-top: 0.75rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        padding: 0.625rem;
+        border: none;
+        border-radius: 0.75rem;
+        color: white;
+        cursor: pointer;
+        flex: 1;
+        font-size: 0.8rem;
+        transition: opacity 0.2s;
+    }
+
+    .btn-reset {
+        background: #ef4444;
+        padding: 0.625rem;
+        border: none;
+        border-radius: 0.75rem;
+        color: white;
+        cursor: pointer;
+        flex: 1;
+        font-size: 0.8rem;
+    }
+
+    /* لیست پرداخت‌ها */
+    .payments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.875rem;
+        margin-bottom: 1rem;
+    }
+
+    .payment-card {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border-radius: 1.125rem;
+        padding: 0.875rem;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .payment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.625rem;
+        border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .payment-ref {
+        font-family: monospace;
+        font-size: 0.85rem;
+        color: #60a5fa;
+        font-weight: bold;
+    }
+
+    .payment-status {
+        display: inline-block;
+        padding: 0.25rem 0.625rem;
+        border-radius: 1.25rem;
+        font-size: 0.65rem;
+        font-weight: 500;
+    }
+
+    .badge-success { background: rgba(16,185,129,0.2); color: #34d399; }
+    .badge-danger { background: rgba(239,68,68,0.2); color: #ef4444; }
+
+    .payment-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+
+    .payment-label {
+        color: #94a3b8;
+        font-size: 0.7rem;
+    }
+
+    .payment-value {
+        color: #fff;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .payment-actions {
+        display: flex;
+        gap: 0.625rem;
+        margin-top: 0.75rem;
+        padding-top: 0.625rem;
+        border-top: 1px solid rgba(102, 126, 234, 0.1);
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 0.75rem;
+        cursor: pointer;
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.375rem;
+    }
+
+    .btn-detail {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-status {
+        background: #10b981;
+        color: white;
+    }
+
+    /* پیجینیشن */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .pagination button {
+        padding: 0.375rem 0.75rem;
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 0.5rem;
+        color: #94a3b8;
+        cursor: pointer;
+        font-size: 0.75rem;
+    }
+
+    .pagination button.active {
+        background: #667eea;
+        color: white;
+    }
+
+    /* مودال */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.95);
+        backdrop-filter: blur(8px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        padding: 0.75rem;
+    }
+
+    .modal-content {
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        border-radius: 1.25rem;
+        padding: 1rem;
+        width: 100%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(102,126,234,0.2);
+    }
+
+    .modal-header h3 {
+        color: #fff;
+        font-size: 1.1rem;
+    }
+
+    .close-modal {
+        background: #ef4444;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        color: white;
+        cursor: pointer;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* جزئیات */
+    .detail-section {
+        background: #0f172a;
+        border-radius: 0.875rem;
+        padding: 0.875rem;
+        margin-bottom: 0.875rem;
+    }
+
+    .detail-title {
+        color: #667eea;
+        font-size: 0.85rem;
+        font-weight: bold;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-right: 3px solid #667eea;
+        padding-right: 0.625rem;
+    }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.625rem;
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px dashed rgba(102,126,234,0.1);
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .detail-label {
+        color: #94a3b8;
+        font-size: 0.7rem;
+    }
+
+    .detail-value {
+        color: #fff;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .price-highlight {
+        color: #fbbf24;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    .status-select-full {
+        width: 100%;
+        padding: 0.625rem;
+        border-radius: 0.75rem;
+        background: #0f172a;
+        color: white;
+        border: 1px solid #667eea;
+        font-size: 0.8rem;
+        margin-bottom: 0.75rem;
+    }
+
+    /* تبلت و بالاتر */
+    @media (min-width: 768px) {
+        .responsive-container {
+            padding: 1rem;
+            max-width: 1200px;
+        }
+
+        .stats-grid {
+            gap: 1rem;
+        }
+
+        .stat-card {
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 1.6rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+        }
+
+        .filter-box {
+            padding: 1.25rem;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            margin-bottom: 0;
+        }
+
+        .filter-buttons {
+            margin-top: 0;
+            gap: 0.75rem;
+        }
+
+        .modal-content {
+            max-width: 600px;
+            padding: 1.25rem;
+        }
+
+        .detail-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    /* دسکتاپ */
+    @media (min-width: 1024px) {
+        .responsive-container {
+            padding: 1.5rem;
+        }
+
+        .stats-grid {
+            gap: 1.25rem;
+        }
+
+        .stat-card {
+            padding: 1.25rem;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+        }
+
+        .filter-box {
+            padding: 1.5rem;
+        }
+
+        .payment-card:hover {
+            transform: translateY(-2px);
+            transition: transform 0.2s;
+        }
+    }
+
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #94a3b8;
+    }
+</style>
+
+<div class="responsive-container">
+    <!-- آمار -->
+    <div class="stats-grid">
+        <div class="stat-card"><div class="stat-number" id="mobileStatTotal">-</div><div class="stat-label">کل تراکنش‌ها</div></div>
+        <div class="stat-card"><div class="stat-number" id="mobileStatSuccessful">-</div><div class="stat-label">موفق</div></div>
+        <div class="stat-card"><div class="stat-number" id="mobileStatFailed">-</div><div class="stat-label">ناموفق</div></div>
+        <div class="stat-card"><div class="stat-number" id="mobileStatTotalAmount">-</div><div class="stat-label">مبلغ کل</div></div>
+    </div>
+
+    <!-- فیلترها -->
+    <div class="filter-box">
+        <div class="filter-grid">
+            <div class="filter-group"><label>از تاریخ</label><input type="text" id="mobileFilterFromDate" placeholder="1403/01/01"></div>
+            <div class="filter-group"><label>تا تاریخ</label><input type="text" id="mobileFilterToDate" placeholder="1403/12/29"></div>
+            <div class="filter-group"><label>وضعیت</label><select id="mobileFilterStatus"><option value="">همه</option><option value="true">موفق</option><option value="false">ناموفق</option></select></div>
+            <div class="filter-group"><label>روش پرداخت</label><select id="mobileFilterMethod"><option value="">همه</option><option value="online">درگاه آنلاین</option><option value="card_to_card">کارت به کارت</option></select></div>
+            <div class="filter-group"><label>جستجو</label><input type="text" id="mobileSearchInput" placeholder="کد پیگیری / شماره سفارش / موبایل..."></div>
+        </div>
+        <div class="filter-buttons">
+            <button class="btn-primary" onclick="applyMobileFilters()"><i class="fas fa-search"></i> جستجو</button>
+            <button class="btn-reset" onclick="resetMobileFilters()"><i class="fas fa-undo"></i> ریست</button>
+        </div>
+    </div>
+
+    <!-- لیست پرداخت‌ها -->
+    <div class="payments-list" id="mobilePaymentsList"><div class="loading">در حال بارگذاری...</div></div>
+
+    <!-- پیجینیشن -->
+    <div class="pagination" id="mobilePagination"></div>
+</div>
+
+<!-- مودال جزئیات -->
+<div id="mobilePaymentModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-receipt"></i> جزئیات کامل پرداخت</h3>
+            <button class="close-modal" onclick="closeMobileModal()">&times;</button>
+        </div>
+        <div id="mobilePaymentDetailContent"></div>
+    </div>
+</div>
+
+<script>
+    let mobilePage = 1, mobileFilters = {}, mobileSearchTimeout = null;
+
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+               document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+    }
+
+    function formatNumber(num) {
+        if (num === undefined || num === null) return '۰';
+        return new Intl.NumberFormat('fa-IR').format(num);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    async function updatePaymentStatus(paymentId, isFinal, refId = null) {
+        try {
+            const response = await fetch('/panel/api/payments/update-status/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify({ payment_id: paymentId, is_final: isFinal, ref_id: refId })
+            });
+            const data = await response.json();
+            if (data.status === 'success') {
+                loadMobilePayments();
+                if (typeof loadPaymentsDesktop === 'function') loadPaymentsDesktop();
+                return true;
+            } else {
+                alert(data.message || 'خطا در تغییر وضعیت');
+                return false;
+            }
+        } catch(e) {
+            console.error('خطا:', e);
+            alert('خطا در ارتباط با سرور');
+            return false;
+        }
+    }
+
+    async function loadMobilePayments() {
+        const params = new URLSearchParams({
+            page: mobilePage,
+            ...mobileFilters
+        });
+
+        try {
+            const response = await fetch(`/panel/api/payments/list/?${params}`);
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                document.getElementById('mobileStatTotal').innerText = formatNumber(data.stats.total);
+                document.getElementById('mobileStatSuccessful').innerText = formatNumber(data.stats.successful);
+                document.getElementById('mobileStatFailed').innerText = formatNumber(data.stats.failed);
+                document.getElementById('mobileStatTotalAmount').innerText = data.stats.total_amount || '۰ تومان';
+
+                renderMobilePayments(data.payments);
+                renderMobilePagination(data.pagination);
+            } else {
+                document.getElementById('mobilePaymentsList').innerHTML = '<div class="loading">خطا: ' + escapeHtml(data.message || 'مشکل در دریافت داده') + '</div>';
+            }
+        } catch(e) {
+            console.error('خطا:', e);
+            document.getElementById('mobilePaymentsList').innerHTML = '<div class="loading">خطا در بارگذاری داده‌ها</div>';
+        }
+    }
+
+    function renderMobilePayments(payments) {
+        const container = document.getElementById('mobilePaymentsList');
+
+        if (!payments || payments.length === 0) {
+            container.innerHTML = '<div class="loading">هیچ پرداختی یافت نشد</div>';
+            return;
+        }
+
+        container.innerHTML = payments.map(p => `
+            <div class="payment-card">
+                <div class="payment-header">
+                    <span class="payment-ref"><i class="fas fa-barcode"></i> ${escapeHtml(p.ref_id)}</span>
+                    <span class="payment-status badge-${p.is_final ? 'success' : 'danger'}">${escapeHtml(p.status_display)}</span>
+                </div>
+                <div class="payment-row">
+                    <span class="payment-label"><i class="fas fa-shopping-cart"></i> شماره سفارش:</span>
+                    <span class="payment-value" dir="ltr">${escapeHtml(p.order_number)}</span>
+                </div>
+                <div class="payment-row">
+                    <span class="payment-label"><i class="fas fa-user"></i> مشتری:</span>
+                    <span class="payment-value">${escapeHtml(p.customer_name)}</span>
+                </div>
+                <div class="payment-row">
+                    <span class="payment-label"><i class="fas fa-phone"></i> موبایل:</span>
+                    <span class="payment-value" dir="ltr">${escapeHtml(p.customer_mobile)}</span>
+                </div>
+                <div class="payment-row">
+                    <span class="payment-label"><i class="fas fa-dollar-sign"></i> مبلغ:</span>
+                    <span class="payment-value" style="color:#fbbf24;">${p.amount}</span>
+                </div>
+                <div class="payment-row">
+                    <span class="payment-label"><i class="fas fa-credit-card"></i> روش پرداخت:</span>
+                    <span class="payment-value">${escapeHtml(p.payment_method)}</span>
+                </div>
+                <div class="payment-row">
+                    <span class="payment-label"><i class="fas fa-calendar"></i> تاریخ:</span>
+                    <span class="payment-value">${p.created_at}</span>
+                </div>
+                ${p.card_number && p.card_number !== '-' ? `
+                <div class="payment-row">
+                    <span class="payment-label"><i class="fas fa-credit-card"></i> شماره کارت:</span>
+                    <span class="payment-value" dir="ltr">${escapeHtml(p.card_number)}</span>
+                </div>
+                ` : ''}
+                ${p.tracking_number && p.tracking_number !== '-' ? `
+                <div class="payment-row">
+                    <span class="payment-label"><i class="fas fa-barcode"></i> کد پیگیری:</span>
+                    <span class="payment-value" dir="ltr">${escapeHtml(p.tracking_number)}</span>
+                </div>
+                ` : ''}
+                <div class="payment-actions">
+                    <button class="action-btn btn-detail" onclick="showMobilePaymentDetail(${p.id})">
+                        <i class="fas fa-eye"></i> جزئیات
+                    </button>
+                    <button class="action-btn btn-status" onclick="showMobileStatusModal(${p.id}, '${escapeHtml(p.ref_id)}', ${p.is_final})">
+                        <i class="fas fa-edit"></i> تغییر وضعیت
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderMobilePagination(pagination) {
+        const container = document.getElementById('mobilePagination');
+        if (!pagination || pagination.total_pages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+
+        let html = '';
+        if (pagination.has_previous) {
+            html += `<button onclick="goToMobilePage(${pagination.current_page - 1})">قبلی</button>`;
+        }
+
+        const startPage = Math.max(1, pagination.current_page - 2);
+        const endPage = Math.min(pagination.total_pages, startPage + 4);
+
+        for (let i = startPage; i <= endPage; i++) {
+            html += `<button onclick="goToMobilePage(${i})" class="${i === pagination.current_page ? 'active' : ''}">${i}</button>`;
+        }
+
+        if (pagination.has_next) {
+            html += `<button onclick="goToMobilePage(${pagination.current_page + 1})">بعدی</button>`;
+        }
+
+        container.innerHTML = html;
+    }
+
+    function goToMobilePage(page) {
+        mobilePage = page;
+        loadMobilePayments();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function applyMobileFilters() {
+        mobileFilters = {
+            from_date: document.getElementById('mobileFilterFromDate').value,
+            to_date: document.getElementById('mobileFilterToDate').value,
+            is_final: document.getElementById('mobileFilterStatus').value,
+            payment_method: document.getElementById('mobileFilterMethod').value,
+            search: document.getElementById('mobileSearchInput').value
+        };
+        Object.keys(mobileFilters).forEach(key => {
+            if (!mobileFilters[key]) delete mobileFilters[key];
+        });
+        mobilePage = 1;
+        loadMobilePayments();
+    }
+
+    function resetMobileFilters() {
+        document.getElementById('mobileFilterFromDate').value = '';
+        document.getElementById('mobileFilterToDate').value = '';
+        document.getElementById('mobileFilterStatus').value = '';
+        document.getElementById('mobileFilterMethod').value = '';
+        document.getElementById('mobileSearchInput').value = '';
+        mobileFilters = {};
+        mobilePage = 1;
+        loadMobilePayments();
+    }
+
+    async function showMobilePaymentDetail(paymentId) {
+        try {
+            const response = await fetch(`/panel/api/payments/${paymentId}/`);
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                const p = data.payment;
+                const content = `
+                    <div class="detail-section">
+                        <div class="detail-title"><i class="fas fa-info-circle"></i> اطلاعات پایه</div>
+                        <div class="detail-grid">
+                            <div class="detail-item"><span class="detail-label">کد پیگیری:</span><span class="detail-value" dir="ltr">${escapeHtml(p.ref_id)}</span></div>
+                            <div class="detail-item"><span class="detail-label">وضعیت:</span><span class="detail-value"><span class="badge-${p.is_final ? 'success' : 'danger'}" style="display:inline-block; padding:2px 8px;">${escapeHtml(p.status_display)}</span></span></div>
+                            <div class="detail-item"><span class="detail-label">کد وضعیت:</span><span class="detail-value">${escapeHtml(p.status_code) || '-'}</span></div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="detail-title"><i class="fas fa-user"></i> اطلاعات مشتری</div>
+                        <div class="detail-grid">
+                            <div class="detail-item"><span class="detail-label">نام کامل:</span><span class="detail-value">${escapeHtml(p.customer.name)}</span></div>
+                            <div class="detail-item"><span class="detail-label">شماره موبایل:</span><span class="detail-value" dir="ltr">${escapeHtml(p.customer.mobile)}</span></div>
+                            <div class="detail-item"><span class="detail-label">ایمیل:</span><span class="detail-value">${escapeHtml(p.customer.email) || '-'}</span></div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="detail-title"><i class="fas fa-shopping-cart"></i> اطلاعات سفارش</div>
+                        <div class="detail-grid">
+                            <div class="detail-item"><span class="detail-label">شماره سفارش:</span><span class="detail-value" dir="ltr">${escapeHtml(p.order?.order_number) || '-'}</span></div>
+                            <div class="detail-item"><span class="detail-label">وضعیت سفارش:</span><span class="detail-value">${escapeHtml(p.order?.status_display) || '-'}</span></div>
+                            <div class="detail-item"><span class="detail-label">مبلغ سفارش:</span><span class="detail-value price-highlight">${p.order?.total_amount || '-'}</span></div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="detail-title"><i class="fas fa-credit-card"></i> اطلاعات پرداخت</div>
+                        <div class="detail-grid">
+                            <div class="detail-item"><span class="detail-label">روش پرداخت:</span><span class="detail-value">${escapeHtml(p.payment_method)}</span></div>
+                            <div class="detail-item"><span class="detail-label">مبلغ:</span><span class="detail-value price-highlight">${p.amount}</span></div>
+                            ${p.card_number && p.card_number !== '-' ? `<div class="detail-item"><span class="detail-label">شماره کارت:</span><span class="detail-value" dir="ltr">${escapeHtml(p.card_number)}</span></div>` : ''}
+                            ${p.card_holder_name && p.card_holder_name !== '-' ? `<div class="detail-item"><span class="detail-label">دارنده کارت:</span><span class="detail-value">${escapeHtml(p.card_holder_name)}</span></div>` : ''}
+                            ${p.tracking_number && p.tracking_number !== '-' ? `<div class="detail-item"><span class="detail-label">کد پیگیری:</span><span class="detail-value" dir="ltr">${escapeHtml(p.tracking_number)}</span></div>` : ''}
+                            ${p.receipt_image ? `<div class="detail-item"><span class="detail-label">رسید:</span><span class="detail-value"><a href="${escapeHtml(p.receipt_image)}" target="_blank" style="color:#60a5fa;">مشاهده رسید</a></span></div>` : ''}
+                            ${p.description ? `<div class="detail-item"><span class="detail-label">توضیحات:</span><span class="detail-value">${escapeHtml(p.description)}</span></div>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <div class="detail-title"><i class="fas fa-clock"></i> زمان</div>
+                        <div class="detail-grid">
+                            <div class="detail-item"><span class="detail-label">تاریخ ثبت:</span><span class="detail-value">${p.created_at}</span></div>
+                            <div class="detail-item"><span class="detail-label">ساعت ثبت:</span><span class="detail-value">${p.created_at_time || '-'}</span></div>
+                            <div class="detail-item"><span class="detail-label">آخرین بروزرسانی:</span><span class="detail-value">${p.updated_at || '-'}</span></div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:20px; padding-top:15px; border-top:1px solid rgba(102,126,234,0.2);">
+                        <div style="margin-bottom:12px;">
+                            <select id="mobileDetailStatusSelect" class="status-select-full">
+                                <option value="true" ${p.is_final ? 'selected' : ''}>✅ موفق</option>
+                                <option value="false" ${!p.is_final ? 'selected' : ''}>❌ ناموفق</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <input type="text" id="mobileDetailRefIdInput" class="status-select-full" placeholder="کد پیگیری جدید (اختیاری)" value="${escapeHtml(p.ref_id !== '-' ? p.ref_id : '')}">
+                        </div>
+                        <button onclick="updateMobilePaymentStatus('${p.id}')" style="width:100%; padding:12px; background:linear-gradient(135deg,#667eea,#764ba2); border:none; border-radius:12px; color:white; cursor:pointer; font-weight:bold;">
+                            <i class="fas fa-save"></i> بروزرسانی وضعیت
+                        </button>
+                    </div>
+                `;
+                document.getElementById('mobilePaymentDetailContent').innerHTML = content;
+                document.getElementById('mobilePaymentModal').style.display = 'flex';
+                window.currentMobilePaymentId = p.id;
+            } else {
+                alert(data.message || 'خطا در دریافت اطلاعات');
+            }
+        } catch(e) {
+            console.error('خطا:', e);
+            alert('خطا در دریافت اطلاعات پرداخت');
+        }
+    }
+
+    async function updateMobilePaymentStatus(paymentId) {
+        const newStatus = document.getElementById('mobileDetailStatusSelect').value === 'true';
+        const newRefId = document.getElementById('mobileDetailRefIdInput').value;
+        const success = await updatePaymentStatus(paymentId, newStatus, newRefId || null);
+        if (success) {
+            closeMobileModal();
+            loadMobilePayments();
+        }
+    }
+
+    function showMobileStatusModal(paymentId, refId, isFinal) {
+        const newStatus = confirm(`آیا میخواهید وضعیت پرداخت ${refId} را تغییر دهید؟\nوضعیت فعلی: ${isFinal ? 'موفق' : 'ناموفق'}\nوضعیت جدید: ${isFinal ? 'ناموفق' : 'موفق'}`);
+        if (newStatus) {
+            updatePaymentStatus(paymentId, !isFinal, null);
+        }
+    }
+
+    function closeMobileModal() {
+        document.getElementById('mobilePaymentModal').style.display = 'none';
+    }
+
+    // Event Listeners
+    document.getElementById('mobileFilterFromDate').addEventListener('change', applyMobileFilters);
+    document.getElementById('mobileFilterToDate').addEventListener('change', applyMobileFilters);
+    document.getElementById('mobileFilterStatus').addEventListener('change', applyMobileFilters);
+    document.getElementById('mobileFilterMethod').addEventListener('change', applyMobileFilters);
+    document.getElementById('mobileSearchInput').addEventListener('input', function() {
+        clearTimeout(mobileSearchTimeout);
+        mobileSearchTimeout = setTimeout(() => applyMobileFilters(), 500);
+    });
+
+    // بارگذاری اولیه
+    loadMobilePayments();
+
+    // آپدیت خودکار هر 30 ثانیه
+    setInterval(loadMobilePayments, 30000);
+</script>
+{% endblock %}
+
+{% block pc %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .payments-container {
+        animation: fadeIn 0.5s ease;
+        padding: 1.5rem;
+        width: 100%;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* گرید آمار دسکتاپ */
+    .stats-desktop-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-desktop-card {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border-radius: 1.25rem;
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-desktop-card:hover {
+        transform: translateY(-3px);
+        border-color: #667eea;
+    }
+
+    .stat-desktop-card h4 {
+        color: #94a3b8;
+        font-size: 0.7rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-desktop-number {
+        color: #fff;
+        font-size: 1.4rem;
+        font-weight: 800;
+        direction: ltr;
+        display: inline-block;
+    }
+
+    .stat-icon {
+        position: absolute;
+        left: 15px;
+        bottom: 15px;
+        opacity: 0.2;
+    }
+
+    .stat-icon i {
+        font-size: 1.5rem;
+        color: #667eea;
+    }
+
+    /* فیلتر دسکتاپ */
+    .filter-desktop-box {
+        background: #1e293b;
+        border-radius: 1.5rem;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .filter-desktop-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+        align-items: flex-end;
+    }
+
+    .filter-desktop-group {
+        min-width: 0;
+    }
+
+    .filter-desktop-group label {
+        display: block;
+        color: #94a3b8;
+        font-size: 0.7rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .filter-desktop-group input,
+    .filter-desktop-group select {
+        width: 100%;
+        padding: 0.625rem 0.75rem;
+        background: #0f172a;
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        border-radius: 0.75rem;
+        color: #fff;
+        font-size: 0.8rem;
+    }
+
+    .search-desktop-group {
+        min-width: 200px;
+    }
+
+    .search-input-wrapper {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .search-input-wrapper input {
+        flex: 1;
+    }
+
+    .btn-desktop-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        padding: 0.625rem 1rem;
+        border: none;
+        border-radius: 0.75rem;
+        color: white;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        font-size: 0.8rem;
+    }
+
+    .btn-desktop-primary:hover {
+        opacity: 0.9;
+    }
+
+    .btn-desktop-reset {
+        background: #ef4444;
+        padding: 0.625rem 1rem;
+        border: none;
+        border-radius: 0.75rem;
+        color: white;
+        cursor: pointer;
+        font-size: 0.8rem;
+    }
+
+    /* نمودارها */
+    .charts-desktop-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .chart-desktop-card {
+        background: #1e293b;
+        border-radius: 1.5rem;
+        padding: 1rem;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .chart-desktop-card h3 {
+        color: #fff;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    canvas {
+        max-height: 250px;
+        width: 100%;
+    }
+
+    /* جدول */
+    .payments-table-wrapper {
+        background: #1e293b;
+        border-radius: 1.5rem;
+        overflow-x: auto;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .payments-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1000px;
+    }
+
+    .payments-table th {
+        text-align: right;
+        padding: 0.875rem 1rem;
+        color: #94a3b8;
+        border-bottom: 1px solid rgba(102, 126, 234, 0.15);
+        background: rgba(0, 0, 0, 0.2);
+        font-size: 0.75rem;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .payments-table th:hover {
+        color: #667eea;
+    }
+
+    .payments-table td {
+        padding: 0.75rem 1rem;
+        color: #e2e8f0;
+        border-bottom: 1px solid rgba(102, 126, 234, 0.08);
+        font-size: 0.8rem;
+    }
+
+    .payments-table tr:hover {
+        background: rgba(102, 126, 234, 0.05);
+    }
+
+    /* وضعیت‌ها */
+    .badge-success { background: rgba(16,185,129,0.2); color: #34d399; padding: 0.25rem 0.75rem; border-radius: 1.875rem; font-size: 0.7rem; display: inline-block; }
+    .badge-danger { background: rgba(239,68,68,0.2); color: #ef4444; padding: 0.25rem 0.75rem; border-radius: 1.875rem; font-size: 0.7rem; display: inline-block; }
+
+    .btn-primary-table {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        padding: 0.375rem 0.75rem;
+        border: none;
+        border-radius: 0.625rem;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.7rem;
+        width: 100%;
+    }
+
+    .btn-primary-table:hover {
+        transform: scale(1.02);
+    }
+
+    .btn-success-table {
+        background: #10b981;
+    }
+
+    .btn-success-table:hover {
+        background: #059669;
+    }
+
+    /* پیجینیشن */
+    .pagination-desktop {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .pagination-desktop button {
+        padding: 0.5rem 1rem;
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 0.5rem;
+        color: #94a3b8;
+        cursor: pointer;
+        font-size: 0.8rem;
+    }
+
+    .pagination-desktop button.active {
+        background: #667eea;
+        color: white;
+    }
+
+    /* مودال دسکتاپ */
+    .modal-desktop {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        backdrop-filter: blur(8px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem;
+    }
+
+    .modal-desktop-content {
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        border-radius: 1.75rem;
+        padding: 1.25rem;
+        width: 90%;
+        max-width: 700px;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+
+    .modal-desktop-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .modal-desktop-header h3 {
+        color: #fff;
+        font-size: 1.1rem;
+    }
+
+    .close-modal-desktop {
+        background: #ef4444;
+        border: none;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        color: white;
+        cursor: pointer;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* جزئیات دسکتاپ */
+    .pc-detail-section {
+        background: #0f172a;
+        border-radius: 1rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(102, 126, 234, 0.15);
+    }
+
+    .pc-detail-section-title {
+        color: #667eea;
+        font-size: 0.85rem;
+        font-weight: bold;
+        margin-bottom: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-right: 3px solid #667eea;
+        padding-right: 0.75rem;
+    }
+
+    .pc-detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .pc-detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px dashed rgba(102, 126, 234, 0.1);
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .pc-detail-label {
+        color: #94a3b8;
+        font-size: 0.75rem;
+    }
+
+    .pc-detail-value {
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .pc-price-highlight {
+        color: #fbbf24;
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+    .status-select-full-desktop {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        background: #0f172a;
+        color: white;
+        border: 1px solid #667eea;
+        font-size: 0.85rem;
+        margin-bottom: 0.75rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .payments-container {
+            padding: 1rem;
+        }
+
+        .stats-desktop-grid {
+            gap: 0.75rem;
+        }
+
+        .stat-desktop-number {
+            font-size: 1.2rem;
+        }
+
+        .charts-desktop-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .filter-desktop-row {
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        }
+    }
+
+    @media (max-width: 768px) {
+        .payments-container {
+            padding: 0.75rem;
+        }
+
+        .stats-desktop-grid {
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+        }
+
+        .stat-desktop-card {
+            padding: 0.75rem;
+        }
+
+        .stat-desktop-number {
+            font-size: 1rem;
+        }
+
+        .filter-desktop-row {
+            grid-template-columns: 1fr;
+        }
+
+        .search-input-wrapper {
+            flex-wrap: wrap;
+        }
+
+        .payments-table th, .payments-table td {
+            padding: 0.5rem;
+            font-size: 0.7rem;
+        }
+
+        .pc-detail-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #94a3b8;
+    }
+</style>
+
+<div class="payments-container">
+    <!-- آمار دسکتاپ -->
+    <div class="stats-desktop-grid">
+        <div class="stat-desktop-card"><div><h4><i class="fas fa-credit-card"></i> کل تراکنش‌ها</h4><div class="stat-desktop-number" id="statTotal">-</div></div><div class="stat-icon"><i class="fas fa-chart-line"></i></div></div>
+        <div class="stat-desktop-card"><div><h4><i class="fas fa-check-circle"></i> موفق</h4><div class="stat-desktop-number" id="statSuccessful">-</div></div><div class="stat-icon"><i class="fas fa-check"></i></div></div>
+        <div class="stat-desktop-card"><div><h4><i class="fas fa-times-circle"></i> ناموفق</h4><div class="stat-desktop-number" id="statFailed">-</div></div><div class="stat-icon"><i class="fas fa-ban"></i></div></div>
+        <div class="stat-desktop-card"><div><h4><i class="fas fa-wallet"></i> مبلغ کل</h4><div class="stat-desktop-number" id="statTotalAmount">-</div></div><div class="stat-icon"><i class="fas fa-dollar-sign"></i></div></div>
+        <div class="stat-desktop-card"><div><h4><i class="fas fa-check-circle"></i> مبلغ موفق</h4><div class="stat-desktop-number" id="statSuccessfulAmount">-</div></div><div class="stat-icon"><i class="fas fa-chart-line"></i></div></div>
+        <div class="stat-desktop-card"><div><h4><i class="fas fa-globe"></i> درگاه آنلاین</h4><div class="stat-desktop-number" id="statOnline">-</div></div><div class="stat-icon"><i class="fas fa-globe"></i></div></div>
+    </div>
+
+    <!-- فیلترها -->
+    <div class="filter-desktop-box">
+        <div class="filter-desktop-row">
+            <div class="filter-desktop-group"><label><i class="fas fa-calendar"></i> از تاریخ</label><input type="text" id="filterFromDate" placeholder="1403/01/01"></div>
+            <div class="filter-desktop-group"><label><i class="fas fa-calendar"></i> تا تاریخ</label><input type="text" id="filterToDate" placeholder="1403/12/29"></div>
+            <div class="filter-desktop-group"><label><i class="fas fa-dollar-sign"></i> حداقل مبلغ</label><input type="number" id="filterMinAmount" placeholder="۰"></div>
+            <div class="filter-desktop-group"><label><i class="fas fa-dollar-sign"></i> حداکثر مبلغ</label><input type="number" id="filterMaxAmount" placeholder="۰"></div>
+            <div class="filter-desktop-group"><label><i class="fas fa-check-circle"></i> وضعیت</label><select id="filterStatus"><option value="">همه</option><option value="true">موفق</option><option value="false">ناموفق</option></select></div>
+            <div class="filter-desktop-group"><label><i class="fas fa-credit-card"></i> روش پرداخت</label><select id="filterPaymentMethod"><option value="">همه</option><option value="online">درگاه آنلاین</option><option value="card_to_card">کارت به کارت</option></select></div>
+            <div class="filter-desktop-group search-desktop-group"><label><i class="fas fa-search"></i> جستجو</label><div class="search-input-wrapper"><input type="text" id="searchInput" placeholder="کد پیگیری / شماره کارت / شماره سفارش / موبایل ..."><button class="btn-desktop-primary" onclick="searchPaymentsDesktop()"><i class="fas fa-search"></i> جستجو</button><button class="btn-desktop-reset" onclick="resetFiltersDesktop()"><i class="fas fa-undo"></i> ریست</button></div></div>
+        </div>
+    </div>
+
+    <!-- نمودارها -->
+    <div class="charts-desktop-row">
+        <div class="chart-desktop-card"><h3><i class="fas fa-chart-line" style="color:#667eea;"></i> روند پرداخت‌ها</h3><canvas id="paymentsTrendChart"></canvas></div>
+        <div class="chart-desktop-card"><h3><i class="fas fa-chart-pie" style="color:#764ba2;"></i> روش‌های پرداخت</h3><canvas id="paymentMethodsChart"></canvas></div>
+    </div>
+
+    <!-- جدول -->
+    <div class="payments-table-wrapper">
+        <table class="payments-table">
+            <thead>
+                <tr>
+                    <th onclick="sortPaymentsDesktop('ref_id')">کد پیگیری <i class="fas fa-sort"></i></th>
+                    <th onclick="sortPaymentsDesktop('order')">شماره سفارش</th>
+                    <th>مشتری</th>
+                    <th onclick="sortPaymentsDesktop('amount')">مبلغ <i class="fas fa-sort"></i></th>
+                    <th>روش پرداخت</th>
+                    <th>وضعیت</th>
+                    <th>جزئیات کارت/پیگیری</th>
+                    <th onclick="sortPaymentsDesktop('created_at')">تاریخ <i class="fas fa-sort"></i></th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+            <tbody id="paymentsTableBody"><tr><td colspan="9" class="loading">در حال بارگذاری...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination-desktop" id="paginationDesktop"></div>
+</div>
+
+<!-- مودال جزئیات دسکتاپ -->
+<div id="paymentDetailModal" class="modal-desktop">
+    <div class="modal-desktop-content">
+        <div class="modal-desktop-header">
+            <h3><i class="fas fa-receipt"></i> جزئیات کامل پرداخت</h3>
+            <button class="close-modal-desktop" onclick="closeModalDesktop('paymentDetailModal')">&times;</button>
+        </div>
+        <div id="paymentDetailContent"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let currentPageDesktop = 1, currentSortDesktop = '-createAt', currentFiltersDesktop = {};
+    let paymentsTrendChartDesktop = null, paymentMethodsChartDesktop = null;
+    let currentPaymentIdDesktop = null, searchTimeoutDesktop = null;
+
+    function getCSRFTokenDesktop() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+               document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+    }
+
+    function formatNumberDesktop(n) {
+        if (n === undefined || n === null) return '۰';
+        return new Intl.NumberFormat('fa-IR').format(n);
+    }
+
+    function escapeHtmlDesktop(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    async function updatePaymentStatusDesktop(paymentId, isFinal, refId = null) {
+        try {
+            const response = await fetch('/panel/api/payments/update-status/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFTokenDesktop()
+                },
+                body: JSON.stringify({ payment_id: paymentId, is_final: isFinal, ref_id: refId })
+            });
+            const data = await response.json();
+            if (data.status === 'success') {
+                loadPaymentsDesktop();
+                return true;
+            } else {
+                alert(data.message || 'خطا در تغییر وضعیت');
+                return false;
+            }
+        } catch(e) {
+            console.error('خطا:', e);
+            alert('خطا در ارتباط با سرور');
+            return false;
+        }
+    }
+
+    async function loadPaymentsDesktop() {
+        const params = new URLSearchParams({
+            page: currentPageDesktop,
+            sort_by: currentSortDesktop,
+            ...currentFiltersDesktop
+        });
+        try {
+            const res = await fetch(`/panel/api/payments/list/?${params}`);
+            const data = await res.json();
+            if (data.status === 'success') {
+                document.getElementById('statTotal').innerText = formatNumberDesktop(data.stats.total);
+                document.getElementById('statSuccessful').innerText = formatNumberDesktop(data.stats.successful);
+                document.getElementById('statFailed').innerText = formatNumberDesktop(data.stats.failed);
+                document.getElementById('statTotalAmount').innerText = data.stats.total_amount;
+                document.getElementById('statSuccessfulAmount').innerText = data.stats.successful_amount;
+                document.getElementById('statOnline').innerText = formatNumberDesktop(data.stats.online_count);
+                updateTableDesktop(data.payments);
+                updatePaginationDesktop(data.pagination);
+            } else {
+                document.getElementById('paymentsTableBody').innerHTML = `<tr><td colspan="9" class="loading">خطا: ${escapeHtmlDesktop(data.message || 'مشکل در دریافت داده')}</td></tr>`;
+            }
+        } catch(e) {
+            console.error(e);
+            document.getElementById('paymentsTableBody').innerHTML = '<tr><td colspan="9" class="loading">خطا در ارتباط با سرور</td></tr>';
+        }
+    }
+
+    async function loadChartsDesktop() {
+        try {
+            const res = await fetch('/panel/api/payments/chart-data/');
+            const data = await res.json();
+            if (data.status === 'success') {
+                if (paymentsTrendChartDesktop) paymentsTrendChartDesktop.destroy();
+                if (paymentMethodsChartDesktop) paymentMethodsChartDesktop.destroy();
+
+                const months = data.monthly_data.map(m => m.month);
+                const successfulCounts = data.monthly_data.map(m => m.successful_count);
+                const failedCounts = data.monthly_data.map(m => m.failed_count);
+
+                paymentsTrendChartDesktop = new Chart(document.getElementById('paymentsTrendChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: months,
+                        datasets: [
+                            { label: 'موفق', data: successfulCounts, backgroundColor: '#34d399', borderRadius: 8 },
+                            { label: 'ناموفق', data: failedCounts, backgroundColor: '#ef4444', borderRadius: 8 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { position: 'top', labels: { color: '#fff' } } },
+                        scales: { y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,0.1)' } }, x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,0.1)' } } }
+                    }
+                });
+
+                paymentMethodsChartDesktop = new Chart(document.getElementById('paymentMethodsChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.payment_method_stats.map(s => s.label),
+                        datasets: [{ data: data.payment_method_stats.map(s => s.count), backgroundColor: ['#34d399', '#fbbf24'], borderWidth: 0 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } }
+                });
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    function updateTableDesktop(payments) {
+        const tbody = document.getElementById('paymentsTableBody');
+        if (!payments || payments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="loading">هیچ پرداختی یافت نشد</td></tr>';
+            return;
+        }
+        tbody.innerHTML = payments.map(p => `
+            <tr>
+                <td dir="ltr" style="font-family:monospace;"><strong style="color:#60a5fa;">${escapeHtmlDesktop(p.ref_id)}</strong></td>
+                <td dir="ltr" style="font-family:monospace;">${escapeHtmlDesktop(p.order_number)}</td>
+                <td><strong>${escapeHtmlDesktop(p.customer_name)}</strong><br><small style="color:#94a3b8;">${escapeHtmlDesktop(p.customer_mobile)}</small></td>
+                <td dir="ltr" style="color:#fbbf24; font-weight:bold;">${p.amount}</td>
+                <td><i class="fas ${p.payment_method_icon}"></i> ${escapeHtmlDesktop(p.payment_method)}</td>
+                <td><span class="${p.status_badge_class}">${escapeHtmlDesktop(p.status_display)}</span></td>
+                <td style="font-size:0.7rem;">
+                    ${p.card_number && p.card_number !== '-' ? `<div><i class="fas fa-credit-card"></i> ${escapeHtmlDesktop(p.card_number)}</div>` : ''}
+                    ${p.tracking_number && p.tracking_number !== '-' ? `<div><i class="fas fa-barcode"></i> ${escapeHtmlDesktop(p.tracking_number)}</div>` : ''}
+                    ${p.receipt_image ? `<div><a href="${escapeHtmlDesktop(p.receipt_image)}" target="_blank" style="color:#60a5fa;"><i class="fas fa-image"></i> رسید</a></div>` : ''}
+                </td>
+                <td dir="ltr" style="font-family:monospace;">${p.created_at}</td>
+                <td>
+                    <div style="display:flex; gap:8px; flex-direction:column;">
+                        <button class="btn-primary-table" onclick="showPaymentDetailDesktop(${p.id})"><i class="fas fa-eye"></i> جزئیات</button>
+                        <button class="btn-primary-table btn-success-table" onclick="showStatusModalDesktop(${p.id}, '${escapeHtmlDesktop(p.ref_id)}', ${p.is_final})"><i class="fas fa-edit"></i> تغییر</button>
+                    </div>
+                </td>
+            </table>
+        `).join('');
+    }
+
+    function updatePaginationDesktop(pagination) {
+        const container = document.getElementById('paginationDesktop');
+        if (!pagination || pagination.total_pages <= 1) { container.innerHTML = ''; return; }
+        let html = '';
+        if (pagination.has_previous) html += `<button onclick="goToPageDesktop(${pagination.current_page - 1})">قبلی</button>`;
+
+        const startPage = Math.max(1, pagination.current_page - 2);
+        const endPage = Math.min(pagination.total_pages, startPage + 4);
+
+        for (let i = startPage; i <= endPage; i++) {
+            html += `<button onclick="goToPageDesktop(${i})" class="${i === pagination.current_page ? 'active' : ''}">${i}</button>`;
+        }
+
+        if (pagination.has_next) html += `<button onclick="goToPageDesktop(${pagination.current_page + 1})">بعدی</button>`;
+        container.innerHTML = html;
+    }
+
+    function applyFiltersDesktop() {
+        currentFiltersDesktop = {
+            from_date: document.getElementById('filterFromDate').value,
+            to_date: document.getElementById('filterToDate').value,
+            min_amount: document.getElementById('filterMinAmount').value,
+            max_amount: document.getElementById('filterMaxAmount').value,
+            is_final: document.getElementById('filterStatus').value,
+            payment_method: document.getElementById('filterPaymentMethod').value,
+            search: document.getElementById('searchInput').value
+        };
+        Object.keys(currentFiltersDesktop).forEach(k => { if (!currentFiltersDesktop[k]) delete currentFiltersDesktop[k]; });
+        currentPageDesktop = 1;
+        loadPaymentsDesktop();
+    }
+
+    function searchPaymentsDesktop() { applyFiltersDesktop(); }
+
+    function resetFiltersDesktop() {
+        document.getElementById('filterFromDate').value = '';
+        document.getElementById('filterToDate').value = '';
+        document.getElementById('filterMinAmount').value = '';
+        document.getElementById('filterMaxAmount').value = '';
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterPaymentMethod').value = '';
+        document.getElementById('searchInput').value = '';
+        currentFiltersDesktop = {};
+        currentPageDesktop = 1;
+        loadPaymentsDesktop();
+    }
+
+    function sortPaymentsDesktop(field) {
+        let sortField = field;
+        if (field === 'ref_id') sortField = 'refId';
+        if (field === 'order') sortField = 'order__order_number';
+        if (field === 'created_at') sortField = 'createAt';
+        if (currentSortDesktop === sortField) currentSortDesktop = `-${sortField}`;
+        else if (currentSortDesktop === `-${sortField}`) currentSortDesktop = sortField;
+        else currentSortDesktop = sortField;
+        loadPaymentsDesktop();
+    }
+
+    function goToPageDesktop(page) {
+        currentPageDesktop = page;
+        loadPaymentsDesktop();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function showPaymentDetailDesktop(id) {
+        try {
+            const res = await fetch(`/panel/api/payments/${id}/`);
+            const data = await res.json();
+            if (data.status === 'success') {
+                const p = data.payment;
+                document.getElementById('paymentDetailContent').innerHTML = `
+                    <div class="pc-detail-section">
+                        <div class="pc-detail-section-title"><i class="fas fa-info-circle"></i> اطلاعات پایه</div>
+                        <div class="pc-detail-grid">
+                            <div class="pc-detail-item"><span class="pc-detail-label">کد پیگیری:</span><span class="pc-detail-value" dir="ltr">${escapeHtmlDesktop(p.ref_id)}</span></div>
+                            <div class="pc-detail-item"><span class="pc-detail-label">وضعیت:</span><span class="pc-detail-value"><span class="${p.is_final ? 'badge-success' : 'badge-danger'}">${escapeHtmlDesktop(p.status_display)}</span></span></div>
+                            <div class="pc-detail-item"><span class="pc-detail-label">کد وضعیت:</span><span class="pc-detail-value">${escapeHtmlDesktop(p.status_code) || '-'}</span></div>
+                        </div>
+                    </div>
+
+                    <div class="pc-detail-section">
+                        <div class="pc-detail-section-title"><i class="fas fa-user"></i> اطلاعات مشتری</div>
+                        <div class="pc-detail-grid">
+                            <div class="pc-detail-item"><span class="pc-detail-label">نام کامل:</span><span class="pc-detail-value">${escapeHtmlDesktop(p.customer.name)}</span></div>
+                            <div class="pc-detail-item"><span class="pc-detail-label">شماره موبایل:</span><span class="pc-detail-value" dir="ltr">${escapeHtmlDesktop(p.customer.mobile)}</span></div>
+                            <div class="pc-detail-item"><span class="pc-detail-label">ایمیل:</span><span class="pc-detail-value">${escapeHtmlDesktop(p.customer.email) || '-'}</span></div>
+                        </div>
+                    </div>
+
+                    <div class="pc-detail-section">
+                        <div class="pc-detail-section-title"><i class="fas fa-shopping-cart"></i> اطلاعات سفارش</div>
+                        <div class="pc-detail-grid">
+                            <div class="pc-detail-item"><span class="pc-detail-label">شماره سفارش:</span><span class="pc-detail-value" dir="ltr">${escapeHtmlDesktop(p.order?.order_number) || '-'}</span></div>
+                            <div class="pc-detail-item"><span class="pc-detail-label">وضعیت سفارش:</span><span class="pc-detail-value">${escapeHtmlDesktop(p.order?.status_display) || '-'}</span></div>
+                            <div class="pc-detail-item"><span class="pc-detail-label">مبلغ سفارش:</span><span class="pc-detail-value pc-price-highlight">${p.order?.total_amount || '-'}</span></div>
+                        </div>
+                    </div>
+
+                    <div class="pc-detail-section">
+                        <div class="pc-detail-section-title"><i class="fas fa-credit-card"></i> اطلاعات پرداخت</div>
+                        <div class="pc-detail-grid">
+                            <div class="pc-detail-item"><span class="pc-detail-label">روش پرداخت:</span><span class="pc-detail-value">${escapeHtmlDesktop(p.payment_method)}</span></div>
+                            <div class="pc-detail-item"><span class="pc-detail-label">مبلغ:</span><span class="pc-detail-value pc-price-highlight">${p.amount}</span></div>
+                            ${p.card_number && p.card_number !== '-' ? `<div class="pc-detail-item"><span class="pc-detail-label">شماره کارت:</span><span class="pc-detail-value" dir="ltr">${escapeHtmlDesktop(p.card_number)}</span></div>` : ''}
+                            ${p.card_holder_name && p.card_holder_name !== '-' ? `<div class="pc-detail-item"><span class="pc-detail-label">دارنده کارت:</span><span class="pc-detail-value">${escapeHtmlDesktop(p.card_holder_name)}</span></div>` : ''}
+                            ${p.tracking_number && p.tracking_number !== '-' ? `<div class="pc-detail-item"><span class="pc-detail-label">کد پیگیری:</span><span class="pc-detail-value" dir="ltr">${escapeHtmlDesktop(p.tracking_number)}</span></div>` : ''}
+                            ${p.receipt_image ? `<div class="pc-detail-item"><span class="pc-detail-label">رسید:</span><span class="pc-detail-value"><a href="${escapeHtmlDesktop(p.receipt_image)}" target="_blank" style="color:#60a5fa;">مشاهده رسید</a></span></div>` : ''}
+                            ${p.description ? `<div class="pc-detail-item"><span class="pc-detail-label">توضیحات:</span><span class="pc-detail-value">${escapeHtmlDesktop(p.description)}</span></div>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="pc-detail-section">
+                        <div class="pc-detail-section-title"><i class="fas fa-clock"></i> زمان</div>
+                        <div class="pc-detail-grid">
+                            <div class="pc-detail-item"><span class="pc-detail-label">تاریخ ثبت:</span><span class="pc-detail-value">${p.created_at}</span></div>
+                            <div class="pc-detail-item"><span class="pc-detail-label">ساعت ثبت:</span><span class="pc-detail-value">${p.created_at_time || '-'}</span></div>
+                            <div class="pc-detail-item"><span class="pc-detail-label">آخرین بروزرسانی:</span><span class="pc-detail-value">${p.updated_at || '-'}</span></div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:20px; padding-top:15px; border-top:1px solid rgba(102,126,234,0.2);">
+                        <div style="margin-bottom:12px;">
+                            <select id="desktopDetailStatusSelect" class="status-select-full-desktop">
+                                <option value="true" ${p.is_final ? 'selected' : ''}>✅ موفق</option>
+                                <option value="false" ${!p.is_final ? 'selected' : ''}>❌ ناموفق</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:12px;">
+                            <input type="text" id="desktopDetailRefIdInput" class="status-select-full-desktop" placeholder="کد پیگیری جدید (اختیاری)" value="${escapeHtmlDesktop(p.ref_id !== '-' ? p.ref_id : '')}">
+                        </div>
+                        <button onclick="updateDesktopPaymentStatus('${p.id}')" style="width:100%; padding:12px; background:linear-gradient(135deg,#667eea,#764ba2); border:none; border-radius:12px; color:white; cursor:pointer; font-weight:bold;">
+                            <i class="fas fa-save"></i> بروزرسانی وضعیت
+                        </button>
+                    </div>
+                `;
+                document.getElementById('paymentDetailModal').style.display = 'flex';
+                window.currentDetailPaymentId = p.id;
+            } else { alert(data.message || 'خطا در دریافت اطلاعات'); }
+        } catch(e) { console.error('خطا:', e); alert('خطا در دریافت اطلاعات پرداخت'); }
+    }
+
+    async function updateDesktopPaymentStatus(paymentId) {
+        const newStatus = document.getElementById('desktopDetailStatusSelect').value === 'true';
+        const newRefId = document.getElementById('desktopDetailRefIdInput').value;
+        const success = await updatePaymentStatusDesktop(paymentId, newStatus, newRefId || null);
+        if (success) {
+            closeModalDesktop('paymentDetailModal');
+            loadPaymentsDesktop();
+        }
+    }
+
+    function showStatusModalDesktop(id, refId, isFinal) {
+        currentPaymentIdDesktop = id;
+        const newStatus = confirm(`آیا میخواهید وضعیت پرداخت ${refId} را تغییر دهید؟\nوضعیت فعلی: ${isFinal ? 'موفق' : 'ناموفق'}\nوضعیت جدید: ${isFinal ? 'ناموفق' : 'موفق'}`);
+        if (newStatus) {
+            updatePaymentStatusDesktop(id, !isFinal, null);
+        }
+    }
+
+    function closeModalDesktop(id) { document.getElementById(id).style.display = 'none'; }
+
+    // Event Listeners
+    document.getElementById('filterFromDate').addEventListener('change', applyFiltersDesktop);
+    document.getElementById('filterToDate').addEventListener('change', applyFiltersDesktop);
+    document.getElementById('filterMinAmount').addEventListener('input', applyFiltersDesktop);
+    document.getElementById('filterMaxAmount').addEventListener('input', applyFiltersDesktop);
+    document.getElementById('filterStatus').addEventListener('change', applyFiltersDesktop);
+    document.getElementById('filterPaymentMethod').addEventListener('change', applyFiltersDesktop);
+    document.getElementById('searchInput').addEventListener('input', function() {
+        clearTimeout(searchTimeoutDesktop);
+        searchTimeoutDesktop = setTimeout(() => applyFiltersDesktop(), 500);
+    });
+
+    window.onclick = function(e) { if (e.target.classList.contains('modal-desktop')) e.target.style.display = 'none'; };
+
+    // بارگذاری اولیه
+    loadPaymentsDesktop();
+    loadChartsDesktop();
+
+    // آپدیت خودکار هر 30 ثانیه
+    setInterval(() => loadPaymentsDesktop(), 30000);
+</script>
+{% endblock %}

@@ -1,0 +1,614 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>ورود رسمی | Deco B2B</title>
+    <link rel="stylesheet" href="https://lib.arvancloud.ir/font-awesome/6.3.0/css/all.css">
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+    <style>
+        /* ---------- RESET & GLOBAL ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.96);
+            --glass-border: rgba(99, 102, 241, 0.2);
+            --glass-shadow: 0 30px 45px -20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+            --blur-amount: 18px;
+            --grad-start: #0f2b4d;
+            --grad-end: #1e4a76;
+            --accent: #2c7da0;
+            --accent-hover: #1f5e7a;
+            --primary-gradient: linear-gradient(105deg, #1e3a5f 0%, #2a5f8a 100%);
+            --text-main: #0b2b3b;
+            --text-muted: #2c5a6e;
+            --text-light: #496f82;
+            --border-light: rgba(180, 210, 225, 0.5);
+            --error-text: #c7362b;
+            --error-surface: rgba(254, 220, 215, 0.95);
+            --success-surface: #e0f2e9;
+            --radius-card: 2rem;
+            --radius-input: 1.25rem;
+            --transition-fast: 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        body {
+            font-family: 'IRANYekan', system-ui, -apple-system, 'Vazirmatn', sans-serif;
+            direction: rtl;
+            min-height: 100vh;
+            background: radial-gradient(ellipse at 30% 20%, #d9e6f2 0%, #bdd4e7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            width: 140%;
+            height: 140%;
+            top: -20%;
+            left: -20%;
+            background: radial-gradient(circle at 20% 40%, rgba(255,255,245,0.4) 0%, rgba(210,230,250,0.1) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 70%;
+            height: 70%;
+            background: radial-gradient(ellipse at 80% 90%, rgba(80, 130, 180, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glass-auth-card {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-amount));
+            -webkit-backdrop-filter: blur(var(--blur-amount));
+            border-radius: var(--radius-card);
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+            padding: 2rem 1.8rem 2.2rem;
+            transition: transform 0.25s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 4;
+        }
+
+        @media (max-width: 560px) {
+            .glass-auth-card {
+                max-width: 100%;
+                padding: 1.6rem 1.3rem 1.8rem;
+                border-radius: 1.8rem;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .glass-auth-card {
+                padding: 1.3rem 1.1rem 1.6rem;
+            }
+            .auth-header h1 {
+                font-size: 1.7rem;
+            }
+        }
+
+        .brand {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 0.8rem;
+        }
+        .logo-circle {
+            background: var(--primary-gradient);
+            width: 70px;
+            height: 70px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 18px -8px rgba(0, 32, 64, 0.25);
+            transition: transform 0.2s;
+        }
+        .logo-circle svg {
+            width: 38px;
+            height: 38px;
+            stroke: white;
+            stroke-width: 1.5;
+            fill: none;
+        }
+        .auth-header {
+            text-align: center;
+            margin-bottom: 1.8rem;
+        }
+        .auth-header h1 {
+            font-size: 1.9rem;
+            font-weight: 800;
+            background: linear-gradient(130deg, #0b3b4f, #1a5878);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.3px;
+        }
+        .auth-header p {
+            color: #2c6e8f;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: rgba(235, 245, 255, 0.7);
+            display: inline-block;
+            padding: 0.3rem 1.4rem;
+            border-radius: 60px;
+            backdrop-filter: blur(2px);
+        }
+
+        .form-group {
+            margin-bottom: 1.6rem;
+        }
+        .input-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.65rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #144e6b;
+        }
+        .input-label svg {
+            width: 18px;
+            height: 18px;
+            stroke: #2c7da0;
+            stroke-width: 1.8;
+        }
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            direction: ltr;
+        }
+        .mobile-prefix {
+            position: absolute;
+            left: 16px;
+            background: rgba(240, 248, 255, 0.9);
+            backdrop-filter: blur(4px);
+            padding: 0 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #0f4c5f;
+            border-radius: 60px;
+            pointer-events: none;
+            font-family: 'Vazirmatn', monospace;
+            direction: ltr;
+            z-index: 2;
+            border: 0.5px solid rgba(100, 150, 180, 0.3);
+            letter-spacing: 0.3px;
+        }
+        .auth-input {
+            width: 100%;
+            padding: 0.95rem 1.2rem;
+            padding-left: 80px;
+            font-size: 1rem;
+            font-family: 'Vazirmatn', 'IRANYekan', monospace;
+            border: 1.5px solid #e2edf2;
+            border-radius: var(--radius-input);
+            background: #ffffff;
+            transition: all 0.2s;
+            text-align: left;
+            direction: ltr;
+            font-weight: 500;
+            color: #0c2c3b;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+        }
+        .auth-input:focus {
+            outline: none;
+            border-color: #2c7da0;
+            box-shadow: 0 0 0 4px rgba(44, 125, 160, 0.15);
+            background: #ffffff;
+        }
+        .auth-input::placeholder {
+            color: #9bb7c9;
+            font-weight: 400;
+            font-size: 0.85rem;
+            direction: ltr;
+            text-align: left;
+            opacity: 0.8;
+        }
+
+        .auth-input.error-input {
+            border-color: #dc5c4a;
+            background-color: #fff7f5;
+        }
+
+        .live-feedback {
+            margin-top: 10px;
+            margin-right: 4px;
+            font-weight: 600;
+            font-size: 0.7rem;
+        }
+        .valid-feedback {
+            color: #1c6e43;
+            background: #e0f2e9;
+            padding: 0.3rem 1rem;
+            border-radius: 60px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            backdrop-filter: blur(2px);
+        }
+        .invalid-feedback {
+            color: #bc4e3c;
+            background: #ffefe5;
+            padding: 0.3rem 1rem;
+            border-radius: 60px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+        .error-list {
+            list-style: none;
+            margin-top: 8px;
+        }
+        .error-list li {
+            background: #ffe6e2;
+            color: #b13e2e;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 0.5px solid #ffc7bc;
+        }
+        .hint-message {
+            font-size: 0.68rem;
+            color: #4b6f82;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(240, 248, 255, 0.7);
+            padding: 0.35rem 1rem;
+            border-radius: 50px;
+            width: fit-content;
+            font-weight: 500;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--primary-gradient);
+            border: none;
+            padding: 0.95rem 1rem;
+            border-radius: 80px;
+            font-size: 1rem;
+            font-weight: 800;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 8px 20px -8px rgba(28, 75, 100, 0.5);
+            font-family: 'IRANYekan', 'Vazirmatn', sans-serif;
+            letter-spacing: 0.2px;
+            margin-top: 0.5rem;
+        }
+        .btn-submit:active {
+            transform: scale(0.97);
+            box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.2);
+        }
+        .btn-submit:disabled {
+            opacity: 0.75;
+            transform: none;
+            cursor: wait;
+        }
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .terms-note {
+            text-align: center;
+            font-size: 0.68rem;
+            color: #526f82;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(150, 185, 200, 0.4);
+            padding-top: 1.2rem;
+        }
+        .terms-note a {
+            color: #1e6f8f;
+            text-decoration: none;
+            font-weight: 700;
+        }
+        .terms-note a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .btn-submit {
+                padding: 0.85rem;
+                font-size: 0.9rem;
+            }
+            .auth-input {
+                font-size: 0.95rem;
+                padding: 0.85rem 1rem;
+                padding-left: 75px;
+            }
+            .mobile-prefix {
+                font-size: 0.8rem;
+                padding: 0 10px;
+                left: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="glass-auth-card">
+    <div class="brand">
+        <div class="logo-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9.5L12 4L21 9.5L12 15L3 9.5Z" />
+                <path d="M5 11.5V16.5L12 20.5L19 16.5V11.5" />
+                <path d="M12 15V20" />
+                <circle cx="12" cy="8" r="1.5" fill="white" stroke="white"/>
+            </svg>
+        </div>
+    </div>
+    <div class="auth-header">
+        <h1>Deco B2B</h1>
+        <p>پلتفرم هوشمند B2B</p>
+    </div>
+
+    <form method="post" action="{% url 'account:send_mobile' %}" id="authForm" novalidate>
+        {% csrf_token %}
+
+        <div class="form-group" id="mobileGroup">
+            <div class="input-label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2" stroke="currentColor" fill="none"/>
+                    <line x1="12" y1="18" x2="12" y2="18" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>شماره همراه مدیر</span>
+            </div>
+            <div class="input-wrapper">
+                <span class="mobile-prefix">+98</span>
+                <input type="tel"
+                       style='border: 0.1px solid gray;'
+                       name="mobileNumber"
+                       id="id_mobileNumber"
+                       class="auth-input"
+                       maxlength="11"
+                       minlength="11"
+                       placeholder="9123456789"
+                       inputmode="numeric"
+                       autocomplete="tel"
+                       value=""
+                       aria-describedby="mobileHelp">
+            </div>
+            <div id="liveValidation" class="live-feedback"></div>
+            <div id="errorContainer">
+                {% if form.mobileNumber.errors %}
+                    <ul class="error-list">
+                        {% for error in form.mobileNumber.errors %}
+                            <li><i class="fa-regular fa-circle-exclamation"></i> {{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="hint-message" id="mobileHelp">
+                <i class="fa-regular fa-clock"></i>
+                شماره 11 رقمی همراه (مثال: 09123456789)
+            </div>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn-submit">
+            <span>دریافت کد تایید</span>
+            <i class="fa-regular fa-paper-plane"></i>
+        </button>
+        <div class="terms-note">
+            ورود به منزله پذیرش <a href="#">قوانین دکو</a> و <a href="#">حریم خصوصی</a> است.
+        </div>
+    </form>
+</div>
+
+<script>
+    (function() {
+        const mobileInput = document.getElementById('id_mobileNumber');
+        const submitBtn = document.getElementById('submitBtn');
+        const form = document.getElementById('authForm');
+        const liveFeedback = document.getElementById('liveValidation');
+        const errorContainer = document.getElementById('errorContainer');
+
+        function normalizeMobileDigits(value) {
+            let digits = value.replace(/\D/g, '');
+            if (digits.length > 11) digits = digits.slice(0, 11);
+            return digits;
+        }
+
+        function isValidIranMobile(digits) {
+            if (digits.length === 11 && digits.startsWith('09')) {
+                return /^09[0-9]{9}$/.test(digits);
+            }
+            if (digits.length === 10 && digits.startsWith('9')) {
+                return /^9[0-9]{9}$/.test(digits);
+            }
+            return false;
+        }
+
+        function getFinalMobile(digits) {
+            if (digits.length === 10 && digits.startsWith('9')) {
+                return '0' + digits;
+            }
+            if (digits.length === 11 && digits.startsWith('09')) {
+                return digits;
+            }
+            return digits;
+        }
+
+        function updateLiveValidationUI() {
+            let raw = mobileInput.value;
+            let digits = normalizeMobileDigits(raw);
+            if (raw !== digits) {
+                const cursorPos = mobileInput.selectionStart;
+                mobileInput.value = digits;
+                if (cursorPos) mobileInput.setSelectionRange(cursorPos, cursorPos);
+            }
+            const isValid = isValidIranMobile(digits);
+            if (digits.length === 0) {
+                liveFeedback.innerHTML = '';
+                mobileInput.classList.remove('error-input');
+                return;
+            }
+
+            if (!isValid) {
+                let message = '';
+                if (digits.length > 0 && digits.length < 10) message = '⚠️ شماره ناقص (حداقل 10 رقم)';
+                else if (digits.length === 10 && !digits.startsWith('9')) message = '⚠️ شماره 10 رقمی باید با 9 شروع شود';
+                else if (digits.length === 11 && !digits.startsWith('09')) message = '⚠️ شماره باید با 09 آغاز شود';
+                else message = '📱 فرمت موبایل معتبر نیست';
+                liveFeedback.innerHTML = `<span class="invalid-feedback"><i class="fa-regular fa-circle-xmark"></i> ${message}</span>`;
+                mobileInput.classList.add('error-input');
+            } else {
+                let displayMsg = '✓ شماره همراه معتبر';
+                if (digits.length === 10 && digits.startsWith('9')) displayMsg = '✓ معتبر (0' + digits + ')';
+                liveFeedback.innerHTML = `<span class="valid-feedback"><i class="fa-regular fa-circle-check"></i> ${displayMsg}</span>`;
+                mobileInput.classList.remove('error-input');
+            }
+        }
+
+        function autoCorrectOnBlur() {
+            let digits = normalizeMobileDigits(mobileInput.value);
+            if (digits.length === 10 && digits.startsWith('9')) {
+                let fullNumber = '0' + digits;
+                mobileInput.value = fullNumber;
+                updateLiveValidationUI();
+            } else if (digits.length === 11 && digits.startsWith('09')) {
+                updateLiveValidationUI();
+            } else if (digits.length > 0 && !isValidIranMobile(digits)) {
+                updateLiveValidationUI();
+            } else {
+                updateLiveValidationUI();
+            }
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            if (errorContainer) {
+                errorContainer.innerHTML = '';
+            }
+
+            let rawDigits = normalizeMobileDigits(mobileInput.value);
+            if (!isValidIranMobile(rawDigits)) {
+                const errorDiv = document.createElement('ul');
+                errorDiv.className = 'error-list';
+                const li = document.createElement('li');
+                li.innerHTML = '<i class="fa-regular fa-ban"></i> شماره موبایل صحیح نیست. مثال: 09123456789';
+                errorDiv.appendChild(li);
+                errorContainer.appendChild(errorDiv);
+                mobileInput.classList.add('error-input');
+                mobileInput.style.transform = 'translateX(3px)';
+                setTimeout(() => { if(mobileInput) mobileInput.style.transform = ''; }, 200);
+                return;
+            }
+
+            let finalMobileNumber = getFinalMobile(rawDigits);
+            if (!finalMobileNumber || !finalMobileNumber.match(/^09[0-9]{9}$/)) {
+                const errorDiv = document.createElement('ul');
+                errorDiv.className = 'error-list';
+                const li = document.createElement('li');
+                li.innerHTML = '<i class="fa-regular fa-xmark-circle"></i> فرمت نهایی شماره نادرست است';
+                errorDiv.appendChild(li);
+                errorContainer.appendChild(errorDiv);
+                return;
+            }
+
+            const originalContent = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span class="spinner"></span> <span>ارسال کد ...</span>`;
+
+            let mobileField = document.querySelector('input[name="mobileNumber"]');
+            if (!mobileField || mobileField === mobileInput) {
+                let hiddenMobile = document.createElement('input');
+                hiddenMobile.type = 'hidden';
+                hiddenMobile.name = 'mobileNumber';
+                hiddenMobile.value = finalMobileNumber;
+                form.appendChild(hiddenMobile);
+                mobileInput.setAttribute('name', 'mobile_display');
+            } else {
+                mobileField.value = finalMobileNumber;
+            }
+
+            try {
+                form.submit();
+            } catch (err) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalContent;
+                const errDiv = document.createElement('ul');
+                errDiv.className = 'error-list';
+                const li = document.createElement('li');
+                li.innerHTML = '<i class="fa-regular fa-wifi"></i> خطا در ارتباط، دوباره تلاش کنید';
+                errDiv.appendChild(li);
+                errorContainer.appendChild(errDiv);
+            }
+        }
+
+        function initEventHandlers() {
+            if (mobileInput) {
+                mobileInput.addEventListener('input', function() {
+                    let val = mobileInput.value;
+                    let cleaned = val.replace(/[^0-9]/g, '');
+                    if (cleaned.length > 11) cleaned = cleaned.slice(0, 11);
+                    if (cleaned !== val) {
+                        const cursorAt = mobileInput.selectionStart;
+                        mobileInput.value = cleaned;
+                        if (cursorAt) mobileInput.setSelectionRange(cursorAt, cursorAt);
+                    }
+                    updateLiveValidationUI();
+                });
+                mobileInput.addEventListener('blur', autoCorrectOnBlur);
+                if (mobileInput.value) {
+                    let cleaned = mobileInput.value.replace(/\D/g, '').slice(0, 11);
+                    if (cleaned !== mobileInput.value) mobileInput.value = cleaned;
+                    updateLiveValidationUI();
+                }
+            }
+            if (form) {
+                form.addEventListener('submit', handleFormSubmit);
+            }
+
+            if (errorContainer && errorContainer.innerHTML.trim() !== '') {
+                if (mobileInput) mobileInput.classList.add('error-input');
+            }
+        }
+
+        initEventHandlers();
+    })();
+</script>
+</body>
+</html>

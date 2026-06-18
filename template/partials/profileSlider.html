@@ -1,0 +1,171 @@
+<div class="slide-panel" id="profilePanel">
+    <div style="display:flex; justify-content:space-between; margin-bottom:24px; align-items:center;">
+        <h3 style="font-size:1.6rem; font-weight:800; background:linear-gradient(135deg, var(--primary), var(--primary-dark)); -webkit-background-clip:text; background-clip:text; color:transparent;">پنل کاربری</h3>
+        <div id="closeProfile" style="cursor:pointer; width:40px; height:40px; background:rgba(255,255,255,0.8); border-radius:14px; display:flex; align-items:center; justify-content:center; box-shadow:var(--glass-shadow); transition:0.2s;"><i class="fas fa-times" style="font-size:1.2rem; color:var(--text-medium);"></i></div>
+    </div>
+
+    <!-- عکس با مداد -->
+    <div class="profile-header">
+        <div style="position:relative; display:inline-block;">
+            <img id="panelAvatarImg" src="/media/images/default-avatar.jpg" style="width:80px; height:80px; border-radius:50%; object-fit:cover;">
+            <label for="avatarUploadInput" style="position:absolute; bottom:0; right:0; background:#3498db; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:white; cursor:pointer; border:2px solid white;">
+                <i class="fas fa-pencil-alt" style="font-size:10px;"></i>
+            </label>
+            <input type="file" id="avatarUploadInput" accept="image/*" style="display:none;">
+        </div>
+        <h3 id="panelName">محسن کیوانی</h3>
+        <p id="panelBio">دکو اس دکوراسیون | عضو طلایی</p>
+    </div>
+
+    <!-- کارت سکه‌ها (جایگزین امتیاز) -->
+    <div class="points-card">
+        <div class="points-amount" id="panelCoins">۰</div>
+        <div class="points-label">سکه‌های B2B</div>
+        <div class="points-badge">
+            <span class="point-indicator"></span>
+           باشگاه همکاران Deco B2B
+        </div>
+    </div>
+
+    <!-- کارت کیف پول (اضافه شد) -->
+    <div class="points-card" style="background: linear-gradient(135deg, #e8f4fd, #d6eeff); margin-top: 12px;">
+        <div class="points-amount" id="panelWalletBalance" style="color: #2980b9;">۰</div>
+        <div class="points-label" style="color: #2980b9;">موجودی کیف پول (تومان)</div>
+        <div class="points-badge" style="background: rgba(52,152,219,0.1);">
+            <span class="point-indicator"></span>
+            قابل استفاده در خرید بعدی
+        </div>
+    </div>
+
+    <div class="stat-row">
+        <span><i class="fas fa-truck"></i> سفارش‌های فعال</span>
+        <strong id="activeOrders">۳ سفارش</strong>
+    </div>
+    <div class="stat-row">
+        <span><i class="fas fa-chart-line"></i> مجموع خرید</span>
+        <strong id="totalPurchase">۴۲,۳۰۰,۰۰۰ تومان</strong>
+    </div>
+    <div class="stat-row">
+        <span><i class="fas fa-gem"></i> سطح عضویت</span>
+        <strong id="membershipLevel"><i class="fas fa-crown" style="color:var(--primary);"></i> طلایی</strong>
+    </div>
+    <div class="stat-row">
+        <span><i class="fas fa-percent"></i> تخفیف ویژه</span>
+        <strong id="discountPercent">۱۲٪</strong>
+    </div>
+</div>
+
+<script>
+// آپلود عکس
+async function uploadAvatar(file) {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    const res = await fetch('/accounts/api/user/upload-avatar/', {
+        method: 'POST',
+        body: formData
+    });
+    return res.json();
+}
+
+// تابع اصلی بارگذاری
+async function loadUserDashboard() {
+    try {
+        const response = await fetch('/accounts/api/user/dashboard/');
+        const result = await response.json();
+
+        if (result.success) {
+            const data = result.data;
+
+            // ========== به‌روزرسانی هدر (points-info) ==========
+            const pointsInfo = document.querySelector('.points-info');
+            if (pointsInfo) {
+                pointsInfo.innerHTML = `
+                    <div class="coins-section">
+                        <i class="fas fa-coins"></i>
+                        <span>B2B</span>
+                        <span id="coinsValue">${data.loyalty?.total_coins_display || '۰'}</span>
+                        <span>سکه</span>
+                    </div>
+                    <div class="wallet-section">
+                        <i class="fas fa-wallet"></i>
+                        <span id="walletValue">${data.wallet?.balance_display || '۰'}</span>
+                        <span>تومان</span>
+                    </div>
+                `;
+            }
+
+            // ========== به‌روزرسانی پنل کاربری ==========
+            // نام و بیو
+            document.getElementById('panelName').textContent = data.user.full_name;
+            document.getElementById('panelBio').innerHTML = `${data.user.mobile} | عضو ${data.loyalty.current_tier_display}`;
+
+            // سکه‌ها (به جای امتیاز)
+            document.getElementById('panelCoins').textContent = data.loyalty.total_coins_display || '۰';
+
+            // موجودی کیف پول
+            document.getElementById('panelWalletBalance').textContent = data.wallet.balance_display || '۰';
+
+            // آمار دیگر
+            document.getElementById('activeOrders').innerHTML = `${data.stats.active_orders_count} سفارش`;
+            document.getElementById('totalPurchase').innerHTML = `${data.stats.total_purchase_display} تومان`;
+            document.getElementById('membershipLevel').innerHTML = `<i class="fas fa-crown" style="color:var(--primary);"></i> ${data.stats.membership_level}`;
+            document.getElementById('discountPercent').innerHTML = data.stats.special_discount;
+
+            // آپدیت عکس
+            if (data.user.avatar_url) {
+                document.getElementById('panelAvatarImg').src = data.user.avatar_url + '?t=' + new Date().getTime();
+                const headerImg = document.querySelector('.user-info img');
+                if (headerImg) headerImg.src = data.user.avatar_url + '?t=' + new Date().getTime();
+            }
+
+            // آپدیت نام کاربر در هدر
+            const userNameSpan = document.getElementById('userName');
+            if (userNameSpan) {
+                userNameSpan.textContent = data.user.full_name;
+            }
+
+            // آپدیت سطح کاربر در هدر
+            const tierValue = document.getElementById('tierValue');
+            if (tierValue) {
+                tierValue.textContent = data.loyalty.current_tier_display;
+            }
+        }
+    } catch (error) {
+        console.error('خطا:', error);
+    }
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', function() {
+    loadUserDashboard();
+    setInterval(loadUserDashboard, 60000);
+
+    // آپلود عکس
+    const avatarInput = document.getElementById('avatarUploadInput');
+    if (avatarInput) {
+        avatarInput.onchange = async (e) => {
+            if (e.target.files[0]) {
+                const result = await uploadAvatar(e.target.files[0]);
+                if (result.success) {
+                    alert('عکس با موفقیت آپلود شد');
+                    loadUserDashboard();
+                } else {
+                    alert('خطا: ' + result.error);
+                }
+            }
+        };
+    }
+
+    // پنل پروفایل
+    const panel = document.getElementById('profilePanel');
+    const trigger = document.getElementById('profileTriggerTop');
+    const closePanel = document.getElementById('closeProfile');
+
+    if (trigger) {
+        trigger.onclick = () => panel.classList.add('open');
+    }
+    if (closePanel) {
+        closePanel.onclick = () => panel.classList.remove('open');
+    }
+});
+</script>

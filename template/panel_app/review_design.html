@@ -1,0 +1,302 @@
+<!-- templates/customer/review_design.html -->
+<!DOCTYPE html>
+{% load humanize %}
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
+    <title>بررسی طراحی | سفارش</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding-bottom: 100px; }
+        .app-header { background: linear-gradient(135deg, #1a1a2e 0%, #0f0f23 100%); padding: 20px 16px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(102,126,234,0.1); }
+        .header-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .header-title h1 { font-size: 1.2rem; color: #fff; font-weight: 600; }
+        .order-badge { background: rgba(102,126,234,0.2); padding: 5px 12px; border-radius: 30px; font-size: 0.7rem; color: #a78bfa; font-family: monospace; }
+        .header-sub { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+        .product-name { color: #94a3b8; font-size: 0.75rem; }
+        .reject-count { background: rgba(239,68,68,0.2); padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; color: #ef4444; }
+        .image-container { padding: 20px; background: #000; margin: 16px; border-radius: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .design-image { width: 100%; border-radius: 20px; display: block; }
+        .image-caption { text-align: center; color: #64748b; font-size: 0.7rem; margin-top: 12px; }
+        .operator-message { background: #1e293b; margin: 0 16px 20px 16px; padding: 14px 16px; border-radius: 20px; border-right: 3px solid #667eea; }
+        .operator-message-label { font-size: 0.65rem; color: #667eea; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+        .operator-message-text { font-size: 0.85rem; color: #cbd5e1; line-height: 1.5; }
+        .info-section { background: #1e293b; margin: 0 16px 20px 16px; padding: 16px; border-radius: 20px; }
+        .section-title { font-size: 0.7rem; color: #94a3b8; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+        .info-grid { display: flex; flex-direction: column; gap: 10px; }
+        .info-row { display: flex; justify-content: space-between; align-items: center; }
+        .info-label { color: #64748b; font-size: 0.75rem; }
+        .info-value { color: #fff; font-size: 0.8rem; font-weight: 500; }
+        .price-value { color: #fbbf24; font-weight: bold; }
+        .floating-actions { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,10,10,0.95); backdrop-filter: blur(20px); padding: 16px 20px; display: flex; gap: 12px; border-top: 1px solid rgba(102,126,234,0.2); z-index: 200; }
+        .btn { flex: 1; padding: 14px 0; border: none; border-radius: 40px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn:active { transform: scale(0.97); }
+        .btn-approve { background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 15px rgba(16,185,129,0.3); }
+        .btn-reject { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; box-shadow: 0 4px 15px rgba(239,68,68,0.3); }
+        .btn-reject:disabled { opacity: 0.5; transform: none; cursor: not-allowed; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px); z-index: 1000; align-items: flex-end; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: linear-gradient(135deg, #1e293b, #0f172a); width: 100%; border-radius: 28px 28px 0 0; padding: 24px 20px 30px; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .modal-title { color: #ef4444; font-size: 1.1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .modal-desc { color: #94a3b8; font-size: 0.75rem; margin-bottom: 20px; }
+        .reject-input { width: 100%; padding: 14px; background: #0f172a; border: 1px solid #334155; border-radius: 16px; color: white; font-size: 0.9rem; resize: none; font-family: inherit; margin-bottom: 20px; }
+        .reject-input:focus { outline: none; border-color: #ef4444; }
+        .modal-buttons { display: flex; gap: 12px; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 40px; border: none; font-weight: 600; cursor: pointer; }
+        .modal-btn-cancel { background: #334155; color: white; }
+        .modal-btn-submit { background: #ef4444; color: white; }
+        .toast-message { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: #10b981; color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.85rem; z-index: 300; opacity: 0; transition: all 0.3s ease; white-space: nowrap; }
+        .toast-message.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .reject-steps { margin: 0 16px 20px 16px; background: #1e293b; padding: 12px 16px; border-radius: 20px; }
+        .steps-label { font-size: 0.65rem; color: #64748b; margin-bottom: 8px; }
+        .steps-bar { display: flex; gap: 6px; margin-bottom: 6px; }
+        .step-dot { flex: 1; height: 4px; background: #334155; border-radius: 2px; }
+        .step-dot.completed { background: #ef4444; }
+        .steps-text { font-size: 0.6rem; color: #94a3b8; text-align: center; }
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 500; display: none; align-items: center; justify-content: center; }
+        .loading-overlay.show { display: flex; }
+        .spinner { width: 40px; height: 40px; border: 3px solid #334155; border-top-color: #667eea; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <!-- هدر -->
+    <div class="app-header">
+        <div class="header-title">
+            <h1><i class="fas fa-palette"></i> بررسی طراحی</h1>
+            <span class="order-badge">{{ order.id|slice:":8" }}</span>
+        </div>
+        <div class="header-sub">
+            <span class="product-name">{{ order.installation.title|default:"محصول" }}</span>
+            <span class="reject-count"><i class="fas fa-times-circle"></i> {{ reject_count }}/3 رد</span>
+        </div>
+    </div>
+
+    <!-- تصویر طراحی -->
+    <div class="image-container">
+        <img src="{{ design.final_design_image.url }}" class="design-image" alt="طراحی" onclick="window.open(this.src)">
+        <div class="image-caption">
+            <i class="fas fa-hand-pointer"></i> برای مشاهده بزرگتر کلیک کنید
+        </div>
+    </div>
+
+    <!-- پیام اپراتور -->
+    {% if design.operator_message %}
+    <div class="operator-message">
+        <div class="operator-message-label">
+            <i class="fas fa-comment-dots"></i> پیام طراح
+        </div>
+        <div class="operator-message-text">{{ design.operator_message }}</div>
+    </div>
+    {% endif %}
+
+    <!-- اطلاعات سفارش - همه مقادیر از ویو میان -->
+    <div class="info-section">
+        <div class="section-title">
+            <i class="fas fa-info-circle"></i> اطلاعات سفارش
+        </div>
+        <div class="info-grid">
+            <div class="info-row">
+                <span class="info-label">📦 محصول</span>
+                <span class="info-value">{{ order.installation.title|default:"-" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">📏 ابعاد</span>
+                <span class="info-value">{{ length|floatformat:2 }} × {{ width|floatformat:2 }} متر</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">📐 مساحت</span>
+                <span class="info-value">{{ area|floatformat:2 }} متر مربع</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">💰 قیمت هر متر</span>
+                <span class="info-value price-value">{{ price_per_m2|floatformat:0|intcomma }} تومان</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">💵 جمع کل</span>
+                <span class="info-value price-value">{{ total_price|floatformat:0|intcomma }} تومان</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- نشانگر مراحل رد -->
+    <div class="reject-steps">
+        <div class="steps-label"><i class="fas fa-history"></i> مراحل رد طراحی</div>
+        <div class="steps-bar">
+            <div class="step-dot {% if reject_count >= 1 %}completed{% endif %}"></div>
+            <div class="step-dot {% if reject_count >= 2 %}completed{% endif %}"></div>
+            <div class="step-dot {% if reject_count >= 3 %}completed{% endif %}"></div>
+        </div>
+        <div class="steps-text">
+            {% if remaining_reject > 0 %}
+            میتوانید <strong>{{ remaining_reject }}</strong> بار دیگر رد کنید
+            {% else %}
+            <span style="color:#ef4444;">❌ به حداکثر تعداد رد رسیده‌اید</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- دکمه‌های شناور -->
+    <div class="floating-actions">
+        <button class="btn btn-approve" id="approveBtn">
+            <i class="fas fa-check-circle"></i> تایید طراحی
+        </button>
+        <button class="btn btn-reject" id="rejectBtn" {% if not can_reject %}disabled{% endif %}>
+            <i class="fas fa-times-circle"></i> رد طراحی
+        </button>
+    </div>
+
+    <!-- مودال رد -->
+    <div id="rejectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">
+                <i class="fas fa-exclamation-triangle"></i> رد طراحی
+            </div>
+            <div class="modal-desc">
+                لطفاً دلیل رد طراحی را وارد کنید. این پیام برای طراح ارسال خواهد شد.
+                {% if remaining_reject == 1 %}
+                <br><span style="color:#ef4444;">⚠️ این آخرین فرصت شماست. در صورت رد، سفارش لغو می‌شود.</span>
+                {% endif %}
+            </div>
+            <textarea class="reject-input" id="rejectReason" rows="4" placeholder="مثلاً: اندازه‌ها با پلن مطابقت ندارد / رنگ‌ها اشتباه است / ..."></textarea>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" id="cancelRejectBtn">انصراف</button>
+                <button class="modal-btn modal-btn-submit" id="submitRejectBtn">تایید و ارسال</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال تایید -->
+    <div id="approveModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title" style="color:#10b981;">
+                <i class="fas fa-check-circle"></i> تایید طراحی
+            </div>
+            <div class="modal-desc">
+                آیا از تایید این طراحی اطمینان دارید؟
+                <br><br>
+                <textarea id="approveMessage" class="reject-input" rows="3" placeholder="پیام اختیاری به طراح... (اختیاری)"></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" id="cancelApproveBtn">انصراف</button>
+                <button class="modal-btn modal-btn-submit" id="submitApproveBtn" style="background:#10b981;">تایید نهایی</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- لودینگ -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- توست پیام -->
+    <div id="toastMessage" class="toast-message"></div>
+
+    <script>
+        const orderId = "{{ order.id }}";
+        const csrfToken = "{{ csrf_token }}";
+        let remainingReject = {{ remaining_reject }};
+
+        const approveBtn = document.getElementById('approveBtn');
+        const rejectBtn = document.getElementById('rejectBtn');
+        const rejectModal = document.getElementById('rejectModal');
+        const approveModal = document.getElementById('approveModal');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const toastMessage = document.getElementById('toastMessage');
+
+        function showToast(msg, isError = false) {
+            toastMessage.textContent = msg;
+            toastMessage.style.background = isError ? '#ef4444' : '#10b981';
+            toastMessage.classList.add('show');
+            setTimeout(() => toastMessage.classList.remove('show'), 3000);
+        }
+
+        function showLoading() { loadingOverlay.classList.add('show'); }
+        function hideLoading() { loadingOverlay.classList.remove('show'); }
+        function closeModals() { rejectModal.classList.remove('show'); approveModal.classList.remove('show'); }
+
+        async function approveDesign(message) {
+            showLoading();
+            try {
+                const response = await fetch(`/panel/api/order/${orderId}/approve/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                    body: JSON.stringify({ message: message || '' })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showToast('✅ ' + data.message);
+                    setTimeout(() => window.location.href = '/panel/customer/dashboard/', 1500);
+                } else {
+                    showToast('❌ ' + (data.error || 'خطا در تایید'), true);
+                    hideLoading();
+                }
+            } catch(e) {
+                showToast('❌ خطا در ارتباط با سرور', true);
+                hideLoading();
+            }
+        }
+
+        async function rejectDesign(reason) {
+            showLoading();
+            try {
+                const response = await fetch(`/panel/api/order/${orderId}/reject/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                    body: JSON.stringify({ reason: reason })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    if (data.is_final_reject) {
+                        showToast('⚠️ طراحی رد شد. به دلیل ۳ بار رد، سفارش شما لغو گردید.');
+                    } else {
+                        showToast('❌ ' + data.message);
+                    }
+                    setTimeout(() => window.location.href = '/panel/customer/dashboard/', 2000);
+                } else {
+                    showToast('❌ ' + (data.error || 'خطا در رد'), true);
+                    hideLoading();
+                }
+            } catch(e) {
+                showToast('❌ خطا در ارتباط با سرور', true);
+                hideLoading();
+            }
+        }
+
+        approveBtn.onclick = () => approveModal.classList.add('show');
+        rejectBtn.onclick = () => {
+            if (remainingReject <= 0) {
+                showToast('❌ دیگر نمی‌توانید رد کنید', true);
+                return;
+            }
+            rejectModal.classList.add('show');
+        };
+
+        document.getElementById('cancelApproveBtn').onclick = closeModals;
+        document.getElementById('submitApproveBtn').onclick = () => {
+            const message = document.getElementById('approveMessage').value;
+            closeModals();
+            approveDesign(message);
+        };
+        document.getElementById('cancelRejectBtn').onclick = closeModals;
+        document.getElementById('submitRejectBtn').onclick = () => {
+            const reason = document.getElementById('rejectReason').value.trim();
+            if (!reason) {
+                showToast('❌ لطفاً دلیل رد را وارد کنید', true);
+                return;
+            }
+            closeModals();
+            rejectDesign(reason);
+        };
+
+        [rejectModal, approveModal].forEach(modal => {
+            modal.onclick = (e) => { if (e.target === modal) closeModals(); };
+        });
+    </script>
+</body>
+</html>

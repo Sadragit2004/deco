@@ -1,0 +1,662 @@
+{% extends "main_template.html" %}
+{% load humanize %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>چک‌های من</title>
+    <link rel="stylesheet" href="https://lib.arvancloud.ir/font-awesome/6.3.0/css/all.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f8fafc;
+            padding-bottom: 75px;
+        }
+
+        .checks-container {
+            max-width: 100%;
+            padding: 16px;
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+
+        /* هدر */
+        .checks-header {
+            margin-bottom: 20px;
+        }
+
+        .checks-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a2c3e;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checks-header h1 i {
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .checks-header p {
+            font-size: 13px;
+            color: #6c7a8e;
+        }
+
+        /* کارت آمار */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .stat-card i {
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .stat-card .stat-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1a2c3e;
+            line-height: 1.2;
+        }
+
+        .stat-card .stat-label {
+            font-size: 11px;
+            color: #8a99b0;
+            margin-top: 4px;
+        }
+
+        .stat-card.total i { color: #667eea; }
+        .stat-card.pending i { color: #f59e0b; }
+        .stat-card.verified i { color: #10b981; }
+        .stat-card.rejected i { color: #ef4444; }
+        .stat-card.finalized i { color: #3b82f6; }
+
+        /* فیلترها */
+        .filters-bar {
+            background: white;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .filter-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-select, .filter-search {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 13px;
+            font-family: inherit;
+            background: #f8fafc;
+            color: #1a2c3e;
+        }
+
+        .filter-search {
+            flex: 2;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+        }
+
+        .filter-search input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 13px;
+        }
+
+        .filter-search i {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .reset-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #ef4444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .reset-btn:hover {
+            background: #fee2e2;
+        }
+
+        /* لیست کارتی چک‌ها */
+        .checks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .check-card {
+            background: white;
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            border: 1px solid #f0f2f5;
+            cursor: pointer;
+        }
+
+        .check-card:active {
+            transform: scale(0.99);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .check-number {
+            font-weight: 700;
+            font-size: 15px;
+            color: #1a2c3e;
+            background: #f1f5f9;
+            padding: 4px 12px;
+            border-radius: 30px;
+            display: inline-block;
+            font-family: monospace;
+            direction: ltr;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-badge.pending { background: #ffedd5; color: #b45309; }
+        .status-badge.verified { background: #dcfce7; color: #15803d; }
+        .status-badge.rejected { background: #fee2e2; color: #b91c1c; }
+        .status-badge.cancelled { background: #f1f5f9; color: #64748b; }
+
+        .finalized-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-right: 4px;
+        }
+
+        .card-body {
+            margin-bottom: 12px;
+        }
+
+        .amount-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .amount-label {
+            font-size: 12px;
+            color: #8a99b0;
+        }
+
+        .amount-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1a2c3e;
+        }
+
+        .amount-value small {
+            font-size: 11px;
+            font-weight: 400;
+            color: #8a99b0;
+        }
+
+        .check-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .check-info-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 500;
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .check-info-item i {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .check-image-preview {
+            width: 40px;
+            height: 32px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #f0f2f5;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .date-info {
+            font-size: 11px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .detail-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 30px;
+            transition: all 0.2s;
+        }
+
+        .detail-btn:hover {
+            background: #eef2ff;
+        }
+
+        /* صفحه‌بندی */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 38px;
+            height: 38px;
+            padding: 0 12px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            color: #1a2c3e;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .page-link:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .page-link.active {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        .page-link.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* حالت خالی */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 24px;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #cbd5e1;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .empty-state h4 {
+            font-size: 18px;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        /* دسکتاپ */
+        @media (min-width: 768px) {
+            .checks-container {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 24px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 16px;
+            }
+
+            .filters-bar {
+                padding: 20px;
+            }
+
+            .filter-row {
+                flex-wrap: nowrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .stat-card {
+                padding: 12px 8px;
+            }
+            .stat-card .stat-value {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="checks-container">
+    <div class="checks-header">
+        <h1>
+            <i class="fas fa-file-invoice"></i>
+            چک‌های من
+        </h1>
+        <p>مشاهده و پیگیری تمام چک‌های ثبت شده شما</p>
+    </div>
+
+    <!-- کارت آمار -->
+    <div class="stats-grid">
+        <div class="stat-card total">
+            <i class="fas fa-file-invoice"></i>
+            <div class="stat-value">{{ stats.total|default:0|intcomma }}</div>
+            <div class="stat-label">کل چک‌ها</div>
+        </div>
+        <div class="stat-card pending">
+            <i class="fas fa-clock"></i>
+            <div class="stat-value">{{ stats.pending|default:0|intcomma }}</div>
+            <div class="stat-label">در انتظار</div>
+        </div>
+        <div class="stat-card verified">
+            <i class="fas fa-check-circle"></i>
+            <div class="stat-value">{{ stats.verified|default:0|intcomma }}</div>
+            <div class="stat-label">تأیید شده</div>
+        </div>
+        <div class="stat-card rejected">
+            <i class="fas fa-times-circle"></i>
+            <div class="stat-value">{{ stats.rejected|default:0|intcomma }}</div>
+            <div class="stat-label">رد شده</div>
+        </div>
+        <div class="stat-card finalized">
+            <i class="fas fa-check-double"></i>
+            <div class="stat-value">{{ stats.finalized|default:0|intcomma }}</div>
+            <div class="stat-label">نهایی شده</div>
+        </div>
+    </div>
+
+    <!-- فیلترها -->
+    <div class="filters-bar">
+        <div class="filter-row">
+            <select class="filter-select" id="statusFilter">
+                <option value="">همه وضعیت‌ها</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if current_filters.status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <select class="filter-select" id="dateFilter">
+                <option value="">همه تاریخ‌ها</option>
+                <option value="today" {% if current_filters.date == 'today' %}selected{% endif %}>امروز</option>
+                <option value="week" {% if current_filters.date == 'week' %}selected{% endif %}>هفته گذشته</option>
+                <option value="month" {% if current_filters.date == 'month' %}selected{% endif %}>ماه گذشته</option>
+            </select>
+        </div>
+        <div class="filter-row">
+            <div class="filter-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="جستجوی شماره پیگیری..." value="{{ current_filters.search|default:'' }}">
+            </div>
+            <button class="reset-btn" id="resetFilter">
+                <i class="fas fa-undo-alt"></i> حذف فیلتر
+            </button>
+        </div>
+    </div>
+
+    <!-- لیست کارتی چک‌ها -->
+    <div class="checks-list">
+        {% if checks %}
+            {% for check in checks %}
+            <div class="check-card" onclick="window.location.href='{% url 'check:user_check_detail' check.tracking_number %}'">
+                <div class="card-header">
+                    <span class="check-number">#{{ check.tracking_number }}</span>
+                    <div>
+                        <span class="status-badge {{ check.status }}">
+                            <i class="fas {% if check.status == 'pending' %}fa-clock{% elif check.status == 'verified' %}fa-check-circle{% elif check.status == 'rejected' %}fa-times-circle{% else %}fa-ban{% endif %}"></i>
+                            {{ check.get_status_display }}
+                        </span>
+                        {% if check.is_finalized %}
+                            <span class="finalized-badge"><i class="fas fa-check"></i> نهایی</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="amount-row">
+                        <span class="amount-label">مبلغ چک</span>
+                        <span class="amount-value">{{ check.check_amount|default:check.total_amount_to_pay|intcomma }}<small> تومان</small></span>
+                    </div>
+
+                    <div class="check-info">
+                        <span class="check-info-item">
+                            <i class="fas fa-user"></i> {{ check.user.get_full_name|default:check.user.username }}
+                        </span>
+
+                        {% if check.bank_name %}
+                            <span class="check-info-item">
+                                <i class="fas fa-university"></i> {{ check.bank_name }}
+                            </span>
+                        {% endif %}
+
+                        {% if check.check_number %}
+                            <span class="check-info-item">
+                                <i class="fas fa-hashtag"></i> {{ check.check_number }}
+                            </span>
+                        {% endif %}
+
+                        {% if check.check_image %}
+                            <img src="{{ check.check_image.url }}" class="check-image-preview" onclick="event.stopPropagation(); window.open('{{ check.check_image.url }}')">
+                        {% endif %}
+                    </div>
+
+                    <div class="check-info" style="margin-top:8px;">
+                        {% if check.related_order_display %}
+                            <span class="check-info-item" style="background:#eef2ff; color:#4f46e5;">
+                                <i class="fas fa-shopping-cart"></i> {{ check.related_order_display }}
+                            </span>
+                        {% endif %}
+                        <span class="date-info">
+                            <i class="fas fa-calendar-alt"></i>
+                            {{ check.created_at|date:"Y/m/d" }}
+                            <i class="fas fa-clock"></i>
+                            {{ check.created_at|date:"H:i" }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    {% if check.description %}
+                        <span class="date-info" style="max-width:60%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                            <i class="fas fa-comment"></i> {{ check.description|truncatechars:30 }}
+                        </span>
+                    {% else %}
+                        <span class="date-info">
+                            <i class="fas fa-file-invoice"></i> چک پرداخت
+                        </span>
+                    {% endif %}
+
+                    <button class="detail-btn" onclick="event.stopPropagation(); window.location.href='{% url 'check:user_check_detail' check.tracking_number %}'">
+                        جزئیات <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-file-invoice"></i>
+                <h4>هیچ چکی یافت نشد</h4>
+                <p>شما هنوز هیچ چکی ثبت نکرده‌اید</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- صفحه‌بندی -->
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if current_filters.status %}&status={{ current_filters.status }}{% endif %}{% if current_filters.date %}&date={{ current_filters.date }}{% endif %}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}" class="page-link">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        {% else %}
+            <span class="page-link disabled"><i class="fas fa-chevron-right"></i></span>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <span class="page-link active">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}{% if current_filters.status %}&status={{ current_filters.status }}{% endif %}{% if current_filters.date %}&date={{ current_filters.date }}{% endif %}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}" class="page-link">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if current_filters.status %}&status={{ current_filters.status }}{% endif %}{% if current_filters.date %}&date={{ current_filters.date }}{% endif %}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}" class="page-link">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        {% else %}
+            <span class="page-link disabled"><i class="fas fa-chevron-left"></i></span>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // فیلترها
+    function applyFilters() {
+        const status = document.getElementById('statusFilter').value;
+        const date = document.getElementById('dateFilter').value;
+        const search = document.getElementById('searchInput').value;
+
+        let url = new URL(window.location.href);
+        if (status) url.searchParams.set('status', status);
+        else url.searchParams.delete('status');
+
+        if (date) url.searchParams.set('date', date);
+        else url.searchParams.delete('date');
+
+        if (search) url.searchParams.set('search', search);
+        else url.searchParams.delete('search');
+
+        url.searchParams.set('page', '1');
+        window.location.href = url.toString();
+    }
+
+    document.getElementById('statusFilter')?.addEventListener('change', applyFilters);
+    document.getElementById('dateFilter')?.addEventListener('change', applyFilters);
+    document.getElementById('searchInput')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') applyFilters();
+    });
+    document.getElementById('resetFilter')?.addEventListener('click', function() {
+        window.location.href = window.location.pathname;
+    });
+</script>
+</body>
+</html>
+
+{% endblock content %}

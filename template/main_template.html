@@ -1,0 +1,377 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
+    <title>Deco B2B | پنل حرفه‌ای B2B دکوراسیون داخلی</title>
+    <link rel="stylesheet" href=" https://lib.arvancloud.ir/font-awesome/6.3.0/css/all.css ">
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main2122.css' %}">
+</head>
+<body>
+
+<aside class="sidebar" id="sidebarDesktop">
+    <div class="logo-side">
+        <div class="logo-icon-side">
+            <img src="/media/images/logo1.jpg" alt="Logo">
+        </div>
+        <div class="logo-text-side"><h2>Deco B2B</h2><span>تخصصی B2B</span></div>
+    </div>
+    <ul class="nav-menu-side">
+        <a href='/'  style='text-decoration: none;'  class="nav-item-side"><i class="fas fa-store"></i> محصولات</a>
+        <a style='text-decoration: none;' href='{% url "order:user_orders" %}' class="nav-item-side"><i class="fas fa-truck"></i> سفارشات</a>
+        <a style='text-decoration: none;' href='{% url "pro:user_pro_orders_panel" %}' class="nav-item-side"><i class="fas fa-truck"></i> سفارشات چاپی</a>
+        <a href='{% url "product:wishlist" %}' style='text-decoration: none;' class="nav-item-side" data-tab="wishlist"><i class="fas fa-heart"></i> علاقمندی</a>
+        <a href='{% url "peyment:payment_list" %}' style='text-decoration: none;' class="nav-item-side"><i class="fas fa-credit-card"></i> پرداخت</a>
+        <a href='{% url "main:portfolio_page" %}' style='text-decoration: none;' class="nav-item-side"><i class="fas fa-cloud-upload-alt"></i> آپلود نمونه کار</a>
+        <a href='{% url "check:user_checks" %}' style='text-decoration: none;' class="nav-item-side"><i class="fas fa-cloud-upload-alt"></i>چک پرداختی من</a>
+    </ul>
+
+    <!-- ساعت دیجیتال - چسبیده به انتهای سایدبار -->
+    <div class="sidebar-footer-clock">
+        <div class="digital-clock">
+            <div class="clock-time">
+                <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span>
+            </div>
+            <div class="clock-date">
+                <span id="dayName"></span>
+                <span id="persianDate"></span>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<div class="main-wrapper">
+    {% include "partials/topheader.html" %}
+    {% include "partials/header.html" %}
+
+    <div class="content-container" id="mainContent">
+        {% block content %}
+        {% endblock %}
+    </div>
+</div>
+
+<div class="mega-overlay-bg" id="megaOverlayBg"></div>
+
+{% include "./partials/profileSlider.html" %}
+
+<div class="slide-panel" id="cartPanel">
+    <div style="display:flex; justify-content:space-between; margin-bottom:24px; align-items:center;">
+        <h3 style="font-size:1.5rem; font-weight:800;">سبد خرید</h3>
+        <div id="closeCart" style="cursor:pointer; width:40px; height:40px; background:rgba(255,255,255,0.8); border-radius:14px; display:flex; align-items:center; justify-content:center;"><i class="fas fa-times"></i></div>
+    </div>
+    <div id="cartItemsList"></div>
+</div>
+
+<div class="slide-panel" id="notifPanel">
+    <div style="display:flex; justify-content:space-between; margin-bottom:24px; align-items:center;">
+        <h3 style="font-size:1.5rem; font-weight:800;">اعلان‌ها</h3>
+        <div id="closeNotif" style="cursor:pointer; width:40px; height:40px; background:rgba(255,255,255,0.8); border-radius:14px; display:flex; align-items:center; justify-content:center;"><i class="fas fa-times"></i></div>
+    </div>
+    <div id="notifList"></div>
+</div>
+
+<div class="mobile-bottom-nav" id="mobileBottomNav">
+    <div class="bottom-item" data-url="/">
+        <i class="fas fa-store"></i>
+        <span>محصولات</span>
+    </div>
+    <div class="bottom-item" data-url="/pro">
+        <i class="fas fa-chalkboard-user"></i>
+        <span>سفارش چاپی</span>
+    </div>
+    <div class="bottom-item" data-url="/order/my-orders/">
+        <i class="fas fa-truck"></i>
+        <span>سفارشات</span>
+    </div>
+    <div class="bottom-item" data-url="/peyment/payments/">
+        <i class="fas fa-credit-card"></i>
+        <span>پرداخت‌ها</span>
+    </div>
+    <div class="bottom-item" data-url="/product/wishlist/active">
+        <i class="fas fa-heart"></i>
+        <span>علاقمندی</span>
+    </div>
+</div>
+
+<style>
+    /* منوی موبایل */
+    .mobile-bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(20px);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 8px 12px 18px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+    }
+
+    @media (min-width: 769px) {
+        .mobile-bottom-nav {
+            display: none !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        body {
+            padding-bottom: 70px !important;
+        }
+    }
+
+    .bottom-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        padding: 6px 8px;
+        border-radius: 40px;
+        background: transparent;
+        flex: 1;
+        text-align: center;
+    }
+
+    .bottom-item i {
+        font-size: 1.3rem;
+        color: #8a9bb0;
+        transition: all 0.2s;
+    }
+
+    .bottom-item span {
+        font-size: 0.65rem;
+        font-weight: 500;
+        color: #8a9bb0;
+        transition: all 0.2s;
+    }
+
+    .bottom-item.active-bottom {
+        background: rgba(230, 126, 34, 0.12);
+    }
+
+    .bottom-item.active-bottom i {
+        color: #e67e22;
+        transform: translateY(-2px);
+    }
+
+    .bottom-item.active-bottom span {
+        color: #e67e22;
+        font-weight: 600;
+    }
+
+    @media (max-width: 480px) {
+        .mobile-bottom-nav {
+            padding: 6px 8px 14px;
+        }
+        .bottom-item i {
+            font-size: 1.2rem;
+        }
+        .bottom-item span {
+            font-size: 0.6rem;
+        }
+        body {
+            padding-bottom: 65px !important;
+        }
+    }
+
+    /* ==================== ساعت دیجیتال - چسبیده به انتهای سایدبار با متن مشکی ==================== */
+    .sidebar {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        overflow-y: auto;
+    }
+
+    .nav-menu-side {
+        flex: 1;
+    }
+
+    .sidebar-footer-clock {
+        margin-top: auto;
+        padding: 15px 12px;
+        background: #f8f9fa;
+        border-top: 1px solid #e0e0e0;
+        text-align: center;
+    }
+
+    .digital-clock {
+        direction: ltr;
+    }
+
+    .clock-time {
+        font-family: 'Courier New', monospace;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+    }
+
+    .clock-time span {
+        display: inline-block;
+        min-width: 32px;
+    }
+
+    .clock-date {
+        font-size: 0.6rem;
+        color: #555;
+        direction: rtl;
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .clock-date #dayName {
+        background: #e9ecef;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 0.55rem;
+        color: #495057;
+    }
+
+    .clock-date #persianDate {
+        color: #495057;
+    }
+
+    @media (max-width: 768px) {
+        .sidebar-footer-clock {
+            display: none;
+        }
+    }
+</style>
+
+<script>
+    // منوی موبایل
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentPath = window.location.pathname;
+        const bottomItems = document.querySelectorAll('.bottom-item');
+
+        function setActiveItem(urlPath) {
+            bottomItems.forEach(item => {
+                const itemUrl = item.getAttribute('data-url');
+                if (itemUrl === urlPath) {
+                    item.classList.add('active-bottom');
+                }
+                else if (itemUrl !== '/' && urlPath.startsWith(itemUrl) && itemUrl.length > 1) {
+                    item.classList.add('active-bottom');
+                }
+                else if (itemUrl === '/' && (urlPath === '/' || urlPath === '')) {
+                    item.classList.add('active-bottom');
+                }
+                else {
+                    item.classList.remove('active-bottom');
+                }
+            });
+        }
+
+        setActiveItem(currentPath);
+
+        bottomItems.forEach(item => {
+            const targetUrl = item.getAttribute('data-url');
+            item.addEventListener('click', function(e) {
+                if (e.target.tagName !== 'A') {
+                    window.location.href = targetUrl;
+                }
+            });
+        });
+    });
+
+    // ساعت دیجیتال
+    function updateClock() {
+        const now = new Date();
+
+        let hours = now.getHours();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+
+        let displayHours = hours % 12;
+        if (displayHours === 0) displayHours = 12;
+
+        const formattedHours = displayHours.toString().padStart(2, '0');
+        const formattedMinutes = minutes.toString().padStart(2, '0');
+        const formattedSeconds = seconds.toString().padStart(2, '0');
+
+        const hoursElem = document.getElementById('hours');
+        const minutesElem = document.getElementById('minutes');
+        const secondsElem = document.getElementById('seconds');
+
+        if (hoursElem) hoursElem.textContent = formattedHours;
+        if (minutesElem) minutesElem.textContent = formattedMinutes;
+        if (secondsElem) secondsElem.textContent = formattedSeconds;
+
+        const persianDate = new Intl.DateTimeFormat('fa-IR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        }).format(now);
+
+        const weekDays = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'];
+        const dayName = weekDays[now.getDay()];
+
+        const dayNameElem = document.getElementById('dayName');
+        const persianDateElem = document.getElementById('persianDate');
+
+        if (dayNameElem) dayNameElem.textContent = dayName;
+        if (persianDateElem) persianDateElem.textContent = persianDate;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+</script>
+
+<script src='{% static "js/main3636.js" %}'></script>
+{% include "./partials/scripts.html" %}
+<script src='{% static "js/cart32.js" %}' ></script>
+<script>
+    window.loadCartFromAPI = loadCartFromAPI;
+    window.renderCart = renderCart;
+    window.cart = cart;
+</script>
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+
+    window.addEventListener('beforeunload', function() {
+        navigator.sendBeacon('/panel/user-offline/', new Blob([], {type: 'application/json'}));
+    });
+
+    fetch('/panel/update-activity/', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrftoken },
+    });
+
+    setInterval(() => {
+        fetch('/panel/update-activity/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken },
+        });
+    }, 30000);
+</script>
+</body>
+</html>

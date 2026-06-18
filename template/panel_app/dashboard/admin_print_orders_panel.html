@@ -1,0 +1,1127 @@
+{% extends 'admin_template.html' %}
+{% load static %}
+
+{% block title %}مدیریت چک‌های پرداخت - پیشرفته{% endblock %}
+
+{% block mobile_orders %}
+<style>
+    /* ===== استایل‌های ریسپانسیو و مدرن ===== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'IRANSans', 'Tahoma', sans-serif;
+        background: #0b1120;
+        color: #e2e8f0;
+    }
+    .check-container {
+        padding: 20px 16px;
+        animation: fadeIn 0.5s ease;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== کارت‌های آماری ===== */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+    .stat-card {
+        background: linear-gradient(145deg, #1e293b, #0f172a);
+        border-radius: 20px;
+        padding: 18px 16px;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+    .stat-card:hover {
+        transform: translateY(-4px);
+        border-color: #667eea;
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
+    }
+    .stat-card .number {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #fff;
+        line-height: 1.2;
+        direction: ltr;
+        display: inline-block;
+    }
+    .stat-card .label {
+        color: #94a3b8;
+        font-size: 0.75rem;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .stat-card.pending { border-right: 4px solid #fbbf24; }
+    .stat-card.verified { border-right: 4px solid #34d399; }
+    .stat-card.rejected { border-right: 4px solid #ef4444; }
+    .stat-card.total { border-right: 4px solid #667eea; }
+
+    /* ===== فیلترها ===== */
+    .filter-box {
+        background: #1e293b;
+        border-radius: 24px;
+        padding: 20px 18px;
+        margin-bottom: 24px;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+    .filter-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 14px;
+        align-items: flex-end;
+    }
+    .filter-group {
+        min-width: 0;
+    }
+    .filter-group label {
+        display: block;
+        color: #94a3b8;
+        font-size: 0.7rem;
+        margin-bottom: 4px;
+        font-weight: 500;
+    }
+    .filter-group input,
+    .filter-group select {
+        width: 100%;
+        padding: 10px 12px;
+        background: #0f172a;
+        border: 1px solid rgba(102, 126, 234, 0.25);
+        border-radius: 12px;
+        color: #fff;
+        font-size: 0.85rem;
+        transition: 0.2s;
+    }
+    .filter-group input:focus,
+    .filter-group select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
+    .filter-group input[type="date"] {
+        color-scheme: dark;
+    }
+    .search-group {
+        grid-column: span 2;
+        min-width: 200px;
+    }
+    .search-wrapper {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .search-wrapper input {
+        flex: 2;
+        min-width: 140px;
+    }
+    .btn {
+        padding: 10px 18px;
+        border: none;
+        border-radius: 12px;
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.25s;
+        font-size: 0.85rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .btn-success { background: #10b981; }
+    .btn-danger { background: #ef4444; }
+    .btn-info { background: #3b82f6; }
+    .btn-warning { background: #f59e0b; }
+    .btn-reset { background: #475569; }
+    .btn-secondary { background: #334155; }
+
+    /* ===== عملیات گروهی ===== */
+    .table-actions {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        align-items: center;
+        background: #1e293b;
+        padding: 12px 18px;
+        border-radius: 16px;
+        border: 1px solid rgba(102,126,234,0.15);
+    }
+    .table-actions .selected-count {
+        color: #94a3b8;
+        font-size: 0.85rem;
+        margin-right: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .table-actions .selected-count input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #667eea;
+        cursor: pointer;
+    }
+
+    /* ===== جدول ===== */
+    .table-wrapper {
+        background: #1e293b;
+        border-radius: 24px;
+        overflow-x: auto;
+        border: 1px solid rgba(102, 126, 234, 0.15);
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1000px;
+    }
+    table th {
+        text-align: right;
+        padding: 14px 16px;
+        color: #94a3b8;
+        border-bottom: 2px solid rgba(102, 126, 234, 0.15);
+        background: rgba(0, 0, 0, 0.25);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+    table td {
+        padding: 12px 16px;
+        color: #e2e8f0;
+        border-bottom: 1px solid rgba(102, 126, 234, 0.06);
+        font-size: 0.85rem;
+        vertical-align: middle;
+    }
+    table tr:hover {
+        background: rgba(102, 126, 234, 0.05);
+    }
+    .checkbox-col {
+        width: 40px;
+        text-align: center;
+    }
+    .checkbox-col input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #667eea;
+    }
+    .check-image-preview {
+        width: 60px;
+        height: 45px;
+        object-fit: cover;
+        border-radius: 8px;
+        cursor: pointer;
+        border: 1px solid rgba(255,255,255,0.1);
+        transition: 0.2s;
+    }
+    .check-image-preview:hover {
+        transform: scale(1.05);
+        border-color: #667eea;
+    }
+
+    /* ===== وضعیت‌ها ===== */
+    .badge {
+        padding: 4px 14px;
+        border-radius: 30px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        display: inline-block;
+        letter-spacing: 0.3px;
+    }
+    .badge-pending { background: rgba(251,191,36,0.2); color: #fbbf24; }
+    .badge-verified { background: rgba(16,185,129,0.2); color: #34d399; }
+    .badge-rejected { background: rgba(239,68,68,0.2); color: #ef4444; }
+    .badge-cancelled { background: rgba(148,163,184,0.2); color: #94a3b8; }
+    .badge-finalized {
+        background: rgba(16,185,129,0.2);
+        color: #34d399;
+        padding: 2px 12px;
+        border-radius: 30px;
+        font-size: 0.6rem;
+        display: inline-block;
+        margin-top: 4px;
+        font-weight: 500;
+    }
+
+    /* ===== دکمه‌های عملیات ===== */
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+    .btn-sm {
+        padding: 5px 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.7rem;
+        cursor: pointer;
+        color: #fff;
+        transition: all 0.2s;
+        font-weight: 500;
+    }
+    .btn-sm:hover {
+        transform: scale(1.06);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .btn-sm-detail { background: #667eea; }
+    .btn-sm-verify { background: #10b981; }
+    .btn-sm-reject { background: #ef4444; }
+    .btn-sm-finalize { background: #3b82f6; }
+
+    /* ===== پیجینیشن ===== */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 28px;
+        flex-wrap: wrap;
+    }
+    .pagination button {
+        padding: 8px 16px;
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 10px;
+        color: #94a3b8;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.85rem;
+    }
+    .pagination button:hover {
+        background: #334155;
+        color: #fff;
+    }
+    .pagination button.active {
+        background: #667eea;
+        color: #fff;
+        border-color: #667eea;
+    }
+
+    /* ===== مودال‌ها ===== */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.92);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        padding: 16px;
+    }
+    .modal-content {
+        background: #1e293b;
+        border-radius: 28px;
+        padding: 28px;
+        width: 720px;
+        max-width: 96%;
+        max-height: 85vh;
+        overflow-y: auto;
+        border: 1px solid rgba(102,126,234,0.2);
+        box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+        animation: modalIn 0.3s ease;
+    }
+    @keyframes modalIn {
+        from { opacity: 0; transform: scale(0.95) translateY(20px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(102, 126, 234, 0.15);
+    }
+    .modal-header h3 {
+        color: #fff;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .modal-close {
+        background: none;
+        border: none;
+        color: #94a3b8;
+        font-size: 30px;
+        cursor: pointer;
+        transition: all 0.3s;
+        line-height: 1;
+        padding: 0 6px;
+    }
+    .modal-close:hover {
+        color: #ef4444;
+        transform: rotate(90deg);
+    }
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(102, 126, 234, 0.06);
+        gap: 10px;
+    }
+    .detail-row .label {
+        color: #94a3b8;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
+    .detail-row .value {
+        color: #e2e8f0;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-align: left;
+        word-break: break-word;
+        flex: 1;
+    }
+    .detail-image {
+        max-width: 100%;
+        max-height: 260px;
+        border-radius: 14px;
+        margin-top: 12px;
+        cursor: pointer;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .modal-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 22px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(102, 126, 234, 0.1);
+        flex-wrap: wrap;
+    }
+    .modal-actions .btn {
+        padding: 10px 24px;
+    }
+    .form-group {
+        margin-bottom: 18px;
+    }
+    .form-group label {
+        display: block;
+        color: #94a3b8;
+        font-size: 0.85rem;
+        margin-bottom: 6px;
+        font-weight: 500;
+    }
+    .form-group textarea {
+        width: 100%;
+        padding: 14px;
+        background: #0f172a;
+        border: 1px solid rgba(102, 126, 234, 0.25);
+        border-radius: 14px;
+        color: #fff;
+        font-size: 0.9rem;
+        resize: vertical;
+        min-height: 90px;
+        transition: 0.2s;
+    }
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    }
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        color: #94a3b8;
+    }
+    .empty-state .icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+        opacity: 0.5;
+    }
+
+    /* ===== واکنش‌گرا ===== */
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .stat-card .number {
+            font-size: 1.4rem;
+        }
+        .filter-row {
+            grid-template-columns: 1fr;
+        }
+        .search-group {
+            grid-column: span 1;
+        }
+        .search-wrapper {
+            flex-direction: column;
+        }
+        .search-wrapper button {
+            width: 100%;
+            justify-content: center;
+        }
+        .table-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .table-actions .selected-count {
+            margin-right: 0;
+            justify-content: center;
+        }
+        .modal-content {
+            padding: 20px;
+            max-height: 90vh;
+        }
+        .detail-row {
+            flex-direction: column;
+            gap: 2px;
+            padding: 8px 0;
+        }
+        .detail-row .value {
+            text-align: right;
+        }
+    }
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .stat-card {
+            padding: 12px;
+        }
+        .stat-card .number {
+            font-size: 1.2rem;
+        }
+        .btn {
+            font-size: 0.75rem;
+            padding: 8px 14px;
+        }
+        .modal-content {
+            padding: 16px;
+        }
+    }
+</style>
+
+<div class="check-container">
+    <!-- ===== کارت‌های آمار ===== -->
+    <div class="stats-grid">
+        <div class="stat-card total">
+            <div class="number" id="statTotal">-</div>
+            <div class="label">📊 کل چک‌ها</div>
+        </div>
+        <div class="stat-card pending">
+            <div class="number" id="statPending">-</div>
+            <div class="label">⏳ در انتظار</div>
+        </div>
+        <div class="stat-card verified">
+            <div class="number" id="statVerified">-</div>
+            <div class="label">✅ تایید شده</div>
+        </div>
+        <div class="stat-card rejected">
+            <div class="number" id="statRejected">-</div>
+            <div class="label">❌ رد شده</div>
+        </div>
+    </div>
+
+    <!-- ===== فیلترها ===== -->
+    <div class="filter-box">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>وضعیت</label>
+                <select id="filterStatus">
+                    <option value="">همه</option>
+                    <option value="pending">در انتظار</option>
+                    <option value="verified">تایید شده</option>
+                    <option value="rejected">رد شده</option>
+                    <option value="cancelled">لغو شده</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>از تاریخ</label>
+                <input type="date" id="filterDateFrom">
+            </div>
+            <div class="filter-group">
+                <label>تا تاریخ</label>
+                <input type="date" id="filterDateTo">
+            </div>
+            <div class="filter-group">
+                <label>مرتب‌سازی</label>
+                <select id="filterSort">
+                    <option value="-created_at">جدیدترین</option>
+                    <option value="created_at">قدیمی‌ترین</option>
+                    <option value="-verified_at">تاریخ تایید</option>
+                    <option value="status">وضعیت</option>
+                </select>
+            </div>
+            <div class="filter-group search-group">
+                <label>جستجو</label>
+                <div class="search-wrapper">
+                    <input type="text" id="searchInput" placeholder="شماره پیگیری، موبایل، بانک...">
+                    <button class="btn btn-primary" onclick="applyFilters()">🔍 جستجو</button>
+                    <button class="btn btn-reset" onclick="resetFilters()">🔄 ریست</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== عملیات گروهی ===== -->
+    <div class="table-actions">
+        <button class="btn btn-success" onclick="bulkAction('verify')">✅ تایید گروهی</button>
+        <button class="btn btn-danger" onclick="bulkAction('reject')">❌ رد گروهی</button>
+        <span class="selected-count">
+            <input type="checkbox" id="selectAll" onchange="toggleAllChecks(this)">
+            <label for="selectAll" style="color:#94a3b8; cursor:pointer;"> انتخاب همه</label>
+            <span id="selectedCount" style="margin-right:10px;">۰ انتخاب شده</span>
+        </span>
+    </div>
+
+    <!-- ===== جدول ===== -->
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th class="checkbox-col"><input type="checkbox" id="selectAllTable" onchange="toggleAllChecks(this)"></th>
+                    <th>شماره پیگیری</th>
+                    <th>کاربر</th>
+                    <th>اطلاعات چک</th>
+                    <th>مبلغ</th>
+                    <th>وضعیت</th>
+                    <th>تاریخ ثبت</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="8" class="empty-state"><div class="icon">⏳</div>در حال بارگذاری...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ===== پیجینیشن ===== -->
+    <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- ===== مودال جزئیات ===== -->
+<div id="detailModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="detailTitle">📄 جزئیات چک</h3>
+            <button class="modal-close" onclick="closeModal('detailModal')">&times;</button>
+        </div>
+        <div id="detailBody"></div>
+        <div class="modal-actions" id="detailActions"></div>
+    </div>
+</div>
+
+<!-- ===== مودال رد ===== -->
+<div id="rejectModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 style="color:#ef4444;">❌ رد چک</h3>
+            <button class="modal-close" onclick="closeModal('rejectModal')">&times;</button>
+        </div>
+        <div class="form-group">
+            <label>دلیل رد *</label>
+            <textarea id="rejectReason" placeholder="لطفاً دلیل رد چک را وارد کنید..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-danger" onclick="confirmReject()">رد کردن</button>
+            <button class="btn btn-secondary" onclick="closeModal('rejectModal')">انصراف</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== مودال عملیات گروهی ===== -->
+<div id="bulkModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="bulkTitle">عملیات گروهی</h3>
+            <button class="modal-close" onclick="closeModal('bulkModal')">&times;</button>
+        </div>
+        <p style="color:#94a3b8;" id="bulkMessage"></p>
+        <div id="bulkReasonGroup" style="display:none;margin-top:15px;">
+            <div class="form-group">
+                <label>دلیل رد گروهی</label>
+                <textarea id="bulkReason" placeholder="دلیل رد..."></textarea>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-success" id="bulkConfirmBtn" onclick="confirmBulk()">تایید</button>
+            <button class="btn btn-secondary" onclick="closeModal('bulkModal')">انصراف</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    //  مدیریت چک‌ها - با حفظ عملکرد کامل
+    // ============================================================
+
+    let currentPage = 1;
+    let currentFilters = {};
+    let currentRejectId = null;
+    let searchTimeout = null;
+    let selectedChecks = [];
+
+    // ===== دریافت CSRF =====
+    function getCSRF() {
+        let v = null;
+        if (document.cookie) {
+            const c = document.cookie.split(';');
+            for (let i = 0; i < c.length; i++) {
+                const ck = c[i].trim();
+                if (ck.substring(0, 9) === 'csrftoken=') {
+                    v = decodeURIComponent(ck.substring(9));
+                    break;
+                }
+            }
+        }
+        return v;
+    }
+    const csrfToken = getCSRF();
+
+    // ===== توابع کمکی =====
+    function formatNumber(n) {
+        if (n === undefined || n === null) return '۰';
+        return new Intl.NumberFormat('fa-IR').format(n);
+    }
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    // ===== بارگذاری چک‌ها =====
+    async function loadChecks() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><div class="icon">⏳</div>در حال بارگذاری...</td></tr>';
+
+        const params = new URLSearchParams({
+            page: currentPage,
+            page_size: 20,
+            ...currentFilters
+        });
+
+        try {
+            const response = await fetch(`/panel/admin/api/check/list/?${params}`);
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                document.getElementById('statTotal').innerText = formatNumber(data.stats.total);
+                document.getElementById('statPending').innerText = formatNumber(data.stats.pending);
+                document.getElementById('statVerified').innerText = formatNumber(data.stats.verified);
+                document.getElementById('statRejected').innerText = formatNumber(data.stats.rejected);
+
+                renderTable(data.checks);
+                renderPagination(data.pagination);
+            } else {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><div class="icon">❌</div>خطا: ' + data.error + '</td></tr>';
+            }
+        } catch(error) {
+            console.error('خطا:', error);
+            tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><div class="icon">❌</div>خطا در بارگذاری</td></tr>';
+        }
+    }
+
+    // ===== رندر جدول =====
+    function renderTable(checks) {
+        const tbody = document.getElementById('tableBody');
+        if (!checks || checks.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><div class="icon">📭</div>هیچ چکی یافت نشد</td></tr>';
+            return;
+        }
+
+        const badgeMap = {
+            'pending': 'badge-pending',
+            'verified': 'badge-verified',
+            'rejected': 'badge-rejected',
+            'cancelled': 'badge-cancelled'
+        };
+
+        tbody.innerHTML = checks.map(check => `
+            <tr>
+                <td class="checkbox-col">
+                    <input type="checkbox" class="check-item" value="${check.id}" onchange="updateSelectedCount()">
+                </td>
+                <td>
+                    <strong>${escapeHtml(check.tracking_number)}</strong>
+                    <div style="font-size:11px;color:#94a3b8;">${check.order_display || 'بدون سفارش'}</div>
+                </td>
+                <td>
+                    <div><strong>${escapeHtml(check.user_name || check.user_mobile)}</strong></div>
+                    <div style="font-size:11px;color:#94a3b8;">${check.user_mobile}</div>
+                </td>
+                <td>
+                    ${check.check_image ? `<img src="${check.check_image}" class="check-image-preview" onclick="window.open(this.src)">` : ''}
+                    ${check.bank_name ? `<div>🏦 ${escapeHtml(check.bank_name)}</div>` : ''}
+                    ${check.check_number ? `<div style="font-size:11px;color:#94a3b8;">#${escapeHtml(check.check_number)}</div>` : ''}
+                </td>
+                <td>${check.check_amount ? `<strong>${formatNumber(check.check_amount)}</strong> تومان` : '-'}</td>
+                <td>
+                    <span class="badge ${badgeMap[check.status] || ''}">${check.status_display}</span>
+                    ${check.is_finalized ? '<div class="badge-finalized">✓ نهایی</div>' : ''}
+                </td>
+                <td style="font-size:13px;">${check.created_at}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn-sm btn-sm-detail" onclick="viewDetail('${check.id}')">👁</button>
+                        ${check.status === 'pending' ? `
+                            <button class="btn-sm btn-sm-verify" onclick="verifyCheck('${check.id}')">✅</button>
+                            <button class="btn-sm btn-sm-reject" onclick="rejectCheck('${check.id}')">❌</button>
+                        ` : ''}
+                        ${check.status === 'verified' && !check.is_finalized ? `
+                            <button class="btn-sm btn-sm-finalize" onclick="finalizeCheck('${check.id}')">🏁</button>
+                        ` : ''}
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+
+        document.getElementById('selectAll').checked = false;
+        document.getElementById('selectAllTable').checked = false;
+        selectedChecks = [];
+        updateSelectedCount();
+    }
+
+    // ===== پیجینیشن =====
+    function renderPagination(pagination) {
+        const container = document.getElementById('pagination');
+        if (!pagination || pagination.total_pages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+
+        let html = '';
+        if (pagination.has_previous) {
+            html += `<button onclick="goToPage(${pagination.current_page - 1})">قبلی</button>`;
+        }
+
+        for (let i = 1; i <= pagination.total_pages; i++) {
+            if (i === 1 || i === pagination.total_pages || (i >= pagination.current_page - 2 && i <= pagination.current_page + 2)) {
+                const active = i === pagination.current_page ? 'active' : '';
+                html += `<button onclick="goToPage(${i})" class="${active}">${i}</button>`;
+            }
+        }
+
+        if (pagination.has_next) {
+            html += `<button onclick="goToPage(${pagination.current_page + 1})">بعدی</button>`;
+        }
+        container.innerHTML = html;
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        loadChecks();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ===== فیلترها =====
+    function applyFilters() {
+        currentFilters = {
+            status: document.getElementById('filterStatus').value,
+            search: document.getElementById('searchInput').value,
+            date_from: document.getElementById('filterDateFrom').value,
+            date_to: document.getElementById('filterDateTo').value,
+            sort_by: document.getElementById('filterSort').value
+        };
+        Object.keys(currentFilters).forEach(key => {
+            if (!currentFilters[key]) delete currentFilters[key];
+        });
+        currentPage = 1;
+        loadChecks();
+    }
+
+    function resetFilters() {
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('searchInput').value = '';
+        document.getElementById('filterDateFrom').value = '';
+        document.getElementById('filterDateTo').value = '';
+        document.getElementById('filterSort').value = '-created_at';
+        currentFilters = {};
+        currentPage = 1;
+        loadChecks();
+    }
+
+    // ===== انتخاب‌ها =====
+    function toggleAllChecks(source) {
+        document.querySelectorAll('.check-item').forEach(cb => cb.checked = source.checked);
+        updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+        selectedChecks = Array.from(document.querySelectorAll('.check-item:checked')).map(cb => cb.value);
+        document.getElementById('selectedCount').innerText = `${selectedChecks.length} انتخاب شده`;
+    }
+
+    // ===== عملیات =====
+    async function viewDetail(id) {
+        try {
+            const response = await fetch(`/panel/admin/api/check/${id}/`);
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                const c = data.check;
+                document.getElementById('detailTitle').innerText = `📄 جزئیات چک - ${c.tracking_number}`;
+
+                const badgeMap = {
+                    'pending': 'badge-pending',
+                    'verified': 'badge-verified',
+                    'rejected': 'badge-rejected',
+                    'cancelled': 'badge-cancelled'
+                };
+
+                let bodyHtml = `
+                    <div class="detail-row"><span class="label">وضعیت</span><span class="value"><span class="badge ${badgeMap[c.status] || ''}">${c.status_display}</span></span></div>
+                    <div class="detail-row"><span class="label">کاربر</span><span class="value">${escapeHtml(c.user_name || c.user_mobile)}</span></div>
+                    <div class="detail-row"><span class="label">موبایل</span><span class="value">${c.user_mobile}</span></div>
+                    <div class="detail-row"><span class="label">شماره پیگیری</span><span class="value">${c.tracking_number}</span></div>
+                    <div class="detail-row"><span class="label">بانک</span><span class="value">${escapeHtml(c.bank_name || '-')}</span></div>
+                    <div class="detail-row"><span class="label">شماره چک</span><span class="value">${escapeHtml(c.check_number || '-')}</span></div>
+                    <div class="detail-row"><span class="label">مبلغ</span><span class="value">${c.check_amount ? formatNumber(c.check_amount) + ' تومان' : '-'}</span></div>
+                    <div class="detail-row"><span class="label">تاریخ چک</span><span class="value">${c.check_date || '-'}</span></div>
+                    <div class="detail-row"><span class="label">تاریخ ثبت</span><span class="value">${c.created_at}</span></div>
+                    ${c.verified_at ? `<div class="detail-row"><span class="label">تاریخ تایید</span><span class="value">${c.verified_at}</span></div>` : ''}
+                    ${c.verified_by ? `<div class="detail-row"><span class="label">تایید کننده</span><span class="value">${escapeHtml(c.verified_by)}</span></div>` : ''}
+                    ${c.rejection_reason ? `<div class="detail-row" style="border-color:#ef4444;"><span class="label" style="color:#ef4444;">دلیل رد</span><span class="value" style="color:#ef4444;">${escapeHtml(c.rejection_reason)}</span></div>` : ''}
+                    ${c.admin_note ? `<div class="detail-row"><span class="label">یادداشت ادمین</span><span class="value">${escapeHtml(c.admin_note)}</span></div>` : ''}
+                    ${c.description ? `<div class="detail-row"><span class="label">توضیحات کاربر</span><span class="value">${escapeHtml(c.description)}</span></div>` : ''}
+                    ${c.is_finalized ? `<div class="detail-row"><span class="label">نهایی شده</span><span class="value" style="color:#34d399;">✅ بله</span></div>` : ''}
+                    ${c.finalized_at ? `<div class="detail-row"><span class="label">تاریخ نهایی</span><span class="value">${c.finalized_at}</span></div>` : ''}
+                `;
+
+                if (c.check_image) {
+                    bodyHtml += `<div style="text-align:center;margin-top:15px;"><img src="${c.check_image}" class="detail-image" onclick="window.open(this.src)"></div>`;
+                }
+
+                if (c.history && c.history.length > 0) {
+                    bodyHtml += `<div style="margin-top:20px;"><h4 style="color:#94a3b8;font-size:0.9rem;">📜 تاریخچه</h4>`;
+                    c.history.forEach(h => {
+                        bodyHtml += `<div class="detail-row" style="font-size:0.8rem;"><span class="label">${h.action_display}</span><span class="value">${escapeHtml(h.message)} - ${h.created_at}</span></div>`;
+                    });
+                    bodyHtml += `</div>`;
+                }
+
+                document.getElementById('detailBody').innerHTML = bodyHtml;
+
+                let actionsHtml = `<button class="btn btn-secondary" onclick="closeModal('detailModal')">بستن</button>`;
+                if (c.status === 'pending') {
+                    actionsHtml += `
+                        <button class="btn btn-success" onclick="verifyCheck('${c.id}')">✅ تایید</button>
+                        <button class="btn btn-danger" onclick="rejectCheck('${c.id}')">❌ رد</button>
+                    `;
+                }
+                if (c.status === 'verified' && !c.is_finalized) {
+                    actionsHtml += `<button class="btn btn-info" onclick="finalizeCheck('${c.id}')">🏁 نهایی‌سازی</button>`;
+                }
+                document.getElementById('detailActions').innerHTML = actionsHtml;
+
+                document.getElementById('detailModal').style.display = 'flex';
+            }
+        } catch(error) {
+            alert('خطا در دریافت جزئیات');
+        }
+    }
+
+    async function verifyCheck(id) {
+        if (!confirm('آیا از تایید این چک اطمینان دارید؟')) return;
+
+        try {
+            const response = await fetch(`/panel/admin/check/verify/${id}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ 'note': 'تایید شده توسط ادمین' })
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert('✅ چک با موفقیت تایید شد');
+                closeModal('detailModal');
+                loadChecks();
+            } else {
+                alert('❌ خطا: ' + data.error);
+            }
+        } catch(error) {
+            alert('❌ خطا در ارتباط با سرور');
+        }
+    }
+
+    function rejectCheck(id) {
+        currentRejectId = id;
+        document.getElementById('rejectReason').value = '';
+        document.getElementById('rejectModal').style.display = 'flex';
+    }
+
+    async function confirmReject() {
+        const reason = document.getElementById('rejectReason').value.trim();
+        if (!reason) {
+            alert('لطفاً دلیل رد را وارد کنید');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/panel/admin/check/reject/${currentRejectId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ 'reason': reason, 'note': '' })
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert('❌ چک با موفقیت رد شد');
+                closeModal('rejectModal');
+                closeModal('detailModal');
+                loadChecks();
+            } else {
+                alert('❌ خطا: ' + data.error);
+            }
+        } catch(error) {
+            alert('❌ خطا در ارتباط با سرور');
+        }
+    }
+
+    async function finalizeCheck(id) {
+        if (!confirm('آیا از نهایی‌سازی این پرداخت اطمینان دارید؟')) return;
+
+        try {
+            const response = await fetch(`/panel/admin/check/finalize/${id}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert('🏁 پرداخت نهایی شد');
+                closeModal('detailModal');
+                loadChecks();
+            } else {
+                alert('❌ خطا: ' + data.error);
+            }
+        } catch(error) {
+            alert('❌ خطا در ارتباط با سرور');
+        }
+    }
+
+    // ===== عملیات گروهی =====
+    function bulkAction(action) {
+        const checked = document.querySelectorAll('.check-item:checked');
+        if (checked.length === 0) {
+            alert('لطفاً حداقل یک چک را انتخاب کنید');
+            return;
+        }
+
+        selectedChecks = Array.from(checked).map(cb => cb.value);
+        bulkActionType = action;
+
+        const modal = document.getElementById('bulkModal');
+        const title = document.getElementById('bulkTitle');
+        const message = document.getElementById('bulkMessage');
+        const reasonGroup = document.getElementById('bulkReasonGroup');
+        const confirmBtn = document.getElementById('bulkConfirmBtn');
+
+        if (action === 'verify') {
+            title.textContent = 'تایید گروهی چک‌ها';
+            message.textContent = `${selectedChecks.length} چک انتخاب شده تایید خواهند شد. آیا اطمینان دارید؟`;
+            reasonGroup.style.display = 'none';
+            confirmBtn.className = 'btn btn-success';
+            confirmBtn.textContent = '✅ تایید گروهی';
+        } else {
+            title.textContent = 'رد گروهی چک‌ها';
+            message.textContent = `${selectedChecks.length} چک انتخاب شده رد خواهند شد. لطفاً دلیل را وارد کنید.`;
+            reasonGroup.style.display = 'block';
+            document.getElementById('bulkReason').value = '';
+            confirmBtn.className = 'btn btn-danger';
+            confirmBtn.textContent = '❌ رد گروهی';
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    async function confirmBulk() {
+        if (selectedChecks.length === 0) {
+            alert('هیچ چکی انتخاب نشده است');
+            return;
+        }
+
+        const formData = new URLSearchParams();
+        selectedChecks.forEach(id => formData.append('check_ids[]', id));
+        formData.append('action', bulkActionType);
+
+        if (bulkActionType === 'reject') {
+            const reason = document.getElementById('bulkReason').value.trim();
+            if (!reason) {
+                alert('لطفاً دلیل رد را وارد کنید');
+                return;
+            }
+            formData.append('reason', reason);
+        }
+
+        try {
+            const response = await fetch('/panel/admin/check/bulk-action/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert(data.message);
+                closeModal('bulkModal');
+                loadChecks();
+            } else {
+                alert('❌ خطا: ' + data.error);
+            }
+        } catch(error) {
+            alert('❌ خطا در ارتباط با سرور');
+        }
+    }
+
+    // ===== Event Listeners =====
+    document.getElementById('filterStatus').addEventListener('change', applyFilters);
+    document.getElementById('filterSort').addEventListener('change', applyFilters);
+    document.getElementById('filterDateFrom').addEventListener('change', applyFilters);
+    document.getElementById('filterDateTo').addEventListener('change', applyFilters);
+
+    document.getElementById('searchInput').addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(applyFilters, 500);
+    });
+
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) this.style.display = 'none';
+        });
+    });
+
+    // ===== بارگذاری اولیه =====
+    document.addEventListener('DOMContentLoaded', loadChecks);
+
+    // ===== آپدیت خودکار هر 30 ثانیه =====
+    setInterval(loadChecks, 30000);
+</script>
+{% endblock %}
+
+

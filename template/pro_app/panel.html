@@ -1,0 +1,994 @@
+<!-- templates/pro_app/panel.html -->
+
+{% extends 'main_template.html' %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}سفارشات چاپی من{% endblock %}
+
+{% block content %}
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    .pro-orders-container {
+        max-width: 100%;
+        padding: 16px;
+        background: #f5f7fb;
+        min-height: 100vh;
+    }
+
+    .pro-orders-header {
+        margin-bottom: 20px;
+    }
+
+    .pro-orders-header h1 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #1a2c3e;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .pro-orders-header h1 i {
+        color: #8b5cf6;
+        font-size: 24px;
+    }
+
+    .pro-orders-header p {
+        font-size: 13px;
+        color: #6c7a8e;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 16px 12px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .stat-card i {
+        font-size: 28px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .stat-card .stat-value {
+        font-size: 22px;
+        font-weight: 800;
+        color: #1a2c3e;
+    }
+
+    .stat-card .stat-label {
+        font-size: 11px;
+        color: #8a99b0;
+        margin-top: 4px;
+    }
+
+    .stat-card.purple i { color: #8b5cf6; }
+    .stat-card.orange i { color: #f59e0b; }
+    .stat-card.blue i { color: #3b82f6; }
+    .stat-card.green i { color: #10b981; }
+    .stat-card.red i { color: #ef4444; }
+
+    .filters-bar {
+        background: white;
+        border-radius: 20px;
+        padding: 16px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .filter-row:last-child { margin-bottom: 0; }
+
+    .filter-select {
+        flex: 1;
+        min-width: 120px;
+        padding: 10px 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 13px;
+        background: #f8fafc;
+        color: #1a2c3e;
+    }
+
+    .filter-search {
+        flex: 2;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #f8fafc;
+    }
+
+    .filter-search input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 13px;
+    }
+
+    .filter-search i { color: #94a3b8; }
+
+    .reset-btn {
+        background: #f1f5f9;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #ef4444;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .reset-btn:hover { background: #fee2e2; }
+
+    .pro-orders-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .pro-order-card {
+        background: white;
+        border-radius: 20px;
+        padding: 16px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border: 1px solid #f0f2f5;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .order-number {
+        font-weight: 700;
+        font-size: 15px;
+        color: #1a2c3e;
+        background: #f1f5f9;
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-family: monospace;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .status-badge.pending { background: #fef3c7; color: #d97706; }
+    .status-badge.confirmed { background: #e0f2fe; color: #0284c7; }
+    .status-badge.processing { background: #eef2ff; color: #4f46e5; }
+    .status-badge.ready { background: #e8faf0; color: #10b981; }
+    .status-badge.delivered { background: #dcfce7; color: #16a34a; }
+    .status-badge.cancelled { background: #fef2f2; color: #ef4444; }
+
+    .design-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 30px;
+        font-size: 10px;
+        font-weight: 500;
+    }
+
+    .design-status-badge.pending_design { background: #fef3c7; color: #d97706; }
+    .design-status-badge.designing { background: #e0f2fe; color: #0284c7; }
+    .design-status-badge.ready_for_review { background: #eef2ff; color: #4f46e5; }
+    .design-status-badge.approved { background: #dcfce7; color: #16a34a; }
+    .design-status-badge.rejected { background: #fef2f2; color: #ef4444; }
+    .design-status-badge.finalized { background: #e8faf0; color: #10b981; }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .info-label {
+        font-size: 12px;
+        color: #8a99b0;
+    }
+
+    .info-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1a2c3e;
+    }
+
+    .amount-value {
+        font-size: 20px;
+        font-weight: 800;
+        color: #1a2c3e;
+    }
+
+    .amount-value small {
+        font-size: 11px;
+        font-weight: 400;
+        color: #8a99b0;
+    }
+
+    .dimension {
+        font-size: 12px;
+        color: #6c7a8e;
+        background: #f8fafc;
+        padding: 4px 10px;
+        border-radius: 20px;
+    }
+
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 12px;
+        border-top: 1px solid #f0f2f5;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .date-info {
+        font-size: 11px;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .detail-btn {
+        background: none;
+        border: none;
+        color: #8b5cf6;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 30px;
+    }
+
+    .detail-btn:hover { background: #f3e8ff; }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 24px;
+        flex-wrap: wrap;
+    }
+
+    .page-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        height: 38px;
+        padding: 0 12px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        color: #1a2c3e;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .page-link.active {
+        background: #8b5cf6;
+        border-color: #8b5cf6;
+        color: white;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 28px;
+        width: 95%;
+        max-width: 500px;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 20px;
+        border-bottom: 1px solid #f0f2f5;
+        position: sticky;
+        top: 0;
+        background: white;
+    }
+
+    .modal-header h3 {
+        font-size: 18px;
+        color: #1a2c3e;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .modal-close {
+        background: #f1f5f9;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+    .modal-body { padding: 20px; }
+
+    .detail-section {
+        margin-bottom: 20px;
+    }
+
+    .detail-section-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #8b5cf6;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border-right: 3px solid #8b5cf6;
+        padding-right: 10px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px dashed #f0f2f5;
+    }
+
+    .detail-label {
+        font-size: 12px;
+        color: #8a99b0;
+    }
+
+    .detail-value {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1a2c3e;
+    }
+
+    .plan-image {
+        width: 100%;
+        border-radius: 16px;
+        margin-top: 8px;
+        cursor: pointer;
+        border: 1px solid #e2e8f0;
+    }
+
+    .template-image {
+        width: 100%;
+        border-radius: 16px;
+        margin-top: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .review-item {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 10px;
+    }
+
+    .review-action.approve { color: #10b981; }
+    .review-action.reject { color: #ef4444; }
+    .review-message { font-size: 11px; color: #64748b; margin-top: 6px; }
+    .review-date { font-size: 10px; color: #94a3b8; margin-top: 6px; }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 14px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .action-btn.approve { background: #e8faf0; color: #10b981; }
+    .action-btn.reject { background: #fef2f2; color: #ef4444; }
+    .action-btn.cancel { background: #f1f5f9; color: #64748b; }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 24px;
+    }
+
+    .empty-state i {
+        font-size: 64px;
+        color: #cbd5e1;
+        margin-bottom: 16px;
+        display: block;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 40px;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #e2e8f0;
+        border-top-color: #8b5cf6;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        margin: 0 auto;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .toast-message {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        background: #1a2c3e;
+        color: white;
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-size: 13px;
+        text-align: center;
+        z-index: 1100;
+        animation: toastFade 3s ease forwards;
+    }
+
+    @keyframes toastFade {
+        0% { opacity: 0; transform: translateY(20px); }
+        10% { opacity: 1; transform: translateY(0); }
+        90% { opacity: 1; }
+        100% { opacity: 0; visibility: hidden; }
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+    .badge-ready { background: #e8faf0; color: #10b981; }
+    .badge-custom { background: #eef2ff; color: #4f46e5; }
+    .badge-pdf { background: #fef3c7; color: #d97706; }
+
+    @media (min-width: 768px) {
+        .pro-orders-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        .stats-grid {
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+        }
+        .filter-row {
+            flex-wrap: nowrap;
+        }
+    }
+</style>
+
+<div class="pro-orders-container">
+    <div class="pro-orders-header">
+        <h1><i class="fas fa-print"></i> سفارشات چاپی من</h1>
+        <p>مدیریت سفارشات طراحی و چاپ شما</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card purple"><i class="fas fa-chart-line"></i><div class="stat-value" id="statTotal">0</div><div class="stat-label">کل سفارشات</div></div>
+        <div class="stat-card orange"><i class="fas fa-clock"></i><div class="stat-value" id="statPending">0</div><div class="stat-label">در انتظار</div></div>
+        <div class="stat-card blue"><i class="fas fa-palette"></i><div class="stat-value" id="statNeedReview">0</div><div class="stat-label">نیاز به بررسی</div></div>
+        <div class="stat-card green"><i class="fas fa-check-circle"></i><div class="stat-value" id="statDelivered">0</div><div class="stat-label">تحویل شده</div></div>
+        <div class="stat-card red"><i class="fas fa-ban"></i><div class="stat-value" id="statCancelled">0</div><div class="stat-label">لغو شده</div></div>
+    </div>
+
+    <div class="filters-bar">
+        <div class="filter-row">
+            <select class="filter-select" id="statusFilter">
+                <option value="">همه وضعیت‌ها</option>
+                <option value="pending">⏳ در انتظار</option>
+                <option value="confirmed">✅ تأیید شده</option>
+                <option value="processing">⚙️ در حال ساخت</option>
+                <option value="ready">📦 آماده تحویل</option>
+                <option value="delivered">🚚 تحویل شده</option>
+                <option value="cancelled">❌ لغو شده</option>
+            </select>
+            <select class="filter-select" id="designStatusFilter">
+                <option value="">همه وضعیت طراحی</option>
+                <option value="pending_design">⏳ در انتظار طراحی</option>
+                <option value="designing">🎨 در حال طراحی</option>
+                <option value="ready_for_review">👀 آماده بررسی</option>
+                <option value="approved">✅ تأیید شده</option>
+                <option value="rejected">❌ رد شده</option>
+                <option value="finalized">🎯 نهایی شده</option>
+            </select>
+        </div>
+        <div class="filter-row">
+            <div class="filter-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="جستجوی شماره سفارش یا نام محصول...">
+            </div>
+            <button class="reset-btn" id="resetFilter"><i class="fas fa-undo-alt"></i> حذف</button>
+        </div>
+    </div>
+
+    <div id="ordersList" class="pro-orders-list">
+        <div class="loading"><div class="spinner"></div><p>در حال بارگذاری...</p></div>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+</div>
+
+<div id="orderModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-print"></i> جزئیات سفارش</h3>
+            <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" id="modalBody"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+</div>
+
+<script>
+    let currentPage = 1;
+    let currentFilters = {};
+
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+               document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+    }
+
+    function toJalali(dateStr) {
+        if (!dateStr) return '-';
+        try {
+            const date = new Date(dateStr);
+            return new Intl.DateTimeFormat('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
+        } catch { return dateStr; }
+    }
+
+    function formatPrice(price) {
+        if (!price && price !== 0) return '۰';
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    function getDesignTypeBadge(type) {
+        if (type === 'ready') return '<span class="badge badge-ready"><i class="fas fa-check-circle"></i> طرح آماده</span>';
+        if (type === 'custom') return '<span class="badge badge-custom"><i class="fas fa-pen-fancy"></i> طراحی اختصاصی</span>';
+        if (type === 'pdf') return '<span class="badge badge-pdf"><i class="fas fa-file-pdf"></i> بر اساس PDF</span>';
+        return '';
+    }
+
+    async function loadOrders() {
+        const params = new URLSearchParams({ page: currentPage, ...currentFilters });
+        const apiUrl = `/pro/panel/api/user/pro-orders/list22/?${params}`;
+
+        try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                document.getElementById('statTotal').innerText = data.stats.total || 0;
+                document.getElementById('statPending').innerText = data.stats.pending || 0;
+                document.getElementById('statNeedReview').innerText = data.stats.ready_for_review || 0;
+                document.getElementById('statDelivered').innerText = data.stats.delivered || 0;
+                document.getElementById('statCancelled').innerText = data.stats.cancelled || 0;
+
+                const ordersContainer = document.getElementById('ordersList');
+
+                if (data.orders && data.orders.length > 0) {
+                    let html = '';
+                    for (let i = 0; i < data.orders.length; i++) {
+                        const order = data.orders[i];
+                        const statusMap = {
+                            'pending': '⏳ در انتظار', 'confirmed': '✅ تأیید شده',
+                            'processing': '⚙️ در حال ساخت', 'ready': '📦 آماده تحویل',
+                            'delivered': '🚚 تحویل شده', 'cancelled': '❌ لغو شده'
+                        };
+                        const statusText = statusMap[order.status] || order.status;
+                        const designStatusText = order.design_status?.status_display || '';
+                        const designStatusClass = order.design_status?.status || '';
+                        const instTitle = order.installation?.title || '-';
+                        const lengthVal = order.length || 0;
+                        const widthVal = order.width || 0;
+                        const areaVal = (lengthVal * widthVal).toFixed(2);
+                        const priceVal = order.total_price || 0;
+
+                        html += `
+                            <div class="pro-order-card">
+                                <div class="card-header">
+                                    <span class="order-number">#${order.order_number || '---'}</span>
+                                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                        <span class="status-badge ${order.status}">${statusText}</span>
+                                        ${designStatusText ? `<span class="design-status-badge ${designStatusClass}">${designStatusText}</span>` : ''}
+                                    </div>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">محصول</span>
+                                    <span class="info-value">${instTitle}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">ابعاد</span>
+                                    <span class="dimension">${lengthVal} × ${widthVal} متر (${areaVal} متر مربع)</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="amount-value">${formatPrice(priceVal)}<small> تومان</small></span>
+                                </div>
+                                <div class="card-footer">
+                                    <span class="date-info"><i class="fas fa-calendar-alt"></i> ${toJalali(order.created_at)}</span>
+                                    <button class="detail-btn" onclick="showOrderDetail('${order.id}')">جزئیات <i class="fas fa-chevron-left"></i></button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    ordersContainer.innerHTML = html;
+                } else {
+                    ordersContainer.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><h4>هیچ سفارشی یافت نشد</h4><p>شما هنوز سفارش چاپی ثبت نکرده‌اید</p></div>';
+                }
+
+                const pagination = data.pagination;
+                const paginationContainer = document.getElementById('pagination');
+                if (pagination && pagination.total_pages > 1) {
+                    let pageHtml = '';
+                    if (pagination.has_previous) {
+                        pageHtml += `<span class="page-link" onclick="goToPage(${pagination.current_page - 1})">قبلی</span>`;
+                    }
+                    for (let i = 1; i <= pagination.total_pages; i++) {
+                        pageHtml += `<span class="page-link ${i === pagination.current_page ? 'active' : ''}" onclick="goToPage(${i})">${i}</span>`;
+                    }
+                    if (pagination.has_next) {
+                        pageHtml += `<span class="page-link" onclick="goToPage(${pagination.current_page + 1})">بعدی</span>`;
+                    }
+                    paginationContainer.innerHTML = pageHtml;
+                } else {
+                    paginationContainer.innerHTML = '';
+                }
+            } else {
+                document.getElementById('ordersList').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h4>خطا در بارگذاری</h4></div>';
+            }
+        } catch(e) {
+            console.error('خطا:', e);
+            document.getElementById('ordersList').innerHTML = '<div class="empty-state"><i class="fas fa-wifi"></i><h4>خطا در ارتباط با سرور</h4></div>';
+        }
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        loadOrders();
+    }
+
+    function applyFilters() {
+        currentFilters = {
+            status: document.getElementById('statusFilter').value,
+            design_status: document.getElementById('designStatusFilter').value,
+            search: document.getElementById('searchInput').value
+        };
+        Object.keys(currentFilters).forEach(k => { if (!currentFilters[k]) delete currentFilters[k]; });
+        currentPage = 1;
+        loadOrders();
+    }
+
+    function resetFilters() {
+        document.getElementById('statusFilter').value = '';
+        document.getElementById('designStatusFilter').value = '';
+        document.getElementById('searchInput').value = '';
+        currentFilters = {};
+        currentPage = 1;
+        loadOrders();
+    }
+
+    async function showOrderDetail(orderId) {
+        const modal = document.getElementById('orderModal');
+        const modalBody = document.getElementById('modalBody');
+        modal.style.display = 'flex';
+        modalBody.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+        try {
+            const response = await fetch(`/pro/panel/api/user/pro-orders/${orderId}/`);
+            const data = await response.json();
+            if (data.status === 'success') {
+                renderOrderDetail(data.order);
+            } else {
+                modalBody.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h4>خطا</h4><p>${data.message || 'خطا در دریافت اطلاعات'}</p></div>`;
+            }
+        } catch(e) {
+            modalBody.innerHTML = '<div class="empty-state"><i class="fas fa-wifi"></i><h4>خطا در ارتباط</h4></div>';
+        }
+    }
+
+    function renderOrderDetail(order) {
+        const designStatus = order.design_status;
+        const canReview = designStatus?.status === 'ready_for_review';
+        const canCancel = order.status === 'pending' || order.status === 'confirmed';
+        const statusMap = {
+            'pending': '⏳ در انتظار', 'confirmed': '✅ تأیید شده',
+            'processing': '⚙️ در حال ساخت', 'ready': '📦 آماده تحویل',
+            'delivered': '🚚 تحویل شده', 'cancelled': '❌ لغو شده'
+        };
+        const statusText = statusMap[order.status] || order.status;
+
+        let templateHtml = '';
+        if (order.ready_template) {
+            templateHtml = `
+                <div class="detail-section">
+                    <div class="detail-section-title"><i class="fas fa-image"></i> طرح آماده</div>
+                    <div class="detail-row"><span class="detail-label">عنوان طرح:</span><span class="detail-value">${order.ready_template.title || '-'}</span></div>
+                    <div class="detail-row"><span class="detail-label">ابعاد طرح:</span><span class="detail-value">${order.ready_template.width || '-'} × ${order.ready_template.height || '-'} سانتی‌متر</span></div>
+                    ${order.ready_template.image ? `<img src="${order.ready_template.image}" class="template-image" onclick="window.open(this.src)">` : ''}
+                </div>
+            `;
+        }
+
+        let pdfHtml = '';
+        if (order.pdf_document) {
+            pdfHtml = `
+                <div class="detail-section">
+                    <div class="detail-section-title"><i class="fas fa-file-pdf"></i> PDF انتخابی</div>
+                    <div class="detail-row"><span class="detail-label">عنوان:</span><span class="detail-value">${order.pdf_document.title || '-'}</span></div>
+                    <div class="detail-row"><span class="detail-label">کد:</span><span class="detail-value">${order.pdf_document.code || '-'}</span></div>
+                    ${order.pdf_document.thumbnail ? `<img src="${order.pdf_document.thumbnail}" class="template-image" onclick="window.open(this.src)">` : ''}
+                    ${order.pdf_document.pdf_url ? `<div class="detail-row"><a href="${order.pdf_document.pdf_url}" target="_blank" class="action-btn approve" style="text-decoration:none; margin-top:8px;"><i class="fas fa-download"></i> دانلود PDF</a></div>` : ''}
+                </div>
+            `;
+        }
+
+        let planHtml = '';
+        if (order.plan_image) {
+            planHtml = `
+                <div class="detail-section">
+                    <div class="detail-section-title"><i class="fas fa-drafting-compass"></i> پلن آپلود شده</div>
+                    <img src="${order.plan_image}" class="plan-image" onclick="window.open(this.src)">
+                </div>
+            `;
+        }
+
+        let notesHtml = '';
+        if (order.notes) {
+            notesHtml = `
+                <div class="detail-section">
+                    <div class="detail-section-title"><i class="fas fa-pencil-alt"></i> توضیحات مشتری</div>
+                    <div class="detail-value" style="background:#f8fafc; padding:10px; border-radius:12px;">${order.notes}</div>
+                </div>
+            `;
+        }
+
+        let reviewHtml = '';
+        if (order.review_history && order.review_history.length > 0) {
+            reviewHtml = `
+                <div class="detail-section">
+                    <div class="detail-section-title"><i class="fas fa-history"></i> تاریخچه</div>
+                    ${order.review_history.map(r => `
+                        <div class="review-item">
+                            <div class="review-action ${r.action === 'user_approve' ? 'approve' : 'reject'}">
+                                <i class="fas ${r.action === 'user_approve' ? 'fa-check-circle' : 'fa-times-circle'}"></i> ${r.action_display || r.action}
+                            </div>
+                            ${r.message ? `<div class="review-message">${r.message}</div>` : ''}
+                            <div class="review-date">${toJalali(r.created_at)}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        let operatorMessageHtml = '';
+        if (designStatus?.operator_message) {
+            operatorMessageHtml = `
+                <div class="detail-section">
+                    <div class="detail-section-title"><i class="fas fa-comment"></i> پیام اپراتور</div>
+                    <div class="detail-value" style="background:#f8fafc; padding:10px; border-radius:12px;">${designStatus.operator_message}</div>
+                </div>
+            `;
+        }
+
+        let finalImageHtml = '';
+        if (designStatus?.final_design_image) {
+            finalImageHtml = `
+                <div class="detail-section">
+                    <div class="detail-section-title"><i class="fas fa-check-circle"></i> تصویر نهایی طراحی</div>
+                    <img src="${designStatus.final_design_image}" class="plan-image" onclick="window.open(this.src)">
+                </div>
+            `;
+        }
+
+        modalBody.innerHTML = `
+            <div class="detail-section">
+                <div class="detail-section-title"><i class="fas fa-info-circle"></i> اطلاعات پایه</div>
+                <div class="detail-row"><span class="detail-label">شماره سفارش:</span><span class="detail-value">${order.order_number || '---'}</span></div>
+                <div class="detail-row"><span class="detail-label">وضعیت:</span><span class="detail-value">${statusText}</span></div>
+                <div class="detail-row"><span class="detail-label">وضعیت طراحی:</span><span class="detail-value">${designStatus?.status_display || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">نوع طراحی:</span><span class="detail-value">${getDesignTypeBadge(order.design_type)}</span></div>
+                <div class="detail-row"><span class="detail-label">تاریخ ثبت:</span><span class="detail-value">${toJalali(order.created_at)}</span></div>
+            </div>
+
+            <div class="detail-section">
+                <div class="detail-section-title"><i class="fas fa-cube"></i> مشخصات محصول</div>
+                <div class="detail-row"><span class="detail-label">نصبیات:</span><span class="detail-value">${order.installation?.title || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">جنس:</span><span class="detail-value">${order.material?.title || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">ابعاد:</span><span class="detail-value">${order.length || 0} × ${order.width || 0} متر</span></div>
+                <div class="detail-row"><span class="detail-label">مساحت:</span><span class="detail-value">${((order.length || 0) * (order.width || 0)).toFixed(2)} متر مربع</span></div>
+            </div>
+
+            ${templateHtml}
+            ${pdfHtml}
+            ${planHtml}
+
+            <div class="detail-section">
+                <div class="detail-section-title"><i class="fas fa-credit-card"></i> اطلاعات مالی</div>
+                <div class="detail-row"><span class="detail-label">مبلغ کل:</span><span class="detail-value" style="color:#8b5cf6; font-size:18px;">${formatPrice(order.total_price)} تومان</span></div>
+            </div>
+
+            ${operatorMessageHtml}
+            ${finalImageHtml}
+            ${notesHtml}
+            ${reviewHtml}
+
+            <div class="action-buttons">
+                ${canReview ? `
+                    <button class="action-btn approve" onclick="approveDesign('${order.id}')"><i class="fas fa-check"></i> تایید طراحی</button>
+                    <button class="action-btn reject" onclick="showRejectInput('${order.id}')"><i class="fas fa-times"></i> رد طراحی</button>
+                ` : ''}
+                ${canCancel ? `<button class="action-btn cancel" onclick="cancelOrder('${order.id}')"><i class="fas fa-ban"></i> لغو سفارش</button>` : ''}
+            </div>
+            <div id="rejectInput" style="display:none; margin-top:16px;">
+                <textarea id="rejectMessage" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:12px;" rows="3" placeholder="لطفاً دلیل رد را وارد کنید..."></textarea>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button class="action-btn approve" style="flex:1;" onclick="confirmReject('${order.id}')">تأیید</button>
+                    <button class="action-btn cancel" style="flex:1;" onclick="hideRejectInput()">انصراف</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function showRejectInput(orderId) {
+        document.getElementById('rejectInput').style.display = 'block';
+        window.currentRejectOrderId = orderId;
+    }
+
+    function hideRejectInput() {
+        document.getElementById('rejectInput').style.display = 'none';
+        document.getElementById('rejectMessage').value = '';
+    }
+
+    async function confirmReject(orderId) {
+        const message = document.getElementById('rejectMessage')?.value;
+        if (!message?.trim()) { showToast('لطفاً دلیل رد را وارد کنید'); return; }
+        await rejectDesign(orderId, message);
+        hideRejectInput();
+    }
+
+    async function approveDesign(orderId) {
+        if (!confirm('آیا از تایید این طراحی اطمینان دارید؟')) return;
+        try {
+            const response = await fetch('/pro/panel/api/user/pro-orders/approve-design/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                body: JSON.stringify({ order_id: orderId })
+            });
+            const data = await response.json();
+            showToast(data.message);
+            if (data.status === 'success') { closeModal(); loadOrders(); }
+        } catch(e) { showToast('خطا در ارتباط با سرور'); }
+    }
+
+    async function rejectDesign(orderId, message) {
+        try {
+            const response = await fetch('/pro/panel/api/user/pro-orders/reject-design/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                body: JSON.stringify({ order_id: orderId, message: message })
+            });
+            const data = await response.json();
+            showToast(data.message);
+            if (data.status === 'success') { closeModal(); loadOrders(); }
+        } catch(e) { showToast('خطا در ارتباط با سرور'); }
+    }
+
+    async function cancelOrder(orderId) {
+        if (!confirm('آیا از لغو این سفارش اطمینان دارید؟')) return;
+        const reason = prompt('لطفاً دلیل لغو سفارش را وارد کنید:');
+        try {
+            const response = await fetch('/pro/panel/api/user/pro-orders/cancel/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                body: JSON.stringify({ order_id: orderId, reason: reason || '' })
+            });
+            const data = await response.json();
+            showToast(data.message);
+            if (data.status === 'success') { closeModal(); loadOrders(); }
+        } catch(e) { showToast('خطا در ارتباط با سرور'); }
+    }
+
+    function showToast(message) {
+        const existing = document.querySelector('.toast-message');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.className = 'toast-message';
+        toast.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
+
+    document.getElementById('statusFilter')?.addEventListener('change', applyFilters);
+    document.getElementById('designStatusFilter')?.addEventListener('change', applyFilters);
+    document.getElementById('searchInput')?.addEventListener('keypress', e => { if (e.key === 'Enter') applyFilters(); });
+    document.getElementById('resetFilter')?.addEventListener('click', resetFilters);
+
+    window.onclick = function(e) { if (e.target === document.getElementById('orderModal')) closeModal(); };
+
+    loadOrders();
+    setInterval(loadOrders, 30000);
+</script>
+{% endblock %}

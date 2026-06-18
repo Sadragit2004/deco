@@ -1,0 +1,1356 @@
+{% extends 'admin_template.html' %}
+{% load humanize %}
+
+{% block title %}داشبورد مدیریت{% endblock %}
+
+{% block mobile_dashboard %}
+<style>
+/* ============================================
+   استایل‌های موبایل - بهبود یافته
+   ============================================ */
+
+.mobile-dashboard * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.mobile-dashboard {
+    font-family: 'Vazirmatn', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(180deg, #0f0c29 0%, #1a1a3e 100%);
+    min-height: 100vh;
+    padding: 16px;
+    direction: rtl;
+}
+
+/* کارت‌های آمار */
+.stats-grid-mobile {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat-card-mobile {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 16px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(102, 126, 234, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card-mobile::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.stat-card-mobile:active {
+    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.stat-card-mobile:active::before {
+    opacity: 1;
+}
+
+.stat-info-mobile h4 {
+    font-size: 12px;
+    color: #a0aec0;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.stat-info-mobile h4 i {
+    font-size: 11px;
+    color: #667eea;
+}
+
+.stat-number-mobile {
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+    direction: ltr;
+    display: inline-block;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+}
+
+.stat-info-mobile small {
+    font-size: 10px;
+    display: block;
+    margin-top: 4px;
+}
+
+.stat-icon-mobile i {
+    font-size: 40px;
+    opacity: 0.2;
+    color: #667eea;
+}
+
+/* کارت‌های نمودار */
+.chart-card-mobile {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    transition: all 0.3s;
+}
+
+.chart-card-mobile h3 {
+    color: #fff;
+    font-size: 14px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.chart-card-mobile h3 i {
+    font-size: 16px;
+}
+
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+/* کاربران آنلاین */
+.online-users-scroll {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+
+.online-user-avatar-mobile {
+    width: 55px;
+    height: 55px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 6px;
+    border: 2px solid rgba(102, 126, 234, 0.5);
+    transition: all 0.3s;
+}
+
+.online-user-avatar-mobile:active {
+    transform: scale(0.95);
+}
+
+/* تب‌ها */
+.mobile-tabs {
+    display: flex;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 50px;
+    padding: 4px;
+    margin-bottom: 20px;
+    gap: 4px;
+}
+
+.mobile-tab-btn {
+    flex: 1;
+    padding: 12px 0;
+    border: none;
+    background: transparent;
+    color: #a0aec0;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.mobile-tab-btn i {
+    font-size: 14px;
+}
+
+.mobile-tab-btn.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* لیست آیتم‌ها */
+.mobile-list-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    transition: all 0.2s;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.mobile-list-item:active {
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(0.99);
+}
+
+.item-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 6px;
+}
+
+.item-sub {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-bottom: 4px;
+    direction: ltr;
+}
+
+/* نشانگرها */
+.badge-mobile {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 30px;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.badge-success {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+.badge-warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+.badge-info-mobile {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 30px;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+/* دکمه حذف */
+.delete-btn-mobile {
+    background: rgba(239, 68, 68, 0.2);
+    border: none;
+    padding: 5px 10px;
+    border-radius: 10px;
+    color: #ef4444;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.delete-btn-mobile:active {
+    background: rgba(239, 68, 68, 0.4);
+    transform: scale(0.95);
+}
+
+/* فیلترها */
+.filter-input-mobile {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 12px;
+    padding: 10px 12px;
+    color: white;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.filter-input-mobile:focus {
+    border-color: #667eea;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.filter-input-mobile::placeholder {
+    color: #64748b;
+}
+
+select.filter-input-mobile option {
+    background: #1e293b;
+    color: white;
+}
+
+.filters-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.btn-primary-mobile {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    padding: 10px 16px;
+    border-radius: 12px;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary-mobile:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+}
+
+/* مودال */
+.modal-mobile {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(12px);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal-content-mobile {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border-radius: 28px;
+    padding: 24px;
+    width: 100%;
+    max-width: 350px;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-content-mobile h3 {
+    color: #fff;
+    font-size: 18px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.modal-row-mobile {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.15);
+}
+
+.modal-label-mobile {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.modal-value-mobile {
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* لودینگ */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+}
+
+.loading::after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #667eea;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
+
+<div id="mobileDashboard" class="page-mobile active-page mobile-dashboard">
+    <!-- کارت‌های آمار -->
+    <div class="stats-grid-mobile">
+        <div class="stat-card-mobile" onclick="openMobileUserModal()">
+            <div class="stat-info-mobile">
+                <h4><i class="fas fa-users"></i> کاربران</h4>
+                <div class="stat-number-mobile" id="mobileStatTotalUsers">-</div>
+                <small style="color:#34d399;"><i class="fas fa-circle"></i> آنلاین: <span id="mobileStatOnlineUsers">-</span></small>
+            </div>
+            <div class="stat-icon-mobile"><i class="fas fa-user-friends"></i></div>
+        </div>
+        <div class="stat-card-mobile" onclick="openMobileOrderModal()">
+            <div class="stat-info-mobile">
+                <h4><i class="fas fa-shopping-cart"></i> سفارشات</h4>
+                <div class="stat-number-mobile" id="mobileStatPaidOrders">-</div>
+                <small style="color:#fbbf24;"><i class="fas fa-calendar-day"></i> امروز: <span id="mobileStatTodayOrders">-</span></small>
+            </div>
+            <div class="stat-icon-mobile"><i class="fas fa-credit-card"></i></div>
+        </div>
+        <div class="stat-card-mobile" onclick="openMobilePrintModal()">
+            <div class="stat-info-mobile">
+                <h4><i class="fas fa-print"></i> چاپی</h4>
+                <div class="stat-number-mobile" id="mobileStatTotalPrint">-</div>
+                <small style="color:#fbbf24;"><i class="fas fa-calendar-day"></i> امروز: <span id="mobileStatTodayPrint">-</span></small>
+            </div>
+            <div class="stat-icon-mobile"><i class="fas fa-print"></i></div>
+        </div>
+        <div class="stat-card-mobile">
+            <div class="stat-info-mobile">
+                <h4><i class="fas fa-coins"></i> درآمد</h4>
+                <div class="stat-number-mobile" id="mobileStatTotalIncome">-</div>
+                <small style="color:#fbbf24;"><i class="fas fa-calendar-day"></i> امروز: <span id="mobileStatTodayIncome">-</span></small>
+            </div>
+            <div class="stat-icon-mobile"><i class="fas fa-chart-line"></i></div>
+        </div>
+    </div>
+
+    <!-- نمودارها -->
+    <div class="chart-card-mobile">
+        <h3><i class="fas fa-chart-line" style="color:#667eea;"></i> رشد کاربران</h3>
+        <canvas id="mobileUsersChart" width="400" height="180"></canvas>
+    </div>
+    <div class="chart-card-mobile">
+        <h3><i class="fas fa-chart-bar" style="color:#764ba2;"></i> فروش ماهانه</h3>
+        <canvas id="mobileSalesChart" width="400" height="180"></canvas>
+    </div>
+
+    <!-- کاربران آنلاین -->
+    <div class="chart-card-mobile">
+        <h3><i class="fas fa-circle" style="color:#10b981;"></i> کاربران آنلاین</h3>
+        <div class="online-users-scroll" id="mobileOnlineUsersList"></div>
+    </div>
+
+    <!-- تب‌ها -->
+    <div class="mobile-tabs">
+        <button class="mobile-tab-btn active" data-mobile-tab="users"><i class="fas fa-users"></i> کاربران</button>
+        <button class="mobile-tab-btn" data-mobile-tab="orders"><i class="fas fa-shopping-cart"></i> سفارشات</button>
+        <button class="mobile-tab-btn" data-mobile-tab="payments"><i class="fas fa-credit-card"></i> پرداخت‌ها</button>
+    </div>
+
+    <!-- لیست کاربران موبایل -->
+    <div id="mobileUsersList" class="mobile-tab-content active-tab">
+        <div class="loading">در حال بارگذاری...</div>
+    </div>
+
+    <!-- لیست سفارشات موبایل -->
+    <div id="mobileOrdersList" class="mobile-tab-content" style="display:none;">
+        <div class="loading">در حال بارگذاری...</div>
+    </div>
+
+    <!-- لیست پرداخت‌ها موبایل -->
+    <div id="mobilePaymentsList" class="mobile-tab-content" style="display:none;">
+        <div class="loading">در حال بارگذاری...</div>
+    </div>
+</div>
+
+<!-- مودال‌های موبایل -->
+<div id="mobileUserModal" class="modal-mobile">
+    <div class="modal-content-mobile">
+        <h3><i class="fas fa-users"></i> آمار کاربران</h3>
+        <div class="modal-row-mobile"><span class="modal-label-mobile">کل کاربران:</span><span class="modal-value-mobile" id="mobileModalTotalUsers">-</span></div>
+        <div class="modal-row-mobile"><span class="modal-label-mobile">آنلاین:</span><span class="modal-value-mobile" style="color:#34d399;" id="mobileModalOnlineUsers">-</span></div>
+        <div class="modal-row-mobile"><span class="modal-label-mobile">آفلاین:</span><span class="modal-value-mobile" style="color:#fbbf24;" id="mobileModalOfflineUsers">-</span></div>
+        <div class="modal-row-mobile"><span class="modal-label-mobile">ثبت نام امروز:</span><span class="modal-value-mobile" style="color:#10b981;" id="mobileModalTodayUsers">-</span></div>
+        <button class="btn-primary-mobile" onclick="closeMobileModal('mobileUserModal')" style="margin-top:20px;">بستن</button>
+    </div>
+</div>
+
+<div id="mobileOrderModal" class="modal-mobile">
+    <div class="modal-content-mobile">
+        <h3><i class="fas fa-shopping-cart"></i> آمار سفارشات</h3>
+        <div class="modal-row-mobile"><span class="modal-label-mobile">پرداخت شده:</span><span class="modal-value-mobile" style="color:#10b981;" id="mobileModalPaidOrders">-</span></div>
+        <div class="modal-row-mobile"><span class="modal-label-mobile">در انتظار:</span><span class="modal-value-mobile" style="color:#fbbf24;" id="mobileModalPendingOrders">-</span></div>
+        <div class="modal-row-mobile"><span class="modal-label-mobile">در حال ارسال:</span><span class="modal-value-mobile" style="color:#60a5fa;" id="mobileModalShippingOrders">-</span></div>
+        <div class="modal-row-mobile"><span class="modal-label-mobile">تحویل شده:</span><span class="modal-value-mobile" style="color:#34d399;" id="mobileModalDeliveredOrders">-</span></div>
+        <div class="modal-row-mobile"><span class="modal-label-mobile">سفارشات امروز:</span><span class="modal-value-mobile" style="color:#10b981;" id="mobileModalTodayOrders">-</span></div>
+        <button class="btn-primary-mobile" onclick="closeMobileModal('mobileOrderModal')" style="margin-top:20px;">بستن</button>
+    </div>
+</div>
+
+<div id="mobilePrintModal" class="modal-mobile">
+    <div class="modal-content-mobile">
+        <h3><i class="fas fa-print"></i> آمار سفارشات چاپی</h3>
+        <div class="modal-row-mobile"><span class="modal-label-mobile">کل سفارشات:</span><span class="modal-value-mobile" id="mobileModalTotalPrint">-</span></div>
+        <div class="modal-row-mobile"><span class="modal-label-mobile">در انتظار:</span><span class="modal-value-mobile" style="color:#fbbf24;" id="mobileModalPrintPending">-</span></div>
+        <div class="modal-row-mobile"><span class="modal-label-mobile">تایید شده:</span><span class="modal-value-mobile" style="color:#10b981;" id="mobileModalPrintConfirmed">-</span></div>
+        <div class="modal-row-mobile"><span class="modal-label-mobile">در حال ساخت:</span><span class="modal-value-mobile" style="color:#60a5fa;" id="mobileModalPrintProcessing">-</span></div>
+        <div class="modal-row-mobile"><span class="modal-label-mobile">امروز:</span><span class="modal-value-mobile" style="color:#10b981;" id="mobileModalTodayPrint">-</span></div>
+        <button class="btn-primary-mobile" onclick="closeMobileModal('mobilePrintModal')" style="margin-top:20px;">بستن</button>
+    </div>
+</div>
+
+<script>
+    let mobileUsersChart = null, mobileSalesChart = null;
+    let mobileOrdersFullData = [];
+    let mobileUsersFullData = [];
+
+    function formatNumber(num) {
+        if(num === undefined || num === null) return '۰';
+        return new Intl.NumberFormat('fa-IR').format(num);
+    }
+
+    function openMobileUserModal() { document.getElementById('mobileUserModal').style.display = 'flex'; }
+    function openMobileOrderModal() { document.getElementById('mobileOrderModal').style.display = 'flex'; }
+    function openMobilePrintModal() { document.getElementById('mobilePrintModal').style.display = 'flex'; }
+    function closeMobileModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // فیلتر سفارشات موبایل
+    function filterMobileOrders() {
+        const search = document.getElementById('mobileSearchOrder')?.value?.toLowerCase() || '';
+        const status = document.getElementById('mobileOrderStatus')?.value || '';
+
+        let filtered = [...mobileOrdersFullData];
+
+        if(search) {
+            filtered = filtered.filter(o => o.order_number?.toLowerCase().includes(search));
+        }
+
+        if(status) {
+            filtered = filtered.filter(o => o.status === status);
+        }
+
+        renderMobileOrders(filtered);
+    }
+
+    function renderMobileOrders(orders) {
+        const container = document.getElementById('mobileOrdersContainer');
+        if(!container) return;
+
+        if(orders.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:40px; color:#64748b;">هیچ سفارشی یافت نشد</div>';
+            return;
+        }
+
+        container.innerHTML = orders.map(o => `
+            <div class="mobile-list-item">
+                <div>
+                    <div class="item-title">#${o.order_number}</div>
+                    <div class="item-sub">${o.customer_name}</div>
+                    <div class="item-sub" dir="ltr">${formatNumber(o.total)} تومان</div>
+                    <div class="item-sub" dir="ltr">${o.created_at || '-'}</div>
+                    ${o.receipt_image ? `<a href="${o.receipt_image}" target="_blank" style="color:#60a5fa; font-size:0.7rem;"><i class="fas fa-image"></i> رسید</a>` : ''}
+                </div>
+                <div style="text-align:left;">
+                    <span class="badge-mobile badge-success">${o.status_display}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // فیلتر کاربران موبایل
+    function filterMobileUsers() {
+        const search = document.getElementById('mobileSearchUser')?.value?.toLowerCase() || '';
+
+        let filtered = [...mobileUsersFullData];
+
+        if(search) {
+            filtered = filtered.filter(u =>
+                u.name?.toLowerCase().includes(search) ||
+                u.mobile_number?.includes(search) ||
+                u.email?.toLowerCase().includes(search)
+            );
+        }
+
+        renderMobileUsers(filtered);
+    }
+
+    function renderMobileUsers(users) {
+        const container = document.getElementById('mobileUsersListContainer');
+        if(!container) return;
+
+        if(users.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:40px; color:#64748b;">هیچ کاربری یافت نشد</div>';
+            return;
+        }
+
+        container.innerHTML = users.map(u => `
+            <div class="mobile-list-item">
+                <div>
+                    <div class="item-title">${u.name}</div>
+                    <div class="item-sub" dir="ltr">${u.mobile_number}</div>
+                    <div class="item-sub">${u.email || '---'}</div>
+                    <div class="item-sub">${u.created_at || '-'}</div>
+                </div>
+                <div style="text-align:left;">
+                    <span class="badge-mobile ${u.online ? 'badge-success' : 'badge-warning'}">${u.online ? 'آنلاین' : 'آفلاین'}</span>
+                    <button class="delete-btn-mobile" onclick="deleteMobileUser('${u.id}')" style="display:block; margin-top:8px;"><i class="fas fa-trash-alt"></i> حذف</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function loadMobileDashboardData() {
+        try {
+            const response = await fetch('/panel/api/dashboard/');
+            const data = await response.json();
+            if(data.status === 'success') {
+                // آمارها
+                document.getElementById('mobileStatTotalUsers').innerText = formatNumber(data.users.total);
+                document.getElementById('mobileStatOnlineUsers').innerText = formatNumber(data.users.online);
+                document.getElementById('mobileStatPaidOrders').innerText = formatNumber(data.orders.paid);
+                document.getElementById('mobileStatTodayOrders').innerText = formatNumber(data.orders.today);
+                document.getElementById('mobileStatTotalPrint').innerText = formatNumber(data.print_orders.total);
+                document.getElementById('mobileStatTodayPrint').innerText = formatNumber(data.print_orders.today);
+                document.getElementById('mobileStatTotalIncome').innerText = data.income.total_display;
+                document.getElementById('mobileStatTodayIncome').innerText = data.income.today_display;
+
+                // مودال‌ها
+                document.getElementById('mobileModalTotalUsers').innerText = formatNumber(data.users.total);
+                document.getElementById('mobileModalOnlineUsers').innerText = formatNumber(data.users.online);
+                document.getElementById('mobileModalOfflineUsers').innerText = formatNumber(data.users.offline);
+                document.getElementById('mobileModalTodayUsers').innerText = formatNumber(data.users.today);
+                document.getElementById('mobileModalPaidOrders').innerText = formatNumber(data.orders.paid);
+                document.getElementById('mobileModalPendingOrders').innerText = formatNumber(data.orders.pending);
+                document.getElementById('mobileModalShippingOrders').innerText = formatNumber(data.orders.shipping);
+                document.getElementById('mobileModalDeliveredOrders').innerText = formatNumber(data.orders.delivered);
+                document.getElementById('mobileModalTodayOrders').innerText = formatNumber(data.orders.today);
+                document.getElementById('mobileModalTotalPrint').innerText = formatNumber(data.print_orders.total);
+                document.getElementById('mobileModalPrintPending').innerText = formatNumber(data.print_orders.pending);
+                document.getElementById('mobileModalPrintConfirmed').innerText = formatNumber(data.print_orders.confirmed);
+                document.getElementById('mobileModalPrintProcessing').innerText = formatNumber(data.print_orders.processing);
+                document.getElementById('mobileModalTodayPrint').innerText = formatNumber(data.print_orders.today);
+
+                // کاربران آنلاین
+                const onlineDiv = document.getElementById('mobileOnlineUsersList');
+                if(data.users.online_list && data.users.online_list.length) {
+                    onlineDiv.innerHTML = data.users.online_list.map(u => `
+                        <div style="text-align:center; display:inline-block;">
+                            <div class="online-user-avatar-mobile">${u.name.charAt(0)}</div>
+                            <div style="color:#e2e8f0; font-size:0.7rem;">${u.name}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    onlineDiv.innerHTML = '<span style="color:#64748b;">هیچ کاربر آنلاینی وجود ندارد</span>';
+                }
+
+                // ذخیره داده‌ها برای فیلتر
+                mobileUsersFullData = data.users.list;
+                mobileOrdersFullData = data.orders.list;
+
+                // لیست کاربران موبایل
+                document.getElementById('mobileUsersList').innerHTML = `
+                    <div style="margin-bottom:12px;">
+                        <input type="text" id="mobileSearchUser" placeholder="جستجوی کاربر (نام، موبایل، ایمیل)..." class="filter-input-mobile" style="width:100%;" onkeyup="filterMobileUsers()">
+                    </div>
+                    <div id="mobileUsersListContainer"></div>
+                `;
+                renderMobileUsers(mobileUsersFullData);
+
+                // لیست سفارشات موبایل
+                document.getElementById('mobileOrdersList').innerHTML = `
+                    <div class="filters-mobile">
+                        <input type="text" id="mobileSearchOrder" placeholder="جستجوی شماره سفارش..." class="filter-input-mobile" onkeyup="filterMobileOrders()">
+                        <select id="mobileOrderStatus" class="filter-input-mobile" onchange="filterMobileOrders()">
+                            <option value="">همه وضعیت‌ها</option>
+                            <option value="paid">پرداخت شده</option>
+                            <option value="pending">در انتظار</option>
+                            <option value="shipping">در حال ارسال</option>
+                            <option value="delivered">تحویل شده</option>
+                        </select>
+                    </div>
+                    <div id="mobileOrdersContainer"></div>
+                `;
+                renderMobileOrders(mobileOrdersFullData);
+
+                // لیست پرداخت‌ها موبایل
+                document.getElementById('mobilePaymentsList').innerHTML = `
+                    ${data.payments.list.map(p => `
+                        <div class="mobile-list-item">
+                            <div>
+                                <div class="item-title" dir="ltr">${p.ref_id}</div>
+                                <div class="item-sub">${p.payer_name}</div>
+                                <div class="item-sub" dir="ltr">${formatNumber(p.amount)} تومان</div>
+                                <div class="item-sub">${p.payment_method}</div>
+                                <div class="item-sub" dir="ltr">${p.created_at || '-'}</div>
+                            </div>
+                            <div>
+                                <span class="badge-info-mobile">${p.status_display}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                `;
+
+                // نمودارها
+                if(data.chart && data.chart.months && data.chart.months.length) {
+                    if(mobileUsersChart) mobileUsersChart.destroy();
+                    if(mobileSalesChart) mobileSalesChart.destroy();
+
+                    mobileUsersChart = new Chart(document.getElementById('mobileUsersChart'), {
+                        type: 'line',
+                        data: {
+                            labels: data.chart.months,
+                            datasets: [{
+                                label: 'کاربران جدید',
+                                data: data.chart.user_growth,
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102,126,234,0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: true }
+                    });
+
+                    mobileSalesChart = new Chart(document.getElementById('mobileSalesChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: data.chart.months,
+                            datasets: [{
+                                label: 'فروش (میلیون تومان)',
+                                data: data.chart.sales_data,
+                                backgroundColor: '#764ba2',
+                                borderRadius: 8
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: true }
+                    });
+                }
+            }
+        } catch(e) { console.error('خطا:', e); }
+    }
+
+    // تب‌های موبایل
+    document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.mobile-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const tab = btn.dataset.mobileTab;
+            document.getElementById('mobileUsersList').style.display = tab === 'users' ? 'block' : 'none';
+            document.getElementById('mobileOrdersList').style.display = tab === 'orders' ? 'block' : 'none';
+            document.getElementById('mobilePaymentsList').style.display = tab === 'payments' ? 'block' : 'none';
+        };
+    });
+
+    function deleteMobileUser(id) {
+        if(confirm('حذف کاربر؟')) {
+            fetch(`/delete-user/${id}/`, {
+                method: 'POST',
+                headers: {'X-CSRFToken': getCookie('csrftoken')}
+            }).then(() => loadMobileDashboardData());
+        }
+    }
+
+    function getCookie(n) {
+        let v=null;
+        if(document.cookie && document.cookie!=='') {
+            const c=document.cookie.split(';');
+            for(let i=0;i<c.length;i++) {
+                const ck=c[i].trim();
+                if(ck.substring(0,n.length+1)=== (n+'=')) {
+                    v=decodeURIComponent(ck.substring(n.length+1));
+                    break;
+                }
+            }
+        }
+        return v;
+    }
+
+    window.addEventListener('click', function(e) {
+        if(e.target.classList.contains('modal-mobile')) e.target.style.display = 'none';
+    });
+
+    loadMobileDashboardData();
+    setInterval(loadMobileDashboardData, 60000);
+</script>
+{% endblock %}
+
+{% block pc %}
+<style>
+/* ============================================
+   استایل‌های دسکتاپ - بهبود یافته
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.dashboard-container {
+    background: linear-gradient(135deg, #0f0c29 0%, #1a1a3e 50%, #0f0c29 100%);
+    min-height: 100vh;
+    padding: 24px;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* کارت‌های آمار */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+    backdrop-filter: blur(10px);
+    border-radius: 28px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(102, 126, 234, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(102, 126, 234, 0.5);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.stat-card:hover::before {
+    opacity: 1;
+}
+
+.stat-card h4 {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+.stat-number {
+    color: #fff;
+    font-size: 2.3rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    direction: ltr;
+    display: inline-block;
+    letter-spacing: -1px;
+}
+
+.stat-card small {
+    display: block;
+    font-size: 0.7rem;
+    margin-top: 8px;
+}
+
+.online-badge { color: #34d399 !important; }
+.today-badge { color: #fbbf24 !important; }
+
+.stat-icon {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    opacity: 0.15;
+    transition: opacity 0.3s;
+}
+
+.stat-card:hover .stat-icon {
+    opacity: 0.25;
+}
+
+.stat-icon i {
+    font-size: 3.5rem;
+    color: #667eea;
+}
+
+/* نمودارها */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.chart-card {
+    background: rgba(30, 41, 59, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 28px;
+    padding: 24px;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    transition: all 0.3s;
+}
+
+.chart-card:hover {
+    border-color: rgba(102, 126, 234, 0.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.chart-card h3 {
+    color: #fff;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* کاربران آنلاین */
+.online-users-card {
+    background: rgba(30, 41, 59, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 28px;
+    padding: 24px;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    margin-bottom: 32px;
+}
+
+.online-users-card h3 {
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.online-user-badge {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+    padding: 8px 20px;
+    border-radius: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #34d399;
+    margin-left: 12px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.online-user-badge:hover {
+    background: rgba(16, 185, 129, 0.25);
+    transform: translateY(-2px);
+}
+
+/* تب‌ها */
+.desktop-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 6px;
+    border-radius: 60px;
+    width: fit-content;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.desktop-tab {
+    padding: 12px 32px;
+    border-radius: 50px;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.desktop-tab:hover {
+    color: #e2e8f0;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.desktop-tab.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* جدول داده‌ها */
+.data-table {
+    background: rgba(30, 41, 59, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    overflow-x: auto;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.data-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    text-align: right;
+    padding: 18px 20px;
+    color: #a0aec0;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.15);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.data-table td {
+    padding: 16px 20px;
+    color: #e2e8f0;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.08);
+    font-size: 0.85rem;
+}
+
+.data-table tr {
+    transition: all 0.2s;
+}
+
+.data-table tr:hover {
+    background: rgba(102, 126, 234, 0.08);
+}
+
+/* نشانگرها */
+.badge-success {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    padding: 5px 14px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    display: inline-block;
+    font-weight: 500;
+}
+
+.badge-warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+    padding: 5px 14px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+}
+
+.badge-info {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    padding: 5px 14px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+}
+
+/* مودال */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(12px);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border-radius: 32px;
+    padding: 32px;
+    width: 480px;
+    max-width: 90%;
+    border: 1px solid rgba(102, 126, 234, 0.4);
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-content h3 {
+    color: #fff;
+    margin-bottom: 24px;
+    font-size: 1.3rem;
+}
+
+.modal-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.15);
+}
+
+.modal-label {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.modal-value {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.close-btn {
+    margin-top: 24px;
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 18px;
+    color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.close-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* دکمه حذف */
+.delete-btn {
+    background: rgba(239, 68, 68, 0.2);
+    border: none;
+    padding: 6px 14px;
+    border-radius: 12px;
+    color: #ef4444;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.75rem;
+}
+
+.delete-btn:hover {
+    background: rgba(239, 68, 68, 0.4);
+    transform: scale(1.02);
+}
+
+.receipt-link {
+    color: #60a5fa;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+}
+
+.receipt-link:hover {
+    color: #93c5fd;
+    text-decoration: underline;
+}
+
+.loading {
+    text-align: center;
+    padding: 60px;
+    color: #94a3b8;
+}
+
+/* واکنشگرایی */
+@media (max-width: 1200px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    .charts-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .dashboard-container {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    .desktop-tabs {
+        width: 100%;
+        justify-content: center;
+    }
+    .desktop-tab {
+        padding: 10px 20px;
+        font-size: 0.8rem;
+    }
+}
+</style>
+
+<div class="dashboard-container">
+    <div id="desktopDashboardPage" class="desktop-page active">
+        <div class="stats-grid">
+            <div class="stat-card" onclick="openUserModal()">
+                <div><h4><i class="fas fa-users"></i> کاربران کل</h4><div class="stat-number" id="statTotalUsers">-</div><small class="online-badge"><i class="fas fa-circle"></i> آنلاین: <span id="statOnlineUsers">-</span></small></div>
+                <div class="stat-icon"><i class="fas fa-user-friends"></i></div>
+            </div>
+            <div class="stat-card" onclick="openOrderModal()">
+                <div><h4><i class="fas fa-shopping-cart"></i> سفارشات پرداخت شده</h4><div class="stat-number" id="statPaidOrders">-</div><small class="today-badge"><i class="fas fa-calendar-day"></i> امروز: <span id="statTodayOrders">-</span></small><small style="display:block; margin-top:5px; color:#34d399;"><i class="fas fa-check-circle"></i> تکمیل شده: <span id="statDeliveredOrders">-</span></small></div>
+                <div class="stat-icon"><i class="fas fa-credit-card"></i></div>
+            </div>
+            <div class="stat-card" onclick="openPrintModal()">
+                <div><h4><i class="fas fa-print"></i> سفارشات چاپی</h4><div class="stat-number" id="statTotalPrint">-</div><small class="today-badge"><i class="fas fa-calendar-day"></i> امروز: <span id="statTodayPrint">-</span></small></div>
+                <div class="stat-icon"><i class="fas fa-print"></i></div>
+            </div>
+            <div class="stat-card" style="cursor:default;">
+                <div><h4><i class="fas fa-coins"></i> درآمد کل</h4><div class="stat-number" id="statTotalIncome">-</div><small class="today-badge"><i class="fas fa-calendar-day"></i> امروز: <span id="statTodayIncome">-</span></small></div>
+                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-line" style="color:#667eea;"></i> رشد کاربران</h3>
+                <canvas id="desktopUsersChart" width="400" height="200"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-bar" style="color:#764ba2;"></i> فروش ماهانه</h3>
+                <canvas id="desktopSalesChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <div class="online-users-card">
+            <h3><i class="fas fa-circle" style="color:#10b981;"></i> کاربران آنلاین</h3>
+            <div id="onlineUsersList"></div>
+        </div>
+
+        <div class="desktop-tabs">
+            <button class="desktop-tab active" data-tab="users"><i class="fas fa-users"></i> کاربران</button>
+            <button class="desktop-tab" data-tab="orders"><i class="fas fa-shopping-cart"></i> سفارشات</button>
+            <button class="desktop-tab" data-tab="payments"><i class="fas fa-credit-card"></i> پرداخت‌ها</button>
+        </div>
+
+        <div class="data-table" id="desktopUsersTable"><div class="loading">در حال بارگذاری...</div></div>
+        <div class="data-table" id="desktopOrdersTable" style="display:none;"><div class="loading">در حال بارگذاری...</div></div>
+        <div class="data-table" id="desktopPaymentsTable" style="display:none;"><div class="loading">در حال بارگذاری...</div></div>
+    </div>
+</div>
+
+<!-- مودال‌ها -->
+<div id="userModal" class="modal"><div class="modal-content"><h3><i class="fas fa-users"></i> آمار کاربران</h3><div class="modal-row"><span class="modal-label">کل کاربران:</span><span class="modal-value" id="modalTotalUsers">-</span></div><div class="modal-row"><span class="modal-label">آنلاین:</span><span class="modal-value" style="color:#34d399;" id="modalOnlineUsers">-</span></div><div class="modal-row"><span class="modal-label">آفلاین:</span><span class="modal-value" style="color:#fbbf24;" id="modalOfflineUsers">-</span></div><div class="modal-row"><span class="modal-label">ثبت نام امروز:</span><span class="modal-value" style="color:#10b981;" id="modalTodayUsers">-</span></div><button class="close-btn" onclick="closeModal('userModal')">بستن</button></div></div>
+
+<div id="orderModal" class="modal"><div class="modal-content"><h3><i class="fas fa-shopping-cart"></i> آمار سفارشات</h3><div class="modal-row"><span class="modal-label">پرداخت شده:</span><span class="modal-value" style="color:#10b981;" id="modalPaidOrders">-</span></div><div class="modal-row"><span class="modal-label">در انتظار:</span><span class="modal-value" style="color:#fbbf24;" id="modalPendingOrders">-</span></div><div class="modal-row"><span class="modal-label">در حال ارسال:</span><span class="modal-value" style="color:#60a5fa;" id="modalShippingOrders">-</span></div><div class="modal-row"><span class="modal-label">تحویل شده:</span><span class="modal-value" style="color:#34d399;" id="modalDeliveredOrders">-</span></div><div class="modal-row"><span class="modal-label">سفارشات امروز:</span><span class="modal-value" style="color:#10b981;" id="modalTodayOrders">-</span></div><button class="close-btn" onclick="closeModal('orderModal')">بستن</button></div></div>
+
+<div id="printModal" class="modal"><div class="modal-content"><h3><i class="fas fa-print"></i> آمار سفارشات چاپی</h3><div class="modal-row"><span class="modal-label">کل سفارشات:</span><span class="modal-value" id="modalTotalPrint">-</span></div><div class="modal-row"><span class="modal-label">در انتظار:</span><span class="modal-value" style="color:#fbbf24;" id="modalPrintPending">-</span></div><div class="modal-row"><span class="modal-label">تایید شده:</span><span class="modal-value" style="color:#10b981;" id="modalPrintConfirmed">-</span></div><div class="modal-row"><span class="modal-label">در حال ساخت:</span><span class="modal-value" style="color:#60a5fa;" id="modalPrintProcessing">-</span></div><div class="modal-row"><span class="modal-label">امروز:</span><span class="modal-value" style="color:#10b981;" id="modalTodayPrint">-</span></div><button class="close-btn" onclick="closeModal('printModal')">بستن</button></div></div>
+
+<script>
+    let usersChart = null, salesChart = null;
+
+    function formatNumber(num) { if(num === undefined || num === null) return '۰'; return new Intl.NumberFormat('fa-IR').format(num); }
+
+    async function loadDashboardData() {
+        try {
+            const response = await fetch('/panel/api/dashboard/');
+            const data = await response.json();
+            if(data.status === 'success') {
+                document.getElementById('statTotalUsers').innerText = formatNumber(data.users.total);
+                document.getElementById('statOnlineUsers').innerText = formatNumber(data.users.online);
+                document.getElementById('statPaidOrders').innerText = formatNumber(data.orders.paid);
+                document.getElementById('statTodayOrders').innerText = formatNumber(data.orders.today);
+                document.getElementById('statDeliveredOrders').innerText = formatNumber(data.orders.delivered);
+                document.getElementById('statTotalPrint').innerText = formatNumber(data.print_orders.total);
+                document.getElementById('statTodayPrint').innerText = formatNumber(data.print_orders.today);
+                document.getElementById('statTotalIncome').innerText = data.income.total_display;
+                document.getElementById('statTodayIncome').innerText = data.income.today_display;
+
+                document.getElementById('modalTotalUsers').innerText = formatNumber(data.users.total);
+                document.getElementById('modalOnlineUsers').innerText = formatNumber(data.users.online);
+                document.getElementById('modalOfflineUsers').innerText = formatNumber(data.users.offline);
+                document.getElementById('modalTodayUsers').innerText = formatNumber(data.users.today);
+                document.getElementById('modalPaidOrders').innerText = formatNumber(data.orders.paid);
+                document.getElementById('modalPendingOrders').innerText = formatNumber(data.orders.pending);
+                document.getElementById('modalShippingOrders').innerText = formatNumber(data.orders.shipping);
+                document.getElementById('modalDeliveredOrders').innerText = formatNumber(data.orders.delivered);
+                document.getElementById('modalTodayOrders').innerText = formatNumber(data.orders.today);
+                document.getElementById('modalTotalPrint').innerText = formatNumber(data.print_orders.total);
+                document.getElementById('modalPrintPending').innerText = formatNumber(data.print_orders.pending);
+                document.getElementById('modalPrintConfirmed').innerText = formatNumber(data.print_orders.confirmed);
+                document.getElementById('modalPrintProcessing').innerText = formatNumber(data.print_orders.processing);
+                document.getElementById('modalTodayPrint').innerText = formatNumber(data.print_orders.today);
+
+                const onlineDiv = document.getElementById('onlineUsersList');
+                if(data.users.online_list && data.users.online_list.length) onlineDiv.innerHTML = data.users.online_list.map(u => `<span class="online-user-badge"><i class="fas fa-circle"></i> ${u.name}</span>`).join('');
+                else onlineDiv.innerHTML = '<span style="color:#64748b;">هیچ کاربر آنلاینی وجود ندارد</span>';
+
+                document.getElementById('desktopUsersTable').innerHTML = `<table><thead><tr><th>نام</th><th>موبایل</th><th>ایمیل</th><th>وضعیت</th><th>تاریخ ثبت</th><th></th></tr></thead><tbody>${data.users.list.map(u => `<tr><td>${u.name}</td><td dir="ltr">${u.mobile_number}</td><td>${u.email || '---'}</td><td><span class="${u.online ? 'badge-success' : 'badge-warning'}">${u.online ? 'آنلاین' : 'آفلاین'}</span></td><td dir="ltr" style="font-family:monospace;">${u.created_at || '-'}</td><td><button class="delete-btn" onclick="deleteUser('${u.id}')"><i class="fas fa-trash-alt"></i> حذف</button></td></tr>`).join('')}</tbody>${''}`;
+
+                document.getElementById('desktopOrdersTable').innerHTML = `<table><thead><tr><th>شماره</th><th>مشتری</th><th>مبلغ</th><th>وضعیت</th><th>روش پرداخت</th><th>جزئیات</th><th>رسید</th><th>تاریخ</th></tr></thead><tbody>${data.orders.list.map(o => `<tr><td dir="ltr">${o.order_number}</td><td>${o.customer_name}</td><td dir="ltr">${formatNumber(o.total)} تومان</td><td><span class="badge-success">${o.status_display}</span></td><td>${o.payment_method === 'کیف پول' ? '<span style="color:#fbbf24;"><i class="fas fa-wallet"></i> کیف پول</span>' : o.payment_method === 'رسید بانکی' ? '<span style="color:#60a5fa;"><i class="fas fa-receipt"></i> رسید بانکی</span>' : '<span style="color:#34d399;"><i class="fas fa-credit-card"></i> ' + o.payment_method + '</span>'}</td><td style="font-size:0.75rem;">${o.payment_detail || '-'}</td><td>${o.receipt_image ? `<a href="${o.receipt_image}" target="_blank" class="receipt-link"><i class="fas fa-image"></i> مشاهده رسید</a>` : (o.wallet_amount > 0 ? `<span style="color:#fbbf24;"><i class="fas fa-coins"></i> ${formatNumber(o.wallet_amount)} تومان</span>` : '-')}</td><td dir="ltr" style="font-family:monospace;">${o.created_at || '-'}</td></tr>`).join('')}</tbody>${''}`;
+
+                document.getElementById('desktopPaymentsTable').innerHTML = `<table><thead><tr><th>کد پیگیری</th><th>پرداخت‌کننده</th><th>مبلغ</th><th>روش پرداخت</th><th>وضعیت</th><th>تاریخ</th></tr></thead><tbody>${data.payments.list.map(p => `<tr><td dir="ltr">${p.ref_id}</td><td>${p.payer_name}</td><td dir="ltr">${formatNumber(p.amount)} تومان</td><td><span class="badge-info">${p.payment_method}</span></td><td><span class="badge-success">${p.status_display}</span></td><td dir="ltr" style="font-family:monospace;">${p.created_at || '-'}</td></tr>`).join('')}</tbody>${''}`;
+
+                if(data.chart && data.chart.months && data.chart.months.length) {
+                    if(usersChart) usersChart.destroy();
+                    if(salesChart) salesChart.destroy();
+                    usersChart = new Chart(document.getElementById('desktopUsersChart'), { type: 'line', data: { labels: data.chart.months, datasets: [{ label: 'کاربران جدید', data: data.chart.user_growth, borderColor: '#667eea', backgroundColor: 'rgba(102,126,234,0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: true } });
+                    salesChart = new Chart(document.getElementById('desktopSalesChart'), { type: 'bar', data: { labels: data.chart.months, datasets: [{ label: 'فروش (میلیون تومان)', data: data.chart.sales_data, backgroundColor: '#764ba2', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: true } });
+                }
+            }
+        } catch(e) { console.error('خطا:', e); }
+    }
+
+    function openUserModal() { document.getElementById('userModal').style.display = 'flex'; }
+    function openOrderModal() { document.getElementById('orderModal').style.display = 'flex'; }
+    function openPrintModal() { document.getElementById('printModal').style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    window.onclick = function(e) { if(e.target.classList.contains('modal')) e.target.style.display = 'none'; }
+
+    document.querySelectorAll('.desktop-tab').forEach(btn => { btn.onclick = () => { document.querySelectorAll('.desktop-tab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); const tab = btn.dataset.tab; document.getElementById('desktopUsersTable').style.display = tab === 'users' ? 'block' : 'none'; document.getElementById('desktopOrdersTable').style.display = tab === 'orders' ? 'block' : 'none'; document.getElementById('desktopPaymentsTable').style.display = tab === 'payments' ? 'block' : 'none'; }; });
+
+    function getCookie(n) { let v=null; if(document.cookie && document.cookie!=='') { const c=document.cookie.split(';'); for(let i=0;i<c.length;i++) { const ck=c[i].trim(); if(ck.substring(0,n.length+1)=== (n+'=')) { v=decodeURIComponent(ck.substring(n.length+1)); break; } } } return v; }
+    const csrf = getCookie('csrftoken');
+    window.addEventListener('beforeunload', () => { navigator.sendBeacon('/set-offline/', new Blob([], {type:'application/json'})); });
+    setInterval(() => { fetch('/update-activity/', { method:'POST', headers:{'X-CSRFToken':csrf} }).catch(e=>console.log(e)); }, 30000);
+    function deleteUser(id) { if(confirm('حذف کاربر؟')) fetch(`/delete-user/${id}/`, { method:'POST', headers:{'X-CSRFToken':csrf} }).then(() => loadDashboardData()); }
+
+    loadDashboardData();
+    setInterval(loadDashboardData, 60000);
+</script>
+{% endblock %}

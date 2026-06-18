@@ -1,0 +1,746 @@
+<div class="desktop-sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="logo-text">
+            <h2>پنل مدیریت</h2>
+            <p>{{user.name}} {{user.family}}</p>
+        </div>
+    </div>
+
+    <div class="sidebar-menu">
+        <div class="sidebar-item" data-url="{% url 'panel:index' %}">
+            <div class="sidebar-icon"><i class="fas fa-tachometer-alt"></i></div>
+            <span class="sidebar-text">داشبورد</span>
+        </div>
+
+        <div class="sidebar-item" data-url="{% url 'panel:admin_orders_panel' %}">
+            <div class="sidebar-icon"><i class="fas fa-shopping-cart"></i></div>
+            <span class="sidebar-text">سفارشات غیر چاپی</span>
+        </div>
+
+        <div class="sidebar-item" data-url="{% url 'panel:admin_print_orders_panel' %}">
+            <div class="sidebar-icon"><i class="fas fa-print"></i></div>
+            <span class="sidebar-text">سفارشات چاپی</span>
+        </div>
+
+        <div class="sidebar-item" data-url="{% url 'panel:admin_payments_panel' %}">
+            <div class="sidebar-icon"><i class="fas fa-credit-card"></i></div>
+            <span class="sidebar-text">پرداخت‌ها</span>
+        </div>
+
+        <div class="sidebar-item" data-url="{% url 'panel:admin_slider_panel' %}">
+            <div class="sidebar-icon"><i class="fas fa-sliders-h"></i></div>
+            <span class="sidebar-text">تنظیمات سایت</span>
+        </div>
+        <div class="sidebar-item" data-url="{% url 'panel:userindex' %}">
+            <div class="sidebar-icon"><i class="fas fa-sliders-h"></i></div>
+            <span class="sidebar-text"> کاربران</span>
+        </div>
+        <div class="sidebar-item" data-url="{% url 'panel:productindex' %}">
+            <div class="sidebar-icon"><i class="fas fa-sliders-h"></i></div>
+            <span class="sidebar-text"> پنل محصولات</span>
+        </div>
+        <div class="sidebar-item" data-url="{% url 'panel:role_panel' %}">
+            <div class="sidebar-icon"><i class="fas fa-sliders-h"></i></div>
+            <span class="sidebar-text">سیستم مجوزات</span>
+        </div>
+        <div class="sidebar-item" data-url="{% url 'panel:operator_dashboard' %}">
+            <div class="sidebar-icon"><i class="fas fa-sliders-h"></i></div>
+            <span class="sidebar-text">پنل فوتوشاپ</span>
+        </div>
+        <div class="sidebar-item" data-url="{% url 'panel:admin_check_list' %}">
+            <div class="sidebar-icon"><i class="fas fa-sliders-h"></i></div>
+            <span class="sidebar-text">پنل چک</span>
+        </div>
+    </div>
+
+    <div class="sidebar-actions">
+        <button class="sidebar-btn sidebar-btn-primary" id="openUserModalBtn">
+            <i class="fas fa-user-plus"></i>
+            <span>کاربر جدید</span>
+        </button>
+        <button class="sidebar-btn sidebar-btn-outline" id="openProductModalBtn">
+            <i class="fas fa-box-plus"></i>
+            <span>محصول جدید</span>
+        </button>
+    </div>
+</div>
+
+<!-- ========== مودال افزودن کاربر ========== -->
+<div id="addUserModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-user-plus"></i> افزودن کاربر جدید</h3>
+            <button class="modal-close" onclick="closeModal('addUserModal')">&times;</button>
+        </div>
+
+        <form id="addUserForm" enctype="multipart/form-data">
+            <!-- آواتار -->
+            <div class="avatar-upload">
+                <div class="avatar-preview" id="avatarPreview">
+                    <i class="fas fa-camera"></i>
+                </div>
+                <input type="file" id="avatarInput" name="avatar" accept="image/*" style="display:none;">
+                <button type="button" class="avatar-btn" onclick="document.getElementById('avatarInput').click()">انتخاب عکس</button>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>نام <span class="required">*</span></label>
+                    <input type="text" id="userName" name="name" placeholder="نام" required>
+                </div>
+                <div class="form-group">
+                    <label>نام خانوادگی <span class="required">*</span></label>
+                    <input type="text" id="userFamily" name="family" placeholder="نام خانوادگی" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>شماره موبایل <span class="required">*</span></label>
+                    <input type="tel" id="userMobile" name="mobileNumber" placeholder="09123456789" required>
+                </div>
+                <div class="form-group">
+                    <label>ایمیل</label>
+                    <input type="email" id="userEmail" name="email" placeholder="example@gmail.com">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>نام فروشگاه</label>
+                <input type="text" id="userShopName" name="shopName" placeholder="نام فروشگاه">
+            </div>
+
+            <button type="button" class="address-btn" onclick="openAddressModal()">
+                <i class="fas fa-map-marker-alt"></i> افزودن آدرس
+            </button>
+
+            <div id="addressPreview" style="display:none;" class="address-preview">
+                <p>آدرس ثبت شده:</p>
+                <p id="addressText"></p>
+            </div>
+
+            <div class="admin-confirm">
+                <label class="switch">
+                    <input type="checkbox" id="adminConfirm">
+                    <span class="slider"></span>
+                </label>
+                <div>
+                    <strong>تایید مدیر ارشد</strong>
+                    <small>فقط مدیران مجاز می‌توانند کاربر اضافه کنند</small>
+                </div>
+            </div>
+
+            <div id="adminPassSection" style="display:none;" class="form-group">
+                <input type="password" id="adminPassword" placeholder="رمز عبور مدیر ارشد">
+            </div>
+
+            <div class="modal-buttons">
+                <button type="submit" class="btn-submit">ثبت کاربر</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('addUserModal')">انصراف</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ========== مودال آدرس ========== -->
+<div id="addressModal" class="modal">
+    <div class="modal-content" style="max-width:450px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-map-marker-alt"></i> آدرس کاربر</h3>
+            <button class="modal-close" onclick="closeModal('addressModal')">&times;</button>
+        </div>
+
+        <div class="form-group">
+            <label>استان</label>
+            <select id="province">
+                <option value="">انتخاب استان</option>
+                <option>تهران</option><option>اصفهان</option><option>خراسان رضوی</option>
+                <option>فارس</option><option>خوزستان</option><option>مازندران</option>
+                <option>گیلان</option><option>البرز</option><option>قم</option><option>کرمان</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>شهر</label>
+            <input type="text" id="city" placeholder="نام شهر">
+        </div>
+
+        <div class="form-group">
+            <label>آدرس کامل</label>
+            <textarea id="fullAddress" rows="3" placeholder="خیابان، پلاک، واحد..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>کد پستی</label>
+            <input type="text" id="postalCode" placeholder="کد پستی ۱۰ رقمی">
+        </div>
+
+        <div class="modal-buttons">
+            <button class="btn-submit" onclick="saveAddress()">ثبت آدرس</button>
+            <button class="btn-cancel" onclick="closeModal('addressModal')">انصراف</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== مودال افزودن محصول ========== -->
+<div id="addProductModal" class="modal">
+    <div class="modal-content" style="max-width:500px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-box-plus"></i> افزودن محصول جدید</h3>
+            <button class="modal-close" onclick="closeModal('addProductModal')">&times;</button>
+        </div>
+
+        <form id="addProductForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>نام محصول <span class="required">*</span></label>
+                <input type="text" id="productName" name="name" placeholder="نام محصول" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>دسته‌بندی</label>
+                    <select id="productCategory" name="category">
+                        <option>اکسسوری</option><option>الکترونیک</option><option>پوشاک</option>
+                        <option>خانه و آشپزخانه</option><option>کتاب</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>قیمت (تومان) <span class="required">*</span></label>
+                    <input type="number" id="productPrice" name="price" placeholder="۰" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>موجودی</label>
+                    <input type="number" id="productStock" name="stock" value="0">
+                </div>
+                <div class="form-group">
+                    <label>تصویر محصول</label>
+                    <input type="file" id="productImage" name="image" accept="image/*" class="file-input">
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button type="submit" class="btn-submit">ثبت محصول</button>
+                <button type="button" class="btn-cancel" onclick="closeModal('addProductModal')">انصراف</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* ========== استایل سایدبار ========== */
+    .desktop-sidebar {
+        position: fixed;
+        right: 0;
+        top: 0;
+        width: 280px;
+        height: 100vh;
+        background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+        border-left: 1px solid rgba(102,126,234,0.15);
+        display: flex;
+        flex-direction: column;
+        z-index: 100;
+    }
+
+    .sidebar-logo {
+        padding: 30px 20px;
+        text-align: center;
+        border-bottom: 1px solid rgba(102,126,234,0.15);
+    }
+
+    .logo-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+    }
+
+    .logo-icon i { font-size: 28px; color: white; }
+    .logo-text h2 { color: #fff; font-size: 1.1rem; margin-bottom: 5px; }
+    .logo-text p { color: #94a3b8; font-size: 0.75rem; }
+
+    .sidebar-menu {
+        flex: 1;
+        padding: 15px;
+    }
+
+    .sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        margin-bottom: 8px;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .sidebar-item:hover {
+        background: rgba(102,126,234,0.1);
+        transform: translateX(-5px);
+    }
+
+    .sidebar-item.active {
+        background: rgba(102,126,234,0.15);
+        border: 1px solid rgba(102,126,234,0.2);
+    }
+
+    .sidebar-icon i { color: #94a3b8; font-size: 1.1rem; }
+    .sidebar-item:hover .sidebar-icon i,
+    .sidebar-item.active .sidebar-icon i { color: #667eea; }
+
+    .sidebar-text { color: #cbd5e1; font-size: 0.85rem; flex: 1; }
+
+    .sidebar-actions {
+        padding: 20px;
+        border-top: 1px solid rgba(102,126,234,0.15);
+    }
+
+    .sidebar-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px;
+        border: none;
+        border-radius: 14px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 12px;
+        transition: all 0.3s;
+    }
+
+    .sidebar-btn:last-child { margin-bottom: 0; }
+
+    .sidebar-btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    .sidebar-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+    }
+
+    .sidebar-btn-outline {
+        background: transparent;
+        color: #667eea;
+        border: 1px solid rgba(102,126,234,0.4);
+    }
+
+    .sidebar-btn-outline:hover {
+        background: rgba(102,126,234,0.1);
+        transform: translateY(-2px);
+    }
+
+    /* ========== استایل مودال ========== */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.95);
+        backdrop-filter: blur(8px);
+        z-index: 1001;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        border-radius: 24px;
+        padding: 28px;
+        width: 550px;
+        max-width: 90%;
+        max-height: 85vh;
+        overflow-y: auto;
+        border: 1px solid rgba(102,126,234,0.3);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(102,126,234,0.2);
+    }
+
+    .modal-header h3 {
+        color: #fff;
+        font-size: 1.2rem;
+    }
+
+    .modal-header h3 i { color: #667eea; margin-left: 10px; }
+
+    .modal-close {
+        background: rgba(239,68,68,0.2);
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        color: #ef4444;
+        font-size: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .modal-close:hover {
+        background: #ef4444;
+        color: white;
+        transform: rotate(90deg);
+    }
+
+    /* فرم استایل */
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-group label {
+        display: block;
+        color: #94a3b8;
+        font-size: 0.75rem;
+        margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        background: #0f172a;
+        border: 1px solid rgba(102,126,234,0.3);
+        border-radius: 12px;
+        color: #fff;
+        font-size: 0.85rem;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .required { color: #ef4444; }
+
+    /* آواتار */
+    .avatar-upload {
+        text-align: center;
+        margin-bottom: 24px;
+    }
+
+    .avatar-preview {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 12px;
+        cursor: pointer;
+        overflow: hidden;
+    }
+
+    .avatar-preview i { font-size: 2rem; color: white; }
+
+    .avatar-btn {
+        background: rgba(102,126,234,0.2);
+        border: 1px solid #667eea;
+        padding: 6px 16px;
+        border-radius: 20px;
+        color: #667eea;
+        font-size: 0.7rem;
+        cursor: pointer;
+    }
+
+    /* آدرس */
+    .address-btn {
+        width: 100%;
+        padding: 12px;
+        background: rgba(102,126,234,0.1);
+        border: 1px dashed #667eea;
+        border-radius: 12px;
+        color: #667eea;
+        cursor: pointer;
+        margin-bottom: 16px;
+    }
+
+    .address-preview {
+        background: #0f172a;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 16px;
+    }
+
+    .address-preview p { color: #94a3b8; font-size: 0.7rem; margin-bottom: 5px; }
+    .address-preview #addressText { color: #cbd5e1; font-size: 0.8rem; }
+
+    /* تایید مدیر */
+    .admin-confirm {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: rgba(102,126,234,0.1);
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+    }
+
+    .admin-confirm strong { color: #fff; font-size: 0.85rem; display: block; }
+    .admin-confirm small { color: #94a3b8; font-size: 0.65rem; }
+
+    /* سوئیچ */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 26px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #334155;
+        transition: 0.3s;
+        border-radius: 34px;
+    }
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+    }
+    input:checked + .slider { background-color: #10b981; }
+    input:checked + .slider:before { transform: translateX(24px); }
+
+    /* دکمه‌ها */
+    .modal-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    .btn-submit, .btn-cancel {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    .btn-submit:hover { transform: translateY(-2px); }
+
+    .btn-cancel {
+        background: rgba(239,68,68,0.2);
+        color: #ef4444;
+    }
+
+    .btn-cancel:hover { background: rgba(239,68,68,0.3); }
+
+    .file-input {
+        padding: 8px !important;
+    }
+
+    /* اسکرول */
+    .modal-content::-webkit-scrollbar { width: 5px; }
+    .modal-content::-webkit-scrollbar-track { background: #0f172a; border-radius: 10px; }
+    .modal-content::-webkit-scrollbar-thumb { background: #667eea; border-radius: 10px; }
+</style>
+
+<script>
+    // ========== سایدبار ==========
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        const url = item.getAttribute('data-url');
+        if (url && window.location.pathname === url) {
+            item.classList.add('active');
+        }
+
+        item.addEventListener('click', function() {
+            const targetUrl = this.getAttribute('data-url');
+            if (targetUrl) window.location.href = targetUrl;
+        });
+    });
+
+    // ========== توابع مودال ==========
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    document.getElementById('openUserModalBtn')?.addEventListener('click', () => {
+        document.getElementById('addUserModal').style.display = 'flex';
+    });
+
+    document.getElementById('openProductModalBtn')?.addEventListener('click', () => {
+        document.getElementById('addProductModal').style.display = 'flex';
+    });
+
+    // بستن با کلیک خارج
+    window.onclick = function(e) {
+        if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
+        }
+    }
+
+    // ========== آواتار ==========
+    document.getElementById('avatarInput')?.addEventListener('change', function(e) {
+        const preview = document.getElementById('avatarPreview');
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                preview.innerHTML = `<img src="${ev.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+
+    // ========== تایید مدیر ==========
+    document.getElementById('adminConfirm')?.addEventListener('change', function() {
+        const passSection = document.getElementById('adminPassSection');
+        passSection.style.display = this.checked ? 'block' : 'none';
+    });
+
+    // ========== آدرس ==========
+    let savedAddress = null;
+
+    window.openAddressModal = function() {
+        document.getElementById('addressModal').style.display = 'flex';
+    }
+
+    window.saveAddress = function() {
+        const province = document.getElementById('province').value;
+        const city = document.getElementById('city').value;
+        const fullAddress = document.getElementById('fullAddress').value;
+        const postalCode = document.getElementById('postalCode').value;
+
+        if (!province || !city || !fullAddress) {
+            alert('لطفاً استان، شهر و آدرس کامل را وارد کنید');
+            return;
+        }
+
+        savedAddress = { province, city, fullAddress, postalCode };
+
+        const previewDiv = document.getElementById('addressPreview');
+        const addressText = document.getElementById('addressText');
+        addressText.innerHTML = `${province}، ${city}<br>${fullAddress}<br>کد پستی: ${postalCode || 'نامشخص'}`;
+        previewDiv.style.display = 'block';
+
+        closeModal('addressModal');
+    }
+
+    // ========== ارسال فرم کاربر ==========
+    document.getElementById('addUserForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const isAdminConfirmed = document.getElementById('adminConfirm').checked;
+        const adminPass = document.getElementById('adminPassword')?.value;
+
+        if (isAdminConfirmed && adminPass !== 'admin123') {
+            alert('رمز عبور مدیر ارشد اشتباه است');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('name', document.getElementById('userName').value);
+        formData.append('family', document.getElementById('userFamily').value);
+        formData.append('mobileNumber', document.getElementById('userMobile').value);
+        formData.append('email', document.getElementById('userEmail').value);
+        formData.append('shopName', document.getElementById('userShopName').value);
+
+        if (savedAddress) formData.append('address', JSON.stringify(savedAddress));
+
+        const avatarFile = document.getElementById('avatarInput').files[0];
+        if (avatarFile) formData.append('avatar', avatarFile);
+
+        try {
+            const response = await fetch('/panel/api/add-user/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                body: formData
+            });
+            const result = await response.json();
+            if (result.status === 'success') {
+                alert('✅ کاربر با موفقیت اضافه شد');
+                location.reload();
+            } else {
+                alert('❌ خطا: ' + result.message);
+            }
+        } catch(error) {
+            alert('❌ خطا در ارتباط با سرور');
+        }
+    });
+
+    // ========== ارسال فرم محصول ==========
+    document.getElementById('addProductForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('name', document.getElementById('productName').value);
+        formData.append('category', document.getElementById('productCategory').value);
+        formData.append('price', document.getElementById('productPrice').value);
+        formData.append('stock', document.getElementById('productStock').value);
+
+        const productImage = document.getElementById('productImage').files[0];
+        if (productImage) formData.append('image', productImage);
+
+        try {
+            const response = await fetch('/panel/api/add-product/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                body: formData
+            });
+            const result = await response.json();
+            if (result.status === 'success') {
+                alert('✅ محصول با موفقیت اضافه شد');
+                location.reload();
+            } else {
+                alert('❌ خطا: ' + result.message);
+            }
+        } catch(error) {
+            alert('❌ خطا در ارتباط با سرور');
+        }
+    });
+
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
+</script>
