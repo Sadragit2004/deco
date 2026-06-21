@@ -32,7 +32,7 @@ urlpatterns = [
     path('api/orders/update-tracking/', orders.api_update_tracking_code, name='api_update_tracking_code'),
     path('api/orders/verify-receipt/', orders.api_verify_receipt, name='api_verify_receipt'),
 
-    path('panel/api/orders/verify-receipt/', orders.api_verify_receipt, name='api_verify_receipt'),
+    path('api/orders/verify-receipt/', orders.api_verify_receipt, name='api_verify_receipt'),
     # ==============
     path('admin/payments/', peyment.admin_payments_panel, name='admin_payments_panel'),
     path('api/payments/list/', peyment.api_payments_list, name='api_payments_list'),
@@ -97,50 +97,58 @@ urlpatterns = [
 
     # ============================
 
-    path('product_panel', products.product_admin_index, name='productindex'),
+        path('product_panel', products.product_admin_index, name='productindex'),
 
-     path('api/products/', products.ProductAPIView.as_view(), name='product_list'),
+    # ========== API محصولات ==========
+    path('api/products/', products.ProductAPIView.as_view(), name='product_list'),
     path('api/products/<int:product_id>/', products.ProductAPIView.as_view(), name='product_detail'),
     path('api/products/<int:product_id>/update/', products.ProductAPIView.as_view(), name='product_update'),
     path('api/products/<int:product_id>/delete/', products.ProductAPIView.as_view(), name='product_delete'),
     path('api/products/bulk-create/', products.BulkProductCreateView.as_view(), name='bulk_create'),
     path('api/products/bulk-price-update/', products.BulkPriceUpdateView.as_view(), name='bulk_price'),
 
-    # آمار
+    # ========== آمار ==========
     path('api/stats/', products.StatsAPIView.as_view(), name='stats'),
 
-    # برندها
+    # ========== برندها ==========
     path('api/brands/', products.BrandAPIView.as_view(), name='brand_list'),
     path('api/brands/create/', products.BrandAPIView.as_view(), name='brand_create'),
+    path('api/brands/<int:brand_id>/', products.BrandAPIView.as_view(), name='brand_detail'),  # ← اضافه شد
     path('api/brands/<int:brand_id>/delete/', products.BrandAPIView.as_view(), name='brand_delete'),
 
-    # دسته‌بندی‌ها
+    # ========== دسته‌بندی‌ها ==========
     path('api/categories/', products.CategoryAPIView.as_view(), name='category_list'),
     path('api/categories/create/', products.CategoryAPIView.as_view(), name='category_create'),
+    path('api/categories/<int:category_id>/', products.CategoryAPIView.as_view(), name='category_detail'),  # ← اضافه شد
     path('api/categories/<int:category_id>/delete/', products.CategoryAPIView.as_view(), name='category_delete'),
+    path('api/categories/<int:category_id>/update-brands/', products.CategoryAPIView.as_view(), name='category_update_brands'),
 
-    # کاتالوگ‌ها
+    # ========== کاتالوگ‌ها ==========
     path('api/catalogs/', products.CatalogAPIView.as_view(), name='catalog_list'),
     path('api/catalogs/create/', products.CatalogAPIView.as_view(), name='catalog_create'),
+    path('api/catalogs/<int:catalog_id>/', products.CatalogAPIView.as_view(), name='catalog_detail'),  # ← اضافه شد
     path('api/catalogs/<int:catalog_id>/delete/', products.CatalogAPIView.as_view(), name='catalog_delete'),
 
-    # واحدها
+    # ========== واحدها ==========
     path('api/sales-units/', products.SalesUnitAPIView.as_view(), name='sales_unit_list'),
     path('api/sales-units/create/', products.SalesUnitAPIView.as_view(), name='sales_unit_create'),
     path('api/package-units/', products.PackageUnitAPIView.as_view(), name='package_unit_list'),
+    path('api/package-units/create/', products.PackageUnitAPIView.as_view(), name='package_unit_create'),
 
-    # ویژگی‌ها
+    # ========== ویژگی‌ها ==========
     path('api/attributes/', products.AttributeAPIView.as_view(), name='attribute_list'),
     path('api/attributes/create/', products.AttributeAPIView.as_view(), name='attribute_create'),
+    path('api/attributes/<int:attr_id>/', products.AttributeAPIView.as_view(), name='attribute_detail'),  # ← اضافه شد
     path('api/attributes/<int:attr_id>/delete/', products.AttributeAPIView.as_view(), name='attribute_delete'),
 
-    # تخفیف‌ها
+    # ========== تخفیف‌ها ==========
     path('api/discounts/', products.DiscountAPIView.as_view(), name='discount_list'),
     path('api/discounts/create/', products.DiscountAPIView.as_view(), name='discount_create'),
+    path('api/discounts/<int:discount_id>/', products.DiscountAPIView.as_view(), name='discount_detail'),  # ← اضافه شد
     path('api/discounts/<int:discount_id>/delete/', products.DiscountAPIView.as_view(), name='discount_delete'),
-    path('api/discounts/<int:discount_id>/toggle/', products.DiscountAPIView.as_view(), {'action': 'toggle'}, name='discount_toggle'),
+    path('api/discounts/<int:discount_id>/toggle/', products.DiscountAPIView.as_view(), name='discount_toggle'),
     # =========
-           path('roles/', role.role_panel_view, name='role_panel'),
+    path('roles/', role.role_panel_view, name='role_panel'),
 
     # API ها - مسیرهای ثابت باید قبل از مسیرهای متغیر بیایند
     path('api/roles/create/', role.role_create_api, name='role_create_api'),
@@ -180,5 +188,9 @@ path('admin/check/reject/<uuid:check_id>/', checkview.admin_check_reject, name='
 path('admin/check/finalize/<uuid:check_id>/', checkview.admin_check_finalize, name='admin_check_finalize'),
 path('admin/check/bulk-action/', checkview.admin_check_bulk_action, name='admin_check_bulk_action'),
 path('admin/check/export-csv/', checkview.admin_check_export_csv, name='admin_check_export_csv'),
+    path('admin/receipt/verify/<str:order_ref>/', checkview.admin_receipt_verify, name='admin_receipt_verify'),
+
+    # رد رسید پرداخت (با شماره سفارش)
+    path('admin/receipt/reject/<str:order_ref>/', checkview.admin_receipt_reject, name='admin_receipt_reject'),
 
 ]

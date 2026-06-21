@@ -1,4 +1,4 @@
-# apps/product/views.py - نسخه نهایی با اصلاح تولید اسلاگ تصادفی
+# apps/product/views.py
 
 import os
 import re
@@ -17,8 +17,8 @@ from django.views import View
 from django.utils import timezone
 from django.utils.text import slugify
 from django.core.files.base import ContentFile
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
+from django.contrib.admin.views.decorators import staff_member_required
+from django.shortcuts import render
 
 from apps.product.models import (
     Product, Category, Brand, Catalog, SalesUnit, PackageUnit,
@@ -27,29 +27,35 @@ from apps.product.models import (
 from apps.discount.models import Discount, DiscountScope, DiscountType
 
 
-def generate_random_slug(length=12):
-    """تولید اسلاگ تصادفی بدون اعداد فارسی و خط تیره"""
+def generate_random_slug(length=10):
+    """تولید اسلاگ تصادفی انگلیسی با حروف کوچک و اعداد"""
     chars = string.ascii_lowercase + string.digits
     return ''.join(random.choices(chars, k=length))
 
 
-def generate_unique_slug(base_slug=None):
-    """تولید اسلاگ یکتا"""
+def generate_unique_slug(model_class, base_slug=None):
+    """تولید اسلاگ یکتا برای هر مدل"""
     if base_slug:
-        # پاک کردن کاراکترهای غیرمجاز و تبدیل به انگلیسی
         base_slug = re.sub(r'[^a-zA-Z0-9]', '', base_slug.lower())
         if base_slug and len(base_slug) >= 4:
             slug_candidate = base_slug[:20]
-            if not Product.objects.filter(slug=slug_candidate).exists():
+            if not model_class.objects.filter(slug=slug_candidate).exists():
                 return slug_candidate
 
-    # تولید اسلاگ تصادفی
     while True:
         random_slug = generate_random_slug(10)
-        if not Product.objects.filter(slug=random_slug).exists():
+        if not model_class.objects.filter(slug=random_slug).exists():
             return random_slug
 
 
+# ==================== صفحه پنل ====================
+@staff_member_required
+def product_admin_index(request):
+    """صفحه اصلی پنل مدیریت محصولات"""
+    return render(request, 'panel_app/dashboard/products.html')
+
+
+# ==================== API محصولات ====================
 class ProductAPIView(View):
     """API اصلی محصولات"""
 
@@ -165,9 +171,11 @@ class ProductAPIView(View):
         if not data.get('title'):
             return JsonResponse({'success': False, 'error': 'عنوان محصول الزامی است'}, status=400)
 
+        slug = generate_unique_slug(Product, data.get('title'))
+
         product = Product.objects.create(
             title=data.get('title'),
-            slug=generate_unique_slug(),
+            slug=slug,
             code=data.get('code') or f"PROD-{int(timezone.now().timestamp())}",
             price=Decimal(str(data['price'])) if data.get('price') else None,
             stock=Decimal(str(data.get('stock', 0))),
@@ -239,7 +247,7 @@ class ProductAPIView(View):
                 setattr(product, field, value)
 
         if not product.slug:
-            product.slug = generate_unique_slug()
+            product.slug = generate_unique_slug(Product, product.title)
 
         product.save()
 
@@ -281,6 +289,7 @@ class ProductAPIView(View):
             return JsonResponse({'success': False, 'error': 'محصول یافت نشد'}, status=404)
 
 
+# ==================== API برندها ====================
 class BrandAPIView(View):
     """API مدیریت برندها"""
 
@@ -309,6 +318,7 @@ class BrandAPIView(View):
                     'title': b.title or str(b.id),
                     'slug': b.slug,
                     'status': b.status,
+                    'is_catalog': b.isCatalog,
                     'description': b.description or ''
                 }
                 for b in paginated
@@ -330,6 +340,7 @@ class BrandAPIView(View):
                     'title': brand.title,
                     'slug': brand.slug,
                     'status': brand.status,
+                    'is_catalog': brand.isCatalog,
                     'description': brand.description or ''
                 }
             })
@@ -351,10 +362,14 @@ class BrandAPIView(View):
         if not title:
             return JsonResponse({'success': False, 'error': 'عنوان برند الزامی است'}, status=400)
 
+        slug = generate_unique_slug(Brand, title)
+
         brand = Brand.objects.create(
             title=title,
-            slug=slugify(title, allow_unicode=True),
-            status=True
+            slug=slug,
+            isCatalog=data.get('is_catalog', True) in [True, 'true', 'True', 1, '1'],
+            status=True,
+            description=data.get('description', '')
         )
 
         return JsonResponse({'success': True, 'message': 'برند با موفقیت ایجاد شد', 'id': brand.id})
@@ -372,9 +387,13 @@ class BrandAPIView(View):
 
         if 'title' in data:
             brand.title = data['title']
-            brand.slug = slugify(data['title'], allow_unicode=True)
+            brand.slug = generate_unique_slug(Brand, data['title'])
+        if 'is_catalog' in data:
+            brand.isCatalog = data['is_catalog'] in [True, 'true', 'True', 1, '1']
         if 'status' in data:
             brand.status = data['status'] in [True, 'true', 'True', 1, '1']
+        if 'description' in data:
+            brand.description = data['description']
 
         brand.save()
         return JsonResponse({'success': True, 'message': 'برند با موفقیت بروزرسانی شد'})
@@ -388,6 +407,7 @@ class BrandAPIView(View):
             return JsonResponse({'success': False, 'error': 'برند یافت نشد'}, status=404)
 
 
+# ==================== API دسته‌بندی ====================
 class CategoryAPIView(View):
     """API مدیریت دسته‌بندی‌ها"""
 
@@ -417,7 +437,8 @@ class CategoryAPIView(View):
                     'slug': c.slug,
                     'parent_id': c.parent_id,
                     'parent_title': c.parent.title if c.parent else None,
-                    'status': c.status
+                    'status': c.status,
+                    'brands': [{'id': b.id, 'title': b.title} for b in c.brands.all()]
                 }
                 for c in paginated
             ],
@@ -438,7 +459,8 @@ class CategoryAPIView(View):
                     'title': category.title,
                     'slug': category.slug,
                     'parent_id': category.parent_id,
-                    'status': category.status
+                    'status': category.status,
+                    'brands': list(category.brands.values_list('id', flat=True))
                 }
             })
         except Category.DoesNotExist:
@@ -446,6 +468,8 @@ class CategoryAPIView(View):
 
     def post(self, request, category_id=None):
         if category_id:
+            if request.path.endswith('/update-brands/'):
+                return self.update_brands(request, category_id)
             return self.update_category(request, category_id)
         return self.create_category(request)
 
@@ -459,12 +483,18 @@ class CategoryAPIView(View):
         if not title:
             return JsonResponse({'success': False, 'error': 'عنوان دسته‌بندی الزامی است'}, status=400)
 
+        slug = generate_unique_slug(Category, title)
+
         category = Category.objects.create(
             title=title,
-            slug=slugify(title, allow_unicode=True),
+            slug=slug,
             parent_id=int(data['parent_id']) if data.get('parent_id') and data['parent_id'] not in ['', 'null'] else None,
             status=True
         )
+
+        brands = data.get('brands', [])
+        if brands:
+            category.brands.set(brands)
 
         return JsonResponse({'success': True, 'message': 'دسته‌بندی با موفقیت ایجاد شد', 'id': category.id})
 
@@ -481,14 +511,35 @@ class CategoryAPIView(View):
 
         if 'title' in data:
             category.title = data['title']
-            category.slug = slugify(data['title'], allow_unicode=True)
+            category.slug = generate_unique_slug(Category, data['title'])
         if 'parent_id' in data:
             category.parent_id = int(data['parent_id']) if data['parent_id'] and data['parent_id'] not in ['', 'null'] else None
         if 'status' in data:
             category.status = data['status'] in [True, 'true', 'True', 1, '1']
+        if 'brands' in data:
+            category.brands.set(data['brands'])
 
         category.save()
         return JsonResponse({'success': True, 'message': 'دسته‌بندی با موفقیت بروزرسانی شد'})
+
+    def update_brands(self, request, category_id):
+        try:
+            category = Category.objects.get(id=category_id)
+        except Category.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'دسته‌بندی یافت نشد'}, status=404)
+
+        try:
+            data = json.loads(request.body)
+        except:
+            return JsonResponse({'success': False, 'error': 'داده نامعتبر'}, status=400)
+
+        brands = data.get('brands', [])
+        if brands:
+            category.brands.set(brands)
+        else:
+            category.brands.clear()
+
+        return JsonResponse({'success': True, 'message': 'برندهای دسته‌بندی بروزرسانی شد'})
 
     def delete(self, request, category_id):
         try:
@@ -499,6 +550,7 @@ class CategoryAPIView(View):
             return JsonResponse({'success': False, 'error': 'دسته‌بندی یافت نشد'}, status=404)
 
 
+# ==================== API کاتالوگ ====================
 class CatalogAPIView(View):
     """API مدیریت کاتالوگ‌ها"""
 
@@ -570,9 +622,11 @@ class CatalogAPIView(View):
         if not title:
             return JsonResponse({'success': False, 'error': 'عنوان کاتالوگ الزامی است'}, status=400)
 
+        slug = generate_unique_slug(Catalog, title)
+
         catalog = Catalog.objects.create(
             title=title,
-            slug=slugify(title, allow_unicode=True),
+            slug=slug,
             brand_id=int(data['brand_id']) if data.get('brand_id') and data['brand_id'] not in ['', 'null'] else None,
             status=True
         )
@@ -592,7 +646,7 @@ class CatalogAPIView(View):
 
         if 'title' in data:
             catalog.title = data['title']
-            catalog.slug = slugify(data['title'], allow_unicode=True)
+            catalog.slug = generate_unique_slug(Catalog, data['title'])
         if 'brand_id' in data:
             catalog.brand_id = int(data['brand_id']) if data['brand_id'] and data['brand_id'] not in ['', 'null'] else None
         if 'status' in data:
@@ -610,39 +664,7 @@ class CatalogAPIView(View):
             return JsonResponse({'success': False, 'error': 'کاتالوگ یافت نشد'}, status=404)
 
 
-class StatsAPIView(View):
-    """آمار داشبورد"""
-
-    def get(self, request):
-        total_products = Product.objects.count()
-        total_brands = Brand.objects.count()
-        total_categories = Category.objects.count()
-        total_catalogs = Catalog.objects.count()
-
-        now = timezone.now()
-        active_discounts = Discount.objects.filter(
-            is_active=True,
-            start_date__lte=now,
-            end_date__gte=now
-        ).count()
-
-        total_value = Product.objects.aggregate(
-            total=models.Sum(models.F('price') * models.F('stock'))
-        )['total'] or 0
-
-        return JsonResponse({
-            'success': True,
-            'data': {
-                'total_products': total_products,
-                'total_brands': total_brands,
-                'total_categories': total_categories,
-                'total_catalogs': total_catalogs,
-                'active_discounts': active_discounts,
-                'total_value': float(total_value),
-            }
-        })
-
-
+# ==================== API واحدها ====================
 class SalesUnitAPIView(View):
     """API واحدهای فروش"""
 
@@ -701,7 +723,28 @@ class PackageUnitAPIView(View):
             ]
         })
 
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+        except:
+            data = request.POST.dict()
 
+        name = data.get('title') or data.get('name')
+        if not name:
+            return JsonResponse({'success': False, 'error': 'نام واحد بسته‌بندی الزامی است'}, status=400)
+
+        unit = PackageUnit.objects.create(
+            name=name,
+            name_en=data.get('name_en'),
+            symbol=data.get('symbol'),
+            icon=data.get('icon', 'fa-box'),
+            status=True
+        )
+
+        return JsonResponse({'success': True, 'message': 'واحد بسته‌بندی ایجاد شد', 'id': unit.id})
+
+
+# ==================== API ویژگی‌ها ====================
 class AttributeAPIView(View):
     """API ویژگی‌ها"""
 
@@ -743,9 +786,11 @@ class AttributeAPIView(View):
         if not name:
             return JsonResponse({'success': False, 'error': 'نام ویژگی الزامی است'}, status=400)
 
+        code = generate_unique_slug(Attribute, name)
+
         attr = Attribute.objects.create(
             name=name,
-            code=slugify(name, allow_unicode=True),
+            code=code,
             icon=data.get('icon')
         )
 
@@ -764,7 +809,7 @@ class AttributeAPIView(View):
 
         if 'name' in data:
             attr.name = data['name']
-            attr.code = slugify(data['name'], allow_unicode=True)
+            attr.code = generate_unique_slug(Attribute, data['name'])
         if 'icon' in data:
             attr.icon = data['icon']
 
@@ -780,6 +825,151 @@ class AttributeAPIView(View):
             return JsonResponse({'success': False, 'error': 'ویژگی یافت نشد'}, status=404)
 
 
+# ==================== API تخفیف‌ها ====================
+class DiscountAPIView(View):
+    """API تخفیف‌ها"""
+
+    def get(self, request, discount_id=None):
+        if discount_id:
+            return self.get_discount_detail(discount_id)
+        return self.get_discount_list(request)
+
+    def get_discount_list(self, request):
+        queryset = Discount.objects.all().order_by('-priority', '-created_at')
+        return JsonResponse({
+            'success': True,
+            'data': [
+                {
+                    'id': d.id,
+                    'title': d.title,
+                    'discount_type': d.discount_type,
+                    'discount_type_display': d.get_discount_type_display(),
+                    'amount': float(d.amount),
+                    'amount_display': f"{int(d.amount):,} تومان" if d.discount_type == 'fixed' else f"{int(d.amount)}%",
+                    'scope': d.scope,
+                    'scope_display': d.get_scope_display(),
+                    'min_quantity': float(d.min_quantity) if d.min_quantity else 0,
+                    'min_cart_amount': float(d.min_cart_amount) if d.min_cart_amount else 0,
+                    'start_date': d.start_date.isoformat(),
+                    'end_date': d.end_date.isoformat(),
+                    'priority': d.priority,
+                    'usage_limit': d.usage_limit,
+                    'used_count': d.used_count,
+                    'is_active': d.is_active,
+                    'products': [p.id for p in d.products.all()] if d.scope == 'product' else [],
+                    'brands': [b.id for b in d.brands.all()] if d.scope == 'brand' else [],
+                    'categories': [c.id for c in d.categories.all()] if d.scope == 'category' else [],
+                }
+                for d in queryset
+            ]
+        })
+
+    def get_discount_detail(self, discount_id):
+        try:
+            discount = Discount.objects.get(id=discount_id)
+            return JsonResponse({'success': True, 'data': {'id': discount.id, 'title': discount.title}})
+        except Discount.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'تخفیف یافت نشد'}, status=404)
+
+    def post(self, request, discount_id=None):
+        if discount_id:
+            return self.toggle_discount(request, discount_id)
+        return self.create_discount(request)
+
+    def create_discount(self, request):
+        try:
+            data = json.loads(request.body)
+        except:
+            return JsonResponse({'success': False, 'error': 'داده نامعتبر'}, status=400)
+
+        required = ['title', 'discount_type', 'amount', 'start_date', 'end_date']
+        for field in required:
+            if not data.get(field):
+                return JsonResponse({'success': False, 'error': f'فیلد {field} الزامی است'}, status=400)
+
+        slug = generate_unique_slug(Discount, data['title'])
+
+        discount = Discount.objects.create(
+            title=data['title'],
+            slug=slug,
+            discount_type=data['discount_type'],
+            amount=Decimal(str(data['amount'])),
+            scope=data.get('scope', 'global'),
+            min_quantity=Decimal(str(data.get('min_quantity', 0))),
+            min_cart_amount=Decimal(str(data.get('min_cart_amount', 0))) if data.get('min_cart_amount') else None,
+            start_date=data['start_date'],
+            end_date=data['end_date'],
+            priority=int(data.get('priority', 0)),
+            usage_limit=int(data.get('usage_limit', 0)) if data.get('usage_limit') else 0,
+            is_active=data.get('is_active', True),
+        )
+
+        if discount.scope == 'product' and data.get('products'):
+            discount.products.set(data['products'])
+        elif discount.scope == 'brand' and data.get('brands'):
+            discount.brands.set(data['brands'])
+        elif discount.scope == 'category' and data.get('categories'):
+            discount.categories.set(data['categories'])
+
+        return JsonResponse({
+            'success': True,
+            'message': 'تخفیف با موفقیت ایجاد شد',
+            'id': discount.id
+        })
+
+    def toggle_discount(self, request, discount_id):
+        try:
+            discount = Discount.objects.get(id=discount_id)
+            discount.is_active = not discount.is_active
+            discount.save()
+            return JsonResponse({'success': True, 'is_active': discount.is_active, 'message': 'وضعیت تخفیف تغییر کرد'})
+        except Discount.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'تخفیف یافت نشد'}, status=404)
+
+    def delete(self, request, discount_id):
+        try:
+            discount = Discount.objects.get(id=discount_id)
+            discount.delete()
+            return JsonResponse({'success': True, 'message': 'تخفیف با موفقیت حذف شد'})
+        except Discount.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'تخفیف یافت نشد'}, status=404)
+
+
+# ==================== آمار ====================
+class StatsAPIView(View):
+    """آمار داشبورد"""
+
+    def get(self, request):
+        total_products = Product.objects.count()
+        total_brands = Brand.objects.count()
+        total_categories = Category.objects.count()
+        total_catalogs = Catalog.objects.count()
+
+        now = timezone.now()
+        active_discounts = Discount.objects.filter(
+            is_active=True,
+            start_date__lte=now,
+            end_date__gte=now
+        ).count()
+
+        total_value = Product.objects.aggregate(
+            total=models.Sum(models.F('price') * models.F('stock'))
+        )['total'] or 0
+
+        return JsonResponse({
+            'success': True,
+            'data': {
+                'total_products': total_products,
+                'total_brands': total_brands,
+                'total_categories': total_categories,
+                'total_catalogs': total_catalogs,
+                'active_discounts': active_discounts,
+                'total_value': float(total_value),
+            }
+        })
+
+
+# ==================== تولید انبوه ====================
 class BulkProductCreateView(View):
     """تولید انبوه محصولات با اسلاگ تصادفی و یکتا"""
 
@@ -799,7 +989,6 @@ class BulkProductCreateView(View):
         if not code_start or not code_end:
             return JsonResponse({'success': False, 'error': 'کد شروع و پایان الزامی است'}, status=400)
 
-        # استخراج پیشوند و اعداد
         start_match = re.search(r'(\D*)(\d+)(\D*)', code_start)
         end_match = re.search(r'(\d+)', code_end)
 
@@ -825,10 +1014,8 @@ class BulkProductCreateView(View):
                 errors.append(f"کد {code} قبلاً وجود دارد - رد شد")
                 continue
 
-            # تولید اسلاگ تصادفی و یکتا
-            product_slug = generate_unique_slug()
+            product_slug = generate_unique_slug(Product)
 
-            # عنوان محصول: کد محصول + نام برند (اختیاری)
             brand_obj = Brand.objects.filter(id=int(brand_id)).first()
             brand_name = brand_obj.title if brand_obj else ""
             product_title = f"{code}"
@@ -872,6 +1059,7 @@ class BulkProductCreateView(View):
         })
 
 
+# ==================== تغییر قیمت دسته‌جمعی ====================
 class BulkPriceUpdateView(View):
     """تغییر قیمت دسته‌جمعی"""
 
@@ -947,120 +1135,3 @@ class BulkPriceUpdateView(View):
             'message': f'قیمت {len(updated_products)} محصول با موفقیت تغییر یافت' if not preview else None,
             'preview': preview
         })
-
-
-class DiscountAPIView(View):
-    """API تخفیف‌ها"""
-
-    def get(self, request, discount_id=None):
-        if discount_id:
-            return self.get_discount_detail(discount_id)
-        return self.get_discount_list(request)
-
-    def get_discount_list(self, request):
-        queryset = Discount.objects.all().order_by('-priority', '-created_at')
-        return JsonResponse({
-            'success': True,
-            'data': [
-                {
-                    'id': d.id,
-                    'title': d.title,
-                    'discount_type': d.discount_type,
-                    'discount_type_display': d.get_discount_type_display(),
-                    'amount': float(d.amount),
-                    'amount_display': f"{int(d.amount):,} تومان" if d.discount_type == 'fixed' else f"{int(d.amount)}%",
-                    'scope': d.scope,
-                    'scope_display': d.get_scope_display(),
-                    'min_quantity': float(d.min_quantity) if d.min_quantity else 0,
-                    'min_cart_amount': float(d.min_cart_amount) if d.min_cart_amount else 0,
-                    'start_date': d.start_date.isoformat(),
-                    'end_date': d.end_date.isoformat(),
-                    'priority': d.priority,
-                    'usage_limit': d.usage_limit,
-                    'used_count': d.used_count,
-                    'is_active': d.is_active,
-                    'products': [p.id for p in d.products.all()] if d.scope == 'product' else [],
-                    'brands': [b.id for b in d.brands.all()] if d.scope == 'brand' else [],
-                    'categories': [c.id for c in d.categories.all()] if d.scope == 'category' else [],
-                }
-                for d in queryset
-            ]
-        })
-
-    def get_discount_detail(self, discount_id):
-        try:
-            discount = Discount.objects.get(id=discount_id)
-            return JsonResponse({'success': True, 'data': {'id': discount.id, 'title': discount.title}})
-        except Discount.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'تخفیف یافت نشد'}, status=404)
-
-    def post(self, request, discount_id=None):
-        if discount_id:
-            return self.toggle_discount(request, discount_id)
-        return self.create_discount(request)
-
-    def create_discount(self, request):
-        try:
-            data = json.loads(request.body)
-        except:
-            return JsonResponse({'success': False, 'error': 'داده نامعتبر'}, status=400)
-
-        required = ['title', 'discount_type', 'amount', 'start_date', 'end_date']
-        for field in required:
-            if not data.get(field):
-                return JsonResponse({'success': False, 'error': f'فیلد {field} الزامی است'}, status=400)
-
-        discount = Discount.objects.create(
-            title=data['title'],
-            slug=slugify(data['title'], allow_unicode=True),
-            discount_type=data['discount_type'],
-            amount=Decimal(str(data['amount'])),
-            scope=data.get('scope', 'global'),
-            min_quantity=Decimal(str(data.get('min_quantity', 0))),
-            min_cart_amount=Decimal(str(data.get('min_cart_amount', 0))) if data.get('min_cart_amount') else None,
-            start_date=data['start_date'],
-            end_date=data['end_date'],
-            priority=int(data.get('priority', 0)),
-            usage_limit=int(data.get('usage_limit', 0)) if data.get('usage_limit') else 0,
-            is_active=data.get('is_active', True),
-        )
-
-        if discount.scope == 'product' and data.get('products'):
-            discount.products.set(data['products'])
-        elif discount.scope == 'brand' and data.get('brands'):
-            discount.brands.set(data['brands'])
-        elif discount.scope == 'category' and data.get('categories'):
-            discount.categories.set(data['categories'])
-
-        return JsonResponse({
-            'success': True,
-            'message': 'تخفیف با موفقیت ایجاد شد',
-            'id': discount.id
-        })
-
-    def toggle_discount(self, request, discount_id):
-        try:
-            discount = Discount.objects.get(id=discount_id)
-            discount.is_active = not discount.is_active
-            discount.save()
-            return JsonResponse({'success': True, 'is_active': discount.is_active, 'message': 'وضعیت تخفیف تغییر کرد'})
-        except Discount.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'تخفیف یافت نشد'}, status=404)
-
-    def delete(self, request, discount_id):
-        try:
-            discount = Discount.objects.get(id=discount_id)
-            discount.delete()
-            return JsonResponse({'success': True, 'message': 'تخفیف با موفقیت حذف شد'})
-        except Discount.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'تخفیف یافت نشد'}, status=404)
-
-
-# apps/product/admin_panel/views.py
-from django.shortcuts import render
-from django.contrib.admin.views.decorators import staff_member_required
-
-@staff_member_required
-def product_admin_index(request):
-    """صفحه اصلی پنل مدیریت محصولات"""
-    return render(request, 'panel_app/dashboard/products.html')

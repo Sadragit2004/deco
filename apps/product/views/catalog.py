@@ -7,8 +7,7 @@ def latest_catalogs(request):
     """
     دریافت آخرین کاتالوگ‌های فعال
     """
-    catalogs = Catalog.objects.filter(status=True).order_by('-created_at')[:6]
-
+    catalogs = Catalog.objects.filter(status=True).order_by('-created_at')
     data = []
     for catalog in catalogs:
         data.append({

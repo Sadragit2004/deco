@@ -28,7 +28,7 @@
                 </span>
                 <span class="tier-badge" id="tierName">
                     <i class="fas fa-gem"></i>
-                    <span id="tierValue">برنزی</span>
+                    <span style='color:#333;' id="tierValue"></span>
                 </span>
             </div>
         </div>
@@ -701,16 +701,16 @@ function updateTier(tier) {
     tierSpan.classList.remove('tier-bronze', 'tier-silver', 'tier-gold', 'tier-platinum');
 
     if (tier === 'bronze') {
-        tierSpan.innerText = 'برنزی';
+        tierSpan.innerText = '';
         tierSpan.classList.add('tier-bronze');
     } else if (tier === 'silver') {
-        tierSpan.innerText = 'نقره‌ای';
+        tierSpan.innerText = '';
         tierSpan.classList.add('tier-silver');
     } else if (tier === 'gold') {
-        tierSpan.innerText = 'طلایی';
+        tierSpan.innerText = '';
         tierSpan.classList.add('tier-gold');
     } else if (tier === 'platinum') {
-        tierSpan.innerText = 'پلاتینیوم';
+        tierSpan.innerText = '';
         tierSpan.classList.add('tier-platinum');
     }
 }

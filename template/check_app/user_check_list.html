@@ -535,7 +535,7 @@
 
                     <div class="check-info">
                         <span class="check-info-item">
-                            <i class="fas fa-user"></i> {{ check.user.get_full_name|default:check.user.username }}
+                            <i class="fas fa-user"></i> {{ check.user.name}} {{ check.user.family}}
                         </span>
 
                         {% if check.bank_name %}

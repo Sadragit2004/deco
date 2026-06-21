@@ -436,26 +436,70 @@
         </div>
     </div>
 
+    <!-- ====== تب برندها با ویرایش کامل ====== -->
     <div id="brandsTab" class="tab-panel" style="display:none;">
         <div class="panel-card">
             <div class="panel-title">🏷️ مدیریت برندها</div>
             <div id="brandsList"></div>
-            <div class="form-group" style="margin-top:20px;">
-                <input type="text" id="newBrandName" class="form-control" placeholder="نام برند جدید">
+            <div style="margin-top:25px; padding-top:20px; border-top:1px solid rgba(102,126,234,0.15);">
+                <h4 style="color:#fff; margin-bottom:15px;">➕ افزودن برند جدید</h4>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>نام برند <span style="color:#ef4444;">*</span></label>
+                        <input type="text" id="newBrandName" class="form-control" placeholder="نام برند">
+                    </div>
+                    <div class="form-group">
+                        <label>توضیحات</label>
+                        <input type="text" id="newBrandDescription" class="form-control" placeholder="توضیحات برند">
+                    </div>
+                    <div class="form-group">
+                        <label>وضعیت</label>
+                        <select id="newBrandStatus" class="form-control">
+                            <option value="true">✅ فعال</option>
+                            <option value="false">❌ غیرفعال</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>کاتالوگ</label>
+                        <select id="newBrandIsCatalog" class="form-control">
+                            <option value="true">✅ بله</option>
+                            <option value="false">❌ خیر</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-success" onclick="quickAddBrand()" style="width:100%; padding:12px;">➕ افزودن برند</button>
             </div>
-            <button class="btn-primary" onclick="quickAddBrand()">➕ افزودن برند</button>
         </div>
     </div>
 
+    <!-- ====== تب دسته‌بندی با قابلیت انتخاب چند برند ====== -->
     <div id="categoriesTab" class="tab-panel" style="display:none;">
         <div class="panel-card">
             <div class="panel-title">📂 مدیریت دسته‌بندی</div>
             <div id="categoriesList"></div>
-            <div class="form-grid" style="margin-top:20px;">
-                <div class="form-group"><input type="text" id="newCategoryName" class="form-control" placeholder="دسته جدید"></div>
-                <div class="form-group"><select id="newCategoryParent" class="form-control"><option value="">بدون والد</option></select></div>
+
+            <div style="margin-top:25px; padding-top:20px; border-top:1px solid rgba(102,126,234,0.15);">
+                <h4 style="color:#fff; margin-bottom:15px;">➕ افزودن دسته‌بندی جدید</h4>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>نام دسته‌بندی <span style="color:#ef4444;">*</span></label>
+                        <input type="text" id="newCategoryName" class="form-control" placeholder="نام دسته‌بندی">
+                    </div>
+                    <div class="form-group">
+                        <label>دسته والد (اختیاری)</label>
+                        <select id="newCategoryParent" class="form-control">
+                            <option value="">بدون والد</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>برندهای مرتبط با این دسته‌بندی</label>
+                        <select id="newCategoryBrands" class="form-control" multiple style="min-height:120px;">
+                        </select>
+                        <small style="color:#64748b; display:block; margin-top:5px;">برای انتخاب چند برند، کلید Ctrl (یا Cmd در مک) را نگه دارید و کلیک کنید</small>
+                    </div>
+                </div>
+                <button class="btn-success" onclick="quickAddCategory()" style="width:100%; padding:12px;">➕ افزودن دسته‌بندی</button>
             </div>
-            <button class="btn-primary" onclick="quickAddCategory()">➕ افزودن دسته</button>
         </div>
     </div>
 
@@ -557,6 +601,7 @@
     </div>
 </div>
 
+<!-- ====== مودال‌ها ====== -->
 <div id="productModal" class="modal">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
@@ -685,7 +730,7 @@
                         <td><button class="btn-warning" style="padding:4px 10px;" onclick="showSingleDiscount(${p.id}, '${(p.title || '').replace(/'/g, "\\'")}')">🎁 تخفیف</button></td>
                         <td><span class="badge ${p.status ? 'badge-active' : 'badge-inactive'}" onclick="toggleStatus(${p.id}, ${p.status})" title="کلیک برای تغییر وضعیت">${p.status ? 'فعال' : 'غیرفعال'}</span></td>
                         <td><button class="btn-primary" style="padding:4px 8px;" onclick="editProduct(${p.id})">✏️</button> <button class="btn-danger" style="padding:4px 8px;" onclick="deleteProduct(${p.id})">🗑️</button></td>
-                    </table>
+                    </tr>
                 `).join('');
 
                 const pag = data.pagination;
@@ -1105,28 +1150,48 @@
         closeModal('uploadImageModal');
     }
 
+    // ==================== برندها ====================
     async function loadBrands() {
         const res = await fetch('/panel/api/brands/?page_size=100');
         const data = await res.json();
         if(data.success) {
             document.getElementById('brandsList').innerHTML = data.data.map(b => `
                 <div class="manager-list-item">
-                    <div><strong>🏷️ ${b.title}</strong></div>
-                    <button class="btn-danger" onclick="deleteBrand(${b.id})">🗑️ حذف</button>
+                    <div>
+                        <strong>🏷️ ${b.title}</strong>
+                        <small>${b.is_catalog ? '📁 کاتالوگ' : ''}</small>
+                        <small style="color:#64748b;">${b.description || ''}</small>
+                        <span class="badge ${b.status ? 'badge-active' : 'badge-inactive'}" style="font-size:0.65rem; padding:2px 8px; margin-right:5px;">
+                            ${b.status ? '✅ فعال' : '❌ غیرفعال'}
+                        </span>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn-warning btn-sm" onclick="editBrand(${b.id})" style="padding:4px 10px; font-size:0.75rem;">✏️</button>
+                        <button class="btn-danger btn-sm" onclick="deleteBrand(${b.id})" style="padding:4px 10px; font-size:0.75rem;">🗑️</button>
+                    </div>
                 </div>
             `).join('');
         }
     }
 
     async function quickAddBrand() {
-        const name = document.getElementById('newBrandName')?.value;
+        const name = document.getElementById('newBrandName')?.value.trim();
         if(!name) { showToast('نام برند را وارد کنید', true); return; }
+
+        const description = document.getElementById('newBrandDescription')?.value || '';
+        const status = document.getElementById('newBrandStatus')?.value === 'true';
+        const isCatalog = document.getElementById('newBrandIsCatalog')?.value === 'true';
 
         try {
             const res = await fetch('/panel/api/brands/create/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
-                body: JSON.stringify({ title: name })
+                body: JSON.stringify({
+                    title: name,
+                    description: description,
+                    status: status,
+                    is_catalog: isCatalog
+                })
             });
             const result = await res.json();
             if(result.success){
@@ -1134,6 +1199,7 @@
                 loadBrands();
                 loadSelectOptions();
                 document.getElementById('newBrandName').value = '';
+                document.getElementById('newBrandDescription').value = '';
             } else {
                 showToast(result.error, true);
             }
@@ -1164,14 +1230,106 @@
         }
     }
 
+    // ====== ویرایش برند ======
+    async function editBrand(brandId) {
+        const res = await fetch(`/panel/api/brands/${brandId}/`);
+        const data = await res.json();
+        if(!data.success) {
+            showToast('خطا در دریافت اطلاعات', true);
+            return;
+        }
+
+        const brand = data.data;
+
+        const modalHtml = `
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>نام برند <span style="color:#ef4444;">*</span></label>
+                    <input type="text" id="editBrandName" class="form-control" value="${brand.title}">
+                </div>
+                <div class="form-group">
+                    <label>توضیحات</label>
+                    <input type="text" id="editBrandDescription" class="form-control" value="${brand.description || ''}">
+                </div>
+                <div class="form-group">
+                    <label>وضعیت</label>
+                    <select id="editBrandStatus" class="form-control">
+                        <option value="true" ${brand.status ? 'selected' : ''}>✅ فعال</option>
+                        <option value="false" ${!brand.status ? 'selected' : ''}>❌ غیرفعال</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>کاتالوگ</label>
+                    <select id="editBrandIsCatalog" class="form-control">
+                        <option value="true" ${brand.is_catalog ? 'selected' : ''}>✅ بله</option>
+                        <option value="false" ${!brand.is_catalog ? 'selected' : ''}>❌ خیر</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="btn-success" onclick="saveEditBrand(${brandId})" style="flex:1;">💾 ذخیره</button>
+                <button class="btn-danger" onclick="closeModal('editBrandModal')" style="flex:1;">❌ انصراف</button>
+            </div>
+        `;
+
+        showModal('editBrandModal', '✏️ ویرایش برند', modalHtml);
+    }
+
+    async function saveEditBrand(brandId) {
+        const title = document.getElementById('editBrandName').value.trim();
+        if(!title) {
+            showToast('نام برند الزامی است', true);
+            return;
+        }
+
+        const data = {
+            title: title,
+            description: document.getElementById('editBrandDescription').value || '',
+            status: document.getElementById('editBrandStatus').value === 'true',
+            is_catalog: document.getElementById('editBrandIsCatalog').value === 'true'
+        };
+
+        try {
+            const res = await fetch(`/panel/api/brands/${brandId}/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if(result.success) {
+                showToast('برند با موفقیت ویرایش شد');
+                closeModal('editBrandModal');
+                loadBrands();
+                loadSelectOptions();
+            } else {
+                showToast(result.error || 'خطا در ویرایش', true);
+            }
+        } catch(e) {
+            showToast('خطا در ارتباط با سرور', true);
+        }
+    }
+
+    // ==================== دسته‌بندی ====================
     async function loadCategories() {
         const res = await fetch('/panel/api/categories/?page_size=100');
         const data = await res.json();
         if(data.success) {
             document.getElementById('categoriesList').innerHTML = data.data.map(c => `
                 <div class="manager-list-item">
-                    <div><strong>📂 ${c.title}</strong> <small>${c.parent_title ? `(والد: ${c.parent_title})` : ''}</small></div>
-                    <button class="btn-danger" onclick="deleteCategory(${c.id})">🗑️ حذف</button>
+                    <div>
+                        <strong>📂 ${c.title}</strong>
+                        <small>${c.parent_title ? `(والد: ${c.parent_title})` : ''}</small>
+                        <div style="margin-top:4px; display:flex; flex-wrap:wrap; gap:4px;">
+                            ${c.brands && c.brands.length > 0 ?
+                                c.brands.map(b => `<span class="badge badge-active" style="font-size:0.65rem; padding:2px 10px;">🏷️ ${b.title}</span>`).join('') :
+                                `<span style="color:#64748b; font-size:0.75rem;">بدون برند</span>`
+                            }
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                        <button class="btn-warning btn-sm" onclick="editCategoryBrands(${c.id}, '${c.title}')" style="padding:4px 10px; font-size:0.75rem;">✏️ برندها</button>
+                        <button class="btn-danger btn-sm" onclick="deleteCategory(${c.id})" style="padding:4px 10px; font-size:0.75rem;">🗑️</button>
+                    </div>
                 </div>
             `).join('');
         }
@@ -1182,11 +1340,18 @@
         if(!name) { showToast('نام دسته را وارد کنید', true); return; }
 
         const parent = document.getElementById('newCategoryParent')?.value;
+        const brandsSelect = document.getElementById('newCategoryBrands');
+        const selectedBrands = Array.from(brandsSelect?.selectedOptions || []).map(opt => parseInt(opt.value));
+
         try {
             const res = await fetch('/panel/api/categories/create/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
-                body: JSON.stringify({ title: name, parent_id: parent || null })
+                body: JSON.stringify({
+                    title: name,
+                    parent_id: parent || null,
+                    brands: selectedBrands
+                })
             });
             const result = await res.json();
             if(result.success){
@@ -1194,6 +1359,9 @@
                 loadCategories();
                 loadSelectOptions();
                 document.getElementById('newCategoryName').value = '';
+                if(brandsSelect) {
+                    Array.from(brandsSelect.options).forEach(opt => opt.selected = false);
+                }
             } else {
                 showToast(result.error, true);
             }
@@ -1223,6 +1391,96 @@
         }
     }
 
+    // ====== ویرایش برندهای دسته‌بندی ======
+    async function editCategoryBrands(categoryId, categoryTitle) {
+        const res = await fetch(`/panel/api/categories/${categoryId}/`);
+        const data = await res.json();
+
+        if(!data.success) {
+            showToast('خطا در دریافت اطلاعات', true);
+            return;
+        }
+
+        const category = data.data;
+        const currentBrands = category.brands || [];
+
+        const brandsRes = await fetch('/panel/api/brands/?page_size=100');
+        const brandsData = await brandsRes.json();
+
+        if(!brandsData.success) {
+            showToast('خطا در دریافت برندها', true);
+            return;
+        }
+
+        const modalHtml = `
+            <div style="padding:10px 0;">
+                <h4 style="color:#fff; margin-bottom:15px;">✏️ ویرایش برندهای دسته‌بندی: ${categoryTitle}</h4>
+                <div class="form-group">
+                    <label>برندهای مرتبط</label>
+                    <select id="editCategoryBrandsSelect" class="form-control" multiple style="min-height:150px;">
+                        ${brandsData.data.map(b => `
+                            <option value="${b.id}" ${currentBrands.includes(b.id) ? 'selected' : ''}>${b.title}</option>
+                        `).join('')}
+                    </select>
+                    <small style="color:#64748b; display:block; margin-top:5px;">برای انتخاب چند برند، کلید Ctrl (یا Cmd در مک) را نگه دارید و کلیک کنید</small>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button class="btn-success" onclick="saveCategoryBrands(${categoryId})" style="flex:1;">💾 ذخیره</button>
+                    <button class="btn-danger" onclick="closeModal('editCategoryBrandsModal')" style="flex:1;">❌ انصراف</button>
+                </div>
+            </div>
+        `;
+
+        showModal('editCategoryBrandsModal', '✏️ ویرایش برندهای دسته‌بندی', modalHtml);
+    }
+
+    async function saveCategoryBrands(categoryId) {
+        const select = document.getElementById('editCategoryBrandsSelect');
+        const selectedBrands = Array.from(select.selectedOptions).map(opt => parseInt(opt.value));
+
+        try {
+            const res = await fetch(`/panel/api/categories/${categoryId}/update-brands/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                body: JSON.stringify({ brands: selectedBrands })
+            });
+            const result = await res.json();
+            if(result.success) {
+                showToast('برندهای دسته‌بندی با موفقیت بروزرسانی شد');
+                closeModal('editCategoryBrandsModal');
+                loadCategories();
+            } else {
+                showToast(result.error || 'خطا در بروزرسانی', true);
+            }
+        } catch(e) {
+            showToast('خطا در ارتباط با سرور', true);
+        }
+    }
+
+    // ====== تابع نمایش مودال ======
+    function showModal(modalId, title, bodyHtml) {
+        let modal = document.getElementById(modalId);
+        if(!modal) {
+            modal = document.createElement('div');
+            modal.id = modalId;
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+                        <h3 id="${modalId}Title" style="color:#fff;">${title}</h3>
+                        <button onclick="closeModal('${modalId}')" style="background:#ef4444; border:none; width:34px; height:34px; border-radius:50%; color:white; cursor:pointer; font-size:1.2rem;">&times;</button>
+                    </div>
+                    <div id="${modalId}Body"></div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        document.getElementById(`${modalId}Title`).innerHTML = title;
+        document.getElementById(`${modalId}Body`).innerHTML = bodyHtml;
+        modal.style.display = 'flex';
+    }
+
+    // ==================== کاتالوگ ====================
     async function loadCatalogs() {
         const res = await fetch('/panel/api/catalogs/?page_size=100');
         const data = await res.json();
@@ -1282,6 +1540,7 @@
         }
     }
 
+    // ==================== ویژگی‌ها ====================
     async function loadAttributes() {
         const res = await fetch('/panel/api/attributes/');
         const data = await res.json();
@@ -1338,6 +1597,7 @@
         }
     }
 
+    // ==================== واحد فروش ====================
     async function quickAddSalesUnit() {
         const name = prompt('نام واحد فروش:');
         if(name){
@@ -1358,6 +1618,7 @@
         }
     }
 
+    // ==================== تخفیف‌ها ====================
     async function loadDiscounts() {
         const res = await fetch('/panel/api/discounts/');
         const data = await res.json();
@@ -1490,7 +1751,7 @@
         }
     }
 
-    // ==================== تخفیف تکی محصول با انتخاب روز ====================
+    // ==================== تخفیف تکی ====================
     function showSingleDiscount(productId, productTitle) {
         const now = new Date();
         const later = new Date();
@@ -1589,6 +1850,7 @@
         } catch(e) { showToast('خطا', true); }
     }
 
+    // ==================== تولید انبوه ====================
     async function bulkCreateProducts() {
         let packageUnitId = document.getElementById('bulkPackageUnit').value;
         if (packageUnitId === '' || packageUnitId === 'null' || packageUnitId === 'ندارد') {
@@ -1632,6 +1894,7 @@
         } catch(e) { showToast('خطا در ارتباط', true); }
     }
 
+    // ==================== ویرایش انبوه ====================
     async function applyBulkEdit() {
         const scope = document.getElementById('bulkEditScope').value;
         const scopeId = document.getElementById('bulkEditTarget').value;
@@ -1689,6 +1952,7 @@
         }
     }
 
+    // ==================== تغییر قیمت ====================
     async function applyBulkPrice() {
         const data = {
             scope: document.getElementById('priceScope').value,
@@ -1764,6 +2028,7 @@
         }
     }
 
+    // ==================== بارگذاری گزینه‌ها ====================
     async function loadSelectOptions() {
         try {
             const [brands, categories, catalogs, units, packageUnits] = await Promise.all([
@@ -1786,6 +2051,13 @@
                 document.getElementById('productCategoryFilter').innerHTML = '<option value="">همه</option>' + catOpts;
                 document.getElementById('bulkCategory').innerHTML = '<option value="">بدون دسته</option>' + catOpts;
                 document.getElementById('newCategoryParent').innerHTML = '<option value="">بدون والد</option>' + catOpts;
+
+                const newCategoryBrands = document.getElementById('newCategoryBrands');
+                if(newCategoryBrands && brands.success) {
+                    newCategoryBrands.innerHTML = brands.data.map(b =>
+                        `<option value="${b.id}">${b.title}</option>`
+                    ).join('');
+                }
             }
 
             if(catalogs.success) {
@@ -1807,6 +2079,7 @@
         } catch(e) { console.error(e); }
     }
 
+    // ==================== تغییر تب ====================
     function switchTab(tab) {
         currentTab = tab;
         document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
@@ -1823,6 +2096,7 @@
         else if(tab === 'bulkEdit') loadBulkEditTargets();
     }
 
+    // ==================== رویدادها ====================
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
@@ -1838,6 +2112,7 @@
         searchTimeout = setTimeout(() => { currentPage = 1; loadProducts(); }, 500);
     });
 
+    // ==================== شروع ====================
     loadStats();
     loadProducts();
     loadSelectOptions();

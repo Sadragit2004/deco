@@ -1,15 +1,17 @@
+# apps/panel/views.py - مدیریت کامل چک‌ها و رسیدها
+
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.db.models import Q, Count
+from django.db.models import Q
 from django.core.paginator import Paginator
 from django.utils import timezone
 from django.db import transaction
 from datetime import datetime
-import json
 
 from apps.check.models import CheckPayment, CheckPaymentStatus, CheckPaymentHistory
+from apps.order.models import Order, PaymentReceipt
 
 
 def admin_check_list(request):
@@ -17,29 +19,98 @@ def admin_check_list(request):
     return render(request, 'panel_app/dashboard/check.html')
 
 
+def check_receipt_verified(check):
+    """بررسی تایید بودن رسید پرداخت"""
+    if check.order:
+        return check.order.receipt_verified
+    elif check.pro_order:
+        return getattr(check.pro_order, 'receipt_verified', False)
+    return False
+
+
+def get_receipt_data(order):
+    """دریافت اطلاعات رسید پرداخت"""
+    receipt_data = {
+        'verified': None,
+        'status_display': None,
+        'status_class': 'pending',
+        'image': None,
+        'receipt_number': None,
+        'bank_name': None,
+        'payment_amount': None,
+        'tracking_code': None,
+        'uploaded_at': None,
+        'verified_at': None,
+        'rejection_reason': None,
+    }
+
+    if order:
+        if hasattr(order, 'payment_receipt'):
+            receipt = order.payment_receipt
+
+            if receipt.status == PaymentReceipt.ReceiptStatus.VERIFIED:
+                receipt_data['verified'] = True
+                receipt_data['status_display'] = '✅ تایید شده'
+                receipt_data['status_class'] = 'verified'
+            elif receipt.status == PaymentReceipt.ReceiptStatus.REJECTED:
+                receipt_data['verified'] = False
+                receipt_data['status_display'] = '❌ رد شده'
+                receipt_data['status_class'] = 'rejected'
+            else:
+                receipt_data['verified'] = False
+                receipt_data['status_display'] = '⏳ در انتظار تایید'
+                receipt_data['status_class'] = 'pending'
+
+            receipt_data['image'] = receipt.receipt_file.url if receipt.receipt_file else None
+            receipt_data['receipt_number'] = receipt.receipt_number
+            receipt_data['bank_name'] = receipt.bank_name
+            receipt_data['payment_amount'] = str(receipt.payment_amount) if receipt.payment_amount else None
+            receipt_data['tracking_code'] = receipt.tracking_code
+            receipt_data['uploaded_at'] = receipt.uploaded_at.strftime('%Y/%m/%d %H:%M') if receipt.uploaded_at else None
+            receipt_data['verified_at'] = receipt.verified_at.strftime('%Y/%m/%d %H:%M') if receipt.verified_at else None
+            receipt_data['rejection_reason'] = receipt.rejection_reason
+        else:
+            receipt_data['verified'] = False
+            receipt_data['status_display'] = 'بدون رسید'
+            receipt_data['status_class'] = 'none'
+
+    return receipt_data
+
+
 @csrf_exempt
 @require_http_methods(["GET"])
 def api_check_list(request):
     """API لیست چک‌ها با فیلتر و صفحه‌بندی"""
     try:
-        # پارامترها
         page = int(request.GET.get('page', 1))
         page_size = int(request.GET.get('page_size', 20))
         status = request.GET.get('status', '')
+        receipt_status = request.GET.get('receipt_status', '')
         search = request.GET.get('search', '')
         date_from = request.GET.get('date_from', '')
         date_to = request.GET.get('date_to', '')
         sort_by = request.GET.get('sort_by', '-created_at')
 
-        # کوئری اصلی
-        queryset = CheckPayment.objects.all().select_related('user', 'order', 'pro_order')
+        queryset = CheckPayment.objects.all().select_related(
+            'user', 'order', 'pro_order', 'order__payment_receipt'
+        )
 
-        # فیلتر وضعیت - استفاده از .value
+        # فیلتر وضعیت چک
         if status:
-            # پیدا کردن مقدار status
             status_values = [s.value for s in CheckPaymentStatus if s.value == status]
             if status_values:
                 queryset = queryset.filter(status=status_values[0])
+
+        # فیلتر وضعیت رسید
+        if receipt_status:
+            if receipt_status == 'verified':
+                queryset = queryset.filter(order__payment_receipt__status=PaymentReceipt.ReceiptStatus.VERIFIED)
+            elif receipt_status == 'pending':
+                queryset = queryset.filter(order__payment_receipt__status=PaymentReceipt.ReceiptStatus.PENDING)
+            elif receipt_status == 'rejected':
+                queryset = queryset.filter(order__payment_receipt__status=PaymentReceipt.ReceiptStatus.REJECTED)
+            elif receipt_status == 'none':
+                queryset = queryset.filter(order__payment_receipt__isnull=True)
 
         # فیلتر تاریخ
         if date_from:
@@ -61,11 +132,12 @@ def api_check_list(request):
             queryset = queryset.filter(
                 Q(tracking_number__icontains=search) |
                 Q(user__mobileNumber__icontains=search) |
+                Q(user__name__icontains=search) |
+                Q(user__family__icontains=search) |
                 Q(bank_name__icontains=search) |
                 Q(check_number__icontains=search)
             )
 
-        # مرتب‌سازی
         queryset = queryset.order_by(sort_by)
 
         # آمار
@@ -76,13 +148,12 @@ def api_check_list(request):
             'rejected': CheckPayment.objects.filter(status=CheckPaymentStatus.REJECTED.value).count(),
         }
 
-        # صفحه‌بندی
         paginator = Paginator(queryset, page_size)
         page_obj = paginator.get_page(page)
 
-        # تبدیل به JSON
         checks = []
         for check in page_obj:
+            receipt_data = get_receipt_data(check.order)
             checks.append({
                 'id': str(check.id),
                 'tracking_number': check.tracking_number,
@@ -98,6 +169,10 @@ def api_check_list(request):
                 'created_at': check.created_at.strftime('%Y/%m/%d %H:%M'),
                 'verified_at': check.verified_at.strftime('%Y/%m/%d %H:%M') if check.verified_at else '',
                 'order_display': check.order.order_number if check.order else (str(check.pro_order.id)[:8] if check.pro_order else ''),
+                'receipt_verified': receipt_data['verified'],
+                'receipt_status_display': receipt_data['status_display'],
+                'receipt_status_class': receipt_data['status_class'],
+                'receipt_image': receipt_data['image'],
             })
 
         return JsonResponse({
@@ -124,6 +199,7 @@ def admin_check_detail(request, check_id):
     """دریافت جزئیات یک چک"""
     try:
         check = CheckPayment.objects.get(id=check_id)
+        receipt_data = get_receipt_data(check.order)
 
         data = {
             'id': str(check.id),
@@ -147,6 +223,7 @@ def admin_check_detail(request, check_id):
             'created_at': check.created_at.strftime('%Y/%m/%d %H:%M'),
             'updated_at': check.updated_at.strftime('%Y/%m/%d %H:%M'),
             'order_ref': check.order.order_number if check.order else (str(check.pro_order.id)[:8] if check.pro_order else ''),
+            'receipt': receipt_data,
             'history': [
                 {
                     'action': h.action,
@@ -161,17 +238,25 @@ def admin_check_detail(request, check_id):
         return JsonResponse({'status': 'success', 'check': data})
     except CheckPayment.DoesNotExist:
         return JsonResponse({'status': 'error', 'error': 'چک یافت نشد'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'error': str(e)}, status=500)
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def admin_check_verify(request, check_id):
-    """تایید چک توسط ادمین"""
+    """تایید چک توسط ادمین (فقط در صورتی که رسید تایید شده باشد)"""
     try:
         check = CheckPayment.objects.get(id=check_id)
 
         if check.status != CheckPaymentStatus.PENDING.value:
             return JsonResponse({'success': False, 'error': 'فقط چک‌های در انتظار قابل تایید هستند'})
+
+        if not check_receipt_verified(check):
+            return JsonResponse({
+                'success': False,
+                'error': '⚠️ ابتدا رسید پرداخت را تایید کنید'
+            })
 
         note = request.POST.get('note', '')
         admin_user = request.user if request.user.is_authenticated else None
@@ -183,7 +268,6 @@ def admin_check_verify(request, check_id):
             check.admin_note = note
         check.save()
 
-        # تاریخچه
         CheckPaymentHistory.objects.create(
             check_payment=check,
             action=CheckPaymentHistory.ActionType.ADMIN_VERIFIED.value,
@@ -191,9 +275,11 @@ def admin_check_verify(request, check_id):
             created_by=admin_user
         )
 
-        return JsonResponse({'success': True, 'message': 'چک با موفقیت تایید شد'})
+        return JsonResponse({'success': True, 'message': '✅ چک با موفقیت تایید شد'})
     except CheckPayment.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'چک یافت نشد'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
 @csrf_exempt
@@ -227,9 +313,11 @@ def admin_check_reject(request, check_id):
             created_by=admin_user
         )
 
-        return JsonResponse({'success': True, 'message': 'چک با موفقیت رد شد'})
+        return JsonResponse({'success': True, 'message': '❌ چک با موفقیت رد شد'})
     except CheckPayment.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'چک یافت نشد'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
 @csrf_exempt
@@ -251,7 +339,6 @@ def admin_check_finalize(request, check_id):
         check.finalized_at = timezone.now()
         check.save()
 
-        # بروزرسانی سفارش
         if check.order and check.order.status == 'pending':
             check.order.mark_as_paid()
         elif check.pro_order and check.pro_order.status == 'pending':
@@ -265,9 +352,11 @@ def admin_check_finalize(request, check_id):
             created_by=admin_user
         )
 
-        return JsonResponse({'success': True, 'message': 'پرداخت نهایی شد و سفارش تایید گردید'})
+        return JsonResponse({'success': True, 'message': '🏁 پرداخت نهایی شد'})
     except CheckPayment.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'چک یافت نشد'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
 @csrf_exempt
@@ -290,9 +379,16 @@ def admin_check_bulk_action(request):
 
         admin_user = request.user if request.user.is_authenticated else None
         success_count = 0
+        skipped_count = 0
+        skipped_ids = []
 
         with transaction.atomic():
             for check in checks:
+                if action == 'verify' and not check_receipt_verified(check):
+                    skipped_count += 1
+                    skipped_ids.append(check.tracking_number)
+                    continue
+
                 if action == 'verify':
                     check.status = CheckPaymentStatus.VERIFIED.value
                     check.verified_by = admin_user
@@ -305,7 +401,7 @@ def admin_check_bulk_action(request):
                         message=f"تایید گروهی توسط {admin_user.mobileNumber if admin_user else 'ادمین'}",
                         created_by=admin_user
                     )
-                else:  # reject
+                else:
                     reason = request.POST.get('reason', 'رد گروهی')
                     check.status = CheckPaymentStatus.REJECTED.value
                     check.rejection_reason = reason
@@ -320,12 +416,89 @@ def admin_check_bulk_action(request):
                     )
                 success_count += 1
 
+        message = f'{success_count} چک با موفقیت {"تایید" if action == "verify" else "رد"} شدند'
+        if skipped_count > 0:
+            message += f' و {skipped_count} چک به دلیل عدم تایید رسید، عملیات روی آنها انجام نشد'
+
         return JsonResponse({
             'success': True,
-            'message': f'{success_count} چک با موفقیت {"تایید" if action == "verify" else "رد"} شدند'
+            'message': message,
+            'skipped_count': skipped_count,
+            'skipped_ids': skipped_ids
         })
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+
+# =============== ویوهای مدیریت رسید ===============
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def admin_receipt_verify(request, order_ref):
+    """تایید رسید پرداخت توسط ادمین"""
+    try:
+        order = Order.objects.get(order_number=order_ref)
+
+        if not hasattr(order, 'payment_receipt'):
+            return JsonResponse({'success': False, 'error': 'رسیدی برای این سفارش وجود ندارد'})
+
+        receipt = order.payment_receipt
+
+        if receipt.status == PaymentReceipt.ReceiptStatus.VERIFIED:
+            return JsonResponse({'success': False, 'error': 'این رسید قبلاً تایید شده است'})
+
+        admin_user = request.user if request.user.is_authenticated else None
+
+        receipt.status = PaymentReceipt.ReceiptStatus.VERIFIED
+        receipt.verified_by = admin_user
+        receipt.verified_at = timezone.now()
+        receipt.save()
+
+        order.receipt_verified = True
+        order.receipt_verified_at = timezone.now()
+        order.save(update_fields=['receipt_verified', 'receipt_verified_at'])
+
+        return JsonResponse({'success': True, 'message': '✅ رسید با موفقیت تایید شد'})
+
+    except Order.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'سفارش یافت نشد'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def admin_receipt_reject(request, order_ref):
+    """رد رسید پرداخت توسط ادمین"""
+    try:
+        order = Order.objects.get(order_number=order_ref)
+
+        if not hasattr(order, 'payment_receipt'):
+            return JsonResponse({'success': False, 'error': 'رسیدی برای این سفارش وجود ندارد'})
+
+        receipt = order.payment_receipt
+        reason = request.POST.get('reason', '')
+
+        if not reason:
+            return JsonResponse({'success': False, 'error': 'لطفاً دلیل رد را وارد کنید'})
+
+        admin_user = request.user if request.user.is_authenticated else None
+
+        receipt.status = PaymentReceipt.ReceiptStatus.REJECTED
+        receipt.rejection_reason = reason
+        receipt.verified_by = admin_user
+        receipt.save()
+
+        order.receipt_verified = False
+        order.receipt_rejection_reason = reason
+        order.save(update_fields=['receipt_verified', 'receipt_rejection_reason'])
+
+        return JsonResponse({'success': True, 'message': '❌ رسید با موفقیت رد شد'})
+
+    except Order.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'سفارش یافت نشد'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
 @csrf_exempt
@@ -341,11 +514,21 @@ def admin_check_export_csv(request):
     writer = csv.writer(response)
     writer.writerow([
         'شماره پیگیری', 'کاربر', 'موبایل', 'بانک', 'شماره چک', 'مبلغ',
-        'وضعیت', 'تاریخ ثبت', 'تاریخ تایید', 'نهایی شده'
+        'وضعیت', 'تاریخ ثبت', 'تاریخ تایید', 'نهایی شده', 'وضعیت رسید'
     ])
 
-    checks = CheckPayment.objects.all().select_related('user')
+    checks = CheckPayment.objects.all().select_related('user', 'order')
     for check in checks:
+        receipt_status = 'بدون رسید'
+        if check.order and hasattr(check.order, 'payment_receipt'):
+            receipt = check.order.payment_receipt
+            if receipt.status == PaymentReceipt.ReceiptStatus.VERIFIED:
+                receipt_status = 'تایید شده'
+            elif receipt.status == PaymentReceipt.ReceiptStatus.REJECTED:
+                receipt_status = 'رد شده'
+            else:
+                receipt_status = 'در انتظار تایید'
+
         writer.writerow([
             check.tracking_number,
             f"{check.user.name} {check.user.family}".strip() or check.user.mobileNumber,
@@ -356,7 +539,8 @@ def admin_check_export_csv(request):
             check.get_status_display(),
             check.created_at.strftime('%Y/%m/%d %H:%M'),
             check.verified_at.strftime('%Y/%m/%d %H:%M') if check.verified_at else '',
-            'بله' if check.is_finalized else 'خیر'
+            'بله' if check.is_finalized else 'خیر',
+            receipt_status
         ])
 
     return response

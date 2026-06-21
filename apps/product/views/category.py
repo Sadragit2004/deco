@@ -110,7 +110,7 @@ class CategoryBrandsView(View):
             brands = brands.order_by('sort_order', 'title')
 
         subcategories = category.children.filter(status=True)
-        popular_brands = brands.order_by('-total_content', '-product_count')[:10]
+        popular_brands = brands.order_by('-total_content', '-product_count')
 
         context = {
             'category': category,
@@ -160,7 +160,7 @@ class BrandCatalogsView(View):
             catalogs = catalogs.order_by('-created_at')
 
         categories = brand.categories.filter(status=True)
-        products = brand.products.filter(status=True)[:6]
+        products = brand.products.filter(status=True)
 
         context = {
             'brand': brand,
@@ -187,7 +187,7 @@ def brand_catalogs_view(request, slug):
 
     catalogs = Catalog.objects.filter(brand=brand, status=True).order_by('-created_at')
     categories = brand.categories.filter(status=True)
-    products = brand.products.filter(status=True)[:8]
+    products = brand.products.filter(status=True)
 
     context = {
         'brand': brand,
@@ -223,7 +223,7 @@ class CategoryMegaMenuView(View):
             status=True
         ).distinct().annotate(
             product_count=Count('products', filter=Q(products__status=True, products__categories__id__in=sub_ids))
-        ).order_by('-product_count')[:8]
+        ).order_by('-product_count')
 
         brands_data = [
             {
@@ -241,7 +241,7 @@ class CategoryMegaMenuView(View):
         catalogs = Catalog.objects.filter(
             categories__id__in=sub_ids,
             status=True
-        ).distinct().order_by('-created_at')[:6]
+        ).distinct().order_by('-created_at')
 
         catalogs_data = [
             {
@@ -264,14 +264,14 @@ class CategoryMegaMenuView(View):
                 order_items__order__status=OrderStatus.PAID.value,
                 order_items__order__receipt_verified=True
             ))
-        ).filter(total_sold__gt=0).order_by('-total_sold')[:6]
+        ).filter(total_sold__gt=0).order_by('-total_sold')
 
         # اگر محصول پرفروشی نبود، محصولات تصادفی یا جدید نشون بده
         if not bestsellers:
             bestsellers = Product.objects.filter(
                 categories__id__in=sub_ids,
                 status=True
-            ).order_by('-created_at')[:6]
+            ).order_by('-created_at')
 
         bestsellers_data = []
         for p in bestsellers:

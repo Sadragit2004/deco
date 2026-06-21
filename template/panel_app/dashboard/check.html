@@ -24,7 +24,6 @@
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* کارت‌های آماری */
     .stats-grid-mobile {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -38,6 +37,11 @@
         padding: 0.875rem;
         text-align: center;
         border: 1px solid rgba(102, 126, 234, 0.2);
+        transition: all 0.3s;
+    }
+
+    .stat-card-mobile:active {
+        transform: scale(0.97);
     }
 
     .stat-card-mobile .number {
@@ -58,7 +62,6 @@
     .stat-card-mobile.rejected { border-right: 4px solid #ef4444; }
     .stat-card-mobile.total { border-right: 4px solid #667eea; }
 
-    /* فیلترها */
     .filter-box-mobile {
         background: #1e293b;
         border-radius: 1rem;
@@ -76,6 +79,7 @@
         color: #94a3b8;
         font-size: 0.7rem;
         margin-bottom: 0.25rem;
+        font-weight: 500;
     }
 
     .filter-group-mobile input,
@@ -87,16 +91,17 @@
         border-radius: 0.75rem;
         color: #fff;
         font-size: 0.8rem;
+        transition: border 0.2s;
+    }
+
+    .filter-group-mobile input:focus,
+    .filter-group-mobile select:focus {
+        border-color: #667eea;
+        outline: none;
     }
 
     .filter-group-mobile input[type="date"] {
         color-scheme: dark;
-    }
-
-    .filter-buttons-mobile {
-        display: flex;
-        gap: 0.625rem;
-        margin-top: 0.75rem;
     }
 
     .btn-mobile {
@@ -108,11 +113,12 @@
         font-size: 0.8rem;
         flex: 1;
         text-align: center;
-        transition: opacity 0.2s;
+        transition: all 0.2s;
+        font-weight: 500;
     }
 
     .btn-mobile:active {
-        transform: scale(0.98);
+        transform: scale(0.96);
     }
 
     .btn-primary-mobile { background: linear-gradient(135deg, #667eea, #764ba2); }
@@ -120,8 +126,8 @@
     .btn-danger-mobile { background: #ef4444; }
     .btn-reset-mobile { background: #6b7280; }
     .btn-secondary-mobile { background: #334155; }
+    .btn-warning-mobile { background: #f59e0b; }
 
-    /* عملیات گروهی موبایل */
     .table-actions-mobile {
         display: flex;
         gap: 0.5rem;
@@ -137,6 +143,7 @@
         flex: 1;
         padding: 0.5rem;
         font-size: 0.75rem;
+        min-width: 60px;
     }
 
     .selected-count-mobile {
@@ -157,7 +164,6 @@
         cursor: pointer;
     }
 
-    /* لیست چک‌ها */
     .checks-list-mobile {
         display: flex;
         flex-direction: column;
@@ -170,6 +176,11 @@
         border-radius: 1.125rem;
         padding: 0.875rem;
         border: 1px solid rgba(102, 126, 234, 0.2);
+        transition: all 0.3s;
+    }
+
+    .check-card-mobile:active {
+        transform: scale(0.99);
     }
 
     .check-card-header-mobile {
@@ -205,13 +216,17 @@
         padding: 0.25rem 0.625rem;
         border-radius: 1.25rem;
         font-size: 0.65rem;
-        font-weight: 500;
+        font-weight: 600;
     }
 
     .badge-pending-mobile { background: rgba(251,191,36,0.2); color: #fbbf24; }
     .badge-verified-mobile { background: rgba(16,185,129,0.2); color: #34d399; }
     .badge-rejected-mobile { background: rgba(239,68,68,0.2); color: #ef4444; }
     .badge-cancelled-mobile { background: rgba(148,163,184,0.2); color: #94a3b8; }
+
+    .badge-receipt-verified-mobile { background: rgba(16,185,129,0.15); color: #34d399; font-size:0.55rem; padding:0.15rem 0.5rem; }
+    .badge-receipt-pending-mobile { background: rgba(251,191,36,0.15); color: #fbbf24; font-size:0.55rem; padding:0.15rem 0.5rem; }
+    .badge-receipt-rejected-mobile { background: rgba(239,68,68,0.15); color: #ef4444; font-size:0.55rem; padding:0.15rem 0.5rem; }
 
     .badge-finalized-mobile {
         background: rgba(16,185,129,0.2);
@@ -235,6 +250,7 @@
     .check-label-mobile {
         color: #94a3b8;
         font-size: 0.7rem;
+        font-weight: 500;
     }
 
     .check-value-mobile {
@@ -250,6 +266,33 @@
         border-radius: 0.5rem;
         cursor: pointer;
         border: 1px solid rgba(255,255,255,0.08);
+        transition: 0.2s;
+    }
+
+    .check-image-preview-mobile:active {
+        transform: scale(1.05);
+    }
+
+    .receipt-preview-mobile {
+        width: 60px;
+        height: 45px;
+        object-fit: cover;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        border: 2px solid rgba(251,191,36,0.3);
+        transition: 0.2s;
+    }
+
+    .receipt-preview-mobile.verified {
+        border-color: #34d399;
+    }
+
+    .receipt-preview-mobile.rejected {
+        border-color: #ef4444;
+    }
+
+    .receipt-preview-mobile:active {
+        transform: scale(1.05);
     }
 
     .check-actions-mobile {
@@ -270,14 +313,22 @@
         cursor: pointer;
         color: #fff;
         text-align: center;
+        font-weight: 500;
+        transition: all 0.2s;
+        min-width: 50px;
+    }
+
+    .check-actions-mobile .btn-sm-mobile:active {
+        transform: scale(0.95);
     }
 
     .btn-sm-detail-mobile { background: #667eea; }
     .btn-sm-verify-mobile { background: #10b981; }
     .btn-sm-reject-mobile { background: #ef4444; }
     .btn-sm-finalize-mobile { background: #3b82f6; }
+    .btn-sm-disabled-mobile { background: #4b5563; opacity:0.5; cursor:not-allowed; }
+    .btn-sm-receipt-mobile { background: #f59e0b; }
 
-    /* پیجینیشن */
     .pagination-mobile {
         display: flex;
         justify-content: center;
@@ -294,6 +345,11 @@
         color: #94a3b8;
         cursor: pointer;
         font-size: 0.75rem;
+        transition: all 0.2s;
+    }
+
+    .pagination-mobile button:active {
+        transform: scale(0.95);
     }
 
     .pagination-mobile button.active {
@@ -302,7 +358,6 @@
         border-color: #667eea;
     }
 
-    /* مودال موبایل */
     .modal-mobile {
         display: none;
         position: fixed;
@@ -318,6 +373,10 @@
         padding: 0.75rem;
     }
 
+    .modal-mobile.active {
+        display: flex;
+    }
+
     .modal-content-mobile {
         background: linear-gradient(135deg, #1e293b, #0f172a);
         border-radius: 1.25rem;
@@ -326,6 +385,12 @@
         max-width: 500px;
         max-height: 90vh;
         overflow-y: auto;
+        animation: modalSlideUp 0.3s ease;
+    }
+
+    @keyframes modalSlideUp {
+        from { opacity: 0; transform: translateY(30px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .modal-header-mobile {
@@ -340,6 +405,7 @@
     .modal-header-mobile h3 {
         color: #fff;
         font-size: 1.05rem;
+        margin: 0;
     }
 
     .modal-close-mobile {
@@ -351,6 +417,14 @@
         color: white;
         cursor: pointer;
         font-size: 1.2rem;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-close-mobile:active {
+        transform: scale(0.9);
     }
 
     .detail-section-mobile {
@@ -358,6 +432,7 @@
         border-radius: 0.875rem;
         padding: 0.875rem;
         margin-bottom: 0.875rem;
+        border: 1px solid rgba(102, 126, 234, 0.08);
     }
 
     .detail-title-mobile {
@@ -376,6 +451,10 @@
         border-bottom: 1px dashed rgba(102, 126, 234, 0.08);
         flex-wrap: wrap;
         gap: 0.25rem;
+    }
+
+    .detail-row-mobile:last-child {
+        border-bottom: none;
     }
 
     .detail-row-mobile .label {
@@ -413,6 +492,7 @@
         flex: 1;
         padding: 0.625rem;
         font-size: 0.8rem;
+        min-width: 70px;
     }
 
     .form-group-mobile {
@@ -424,6 +504,7 @@
         color: #94a3b8;
         font-size: 0.8rem;
         margin-bottom: 0.25rem;
+        font-weight: 500;
     }
 
     .form-group-mobile textarea {
@@ -436,12 +517,35 @@
         font-size: 0.85rem;
         resize: vertical;
         min-height: 80px;
+        transition: border 0.2s;
+    }
+
+    .form-group-mobile textarea:focus {
+        border-color: #667eea;
+        outline: none;
     }
 
     .loading-mobile {
         text-align: center;
         padding: 2rem;
         color: #94a3b8;
+    }
+
+    .loading-mobile::after {
+        content: '';
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #667eea;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin-right: 0.5rem;
+        vertical-align: middle;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
     }
 
     .empty-state-mobile {
@@ -454,6 +558,47 @@
         font-size: 2.5rem;
         margin-bottom: 0.5rem;
         opacity: 0.5;
+    }
+
+    .toast-mobile {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1e293b;
+        color: #fff;
+        padding: 0.75rem 1.5rem;
+        border-radius: 1rem;
+        border: 1px solid rgba(102,126,234,0.2);
+        z-index: 9999;
+        font-size: 0.85rem;
+        max-width: 90%;
+        text-align: center;
+        animation: toastSlideUp 0.3s ease;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+
+    .toast-mobile.error { border-color: #ef4444; }
+    .toast-mobile.success { border-color: #34d399; }
+    .toast-mobile.warning { border-color: #f59e0b; }
+
+    @keyframes toastSlideUp {
+        from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* اسکرول‌بار مودال */
+    .modal-content-mobile::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .modal-content-mobile::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .modal-content-mobile::-webkit-scrollbar-thumb {
+        background: #667eea;
+        border-radius: 10px;
     }
 </style>
 
@@ -481,13 +626,23 @@
     <!-- فیلترها -->
     <div class="filter-box-mobile">
         <div class="filter-group-mobile">
-            <label>وضعیت</label>
+            <label>وضعیت چک</label>
             <select id="mFilterStatus">
                 <option value="">همه</option>
                 <option value="pending">در انتظار</option>
                 <option value="verified">تایید شده</option>
                 <option value="rejected">رد شده</option>
                 <option value="cancelled">لغو شده</option>
+            </select>
+        </div>
+        <div class="filter-group-mobile">
+            <label>وضعیت رسید</label>
+            <select id="mFilterReceipt">
+                <option value="">همه</option>
+                <option value="verified">تایید شده</option>
+                <option value="pending">در انتظار</option>
+                <option value="rejected">رد شده</option>
+                <option value="none">بدون رسید</option>
             </select>
         </div>
         <div class="filter-group-mobile">
@@ -623,8 +778,27 @@
         return div.innerHTML;
     }
 
+    function showToast(message, type = 'info') {
+        const existing = document.querySelector('.toast-mobile');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.className = `toast-mobile ${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.remove(); }, 4000);
+    }
+
     function closeMobileModal(id) {
+        document.getElementById(id).classList.remove('active');
         document.getElementById(id).style.display = 'none';
+    }
+
+    function openMobileModal(id) {
+        document.getElementById(id).style.display = 'flex';
+        setTimeout(() => {
+            document.getElementById(id).classList.add('active');
+        }, 10);
     }
 
     async function loadMobileChecks() {
@@ -651,11 +825,11 @@
                 renderMobilePagination(data.pagination);
                 updateMobileSelectedCount();
             } else {
-                list.innerHTML = '<div class="loading-mobile">❌ خطا: ' + data.error + '</div>';
+                list.innerHTML = '<div class="empty-state-mobile"><div class="icon">❌</div>' + data.error + '</div>';
             }
         } catch(error) {
             console.error('خطا:', error);
-            list.innerHTML = '<div class="loading-mobile">❌ خطا در بارگذاری</div>';
+            list.innerHTML = '<div class="empty-state-mobile"><div class="icon">❌</div>خطا در بارگذاری</div>';
         }
     }
 
@@ -673,7 +847,22 @@
             'cancelled': 'badge-cancelled-mobile'
         };
 
-        list.innerHTML = checks.map(check => `
+        const receiptBadgeMap = {
+            'verified': 'badge-receipt-verified-mobile',
+            'pending': 'badge-receipt-pending-mobile',
+            'rejected': 'badge-receipt-rejected-mobile',
+            'none': 'badge-receipt-pending-mobile'
+        };
+
+        list.innerHTML = checks.map(check => {
+            const receiptStatus = check.receipt_status_class || 'pending';
+            const receiptBadgeClass = receiptBadgeMap[receiptStatus] || 'badge-receipt-pending-mobile';
+            const receiptLabel = check.receipt_status_display || 'در انتظار تایید';
+            const receiptBorderClass = receiptStatus === 'verified' ? 'verified' :
+                                      receiptStatus === 'rejected' ? 'rejected' : '';
+            const showVerifyReceiptBtn = check.status === 'pending' && receiptStatus === 'pending' && check.order_display;
+
+            return `
             <div class="check-card-mobile">
                 <div class="check-card-header-mobile">
                     <span class="check-tracking-mobile">
@@ -707,6 +896,35 @@
                     <img src="${check.check_image}" class="check-image-preview-mobile" style="width:80px; height:60px;" onclick="window.open(this.src)">
                 </div>
                 ` : ''}
+
+                <!-- بخش رسید -->
+                ${check.receipt_image ? `
+                <div class="check-row-mobile" style="justify-content:center; border-top:1px dashed rgba(102,126,234,0.1); padding-top:0.5rem;">
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:0.25rem; width:100%;">
+                        <span class="check-label-mobile">🧾 رسید پرداخت</span>
+                        <img src="${check.receipt_image}" class="receipt-preview-mobile ${receiptBorderClass}" style="width:70px; height:50px;" onclick="window.open(this.src)">
+                        <span class="badge-mobile ${receiptBadgeClass} receipt-status-badge-mobile">
+                            ${receiptLabel}
+                        </span>
+                        ${showVerifyReceiptBtn ? `
+                            <button class="btn-sm-mobile btn-sm-receipt-mobile" onclick="verifyReceiptMobile('${check.order_display}')">
+                                ✅ تایید رسید
+                            </button>
+                        ` : ''}
+                        ${receiptStatus === 'verified' ? `
+                            <span style="color:#34d399; font-size:0.55rem;">✓ رسید تایید شده</span>
+                        ` : ''}
+                        ${receiptStatus === 'rejected' ? `
+                            <span style="color:#ef4444; font-size:0.55rem;">✗ رسید رد شده</span>
+                        ` : ''}
+                    </div>
+                </div>
+                ` : `
+                <div class="check-row-mobile" style="justify-content:center; border-top:1px dashed rgba(102,126,234,0.1); padding-top:0.5rem;">
+                    <span class="check-label-mobile" style="color:#6b7280;">🧾 بدون رسید</span>
+                </div>
+                `}
+
                 <div class="check-row-mobile">
                     <span class="check-label-mobile">📅 تاریخ</span>
                     <span class="check-value-mobile">${check.created_at}</span>
@@ -715,7 +933,11 @@
                 <div class="check-actions-mobile">
                     <button class="btn-sm-mobile btn-sm-detail-mobile" onclick="viewMobileDetail('${check.id}')">👁 جزئیات</button>
                     ${check.status === 'pending' ? `
-                        <button class="btn-sm-mobile btn-sm-verify-mobile" onclick="verifyMobileCheck('${check.id}')">✅ تایید</button>
+                        ${receiptStatus === 'verified' ? `
+                            <button class="btn-sm-mobile btn-sm-verify-mobile" onclick="verifyMobileCheck('${check.id}')">✅ تایید</button>
+                        ` : `
+                            <button class="btn-sm-mobile btn-sm-disabled-mobile" title="ابتدا رسید پرداخت را تایید کنید" disabled>⛔ تایید</button>
+                        `}
                         <button class="btn-sm-mobile btn-sm-reject-mobile" onclick="rejectMobileCheck('${check.id}')">❌ رد</button>
                     ` : ''}
                     ${check.status === 'verified' && !check.is_finalized ? `
@@ -723,7 +945,8 @@
                     ` : ''}
                 </div>
             </div>
-        `).join('');
+            `;
+        }).join('');
 
         document.getElementById('mSelectAll').checked = false;
         mobileSelectedChecks = [];
@@ -765,6 +988,7 @@
     function applyMobileFilters() {
         mobileFilters = {
             status: document.getElementById('mFilterStatus').value,
+            receipt_status: document.getElementById('mFilterReceipt').value,
             search: document.getElementById('mSearchInput').value,
             date_from: document.getElementById('mFilterDateFrom').value,
             date_to: document.getElementById('mFilterDateTo').value,
@@ -779,6 +1003,7 @@
 
     function resetMobileFilters() {
         document.getElementById('mFilterStatus').value = '';
+        document.getElementById('mFilterReceipt').value = '';
         document.getElementById('mSearchInput').value = '';
         document.getElementById('mFilterDateFrom').value = '';
         document.getElementById('mFilterDateTo').value = '';
@@ -798,6 +1023,35 @@
         document.getElementById('mSelectedCount').innerText = mobileSelectedChecks.length;
     }
 
+    // ===== تایید رسید موبایل =====
+    async function verifyReceiptMobile(orderRef) {
+        if (!orderRef) {
+            showToast('شماره سفارش یافت نشد', 'warning');
+            return;
+        }
+        if (!confirm('آیا از تایید رسید پرداخت این سفارش اطمینان دارید؟')) return;
+
+        try {
+            const response = await fetch(`/panel/admin/receipt/verify/${orderRef}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                showToast('✅ رسید با موفقیت تایید شد', 'success');
+                loadMobileChecks();
+            } else {
+                showToast('❌ خطا: ' + data.error, 'error');
+            }
+        } catch(error) {
+            showToast('❌ خطا در ارتباط با سرور', 'error');
+        }
+    }
+
+    // ===== جزئیات موبایل =====
     async function viewMobileDetail(id) {
         try {
             const response = await fetch(`/panel/admin/api/check/${id}/`);
@@ -813,6 +1067,10 @@
                     'rejected': 'badge-rejected-mobile',
                     'cancelled': 'badge-cancelled-mobile'
                 };
+
+                const receiptStatus = c.receipt?.status_display || 'بدون رسید';
+                const receiptColor = c.receipt?.status_class === 'verified' ? '#34d399' :
+                                    c.receipt?.status_class === 'rejected' ? '#ef4444' : '#fbbf24';
 
                 let bodyHtml = `
                     <div class="detail-section-mobile">
@@ -836,12 +1094,41 @@
                     bodyHtml += `<div style="text-align:center;margin-top:0.5rem;"><img src="${c.check_image}" class="detail-image-mobile" onclick="window.open(this.src)"></div>`;
                 }
 
+                // بخش رسید
+                if (c.receipt && c.receipt.image) {
+                    bodyHtml += `
+                        <div class="detail-section-mobile" style="border:1px solid ${receiptColor};">
+                            <div class="detail-title-mobile" style="color:${receiptColor};">
+                                🧾 رسید پرداخت - ${receiptStatus}
+                            </div>
+                            <div style="text-align:center;margin-bottom:0.5rem;">
+                                <img src="${c.receipt.image}" class="detail-image-mobile" style="max-height:150px;" onclick="window.open(this.src)">
+                            </div>
+                            ${c.receipt.receipt_number ? `<div class="detail-row-mobile"><span class="label">شماره رسید</span><span class="value">${escapeHtml(c.receipt.receipt_number)}</span></div>` : ''}
+                            ${c.receipt.bank_name ? `<div class="detail-row-mobile"><span class="label">بانک</span><span class="value">${escapeHtml(c.receipt.bank_name)}</span></div>` : ''}
+                            ${c.receipt.payment_amount ? `<div class="detail-row-mobile"><span class="label">مبلغ پرداختی</span><span class="value" style="color:#fbbf24;">${formatNumber(c.receipt.payment_amount)} تومان</span></div>` : ''}
+                            ${c.receipt.tracking_code ? `<div class="detail-row-mobile"><span class="label">کد پیگیری</span><span class="value" style="direction:ltr;">${escapeHtml(c.receipt.tracking_code)}</span></div>` : ''}
+                            ${c.receipt.uploaded_at ? `<div class="detail-row-mobile"><span class="label">تاریخ آپلود</span><span class="value">${c.receipt.uploaded_at}</span></div>` : ''}
+                            ${c.receipt.verified_at ? `<div class="detail-row-mobile"><span class="label" style="color:#34d399;">تاریخ تایید رسید</span><span class="value" style="color:#34d399;">${c.receipt.verified_at}</span></div>` : ''}
+                            ${c.receipt.rejection_reason ? `<div class="detail-row-mobile" style="border-color:#ef4444;"><span class="label" style="color:#ef4444;">دلیل رد رسید</span><span class="value" style="color:#ef4444;">${escapeHtml(c.receipt.rejection_reason)}</span></div>` : ''}
+                        </div>
+                    `;
+                }
+
                 document.getElementById('mDetailBody').innerHTML = bodyHtml;
 
                 let actionsHtml = `<button class="btn-mobile btn-secondary-mobile" onclick="closeMobileModal('mDetailModal')">بستن</button>`;
                 if (c.status === 'pending') {
+                    if (c.receipt?.status_class === 'verified') {
+                        actionsHtml += `
+                            <button class="btn-mobile btn-success-mobile" onclick="verifyMobileCheck('${c.id}')">✅ تایید</button>
+                        `;
+                    } else {
+                        actionsHtml += `
+                            <button class="btn-mobile btn-secondary-mobile" style="opacity:0.5;cursor:not-allowed;" disabled>⛔ تایید (رسید تایید نشده)</button>
+                        `;
+                    }
                     actionsHtml += `
-                        <button class="btn-mobile btn-success-mobile" onclick="verifyMobileCheck('${c.id}')">✅ تایید</button>
                         <button class="btn-mobile btn-danger-mobile" onclick="rejectMobileCheck('${c.id}')">❌ رد</button>
                     `;
                 }
@@ -850,13 +1137,14 @@
                 }
                 document.getElementById('mDetailActions').innerHTML = actionsHtml;
 
-                document.getElementById('mDetailModal').style.display = 'flex';
+                openMobileModal('mDetailModal');
             }
         } catch(error) {
-            alert('خطا در دریافت جزئیات');
+            showToast('خطا در دریافت جزئیات', 'error');
         }
     }
 
+    // ===== تایید چک موبایل =====
     async function verifyMobileCheck(id) {
         if (!confirm('آیا از تایید این چک اطمینان دارید؟')) return;
 
@@ -871,27 +1159,28 @@
             });
             const data = await response.json();
             if (data.success) {
-                alert('✅ چک با موفقیت تایید شد');
+                showToast('✅ چک با موفقیت تایید شد', 'success');
                 closeMobileModal('mDetailModal');
                 loadMobileChecks();
             } else {
-                alert('❌ خطا: ' + data.error);
+                showToast('❌ خطا: ' + data.error, 'error');
             }
         } catch(error) {
-            alert('❌ خطا در ارتباط با سرور');
+            showToast('❌ خطا در ارتباط با سرور', 'error');
         }
     }
 
+    // ===== رد چک موبایل =====
     function rejectMobileCheck(id) {
         mobileRejectId = id;
         document.getElementById('mRejectReason').value = '';
-        document.getElementById('mRejectModal').style.display = 'flex';
+        openMobileModal('mRejectModal');
     }
 
     async function confirmMobileReject() {
         const reason = document.getElementById('mRejectReason').value.trim();
         if (!reason) {
-            alert('لطفاً دلیل رد را وارد کنید');
+            showToast('لطفاً دلیل رد را وارد کنید', 'warning');
             return;
         }
 
@@ -906,18 +1195,19 @@
             });
             const data = await response.json();
             if (data.success) {
-                alert('❌ چک با موفقیت رد شد');
+                showToast('❌ چک با موفقیت رد شد', 'success');
                 closeMobileModal('mRejectModal');
                 closeMobileModal('mDetailModal');
                 loadMobileChecks();
             } else {
-                alert('❌ خطا: ' + data.error);
+                showToast('❌ خطا: ' + data.error, 'error');
             }
         } catch(error) {
-            alert('❌ خطا در ارتباط با سرور');
+            showToast('❌ خطا در ارتباط با سرور', 'error');
         }
     }
 
+    // ===== نهایی‌سازی موبایل =====
     async function finalizeMobileCheck(id) {
         if (!confirm('آیا از نهایی‌سازی این پرداخت اطمینان دارید؟')) return;
 
@@ -931,21 +1221,22 @@
             });
             const data = await response.json();
             if (data.success) {
-                alert('🏁 پرداخت نهایی شد');
+                showToast('🏁 پرداخت نهایی شد', 'success');
                 closeMobileModal('mDetailModal');
                 loadMobileChecks();
             } else {
-                alert('❌ خطا: ' + data.error);
+                showToast('❌ خطا: ' + data.error, 'error');
             }
         } catch(error) {
-            alert('❌ خطا در ارتباط با سرور');
+            showToast('❌ خطا در ارتباط با سرور', 'error');
         }
     }
 
+    // ===== عملیات گروهی موبایل =====
     function bulkActionMobile(action) {
         const checked = document.querySelectorAll('.m-check-item:checked');
         if (checked.length === 0) {
-            alert('لطفاً حداقل یک چک را انتخاب کنید');
+            showToast('لطفاً حداقل یک چک را انتخاب کنید', 'warning');
             return;
         }
 
@@ -960,7 +1251,7 @@
 
         if (action === 'verify') {
             title.textContent = '✅ تایید گروهی';
-            message.textContent = `${mobileSelectedChecks.length} چک تایید می‌شوند. اطمینان دارید؟`;
+            message.textContent = `${mobileSelectedChecks.length} چک تایید می‌شوند.`;
             reasonGroup.style.display = 'none';
             confirmBtn.className = 'btn-mobile btn-success-mobile';
             confirmBtn.textContent = '✅ تایید';
@@ -973,12 +1264,12 @@
             confirmBtn.textContent = '❌ رد';
         }
 
-        modal.style.display = 'flex';
+        openMobileModal('mBulkModal');
     }
 
     async function confirmMobileBulk() {
         if (mobileSelectedChecks.length === 0) {
-            alert('هیچ چکی انتخاب نشده است');
+            showToast('هیچ چکی انتخاب نشده است', 'warning');
             return;
         }
 
@@ -989,7 +1280,7 @@
         if (mobileBulkActionType === 'reject') {
             const reason = document.getElementById('mBulkReason').value.trim();
             if (!reason) {
-                alert('لطفاً دلیل رد را وارد کنید');
+                showToast('لطفاً دلیل رد را وارد کنید', 'warning');
                 return;
             }
             formData.append('reason', reason);
@@ -1006,19 +1297,20 @@
             });
             const data = await response.json();
             if (data.success) {
-                alert(data.message);
+                showToast(data.message, 'success');
                 closeMobileModal('mBulkModal');
                 loadMobileChecks();
             } else {
-                alert('❌ خطا: ' + data.error);
+                showToast('❌ خطا: ' + data.error, 'error');
             }
         } catch(error) {
-            alert('❌ خطا در ارتباط با سرور');
+            showToast('❌ خطا در ارتباط با سرور', 'error');
         }
     }
 
-    // Event Listeners موبایل
+    // ===== Event Listeners موبایل =====
     document.getElementById('mFilterStatus').addEventListener('change', applyMobileFilters);
+    document.getElementById('mFilterReceipt').addEventListener('change', applyMobileFilters);
     document.getElementById('mFilterSort').addEventListener('change', applyMobileFilters);
     document.getElementById('mFilterDateFrom').addEventListener('change', applyMobileFilters);
     document.getElementById('mFilterDateTo').addEventListener('change', applyMobileFilters);
@@ -1030,7 +1322,10 @@
 
     document.querySelectorAll('.modal-mobile').forEach(modal => {
         modal.addEventListener('click', function(e) {
-            if (e.target === this) this.style.display = 'none';
+            if (e.target === this) {
+                this.classList.remove('active');
+                this.style.display = 'none';
+            }
         });
     });
 
@@ -1054,7 +1349,6 @@
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* کارت‌های آماری دسکتاپ */
     .pc-stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -1073,6 +1367,7 @@
     .pc-stat-card:hover {
         transform: translateY(-3px);
         border-color: #667eea;
+        box-shadow: 0 8px 25px rgba(102,126,234,0.15);
     }
 
     .pc-stat-card .number {
@@ -1093,7 +1388,6 @@
     .pc-stat-card.rejected { border-right: 4px solid #ef4444; }
     .pc-stat-card.total { border-right: 4px solid #667eea; }
 
-    /* فیلترهای دسکتاپ */
     .pc-filter-box {
         background: #1e293b;
         border-radius: 1.5rem;
@@ -1114,6 +1408,9 @@
         color: #94a3b8;
         font-size: 0.7rem;
         margin-bottom: 0.25rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .pc-filter-group input,
@@ -1125,6 +1422,14 @@
         border-radius: 0.75rem;
         color: #fff;
         font-size: 0.8rem;
+        transition: all 0.2s;
+    }
+
+    .pc-filter-group input:focus,
+    .pc-filter-group select:focus {
+        border-color: #667eea;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
     }
 
     .pc-filter-group input[type="date"] {
@@ -1154,6 +1459,7 @@
         font-size: 0.8rem;
         transition: all 0.2s;
         white-space: nowrap;
+        font-weight: 500;
     }
 
     .pc-btn:hover {
@@ -1161,13 +1467,17 @@
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
 
+    .pc-btn:active {
+        transform: scale(0.97);
+    }
+
     .pc-btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); }
     .pc-btn-success { background: #10b981; }
     .pc-btn-danger { background: #ef4444; }
     .pc-btn-reset { background: #6b7280; }
     .pc-btn-secondary { background: #334155; }
+    .pc-btn-warning { background: #f59e0b; }
 
-    /* عملیات گروهی دسکتاپ */
     .pc-table-actions {
         display: flex;
         gap: 0.75rem;
@@ -1200,7 +1510,6 @@
         cursor: pointer;
     }
 
-    /* جدول دسکتاپ */
     .pc-table-wrapper {
         background: #1e293b;
         border-radius: 1.5rem;
@@ -1211,7 +1520,7 @@
     .pc-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 1000px;
+        min-width: 1100px;
     }
 
     .pc-table th {
@@ -1224,6 +1533,7 @@
         font-weight: 700;
         text-transform: uppercase;
         white-space: nowrap;
+        letter-spacing: 0.5px;
     }
 
     .pc-table td {
@@ -1254,7 +1564,7 @@
         padding: 0.25rem 0.75rem;
         border-radius: 1.875rem;
         font-size: 0.7rem;
-        font-weight: 500;
+        font-weight: 600;
         display: inline-block;
     }
 
@@ -1262,6 +1572,10 @@
     .pc-badge-verified { background: rgba(16,185,129,0.2); color: #34d399; }
     .pc-badge-rejected { background: rgba(239,68,68,0.2); color: #ef4444; }
     .pc-badge-cancelled { background: rgba(148,163,184,0.2); color: #94a3b8; }
+
+    .pc-badge-receipt-verified { background: rgba(16,185,129,0.15); color: #34d399; font-size:0.6rem; padding:0.125rem 0.5rem; }
+    .pc-badge-receipt-pending { background: rgba(251,191,36,0.15); color: #fbbf24; font-size:0.6rem; padding:0.125rem 0.5rem; }
+    .pc-badge-receipt-rejected { background: rgba(239,68,68,0.15); color: #ef4444; font-size:0.6rem; padding:0.125rem 0.5rem; }
 
     .pc-badge-finalized {
         background: rgba(16,185,129,0.2);
@@ -1274,18 +1588,40 @@
     }
 
     .pc-check-image {
-        width: 55px;
-        height: 40px;
+        width: 50px;
+        height: 38px;
         object-fit: cover;
         border-radius: 0.5rem;
         cursor: pointer;
         border: 1px solid rgba(255,255,255,0.08);
-        transition: 0.2s;
+        transition: all 0.2s;
     }
 
     .pc-check-image:hover {
         transform: scale(1.05);
         border-color: #667eea;
+    }
+
+    .pc-receipt-image {
+        width: 55px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        border: 2px solid rgba(251,191,36,0.3);
+        transition: all 0.2s;
+    }
+
+    .pc-receipt-image.verified {
+        border-color: #34d399;
+    }
+
+    .pc-receipt-image.rejected {
+        border-color: #ef4444;
+    }
+
+    .pc-receipt-image:hover {
+        transform: scale(1.05);
     }
 
     .pc-action-btns {
@@ -1303,18 +1639,25 @@
         color: #fff;
         transition: all 0.2s;
         font-weight: 500;
+        min-width: 30px;
+        text-align: center;
     }
 
     .pc-btn-sm:hover {
         transform: scale(1.05);
     }
 
+    .pc-btn-sm:active {
+        transform: scale(0.95);
+    }
+
     .pc-btn-sm-detail { background: #667eea; }
     .pc-btn-sm-verify { background: #10b981; }
     .pc-btn-sm-reject { background: #ef4444; }
     .pc-btn-sm-finalize { background: #3b82f6; }
+    .pc-btn-sm-disabled { background: #4b5563; opacity:0.5; cursor:not-allowed; }
+    .pc-btn-sm-receipt { background: #f59e0b; }
 
-    /* پیجینیشن دسکتاپ */
     .pc-pagination {
         display: flex;
         justify-content: center;
@@ -1363,7 +1706,23 @@
         color: #94a3b8;
     }
 
-    /* مودال دسکتاپ */
+    .pc-loading::after {
+        content: '';
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        border: 2px solid #667eea;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: pcSpin 0.8s linear infinite;
+        margin-right: 0.5rem;
+        vertical-align: middle;
+    }
+
+    @keyframes pcSpin {
+        to { transform: rotate(360deg); }
+    }
+
     .pc-modal {
         display: none;
         position: fixed;
@@ -1379,15 +1738,25 @@
         padding: 1rem;
     }
 
+    .pc-modal.active {
+        display: flex;
+    }
+
     .pc-modal-content {
         background: linear-gradient(135deg, #1e293b, #0f172a);
         border-radius: 1.75rem;
         padding: 1.5rem;
         width: 100%;
-        max-width: 650px;
+        max-width: 700px;
         max-height: 85vh;
         overflow-y: auto;
         border: 1px solid rgba(102,126,234,0.15);
+        animation: pcModalSlideUp 0.3s ease;
+    }
+
+    @keyframes pcModalSlideUp {
+        from { opacity: 0; transform: translateY(30px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .pc-modal-header {
@@ -1405,6 +1774,7 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        margin: 0;
     }
 
     .pc-modal-close {
@@ -1419,7 +1789,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: 0.2s;
+        transition: all 0.2s;
     }
 
     .pc-modal-close:hover {
@@ -1452,9 +1822,14 @@
         gap: 0.5rem;
     }
 
+    .pc-detail-row:last-child {
+        border-bottom: none;
+    }
+
     .pc-detail-row .label {
         color: #94a3b8;
         font-size: 0.75rem;
+        font-weight: 500;
     }
 
     .pc-detail-row .value {
@@ -1496,6 +1871,7 @@
         color: #94a3b8;
         font-size: 0.8rem;
         margin-bottom: 0.25rem;
+        font-weight: 500;
     }
 
     .pc-form-group textarea {
@@ -1508,53 +1884,80 @@
         font-size: 0.85rem;
         resize: vertical;
         min-height: 80px;
+        transition: border 0.2s;
     }
 
     .pc-form-group textarea:focus {
-        outline: none;
         border-color: #667eea;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
     }
 
-    /* Responsive */
+    .pc-toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1e293b;
+        color: #fff;
+        padding: 1rem 2rem;
+        border-radius: 1rem;
+        border: 1px solid rgba(102,126,234,0.2);
+        z-index: 9999;
+        font-size: 0.9rem;
+        max-width: 90%;
+        text-align: center;
+        animation: pcToastSlideUp 0.3s ease;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+
+    .pc-toast.error { border-color: #ef4444; }
+    .pc-toast.success { border-color: #34d399; }
+    .pc-toast.warning { border-color: #f59e0b; }
+
+    @keyframes pcToastSlideUp {
+        from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    .receipt-status-cell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+    }
+
+    /* اسکرول‌بار مودال */
+    .pc-modal-content::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .pc-modal-content::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .pc-modal-content::-webkit-scrollbar-thumb {
+        background: #667eea;
+        border-radius: 10px;
+    }
+
     @media (max-width: 1024px) {
-        .pc-checks-container {
-            padding: 1rem;
-        }
-        .pc-stats-grid {
-            gap: 0.75rem;
-        }
-        .pc-stat-card .number {
-            font-size: 1.4rem;
-        }
-        .pc-filter-grid {
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-        }
-        .pc-filter-search {
-            grid-column: span 1;
-        }
+        .pc-checks-container { padding: 1rem; }
+        .pc-stats-grid { gap: 0.75rem; }
+        .pc-stat-card .number { font-size: 1.4rem; }
+        .pc-filter-grid { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+        .pc-filter-search { grid-column: span 1; }
     }
 
     @media (max-width: 768px) {
-        .pc-table {
-            min-width: 700px;
-        }
-        .pc-table th,
-        .pc-table td {
-            padding: 0.5rem 0.625rem;
-            font-size: 0.7rem;
-        }
-        .pc-check-image {
-            width: 40px;
-            height: 30px;
-        }
-        .pc-btn-sm {
-            padding: 3px 7px;
-            font-size: 0.6rem;
-        }
+        .pc-table { min-width: 800px; }
+        .pc-table th, .pc-table td { padding: 0.5rem 0.625rem; font-size: 0.7rem; }
+        .pc-check-image { width: 40px; height: 30px; }
+        .pc-receipt-image { width: 45px; height: 32px; }
+        .pc-btn-sm { padding: 3px 7px; font-size: 0.6rem; }
     }
 </style>
 
-<!-- ===== محتوای دسکتاپ ===== -->
 <div class="pc-checks-container">
     <!-- کارت‌های آمار -->
     <div class="pc-stats-grid">
@@ -1580,13 +1983,23 @@
     <div class="pc-filter-box">
         <div class="pc-filter-grid">
             <div class="pc-filter-group">
-                <label>وضعیت</label>
+                <label>وضعیت چک</label>
                 <select id="pcFilterStatus">
                     <option value="">همه</option>
                     <option value="pending">در انتظار</option>
                     <option value="verified">تایید شده</option>
                     <option value="rejected">رد شده</option>
                     <option value="cancelled">لغو شده</option>
+                </select>
+            </div>
+            <div class="pc-filter-group">
+                <label>وضعیت رسید</label>
+                <select id="pcFilterReceipt">
+                    <option value="">همه</option>
+                    <option value="verified">تایید شده</option>
+                    <option value="pending">در انتظار</option>
+                    <option value="rejected">رد شده</option>
+                    <option value="none">بدون رسید</option>
                 </select>
             </div>
             <div class="pc-filter-group">
@@ -1639,12 +2052,13 @@
                     <th>اطلاعات چک</th>
                     <th>مبلغ</th>
                     <th>وضعیت</th>
+                    <th>رسید</th>
                     <th>تاریخ ثبت</th>
                     <th>عملیات</th>
                 </tr>
             </thead>
             <tbody id="pcTableBody">
-                <tr><td colspan="8" class="pc-loading">در حال بارگذاری...</td></tr>
+                <tr><td colspan="9" class="pc-loading">در حال بارگذاری...</td></tr>
             </tbody>
         </table>
     </div>
@@ -1711,9 +2125,60 @@
     let pcSelectedChecks = [];
     let pcBulkActionType = '';
 
+    function pcGetCSRF() {
+        let v = null;
+        if (document.cookie) {
+            const c = document.cookie.split(';');
+            for (let i = 0; i < c.length; i++) {
+                const ck = c[i].trim();
+                if (ck.substring(0, 9) === 'csrftoken=') {
+                    v = decodeURIComponent(ck.substring(9));
+                    break;
+                }
+            }
+        }
+        return v;
+    }
+    const pcCsrfToken = pcGetCSRF();
+
+    function pcFormatNumber(n) {
+        if (n === undefined || n === null) return '۰';
+        return new Intl.NumberFormat('fa-IR').format(n);
+    }
+
+    function pcEscapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function pcShowToast(message, type = 'info') {
+        const existing = document.querySelector('.pc-toast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.className = `pc-toast ${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.remove(); }, 4000);
+    }
+
+    function closePcModal(id) {
+        document.getElementById(id).classList.remove('active');
+        document.getElementById(id).style.display = 'none';
+    }
+
+    function openPcModal(id) {
+        document.getElementById(id).style.display = 'flex';
+        setTimeout(() => {
+            document.getElementById(id).classList.add('active');
+        }, 10);
+    }
+
     async function loadPcChecks() {
         const tbody = document.getElementById('pcTableBody');
-        tbody.innerHTML = '<tr><td colspan="8" class="pc-loading">در حال بارگذاری...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="pc-loading">در حال بارگذاری...</td></tr>';
 
         const params = new URLSearchParams({
             page: pcPage,
@@ -1726,27 +2191,27 @@
             const data = await response.json();
 
             if (data.status === 'success') {
-                document.getElementById('pcStatTotal').innerText = formatNumber(data.stats.total);
-                document.getElementById('pcStatPending').innerText = formatNumber(data.stats.pending);
-                document.getElementById('pcStatVerified').innerText = formatNumber(data.stats.verified);
-                document.getElementById('pcStatRejected').innerText = formatNumber(data.stats.rejected);
+                document.getElementById('pcStatTotal').innerText = pcFormatNumber(data.stats.total);
+                document.getElementById('pcStatPending').innerText = pcFormatNumber(data.stats.pending);
+                document.getElementById('pcStatVerified').innerText = pcFormatNumber(data.stats.verified);
+                document.getElementById('pcStatRejected').innerText = pcFormatNumber(data.stats.rejected);
 
                 renderPcTable(data.checks);
                 renderPcPagination(data.pagination);
                 updatePcSelectedCount();
             } else {
-                tbody.innerHTML = '<tr><td colspan="8" class="pc-empty-state"><div class="icon">❌</div>خطا: ' + data.error + '</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" class="pc-empty-state"><div class="icon">❌</div>خطا: ' + data.error + '</td></tr>';
             }
         } catch(error) {
             console.error('خطا:', error);
-            tbody.innerHTML = '<tr><td colspan="8" class="pc-empty-state"><div class="icon">❌</div>خطا در بارگذاری</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" class="pc-empty-state"><div class="icon">❌</div>خطا در بارگذاری</td></tr>';
         }
     }
 
     function renderPcTable(checks) {
         const tbody = document.getElementById('pcTableBody');
         if (!checks || checks.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="pc-empty-state"><div class="icon">📭</div>هیچ چکی یافت نشد</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" class="pc-empty-state"><div class="icon">📭</div>هیچ چکی یافت نشد</td></tr>';
             return;
         }
 
@@ -1757,35 +2222,73 @@
             'cancelled': 'pc-badge-cancelled'
         };
 
-        tbody.innerHTML = checks.map(check => `
+        const receiptBadgeMap = {
+            'verified': 'pc-badge-receipt-verified',
+            'pending': 'pc-badge-receipt-pending',
+            'rejected': 'pc-badge-receipt-rejected',
+            'none': 'pc-badge-receipt-pending'
+        };
+
+        tbody.innerHTML = checks.map(check => {
+            const receiptStatus = check.receipt_status_class || 'pending';
+            const receiptBadgeClass = receiptBadgeMap[receiptStatus] || 'pc-badge-receipt-pending';
+            const receiptLabel = check.receipt_status_display || 'در انتظار تایید';
+            const receiptBorderClass = receiptStatus === 'verified' ? 'verified' :
+                                      receiptStatus === 'rejected' ? 'rejected' : '';
+            const showVerifyReceiptBtn = check.status === 'pending' && receiptStatus === 'pending' && check.order_display;
+
+            return `
             <tr>
                 <td class="pc-checkbox-col">
                     <input type="checkbox" class="pc-check-item" value="${check.id}" onchange="updatePcSelectedCount()">
                 </td>
                 <td>
-                    <strong style="color:#60a5fa;">${escapeHtml(check.tracking_number)}</strong>
+                    <strong style="color:#60a5fa;">${pcEscapeHtml(check.tracking_number)}</strong>
                     <div style="font-size:11px;color:#94a3b8;">${check.order_display || 'بدون سفارش'}</div>
                 </td>
                 <td>
-                    <div><strong>${escapeHtml(check.user_name || check.user_mobile)}</strong></div>
+                    <div><strong>${pcEscapeHtml(check.user_name || check.user_mobile)}</strong></div>
                     <div style="font-size:11px;color:#94a3b8;">${check.user_mobile}</div>
                 </td>
                 <td>
                     ${check.check_image ? `<img src="${check.check_image}" class="pc-check-image" onclick="window.open(this.src)">` : ''}
-                    ${check.bank_name ? `<div>🏦 ${escapeHtml(check.bank_name)}</div>` : ''}
-                    ${check.check_number ? `<div style="font-size:11px;color:#94a3b8;">#${escapeHtml(check.check_number)}</div>` : ''}
+                    ${check.bank_name ? `<div>🏦 ${pcEscapeHtml(check.bank_name)}</div>` : ''}
+                    ${check.check_number ? `<div style="font-size:11px;color:#94a3b8;">#${pcEscapeHtml(check.check_number)}</div>` : ''}
                 </td>
-                <td>${check.check_amount ? `<strong style="color:#fbbf24;">${formatNumber(check.check_amount)}</strong> تومان` : '-'}</td>
+                <td>${check.check_amount ? `<strong style="color:#fbbf24;">${pcFormatNumber(check.check_amount)}</strong> تومان` : '-'}</td>
                 <td>
                     <span class="pc-badge ${badgeMap[check.status] || ''}">${check.status_display}</span>
                     ${check.is_finalized ? '<div class="pc-badge-finalized">✓ نهایی</div>' : ''}
+                </td>
+                <td>
+                    ${check.receipt_image ? `
+                        <div class="receipt-status-cell">
+                            <img src="${check.receipt_image}" class="pc-receipt-image ${receiptBorderClass}" style="width:55px; height:40px;" onclick="window.open(this.src)">
+                            <span class="pc-badge ${receiptBadgeClass}">${receiptLabel}</span>
+                            ${showVerifyReceiptBtn ? `
+                                <button class="pc-btn-sm pc-btn-sm-receipt" onclick="verifyReceiptPc('${check.order_display}')">
+                                    ✅ تایید رسید
+                                </button>
+                            ` : ''}
+                            ${receiptStatus === 'verified' ? `
+                                <span style="color:#34d399; font-size:0.55rem;">✓ تایید شده</span>
+                            ` : ''}
+                            ${receiptStatus === 'rejected' ? `
+                                <span style="color:#ef4444; font-size:0.55rem;">✗ رد شده</span>
+                            ` : ''}
+                        </div>
+                    ` : '<span style="color:#6b7280;font-size:11px;">بدون رسید</span>'}
                 </td>
                 <td style="font-size:12px;">${check.created_at}</td>
                 <td>
                     <div class="pc-action-btns">
                         <button class="pc-btn-sm pc-btn-sm-detail" onclick="viewPcDetail('${check.id}')">👁</button>
                         ${check.status === 'pending' ? `
-                            <button class="pc-btn-sm pc-btn-sm-verify" onclick="verifyPcCheck('${check.id}')">✅</button>
+                            ${receiptStatus === 'verified' ? `
+                                <button class="pc-btn-sm pc-btn-sm-verify" onclick="verifyPcCheck('${check.id}')">✅</button>
+                            ` : `
+                                <button class="pc-btn-sm pc-btn-sm-disabled" title="ابتدا رسید را تایید کنید" disabled>⛔</button>
+                            `}
                             <button class="pc-btn-sm pc-btn-sm-reject" onclick="rejectPcCheck('${check.id}')">❌</button>
                         ` : ''}
                         ${check.status === 'verified' && !check.is_finalized ? `
@@ -1794,7 +2297,8 @@
                     </div>
                 </td>
             </tr>
-        `).join('');
+            `;
+        }).join('');
 
         document.getElementById('pcSelectAll').checked = false;
         document.getElementById('pcSelectAllTable').checked = false;
@@ -1837,6 +2341,7 @@
     function applyPcFilters() {
         pcFilters = {
             status: document.getElementById('pcFilterStatus').value,
+            receipt_status: document.getElementById('pcFilterReceipt').value,
             search: document.getElementById('pcSearchInput').value,
             date_from: document.getElementById('pcFilterDateFrom').value,
             date_to: document.getElementById('pcFilterDateTo').value,
@@ -1851,6 +2356,7 @@
 
     function resetPcFilters() {
         document.getElementById('pcFilterStatus').value = '';
+        document.getElementById('pcFilterReceipt').value = '';
         document.getElementById('pcSearchInput').value = '';
         document.getElementById('pcFilterDateFrom').value = '';
         document.getElementById('pcFilterDateTo').value = '';
@@ -1870,10 +2376,35 @@
         document.getElementById('pcSelectedCount').innerText = pcSelectedChecks.length + ' انتخاب شده';
     }
 
-    function closePcModal(id) {
-        document.getElementById(id).style.display = 'none';
+    // ===== تایید رسید دسکتاپ =====
+    async function verifyReceiptPc(orderRef) {
+        if (!orderRef) {
+            pcShowToast('شماره سفارش یافت نشد', 'warning');
+            return;
+        }
+        if (!confirm('آیا از تایید رسید پرداخت این سفارش اطمینان دارید؟')) return;
+
+        try {
+            const response = await fetch(`/panel/admin/receipt/verify/${orderRef}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': pcCsrfToken,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            });
+            const data = await response.json();
+            if (data.success) {
+                pcShowToast('✅ رسید با موفقیت تایید شد', 'success');
+                loadPcChecks();
+            } else {
+                pcShowToast('❌ خطا: ' + data.error, 'error');
+            }
+        } catch(error) {
+            pcShowToast('❌ خطا در ارتباط با سرور', 'error');
+        }
     }
 
+    // ===== جزئیات دسکتاپ =====
     async function viewPcDetail(id) {
         try {
             const response = await fetch(`/panel/admin/api/check/${id}/`);
@@ -1890,23 +2421,27 @@
                     'cancelled': 'pc-badge-cancelled'
                 };
 
+                const receiptStatus = c.receipt?.status_display || 'بدون رسید';
+                const receiptColor = c.receipt?.status_class === 'verified' ? '#34d399' :
+                                    c.receipt?.status_class === 'rejected' ? '#ef4444' : '#fbbf24';
+
                 let bodyHtml = `
                     <div class="pc-detail-section">
                         <div class="pc-detail-title">📋 اطلاعات اصلی</div>
                         <div class="pc-detail-row"><span class="label">وضعیت</span><span class="value"><span class="pc-badge ${badgeMap[c.status] || ''}">${c.status_display}</span></span></div>
-                        <div class="pc-detail-row"><span class="label">کاربر</span><span class="value">${escapeHtml(c.user_name || c.user_mobile)}</span></div>
+                        <div class="pc-detail-row"><span class="label">کاربر</span><span class="value">${pcEscapeHtml(c.user_name || c.user_mobile)}</span></div>
                         <div class="pc-detail-row"><span class="label">موبایل</span><span class="value">${c.user_mobile}</span></div>
                         <div class="pc-detail-row"><span class="label">شماره پیگیری</span><span class="value" style="direction:ltr;">${c.tracking_number}</span></div>
-                        <div class="pc-detail-row"><span class="label">بانک</span><span class="value">${escapeHtml(c.bank_name || '-')}</span></div>
-                        <div class="pc-detail-row"><span class="label">شماره چک</span><span class="value" style="direction:ltr;">${escapeHtml(c.check_number || '-')}</span></div>
-                        <div class="pc-detail-row"><span class="label">مبلغ</span><span class="value" style="color:#fbbf24;">${c.check_amount ? formatNumber(c.check_amount) + ' تومان' : '-'}</span></div>
+                        <div class="pc-detail-row"><span class="label">بانک</span><span class="value">${pcEscapeHtml(c.bank_name || '-')}</span></div>
+                        <div class="pc-detail-row"><span class="label">شماره چک</span><span class="value" style="direction:ltr;">${pcEscapeHtml(c.check_number || '-')}</span></div>
+                        <div class="pc-detail-row"><span class="label">مبلغ</span><span class="value" style="color:#fbbf24;">${c.check_amount ? pcFormatNumber(c.check_amount) + ' تومان' : '-'}</span></div>
                         <div class="pc-detail-row"><span class="label">تاریخ چک</span><span class="value">${c.check_date || '-'}</span></div>
                         <div class="pc-detail-row"><span class="label">تاریخ ثبت</span><span class="value">${c.created_at}</span></div>
                         ${c.verified_at ? `<div class="pc-detail-row"><span class="label">تاریخ تایید</span><span class="value">${c.verified_at}</span></div>` : ''}
-                        ${c.verified_by ? `<div class="pc-detail-row"><span class="label">تایید کننده</span><span class="value">${escapeHtml(c.verified_by)}</span></div>` : ''}
-                        ${c.rejection_reason ? `<div class="pc-detail-row" style="border-color:#ef4444;"><span class="label" style="color:#ef4444;">دلیل رد</span><span class="value" style="color:#ef4444;">${escapeHtml(c.rejection_reason)}</span></div>` : ''}
-                        ${c.admin_note ? `<div class="pc-detail-row"><span class="label">یادداشت ادمین</span><span class="value">${escapeHtml(c.admin_note)}</span></div>` : ''}
-                        ${c.description ? `<div class="pc-detail-row"><span class="label">توضیحات کاربر</span><span class="value">${escapeHtml(c.description)}</span></div>` : ''}
+                        ${c.verified_by ? `<div class="pc-detail-row"><span class="label">تایید کننده</span><span class="value">${pcEscapeHtml(c.verified_by)}</span></div>` : ''}
+                        ${c.rejection_reason ? `<div class="pc-detail-row" style="border-color:#ef4444;"><span class="label" style="color:#ef4444;">دلیل رد</span><span class="value" style="color:#ef4444;">${pcEscapeHtml(c.rejection_reason)}</span></div>` : ''}
+                        ${c.admin_note ? `<div class="pc-detail-row"><span class="label">یادداشت ادمین</span><span class="value">${pcEscapeHtml(c.admin_note)}</span></div>` : ''}
+                        ${c.description ? `<div class="pc-detail-row"><span class="label">توضیحات کاربر</span><span class="value">${pcEscapeHtml(c.description)}</span></div>` : ''}
                         ${c.is_finalized ? `<div class="pc-detail-row"><span class="label">نهایی شده</span><span class="value" style="color:#34d399;">✅ بله</span></div>` : ''}
                         ${c.finalized_at ? `<div class="pc-detail-row"><span class="label">تاریخ نهایی</span><span class="value">${c.finalized_at}</span></div>` : ''}
                     </div>
@@ -1916,6 +2451,27 @@
                     bodyHtml += `<div style="text-align:center;margin-top:0.5rem;"><img src="${c.check_image}" class="pc-detail-image" onclick="window.open(this.src)"></div>`;
                 }
 
+                // بخش رسید
+                if (c.receipt && c.receipt.image) {
+                    bodyHtml += `
+                        <div class="pc-detail-section" style="border:1px solid ${receiptColor};">
+                            <div class="pc-detail-title" style="color:${receiptColor};">
+                                🧾 رسید پرداخت - ${receiptStatus}
+                            </div>
+                            <div style="text-align:center;margin-bottom:0.5rem;">
+                                <img src="${c.receipt.image}" class="pc-detail-image" style="max-height:150px;" onclick="window.open(this.src)">
+                            </div>
+                            ${c.receipt.receipt_number ? `<div class="pc-detail-row"><span class="label">شماره رسید</span><span class="value">${pcEscapeHtml(c.receipt.receipt_number)}</span></div>` : ''}
+                            ${c.receipt.bank_name ? `<div class="pc-detail-row"><span class="label">بانک</span><span class="value">${pcEscapeHtml(c.receipt.bank_name)}</span></div>` : ''}
+                            ${c.receipt.payment_amount ? `<div class="pc-detail-row"><span class="label">مبلغ پرداختی</span><span class="value" style="color:#fbbf24;">${pcFormatNumber(c.receipt.payment_amount)} تومان</span></div>` : ''}
+                            ${c.receipt.tracking_code ? `<div class="pc-detail-row"><span class="label">کد پیگیری</span><span class="value" style="direction:ltr;">${pcEscapeHtml(c.receipt.tracking_code)}</span></div>` : ''}
+                            ${c.receipt.uploaded_at ? `<div class="pc-detail-row"><span class="label">تاریخ آپلود</span><span class="value">${c.receipt.uploaded_at}</span></div>` : ''}
+                            ${c.receipt.verified_at ? `<div class="pc-detail-row"><span class="label" style="color:#34d399;">تاریخ تایید رسید</span><span class="value" style="color:#34d399;">${c.receipt.verified_at}</span></div>` : ''}
+                            ${c.receipt.rejection_reason ? `<div class="pc-detail-row" style="border-color:#ef4444;"><span class="label" style="color:#ef4444;">دلیل رد رسید</span><span class="value" style="color:#ef4444;">${pcEscapeHtml(c.receipt.rejection_reason)}</span></div>` : ''}
+                        </div>
+                    `;
+                }
+
                 if (c.history && c.history.length > 0) {
                     bodyHtml += `
                         <div class="pc-detail-section">
@@ -1923,7 +2479,7 @@
                             ${c.history.map(h => `
                                 <div class="pc-detail-row" style="font-size:0.75rem;">
                                     <span class="label">${h.action_display}</span>
-                                    <span class="value">${escapeHtml(h.message)} - ${h.created_at}</span>
+                                    <span class="value">${pcEscapeHtml(h.message)} - ${h.created_at}</span>
                                 </div>
                             `).join('')}
                         </div>
@@ -1934,8 +2490,16 @@
 
                 let actionsHtml = `<button class="pc-btn pc-btn-secondary" onclick="closePcModal('pcDetailModal')">بستن</button>`;
                 if (c.status === 'pending') {
+                    if (c.receipt?.status_class === 'verified') {
+                        actionsHtml += `
+                            <button class="pc-btn pc-btn-success" onclick="verifyPcCheck('${c.id}')">✅ تایید</button>
+                        `;
+                    } else {
+                        actionsHtml += `
+                            <button class="pc-btn pc-btn-secondary" style="opacity:0.5;cursor:not-allowed;" disabled>⛔ تایید (رسید تایید نشده)</button>
+                        `;
+                    }
                     actionsHtml += `
-                        <button class="pc-btn pc-btn-success" onclick="verifyPcCheck('${c.id}')">✅ تایید</button>
                         <button class="pc-btn pc-btn-danger" onclick="rejectPcCheck('${c.id}')">❌ رد</button>
                     `;
                 }
@@ -1944,13 +2508,14 @@
                 }
                 document.getElementById('pcDetailActions').innerHTML = actionsHtml;
 
-                document.getElementById('pcDetailModal').style.display = 'flex';
+                openPcModal('pcDetailModal');
             }
         } catch(error) {
-            alert('خطا در دریافت جزئیات');
+            pcShowToast('خطا در دریافت جزئیات', 'error');
         }
     }
 
+    // ===== تایید چک دسکتاپ =====
     async function verifyPcCheck(id) {
         if (!confirm('آیا از تایید این چک اطمینان دارید؟')) return;
 
@@ -1958,34 +2523,35 @@
             const response = await fetch(`/panel/admin/check/verify/${id}/`, {
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': csrfToken,
+                    'X-CSRFToken': pcCsrfToken,
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({ 'note': 'تایید شده توسط ادمین' })
             });
             const data = await response.json();
             if (data.success) {
-                alert('✅ چک با موفقیت تایید شد');
+                pcShowToast('✅ چک با موفقیت تایید شد', 'success');
                 closePcModal('pcDetailModal');
                 loadPcChecks();
             } else {
-                alert('❌ خطا: ' + data.error);
+                pcShowToast('❌ خطا: ' + data.error, 'error');
             }
         } catch(error) {
-            alert('❌ خطا در ارتباط با سرور');
+            pcShowToast('❌ خطا در ارتباط با سرور', 'error');
         }
     }
 
+    // ===== رد چک دسکتاپ =====
     function rejectPcCheck(id) {
         pcRejectId = id;
         document.getElementById('pcRejectReason').value = '';
-        document.getElementById('pcRejectModal').style.display = 'flex';
+        openPcModal('pcRejectModal');
     }
 
     async function confirmPcReject() {
         const reason = document.getElementById('pcRejectReason').value.trim();
         if (!reason) {
-            alert('لطفاً دلیل رد را وارد کنید');
+            pcShowToast('لطفاً دلیل رد را وارد کنید', 'warning');
             return;
         }
 
@@ -1993,25 +2559,26 @@
             const response = await fetch(`/panel/admin/check/reject/${pcRejectId}/`, {
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': csrfToken,
+                    'X-CSRFToken': pcCsrfToken,
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams({ 'reason': reason, 'note': '' })
             });
             const data = await response.json();
             if (data.success) {
-                alert('❌ چک با موفقیت رد شد');
+                pcShowToast('❌ چک با موفقیت رد شد', 'success');
                 closePcModal('pcRejectModal');
                 closePcModal('pcDetailModal');
                 loadPcChecks();
             } else {
-                alert('❌ خطا: ' + data.error);
+                pcShowToast('❌ خطا: ' + data.error, 'error');
             }
         } catch(error) {
-            alert('❌ خطا در ارتباط با سرور');
+            pcShowToast('❌ خطا در ارتباط با سرور', 'error');
         }
     }
 
+    // ===== نهایی‌سازی دسکتاپ =====
     async function finalizePcCheck(id) {
         if (!confirm('آیا از نهایی‌سازی این پرداخت اطمینان دارید؟')) return;
 
@@ -2019,27 +2586,28 @@
             const response = await fetch(`/panel/admin/check/finalize/${id}/`, {
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': csrfToken,
+                    'X-CSRFToken': pcCsrfToken,
                     'Content-Type': 'application/x-www-form-urlencoded',
                 }
             });
             const data = await response.json();
             if (data.success) {
-                alert('🏁 پرداخت نهایی شد');
+                pcShowToast('🏁 پرداخت نهایی شد', 'success');
                 closePcModal('pcDetailModal');
                 loadPcChecks();
             } else {
-                alert('❌ خطا: ' + data.error);
+                pcShowToast('❌ خطا: ' + data.error, 'error');
             }
         } catch(error) {
-            alert('❌ خطا در ارتباط با سرور');
+            pcShowToast('❌ خطا در ارتباط با سرور', 'error');
         }
     }
 
+    // ===== عملیات گروهی دسکتاپ =====
     function pcBulkAction(action) {
         const checked = document.querySelectorAll('.pc-check-item:checked');
         if (checked.length === 0) {
-            alert('لطفاً حداقل یک چک را انتخاب کنید');
+            pcShowToast('لطفاً حداقل یک چک را انتخاب کنید', 'warning');
             return;
         }
 
@@ -2054,7 +2622,7 @@
 
         if (action === 'verify') {
             title.textContent = '✅ تایید گروهی چک‌ها';
-            message.textContent = `${pcSelectedChecks.length} چک انتخاب شده تایید می‌شوند. اطمینان دارید؟`;
+            message.textContent = `${pcSelectedChecks.length} چک انتخاب شده تایید می‌شوند. (فقط چک‌هایی که رسید تایید شده دارند عملیات می‌شوند)`;
             reasonGroup.style.display = 'none';
             confirmBtn.className = 'pc-btn pc-btn-success';
             confirmBtn.textContent = '✅ تایید گروهی';
@@ -2067,12 +2635,12 @@
             confirmBtn.textContent = '❌ رد گروهی';
         }
 
-        modal.style.display = 'flex';
+        openPcModal('pcBulkModal');
     }
 
     async function confirmPcBulk() {
         if (pcSelectedChecks.length === 0) {
-            alert('هیچ چکی انتخاب نشده است');
+            pcShowToast('هیچ چکی انتخاب نشده است', 'warning');
             return;
         }
 
@@ -2083,7 +2651,7 @@
         if (pcBulkActionType === 'reject') {
             const reason = document.getElementById('pcBulkReason').value.trim();
             if (!reason) {
-                alert('لطفاً دلیل رد را وارد کنید');
+                pcShowToast('لطفاً دلیل رد را وارد کنید', 'warning');
                 return;
             }
             formData.append('reason', reason);
@@ -2093,26 +2661,27 @@
             const response = await fetch('/panel/admin/check/bulk-action/', {
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': csrfToken,
+                    'X-CSRFToken': pcCsrfToken,
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: formData
             });
             const data = await response.json();
             if (data.success) {
-                alert(data.message);
+                pcShowToast(data.message, 'success');
                 closePcModal('pcBulkModal');
                 loadPcChecks();
             } else {
-                alert('❌ خطا: ' + data.error);
+                pcShowToast('❌ خطا: ' + data.error, 'error');
             }
         } catch(error) {
-            alert('❌ خطا در ارتباط با سرور');
+            pcShowToast('❌ خطا در ارتباط با سرور', 'error');
         }
     }
 
-    // Event Listeners دسکتاپ
+    // ===== Event Listeners دسکتاپ =====
     document.getElementById('pcFilterStatus').addEventListener('change', applyPcFilters);
+    document.getElementById('pcFilterReceipt').addEventListener('change', applyPcFilters);
     document.getElementById('pcFilterSort').addEventListener('change', applyPcFilters);
     document.getElementById('pcFilterDateFrom').addEventListener('change', applyPcFilters);
     document.getElementById('pcFilterDateTo').addEventListener('change', applyPcFilters);
@@ -2124,14 +2693,17 @@
 
     document.querySelectorAll('.pc-modal').forEach(modal => {
         modal.addEventListener('click', function(e) {
-            if (e.target === this) this.style.display = 'none';
+            if (e.target === this) {
+                this.classList.remove('active');
+                this.style.display = 'none';
+            }
         });
     });
 
     // بارگذاری اولیه دسکتاپ
     document.addEventListener('DOMContentLoaded', loadPcChecks);
 
-    // آپدیت خودکار
+    // آپدیت خودکار هر 30 ثانیه
     setInterval(loadPcChecks, 30000);
 </script>
 {% endblock %}
