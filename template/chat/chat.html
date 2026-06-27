@@ -1,0 +1,1341 @@
+<!-- templates/chat/chat.html -->
+
+<style>
+    /* ===== همه استایل‌ها با پیشوند chat- برای ایزوله کردن ===== */
+    .chat-fab-wrapper * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    /* ===== دکمه شناور چت ===== */
+    .chat-fab-wrapper .chat-fab {
+        position: fixed;
+        bottom: max(30px, env(safe-area-inset-bottom, 30px));
+        right: max(300px, env(safe-area-inset-right, 30px));
+        z-index: 999999;
+        width: 68px;
+        height: 68px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #0a7e6e, #065a4e);
+        border: none;
+        box-shadow: 0 8px 32px rgba(7, 94, 84, 0.45), 0 2px 8px rgba(0,0,0,0.1), inset 0 1px 1px rgba(255,255,255,0.2);
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: white;
+        pointer-events: auto !important;
+        font-family: 'Tahoma', 'Segoe UI', sans-serif;
+        backdrop-filter: blur(4px);
+    }
+    .chat-fab-wrapper .chat-fab:hover {
+        transform: scale(1.12) translateY(-4px) rotate(-4deg);
+        box-shadow: 0 12px 48px rgba(7, 94, 84, 0.55), 0 0 0 4px rgba(7, 94, 84, 0.15);
+    }
+    .chat-fab-wrapper .chat-fab:active {
+        transform: scale(0.92) translateY(2px);
+    }
+    .chat-fab-wrapper .chat-fab::after {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, rgba(255,255,255,0.15), transparent);
+        pointer-events: none;
+    }
+    .chat-fab-wrapper .chat-fab .badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        background: linear-gradient(145deg, #ef4444, #dc2626);
+        color: white;
+        font-size: 11px;
+        font-weight: 700;
+        min-width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2.5px solid white;
+        animation: chat-pulse-badge 2s infinite;
+        font-family: 'Tahoma', sans-serif;
+        box-shadow: 0 2px 12px rgba(239, 68, 68, 0.4);
+    }
+    .chat-fab-wrapper .chat-fab .badge.hidden { display: none; }
+    @keyframes chat-pulse-badge {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.18); }
+    }
+
+    /* ===== کانتینر اصلی چت ===== */
+    .chat-fab-wrapper .chat-container {
+        position: fixed;
+        bottom: max(100px, calc(env(safe-area-inset-bottom, 30px) + 70px));
+        right: max(30px, env(safe-area-inset-right, 30px));
+        z-index: 999998;
+        width: 420px;
+        max-width: calc(100vw - 60px);
+        height: 580px;
+        max-height: calc(100vh - 180px);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 28px;
+        box-shadow: 0 30px 90px rgba(0,0,0,0.22), 0 0 0 1px rgba(255,255,255,0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+        display: none !important;
+        flex-direction: column;
+        overflow: hidden;
+        font-family: 'Tahoma', 'Segoe UI', sans-serif;
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+    .chat-fab-wrapper .chat-container.open {
+        display: flex !important;
+        animation: chat-slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes chat-slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px) scale(0.92);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* ===== هدر چت ===== */
+    .chat-fab-wrapper .chat-header {
+        background: linear-gradient(145deg, #0a7e6e, #065a4e);
+        color: white;
+        padding: 16px 22px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-shrink: 0;
+        min-height: 72px;
+        position: relative;
+        overflow: hidden;
+    }
+    .chat-fab-wrapper .chat-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 80%;
+        height: 200%;
+        background: radial-gradient(ellipse, rgba(255,255,255,0.06), transparent 70%);
+        pointer-events: none;
+    }
+    .chat-fab-wrapper .chat-header .avatar {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: bold;
+        flex-shrink: 0;
+        border: 2px solid rgba(255,255,255,0.25);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        backdrop-filter: blur(4px);
+    }
+    .chat-fab-wrapper .chat-header .info { flex: 1; z-index: 1; }
+    .chat-fab-wrapper .chat-header .info h3 {
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin: 0;
+        color: white;
+        text-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    .chat-fab-wrapper .chat-header .info small {
+        font-size: 12px;
+        opacity: 0.9;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 2px;
+        color: rgba(255,255,255,0.92);
+        font-weight: 500;
+    }
+    .chat-fab-wrapper .chat-header .online-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #4ade80;
+        display: inline-block;
+        animation: chat-blink 1.8s infinite;
+        box-shadow: 0 0 12px rgba(74, 222, 128, 0.5);
+    }
+    .chat-fab-wrapper .chat-header .offline-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #f87171;
+        display: inline-block;
+        box-shadow: 0 0 12px rgba(248, 113, 113, 0.4);
+    }
+    @keyframes chat-blink {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.3; transform: scale(0.8); }
+    }
+    .chat-fab-wrapper .chat-header .close-btn {
+        background: rgba(255,255,255,0.1);
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 8px 12px;
+        border-radius: 12px;
+        transition: all 0.3s;
+        opacity: 0.7;
+        backdrop-filter: blur(4px);
+        z-index: 1;
+    }
+    .chat-fab-wrapper .chat-header .close-btn:hover {
+        opacity: 1;
+        background: rgba(255,255,255,0.2);
+        transform: rotate(90deg);
+    }
+
+    /* ===== استاتوس بار ===== */
+    .chat-fab-wrapper .status-bar {
+        padding: 8px 18px;
+        background: rgba(248, 249, 250, 0.9);
+        backdrop-filter: blur(4px);
+        font-size: 12px;
+        color: #666;
+        text-align: center;
+        border-bottom: 1px solid rgba(233, 236, 239, 0.6);
+        flex-shrink: 0;
+        transition: all 0.4s;
+        font-weight: 600;
+        font-family: 'Tahoma', sans-serif;
+        letter-spacing: 0.3px;
+    }
+    .chat-fab-wrapper .status-bar.online { color: #059669; background: rgba(236, 253, 245, 0.9); }
+    .chat-fab-wrapper .status-bar.offline { color: #dc2626; background: rgba(254, 242, 242, 0.9); }
+
+    /* ===== پیام‌ها ===== */
+    .chat-fab-wrapper .chat-messages {
+        flex: 1;
+        padding: 18px 18px;
+        overflow-y: auto;
+        background: rgba(229, 221, 213, 0.5);
+        backdrop-filter: blur(4px);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-family: 'Tahoma', sans-serif;
+    }
+    .chat-fab-wrapper .chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+    .chat-fab-wrapper .chat-messages::-webkit-scrollbar-track {
+        background: rgba(209, 199, 193, 0.3);
+        border-radius: 10px;
+    }
+    .chat-fab-wrapper .chat-messages::-webkit-scrollbar-thumb {
+        background: linear-gradient(145deg, #a89a92, #8a7a72);
+        border-radius: 10px;
+    }
+    .chat-fab-wrapper .chat-messages::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(145deg, #8a7a72, #6a5a52);
+    }
+
+    /* ===== پیام‌ها ===== */
+    .chat-fab-wrapper .message {
+        max-width: 84%;
+        padding: 10px 18px;
+        border-radius: 18px;
+        word-wrap: break-word;
+        font-size: 14px;
+        line-height: 1.7;
+        animation: chat-messageIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+        position: relative;
+        font-family: 'Tahoma', sans-serif;
+        transition: all 0.2s;
+    }
+    .chat-fab-wrapper .message:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+    @keyframes chat-messageIn {
+        from {
+            opacity: 0;
+            transform: translateY(16px) scale(0.94);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .chat-fab-wrapper .message.sent {
+        align-self: flex-start;
+        background: linear-gradient(145deg, #dcf8c6, #c5e8b0);
+        border-bottom-right-radius: 6px;
+        border-bottom-left-radius: 18px;
+        border-left: 3px solid rgba(7, 94, 84, 0.2);
+    }
+
+    .chat-fab-wrapper .message.received {
+        align-self: flex-end;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(4px);
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 18px;
+        border-right: 3px solid rgba(7, 94, 84, 0.15);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .chat-fab-wrapper .message .sender-name {
+        font-size: 11px;
+        font-weight: 700;
+        color: #075e54;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        opacity: 0.8;
+        letter-spacing: 0.3px;
+    }
+    .chat-fab-wrapper .message .message-text {
+        word-break: break-word;
+        color: #1f2937;
+    }
+    .chat-fab-wrapper .message .time {
+        font-size: 10px;
+        color: #a0a0a0;
+        margin-top: 6px;
+        display: block;
+        text-align: left;
+        direction: ltr;
+        font-weight: 500;
+    }
+
+    .chat-fab-wrapper .message-file {
+        margin-top: 6px;
+        padding: 8px 14px;
+        background: rgba(0,0,0,0.03);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 1px solid rgba(0,0,0,0.04);
+    }
+    .chat-fab-wrapper .message-file:hover {
+        background: rgba(0,0,0,0.06);
+        transform: scale(1.02);
+        border-color: rgba(7, 94, 84, 0.15);
+    }
+    .chat-fab-wrapper .message-file .file-icon { font-size: 24px; }
+    .chat-fab-wrapper .message-file .file-info { flex: 1; }
+    .chat-fab-wrapper .message-file .file-name { font-size: 13px; font-weight: 600; color: #075e54; }
+    .chat-fab-wrapper .message-file .file-size { font-size: 11px; color: #aaa; }
+    .chat-fab-wrapper .message-file .file-download { color: #075e54; font-size: 18px; }
+
+    .chat-fab-wrapper .message-image {
+        max-width: 100%;
+        border-radius: 12px;
+        margin-top: 6px;
+        cursor: pointer;
+        border: 2px solid rgba(255,255,255,0.3);
+        transition: all 0.4s;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .chat-fab-wrapper .message-image:hover {
+        border-color: #075e54;
+        transform: scale(1.03);
+        box-shadow: 0 4px 24px rgba(7, 94, 84, 0.15);
+    }
+    .chat-fab-wrapper .message-video {
+        max-width: 100%;
+        border-radius: 12px;
+        margin-top: 6px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .chat-fab-wrapper .message-audio {
+        width: 100%;
+        margin-top: 6px;
+        border-radius: 12px;
+    }
+
+    /* ===== حالت خالی ===== */
+    .chat-fab-wrapper .empty-state {
+        text-align: center;
+        color: #888;
+        padding: 50px 20px;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        font-family: 'Tahoma', sans-serif;
+        background: rgba(255,255,255,0.3);
+        backdrop-filter: blur(4px);
+        border-radius: 20px;
+        margin: 20px;
+    }
+    .chat-fab-wrapper .empty-state .icon {
+        font-size: 52px;
+        opacity: 0.5;
+        animation: chat-float 4s ease-in-out infinite;
+    }
+    @keyframes chat-float {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-12px) scale(1.05); }
+    }
+    .chat-fab-wrapper .empty-state p { font-size: 16px; color: #444; font-weight: 700; margin: 0; }
+    .chat-fab-wrapper .empty-state small { color: #aaa; font-size: 13px; }
+
+    .chat-fab-wrapper .loading-spinner {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        border: 3px solid rgba(233, 236, 239, 0.6);
+        border-top: 3px solid #075e54;
+        border-radius: 50%;
+        animation: chat-spin 0.8s linear infinite;
+    }
+    @keyframes chat-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* ===== ورودی ===== */
+    .chat-fab-wrapper .chat-input {
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(12px);
+        border-top: 1px solid rgba(233, 236, 239, 0.5);
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-shrink: 0;
+        font-family: 'Tahoma', sans-serif;
+    }
+    .chat-fab-wrapper .chat-input .input-wrapper {
+        flex: 1;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        background: rgba(248, 249, 250, 0.8);
+        backdrop-filter: blur(4px);
+        border: 2px solid rgba(233, 236, 239, 0.5);
+        border-radius: 30px;
+        padding: 2px 6px 2px 16px;
+        transition: all 0.4s;
+    }
+    .chat-fab-wrapper .chat-input .input-wrapper:focus-within {
+        border-color: #075e54;
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 0 0 6px rgba(7, 94, 84, 0.06), 0 4px 20px rgba(7, 94, 84, 0.04);
+    }
+    .chat-fab-wrapper .chat-input .input-wrapper input {
+        flex: 1;
+        padding: 10px 0;
+        border: none;
+        outline: none;
+        font-size: 14px;
+        background: transparent;
+        font-family: inherit;
+        color: #1f2937;
+    }
+    .chat-fab-wrapper .chat-input .input-wrapper input::placeholder {
+        color: #adb5bd;
+        font-size: 13px;
+        font-weight: 400;
+    }
+    .chat-fab-wrapper .chat-input .input-wrapper input:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    .chat-fab-wrapper .chat-input .file-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 6px 8px;
+        border-radius: 50%;
+        transition: all 0.3s;
+        color: #075e54;
+    }
+    .chat-fab-wrapper .chat-input .file-btn:hover {
+        background: rgba(7, 94, 84, 0.08);
+        transform: scale(1.15) rotate(-8deg);
+    }
+    .chat-fab-wrapper .chat-input .file-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        transform: none;
+    }
+    .chat-fab-wrapper .chat-input .send-btn {
+        padding: 12px 24px;
+        background: linear-gradient(145deg, #0a7e6e, #065a4e);
+        color: white;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 700;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        white-space: nowrap;
+        font-family: inherit;
+        min-width: 56px;
+        box-shadow: 0 4px 20px rgba(7, 94, 84, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .chat-fab-wrapper .chat-input .send-btn:hover:not(:disabled) {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 8px 32px rgba(7, 94, 84, 0.35);
+    }
+    .chat-fab-wrapper .chat-input .send-btn:active:not(:disabled) {
+        transform: translateY(0) scale(0.96);
+    }
+    .chat-fab-wrapper .chat-input .send-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none;
+    }
+    .chat-fab-wrapper .chat-input .send-btn i {
+        font-size: 16px;
+    }
+
+    /* ===== پیش‌نمایش فایل ===== */
+    .chat-fab-wrapper .file-preview {
+        padding: 8px 14px;
+        background: rgba(248, 249, 250, 0.9);
+        backdrop-filter: blur(4px);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: chat-slideUp 0.3s ease;
+        flex-shrink: 0;
+        margin: 0 16px 6px 16px;
+        font-family: 'Tahoma', sans-serif;
+        border: 1px solid rgba(233, 236, 239, 0.4);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+    .chat-fab-wrapper .file-preview .preview-icon { font-size: 28px; }
+    .chat-fab-wrapper .file-preview .preview-info { flex: 1; }
+    .chat-fab-wrapper .file-preview .preview-name { font-size: 13px; font-weight: 600; color: #1f2937; }
+    .chat-fab-wrapper .file-preview .preview-size { font-size: 11px; color: #aaa; }
+    .chat-fab-wrapper .file-preview .preview-remove {
+        background: none;
+        border: none;
+        color: #dc2626;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 50%;
+        transition: all 0.3s;
+    }
+    .chat-fab-wrapper .file-preview .preview-remove:hover {
+        background: rgba(220, 38, 38, 0.08);
+        transform: rotate(90deg) scale(1.1);
+    }
+    .chat-fab-wrapper .file-preview .preview-image {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        object-fit: cover;
+        border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .chat-fab-wrapper .file-preview-container {
+        padding: 0 16px 4px 16px;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(4px);
+        flex-shrink: 0;
+    }
+
+    /* ===== نوتیفیکیشن ===== */
+    .chat-fab-wrapper .notification {
+        position: fixed;
+        bottom: max(180px, calc(env(safe-area-inset-bottom, 30px) + 150px));
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(31, 41, 55, 0.92);
+        backdrop-filter: blur(12px);
+        color: white;
+        padding: 14px 32px;
+        border-radius: 16px;
+        font-size: 14px;
+        box-shadow: 0 16px 64px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.05);
+        z-index: 999999;
+        animation: chat-notifIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), chat-notifOut 0.5s ease 3s forwards;
+        max-width: 92%;
+        text-align: center;
+        font-family: 'Tahoma', sans-serif;
+        font-weight: 500;
+        border: 1px solid rgba(255,255,255,0.06);
+    }
+    @keyframes chat-notifIn {
+        from { opacity: 0; transform: translateX(-50%) translateY(30px) scale(0.92); }
+        to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    }
+    @keyframes chat-notifOut {
+        from { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+        to { opacity: 0; transform: translateX(-50%) translateY(-30px) scale(0.92); }
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 576px) {
+        .chat-fab-wrapper .chat-container {
+            bottom: 0;
+            right: 0;
+            width: 100vw;
+            max-width: 100vw;
+            height: 100vh;
+            max-height: 100vh;
+            border-radius: 0;
+            backdrop-filter: blur(8px);
+        }
+        .chat-fab-wrapper .chat-fab {
+            bottom: max(20px, env(safe-area-inset-bottom, 20px));
+            right: max(20px, env(safe-area-inset-right, 20px));
+            width: 60px;
+            height: 60px;
+            font-size: 28px;
+        }
+        .chat-fab-wrapper .chat-header {
+            padding: 14px 18px;
+            min-height: 64px;
+        }
+        .chat-fab-wrapper .chat-header .avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+        }
+        .chat-fab-wrapper .chat-header .info h3 { font-size: 15px; }
+        .chat-fab-wrapper .chat-header .info small { font-size: 11px; }
+        .chat-fab-wrapper .chat-messages { padding: 14px 14px; }
+        .chat-fab-wrapper .chat-input { padding: 10px 12px; }
+        .chat-fab-wrapper .chat-input .input-wrapper { padding: 2px 4px 2px 12px; }
+        .chat-fab-wrapper .chat-input .input-wrapper input { font-size: 13px; padding: 8px 0; }
+        .chat-fab-wrapper .chat-input .send-btn { padding: 10px 18px; font-size: 13px; min-width: 44px; }
+        .chat-fab-wrapper .message { max-width: 90%; font-size: 13px; padding: 8px 14px; }
+        .chat-fab-wrapper .notification { bottom: max(120px, calc(env(safe-area-inset-bottom, 20px) + 100px)); font-size: 13px; padding: 10px 22px; }
+        .chat-fab-wrapper .empty-state { padding: 30px 16px; margin: 12px; }
+        .chat-fab-wrapper .empty-state .icon { font-size: 40px; }
+    }
+
+    @media (max-width: 400px) {
+        .chat-fab-wrapper .chat-fab {
+            bottom: max(100px, env(safe-area-inset-bottom, 16px));
+            right: max(12px, env(safe-area-inset-right, 16px));
+            width: 54px;
+            height: 54px;
+            font-size: 24px;
+        }
+        .chat-fab-wrapper .chat-header .info h3 { font-size: 14px; }
+        .chat-fab-wrapper .chat-header .info small { font-size: 10px; }
+        .chat-fab-wrapper .message { font-size: 12px; padding: 6px 12px; }
+        .chat-fab-wrapper .chat-input .send-btn { padding: 8px 14px; font-size: 12px; min-width: 38px; }
+        .chat-fab-wrapper .chat-input .input-wrapper input { font-size: 12px; }
+        .chat-fab-wrapper .chat-input .file-btn { font-size: 18px; }
+    }
+
+    /* ===== پشتیبانی از صفحه‌های با ناوبار پایین ===== */
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+        .chat-fab-wrapper .chat-fab {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .chat-fab-wrapper .chat-container {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .chat-fab-wrapper .notification {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    }
+</style>
+
+<!-- ===== HTML چت ===== -->
+<div class="chat-fab-wrapper">
+    <!-- دکمه شناور -->
+    <button class="chat-fab" id="chat-fab" title="پشتیبانی">
+        <i class="fas fa-comment-dots"></i>
+        <span class="badge hidden" id="fab-badge">0</span>
+    </button>
+
+    <!-- کانتینر چت -->
+    <div class="chat-container" id="chat-container">
+        <!-- هدر -->
+        <div class="chat-header">
+            <div class="avatar"><i class="fas fa-headset"></i></div>
+            <div class="info">
+                <h3>پشتیبانی فروشگاه</h3>
+                <small id="connection-status">
+                    <span class="online-dot" id="status-dot"></span>
+                    در حال اتصال...
+                </small>
+            </div>
+            <button class="close-btn" id="close-chat"><i class="fas fa-times"></i></button>
+        </div>
+
+        <!-- استاتوس بار -->
+        <div class="status-bar" id="status-bar"><i class="fas fa-spinner fa-spin"></i> در حال بارگذاری...</div>
+
+        <!-- پیام‌ها -->
+        <div class="chat-messages" id="chat-messages">
+            <div class="empty-state" id="empty-state">
+                <div class="icon"><i class="fas fa-comment-smile"></i></div>
+                <p>به پشتیبانی خوش آمدید</p>
+                <small><i class="fas fa-arrow-up"></i> پیام خود را بنویسید...</small>
+            </div>
+        </div>
+
+        <!-- پیش‌نمایش فایل -->
+        <div class="file-preview-container" id="file-preview-container" style="display:none;">
+            <div class="file-preview" id="file-preview">
+                <span class="preview-icon" id="preview-icon"><i class="fas fa-file"></i></span>
+                <img class="preview-image" id="preview-image" style="display:none;" />
+                <div class="preview-info">
+                    <div class="preview-name" id="preview-name">فایل</div>
+                    <div class="preview-size" id="preview-size">۰ بایت</div>
+                </div>
+                <button class="preview-remove" id="preview-remove"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+
+        <!-- ورودی -->
+        <div class="chat-input">
+            <div class="input-wrapper">
+                <button class="file-btn" id="file-btn" title="آپلود فایل"><i class="fas fa-paperclip"></i></button>
+                <input type="text" id="msg-input" placeholder="پیام خود را بنویسید..." autocomplete="off" maxlength="1000" />
+                <input type="file" id="file-input" style="display:none;" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.zip,.txt" />
+            </div>
+            <button class="send-btn" id="send-btn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    //  اسکریپت چت - کاملاً ایزوله با صدا
+    // ============================================================
+    (function() {
+        'use strict';
+
+        console.log('🚀 چت شناور بارگذاری شد...');
+
+        // ============================================================
+        //  عناصر
+        // ============================================================
+        const chatFab = document.getElementById('chat-fab');
+        const chatContainer = document.getElementById('chat-container');
+        const closeChatBtn = document.getElementById('close-chat');
+        const messagesContainer = document.getElementById('chat-messages');
+        const msgInput = document.getElementById('msg-input');
+        const sendBtn = document.getElementById('send-btn');
+        const fileBtn = document.getElementById('file-btn');
+        const fileInput = document.getElementById('file-input');
+        const statusBar = document.getElementById('status-bar');
+        const connectionStatus = document.getElementById('connection-status');
+        const statusDot = document.getElementById('status-dot');
+        const fabBadge = document.getElementById('fab-badge');
+        const filePreviewContainer = document.getElementById('file-preview-container');
+        const previewIcon = document.getElementById('preview-icon');
+        const previewImage = document.getElementById('preview-image');
+        const previewName = document.getElementById('preview-name');
+        const previewSize = document.getElementById('preview-size');
+        const previewRemove = document.getElementById('preview-remove');
+
+        // ============================================================
+        //  صدا - با پشتیبانی کامل
+        // ============================================================
+        let notificationSound = null;
+        let soundLoaded = false;
+
+        function initSound() {
+            try {
+                const audio = new Audio('/media/audio/sms.mp3');
+                audio.preload = 'auto';
+
+                audio.addEventListener('canplaythrough', function() {
+                    soundLoaded = true;
+                    console.log('🔊 فایل صوتی بارگذاری شد: /media/audio/sms.mp3');
+                });
+
+                audio.addEventListener('error', function() {
+                    console.warn('⚠️ فایل صوتی پیدا نشد، استفاده از صدای جایگزین');
+                    createFallbackSound();
+                });
+
+                notificationSound = audio;
+
+                if (audio.readyState >= 3) {
+                    soundLoaded = true;
+                    console.log('🔊 فایل صوتی آماده است');
+                }
+
+                setTimeout(function() {
+                    if (!soundLoaded && notificationSound) {
+                        console.warn('⚠️ زمان بارگذاری صدا زیاد شد، استفاده از صدای جایگزین');
+                        createFallbackSound();
+                    }
+                }, 2000);
+
+            } catch (e) {
+                console.warn('⚠️ خطا در تنظیم صدا:', e);
+                createFallbackSound();
+            }
+        }
+
+        function createFallbackSound() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const audioCtx = new AudioContext();
+
+                notificationSound = {
+                    play: function() {
+                        try {
+                            const oscillator = audioCtx.createOscillator();
+                            const gainNode = audioCtx.createGain();
+                            oscillator.connect(gainNode);
+                            gainNode.connect(audioCtx.destination);
+                            oscillator.frequency.value = 800;
+                            oscillator.type = 'sine';
+                            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                            oscillator.start();
+                            oscillator.stop(audioCtx.currentTime + 0.3);
+                            console.log('🔊 صدای جایگزین پخش شد');
+                        } catch (e) {
+                            console.warn('⚠️ خطا در پخش صدای جایگزین:', e);
+                        }
+                    },
+                    currentTime: 0
+                };
+                soundLoaded = true;
+                console.log('🔊 صدای جایگزین ایجاد شد');
+            } catch (e) {
+                console.warn('⚠️ خطا در ایجاد صدای جایگزین:', e);
+                notificationSound = {
+                    play: function() {}
+                };
+            }
+        }
+
+        function playNotificationSound() {
+            try {
+                if (notificationSound) {
+                    if (typeof notificationSound.play === 'function') {
+                        notificationSound.play();
+                    } else if (notificationSound.play instanceof Function) {
+                        notificationSound.play();
+                    } else {
+                        notificationSound.currentTime = 0;
+                        const playPromise = notificationSound.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(function() {
+                                if (!soundLoaded) {
+                                    createFallbackSound();
+                                    if (notificationSound) {
+                                        notificationSound.play();
+                                    }
+                                }
+                            });
+                        }
+                    }
+                } else {
+                    createFallbackSound();
+                    if (notificationSound) {
+                        notificationSound.play();
+                    }
+                }
+            } catch (e) {
+                console.warn('⚠️ خطا در پخش صدا:', e);
+            }
+        }
+
+        initSound();
+
+        // ============================================================
+        //  متغیرها
+        // ============================================================
+        let ws = null;
+        let isConnected = false;
+        let reconnectAttempts = 0;
+        let currentUserId = null;
+        let pendingMessages = [];
+        let selectedFile = null;
+        let selectedFileType = 'file';
+        let selectedFileData = null;
+        let unreadCount = 0;
+        let isChatOpen = false;
+
+        // ============================================================
+        //  مدیریت باز/بسته شدن چت
+        // ============================================================
+        function openChat() {
+            isChatOpen = true;
+            chatContainer.classList.add('open');
+            chatContainer.style.display = 'flex !important';
+            chatFab.style.display = 'none';
+            unreadCount = 0;
+            updateBadge();
+            setTimeout(function() { msgInput.focus(); }, 400);
+            if (ws && isConnected) {
+                loadChatHistory();
+            }
+        }
+
+        function closeChat() {
+            isChatOpen = false;
+            chatContainer.classList.remove('open');
+            chatContainer.style.display = 'none !important';
+            setTimeout(function() {
+                chatFab.style.display = 'flex';
+            }, 400);
+        }
+
+        // ============================================================
+        //  رویدادها
+        // ============================================================
+        if (chatFab) {
+            chatFab.addEventListener('click', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                if (!isChatOpen) {
+                    openChat();
+                }
+            });
+        }
+
+        if (closeChatBtn) {
+            closeChatBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (isChatOpen) {
+                    closeChat();
+                }
+            });
+        }
+
+        document.addEventListener('click', function(e) {
+            if (isChatOpen && chatContainer && !chatContainer.contains(e.target) && e.target !== chatFab) {
+                closeChat();
+            }
+        });
+
+        // ============================================================
+        //  Badge
+        // ============================================================
+        function updateBadge() {
+            if (unreadCount > 0) {
+                fabBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                fabBadge.classList.remove('hidden');
+            } else {
+                fabBadge.classList.add('hidden');
+            }
+        }
+
+        function incrementUnread() {
+            if (!isChatOpen) {
+                unreadCount++;
+                updateBadge();
+                playNotificationSound();
+            }
+        }
+
+        // ============================================================
+        //  دریافت ID کاربر فعلی
+        // ============================================================
+        function getCurrentUserId() {
+            const userIdElement = document.body.getAttribute('data-user-id');
+            if (userIdElement) {
+                currentUserId = userIdElement;
+                return currentUserId;
+            }
+            fetch('/chat/api/history/')
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (data.status === 'success' && data.messages.length > 0) {
+                        currentUserId = data.messages[0].sender_id;
+                    }
+                })
+                .catch(function() {});
+        }
+
+        // ============================================================
+        //  دریافت تاریخچه پیام‌ها
+        // ============================================================
+        async function loadChatHistory() {
+            try {
+                statusBar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> بارگذاری...';
+                const response = await fetch('/chat/api/history/');
+                const data = await response.json();
+
+                const emptyState = document.getElementById('empty-state');
+                if (emptyState) emptyState.remove();
+
+                if (data.status === 'success' && data.messages.length > 0) {
+                    messagesContainer.innerHTML = '';
+                    data.messages.forEach(function(msg) {
+                        const isAdmin = msg.is_admin || false;
+                        const senderName = isAdmin ? '🛡️ ادمین' : (msg.sender_name || 'شما');
+                        addMessageToUI(msg, senderName, isAdmin);
+                    });
+                    statusBar.innerHTML = '<i class="fas fa-envelope"></i> ' + data.messages.length + ' پیام';
+                } else {
+                    const newEmpty = document.createElement('div');
+                    newEmpty.className = 'empty-state';
+                    newEmpty.id = 'empty-state';
+                    newEmpty.innerHTML = `
+                        <div class="icon"><i class="fas fa-comment-smile"></i></div>
+                        <p>به پشتیبانی خوش آمدید</p>
+                        <small><i class="fas fa-arrow-up"></i> پیام خود را بنویسید...</small>
+                    `;
+                    messagesContainer.appendChild(newEmpty);
+                    statusBar.innerHTML = '<i class="fas fa-comment"></i> چت خالی است';
+                }
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            } catch (error) {
+                console.error('❌ خطا:', error);
+                statusBar.innerHTML = '<i class="fas fa-exclamation-triangle"></i> خطا در بارگذاری';
+            }
+        }
+
+        // ============================================================
+        //  WebSocket
+        // ============================================================
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = protocol + '//' + window.location.host + '/ws/chat/';
+
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = function() {
+                isConnected = true;
+                reconnectAttempts = 0;
+                console.log('✅ WebSocket متصل شد!');
+                statusBar.innerHTML = '<i class="fas fa-circle" style="color:#4ade80;font-size:10px;"></i> متصل';
+                statusBar.className = 'status-bar online';
+                connectionStatus.innerHTML = '<span class="online-dot" id="status-dot"></span> آنلاین';
+                statusDot.className = 'online-dot';
+                if (isChatOpen) loadChatHistory();
+            };
+
+            ws.onerror = function() {
+                statusBar.innerHTML = '<i class="fas fa-exclamation-circle"></i> خطا در اتصال';
+                statusBar.className = 'status-bar offline';
+            };
+
+            ws.onclose = function() {
+                isConnected = false;
+                console.log('🔴 اتصال قطع شد');
+                statusBar.innerHTML = '<i class="fas fa-circle" style="color:#f87171;font-size:10px;"></i> قطع شده - تلاش مجدد...';
+                statusBar.className = 'status-bar offline';
+                connectionStatus.innerHTML = '<span class="offline-dot"></span> آفلاین';
+                statusDot.className = 'offline-dot';
+
+                if (reconnectAttempts < 10) {
+                    reconnectAttempts++;
+                    setTimeout(connectWebSocket, 3000);
+                } else {
+                    statusBar.innerHTML = '<i class="fas fa-exclamation-triangle"></i> قطع شده - رفرش کنید';
+                }
+            };
+
+            ws.onmessage = function(e) {
+                try {
+                    const data = JSON.parse(e.data);
+                    console.log('📩 پیام جدید:', data);
+
+                    const emptyState = document.getElementById('empty-state');
+                    if (emptyState) emptyState.remove();
+
+                    const isOwnMessage = data.sender_id && data.sender_id === currentUserId;
+
+                    if (isOwnMessage) {
+                        console.log('⏭️ پیام از خود');
+                        return;
+                    }
+
+                    const isAdmin = data.is_admin || false;
+                    let senderName = isAdmin ? '🛡️ ادمین' : (data.sender_name || 'کاربر');
+
+                    if (isChatOpen) {
+                        addMessageToUI(data, senderName, isAdmin);
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    } else {
+                        incrementUnread();
+                    }
+
+                    if (isAdmin) {
+                        statusBar.innerHTML = '<i class="fas fa-bell"></i> پیام جدید از ادمین';
+                        setTimeout(function() {
+                            if (isConnected) statusBar.innerHTML = '<i class="fas fa-circle" style="color:#4ade80;font-size:10px;"></i> متصل';
+                        }, 2000);
+                    }
+                } catch (err) {
+                    console.log('❌ خطا:', err);
+                }
+            };
+        }
+
+        // ============================================================
+        //  افزودن پیام به UI
+        // ============================================================
+        function addMessageToUI(data, senderName, isAdmin) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ' + (isAdmin ? 'received' : 'sent');
+
+            const time = data.timestamp ? new Date(data.timestamp).toLocaleTimeString('fa-IR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            }) : new Date().toLocaleTimeString('fa-IR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            let contentHTML = '';
+            const messageText = data.content || data.message || '';
+            if (messageText) {
+                contentHTML += '<div class="message-text">' + escapeHtml(messageText) + '</div>';
+            }
+
+            if (data.file_url) {
+                const fileType = data.message_type || 'file';
+                const fileUrl = data.file_url;
+                const fileName = data.file_name || 'فایل';
+                const fileSize = data.file_size || '';
+
+                switch (fileType) {
+                    case 'image':
+                        contentHTML += '<img src="' + fileUrl + '" class="message-image" onclick="window.open(\'' + fileUrl + '\')" loading="lazy" />';
+                        break;
+                    case 'video':
+                        contentHTML += '<video class="message-video" controls><source src="' + fileUrl + '" /></video>';
+                        break;
+                    case 'audio':
+                        contentHTML += '<audio class="message-audio" controls><source src="' + fileUrl + '" /></audio>';
+                        break;
+                    default:
+                        contentHTML += `
+                            <div class="message-file" onclick="window.open('${fileUrl}')">
+                                <span class="file-icon"><i class="fas fa-paperclip"></i></span>
+                                <div class="file-info">
+                                    <div class="file-name">${escapeHtml(fileName)}</div>
+                                    <div class="file-size">${fileSize}</div>
+                                </div>
+                                <span class="file-download"><i class="fas fa-download"></i></span>
+                            </div>
+                        `;
+                }
+            }
+
+            msgDiv.innerHTML = `
+                <div class="sender-name"><i class="fas fa-user-circle"></i> ${senderName}</div>
+                ${contentHTML}
+                <span class="time"><i class="far fa-clock"></i> ${time}</span>
+            `;
+
+            messagesContainer.appendChild(msgDiv);
+            setTimeout(function() {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 50);
+        }
+
+        // ============================================================
+        //  مدیریت فایل
+        // ============================================================
+        if (fileBtn) {
+            fileBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+        }
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (file.size > 10 * 1024 * 1024) {
+                    showNotification('❌ حجم فایل بیش از 10 مگابایت');
+                    fileInput.value = '';
+                    return;
+                }
+
+                selectedFile = file;
+                selectedFileType = file.type.split('/')[0] || 'file';
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedFileData = e.target.result;
+                    filePreviewContainer.style.display = 'block';
+                    previewName.textContent = file.name;
+                    previewSize.textContent = formatFileSize(file.size);
+
+                    if (selectedFileType === 'image') {
+                        previewImage.style.display = 'block';
+                        previewImage.src = e.target.result;
+                        previewIcon.style.display = 'none';
+                    } else {
+                        previewImage.style.display = 'none';
+                        previewIcon.style.display = 'block';
+                        const icons = { 'video': 'fa-video', 'audio': 'fa-music', 'pdf': 'fa-file-pdf', 'zip': 'fa-file-archive', 'document': 'fa-file-word' };
+                        previewIcon.innerHTML = '<i class="fas ' + (icons[selectedFileType] || 'fa-file') + '"></i>';
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        if (previewRemove) {
+            previewRemove.addEventListener('click', clearFilePreview);
+        }
+
+        function clearFilePreview() {
+            selectedFile = null;
+            selectedFileType = 'file';
+            selectedFileData = null;
+            fileInput.value = '';
+            filePreviewContainer.style.display = 'none';
+            previewImage.src = '';
+            previewImage.style.display = 'none';
+            previewIcon.style.display = 'block';
+            previewIcon.innerHTML = '<i class="fas fa-file"></i>';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+            return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+        }
+
+        // ============================================================
+        //  ارسال پیام
+        // ============================================================
+        function sendMessage() {
+            const message = msgInput.value.trim();
+
+            if (!message && !selectedFile) {
+                msgInput.style.borderColor = '#dc2626';
+                setTimeout(function() { msgInput.style.borderColor = ''; }, 1500);
+                return;
+            }
+
+            if (!isConnected) {
+                showNotification('❌ اتصال برقرار نیست!');
+                return;
+            }
+
+            try {
+                const payload = {};
+                if (message) payload.message = message;
+                if (selectedFile && selectedFileData) {
+                    payload.file = selectedFileData;
+                    payload.file_name = selectedFile.name;
+                    payload.file_type = selectedFileType;
+                }
+
+                ws.send(JSON.stringify(payload));
+
+                const data = {
+                    content: message,
+                    timestamp: new Date().toISOString(),
+                    message_type: selectedFile ? selectedFileType : 'text',
+                    file_url: selectedFile ? URL.createObjectURL(selectedFile) : null,
+                    file_name: selectedFile ? selectedFile.name : null,
+                    file_size: selectedFile ? formatFileSize(selectedFile.size) : null,
+                };
+                addMessageToUI(data, 'شما', false);
+
+                msgInput.value = '';
+                clearFilePreview();
+
+                statusBar.innerHTML = '<i class="fas fa-check-circle" style="color:#059669;"></i> پیام ارسال شد';
+                setTimeout(function() {
+                    if (isConnected) statusBar.innerHTML = '<i class="fas fa-circle" style="color:#4ade80;font-size:10px;"></i> متصل';
+                }, 1500);
+
+            } catch (error) {
+                console.error('❌ خطا:', error);
+                showNotification('❌ خطا در ارسال پیام');
+            }
+        }
+
+        // ============================================================
+        //  توابع کمکی
+        // ============================================================
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showNotification(text) {
+            const old = document.querySelector('.chat-fab-wrapper .notification');
+            if (old) old.remove();
+
+            const notif = document.createElement('div');
+            notif.className = 'notification';
+            notif.innerHTML = text;
+            document.body.appendChild(notif);
+
+            setTimeout(function() {
+                if (notif.parentNode) notif.remove();
+            }, 3500);
+        }
+
+        // ============================================================
+        //  رویدادها
+        // ============================================================
+        if (sendBtn) {
+            sendBtn.onclick = sendMessage;
+        }
+        if (msgInput) {
+            msgInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        }
+
+        // ============================================================
+        //  بارگذاری اولیه
+        // ============================================================
+        console.log('🚀 چت شناور بارگذاری شد');
+        getCurrentUserId();
+        connectWebSocket();
+
+        // ============================================================
+        //  تنظیمات اضافی
+        // ============================================================
+        setInterval(function() {
+            if (isConnected) statusBar.className = 'status-bar online';
+        }, 5000);
+
+        window.addEventListener('online', function() {
+            showNotification('🟢 اتصال اینترنت برقرار شد');
+            if (!isConnected) connectWebSocket();
+        });
+
+        window.addEventListener('offline', function() {
+            showNotification('🔴 اتصال اینترنت قطع شد');
+        });
+
+        console.log('✅ چت آماده است!');
+
+    })();
+</script>

@@ -18,7 +18,8 @@ urlpatterns = [
     path('notification/',include('apps.Notification.urls')),
     path('pro/',include('apps.pro.urls',namespace='pro')),
     path('panel/',include('apps.panel.urls',namespace='panel')),
-    path('check/',include('apps.check.urls',namespace='check'))
+    path('check/',include('apps.check.urls',namespace='check')),
+    path('chat/',include('apps.chat.urls',namespace='chat'))
 
 
 

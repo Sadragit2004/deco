@@ -1,0 +1,178 @@
+<!-- templates/chat/chat_detail.html -->
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>چت با {{ target_user.name }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Tahoma, sans-serif; background: #f0f2f5; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .chat-container { width: 100%; max-width: 600px; height: 90vh; background: white; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.12); display: flex; flex-direction: column; overflow: hidden; }
+        .chat-header { background: #075e54; color: white; padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
+        .chat-header .back-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; text-decoration: none; }
+        .chat-header .back-btn:hover { background: rgba(255,255,255,0.3); }
+        .chat-header .avatar { width: 40px; height: 40px; border-radius: 50%; background: #128c7e; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; }
+        .chat-header .info h3 { font-size: 16px; }
+        .chat-header .info small { font-size: 12px; opacity: 0.8; }
+        .chat-messages { flex: 1; padding: 16px; overflow-y: auto; background: #e5ddd5; display: flex; flex-direction: column; gap: 8px; }
+        .message { max-width: 75%; padding: 10px 14px; border-radius: 12px; word-wrap: break-word; font-size: 14px; line-height: 1.5; }
+        .message.sent { align-self: flex-end; background: #dcf8c6; }
+        .message.received { align-self: flex-start; background: white; }
+        .message .time { font-size: 10px; color: #888; margin-top: 4px; display: block; text-align: left; }
+        .message .sender-name { font-size: 11px; font-weight: bold; color: #075e54; }
+        .chat-input { padding: 12px 16px; background: white; border-top: 1px solid #ddd; display: flex; gap: 10px; }
+        .chat-input input { flex: 1; padding: 10px 14px; border: 1px solid #ddd; border-radius: 24px; outline: none; font-size: 14px; }
+        .chat-input input:focus { border-color: #075e54; }
+        .chat-input button { padding: 10px 24px; background: #075e54; color: white; border: none; border-radius: 24px; cursor: pointer; font-size: 14px; }
+        .chat-input button:hover { background: #064a42; }
+        .status-bar { padding: 8px 16px; background: #f8f9fa; font-size: 12px; color: #666; text-align: center; border-bottom: 1px solid #e9ecef; }
+        .status-bar.online { color: #28a745; }
+        .empty-state { text-align: center; color: #888; padding: 40px 20px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <a href="/chat/admin/" class="back-btn">← بازگشت</a>
+            <div class="avatar">{{ target_user.name|first|default:'?' }}</div>
+            <div class="info">
+                <h3>{{ target_user.name|default:target_user.mobileNumber }}</h3>
+                <small id="connection-status">در حال اتصال...</small>
+            </div>
+        </div>
+
+        <div class="status-bar" id="status-bar">⏳ در حال اتصال به سرور...</div>
+
+        <div class="chat-messages" id="chat-messages"></div>
+
+        <div class="chat-input">
+            <input type="text" id="msg-input" placeholder="پیام خود را بنویسید..." />
+            <button id="send-btn">ارسال</button>
+        </div>
+    </div>
+
+    <script>
+        // ======================== المنت‌ها ========================
+        const messagesContainer = document.getElementById('chat-messages');
+        const msgInput = document.getElementById('msg-input');
+        const sendBtn = document.getElementById('send-btn');
+        const statusBar = document.getElementById('status-bar');
+        const connectionStatus = document.getElementById('connection-status');
+
+        // ======================== پیام‌های اولیه ========================
+        const initialMessages = {{ messages|safe }};
+        const targetUserId = '{{ target_user.id }}';
+        console.log(`📚 ${initialMessages.length} پیام قبلی بارگذاری شد`);
+
+        // ======================== نمایش پیام ========================
+        function displayMessage(data, isInitial = false) {
+            const emptyState = messagesContainer.querySelector('.empty-state');
+            if (emptyState) emptyState.remove();
+
+            const msgDiv = document.createElement('div');
+
+            // تشخیص فرستنده (برای ادمین: اگه is_admin = true یعنی خودش)
+            const isMe = data.is_admin === true;
+            msgDiv.className = `message ${isMe ? 'sent' : 'received'}`;
+
+            const senderName = isMe ? 'شما (ادمین)' : (data.sender_name || 'مشتری');
+            msgDiv.innerHTML = `
+                <div class="sender-name">👤 ${senderName}</div>
+                ${data.message}
+                <span class="time">${new Date(data.timestamp).toLocaleTimeString('fa-IR')}</span>
+            `;
+
+            messagesContainer.appendChild(msgDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // ======================== بارگذاری پیام‌های اولیه ========================
+        function loadInitialMessages() {
+            messagesContainer.innerHTML = '';
+            if (initialMessages.length === 0) {
+                messagesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <p>💬 پیامی برای نمایش وجود ندارد</p>
+                        <small>اولین پیام را ارسال کنید</small>
+                    </div>
+                `;
+            } else {
+                initialMessages.forEach(msg => {
+                    displayMessage(msg, true);
+                });
+            }
+        }
+
+        // ======================== WebSocket ========================
+        const ws = new WebSocket(`ws://127.0.0.1:5000/ws/chat/?target_user_id=${targetUserId}`);
+        let isConnected = false;
+
+        ws.onopen = function() {
+            isConnected = true;
+            console.log('✅ WebSocket متصل شد!');
+            statusBar.textContent = '🟢 متصل';
+            statusBar.className = 'status-bar online';
+            connectionStatus.textContent = 'آنلاین';
+            connectionStatus.style.color = '#28a745';
+            msgInput.disabled = false;
+            sendBtn.disabled = false;
+        };
+
+        ws.onerror = function(error) {
+            console.log('❌ خطا:', error);
+            statusBar.textContent = '🔴 خطا در اتصال';
+        };
+
+        ws.onclose = function() {
+            isConnected = false;
+            console.log('🔴 اتصال قطع شد');
+            statusBar.textContent = '🔴 قطع شده';
+            statusBar.className = 'status-bar';
+            connectionStatus.textContent = 'آفلاین';
+            connectionStatus.style.color = '#dc3545';
+            msgInput.disabled = true;
+            sendBtn.disabled = true;
+        };
+
+        ws.onmessage = function(e) {
+            console.log('📩 پیام جدید دریافت شد');
+            try {
+                const data = JSON.parse(e.data);
+                displayMessage(data, false);
+            } catch (err) {
+                console.log('❌ خطا در parse:', err);
+            }
+        };
+
+        // ======================== ارسال پیام ========================
+        function sendMessage() {
+            const message = msgInput.value.trim();
+            if (!message) {
+                alert('پیام خالی است!');
+                return;
+            }
+
+            if (!isConnected) {
+                alert('اتصال برقرار نیست!');
+                return;
+            }
+
+            ws.send(JSON.stringify({ message: message }));
+            msgInput.value = '';
+            console.log('📤 پیام ارسال شد:', message);
+        }
+
+        // ======================== رویدادها ========================
+        sendBtn.onclick = sendMessage;
+        msgInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // ======================== راه‌اندازی ========================
+        console.log('🚀 صفحه بارگذاری شد');
+        loadInitialMessages();
+    </script>
+</body>
+</html>
