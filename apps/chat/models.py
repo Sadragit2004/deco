@@ -7,7 +7,6 @@ import os
 
 def message_file_path(instance, filename):
     """مسیر ذخیره فایل‌های پیام"""
-    # فایل در مسیر chat/messages/user_{id}/year/month/day/ ذخیره می‌شود
     return f'chat/messages/user_{instance.sender.id}/{instance.chat.id}/{filename}'
 
 
@@ -99,6 +98,7 @@ class Message(models.Model):
     )
     timestamp = models.DateTimeField(auto_now_add=True, verbose_name="زمان ارسال")
     is_read = models.BooleanField(default=False, verbose_name="خوانده شده")
+    is_seen = models.BooleanField(default=False, verbose_name="دیده شده")  # 🔥 اضافه شد
 
     class Meta:
         verbose_name = "پیام"

@@ -36,9 +36,14 @@
 
     <div class="search-wrapper">
         <div class="search-box-header">
-            <i class="fas fa-search search-icon-header"></i>
+            <div class="search-icon-wrapper">
+                <i class="fas fa-search search-icon-header"></i>
+            </div>
             <input type="text" id="globalSearchInput" placeholder="جستجوی محصول، برند، کاتالوگ..." autocomplete="off">
-            <button class="search-btn-header" id="searchBtnHeader"><i class="fas fa-arrow-left"></i></button>
+            <button class="search-btn-header" id="searchBtnHeader">
+                <i class="fas fa-arrow-left"></i>
+                <span class="search-btn-text">جستجو</span>
+            </button>
         </div>
         <div class="search-suggestions" id="searchSuggestions"></div>
     </div>
@@ -109,28 +114,78 @@
 .search-wrapper {
     position: relative;
     flex: 1;
-    max-width: 500px;
+    max-width: 580px;
+    min-width: 200px;
 }
 
 .search-box-header {
     display: flex;
     align-items: center;
     background: #f8fafc;
-    border: 1px solid #c8ccd1;
+    border: 2px solid #e2e8f0;
     border-radius: 60px;
-    padding: 4px 4px 4px 8px;
-    transition: all 0.3s;
+    padding: 3px 3px 3px 6px;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+.search-box-header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #d25f00, #f59e0b, #d25f00);
+    background-size: 200% auto;
+    border-radius: 10px;
+    transition: all 0.4s ease;
+    transform: translateX(-50%);
+}
+
+.search-box-header:focus-within::after {
+    width: 80%;
+    animation: shimmerLine 2s linear infinite;
+}
+
+@keyframes shimmerLine {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
 }
 
 .search-box-header:focus-within {
     border-color: #d25f00;
-    box-shadow: 0 0 0 3px rgba(210,95,0,0.1);
+    box-shadow: 0 4px 20px rgba(210,95,0,0.12), 0 0 0 4px rgba(210,95,0,0.06);
     background: white;
+    transform: scale(1.01);
+}
+
+.search-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.search-box-header:focus-within .search-icon-wrapper {
+    background: rgba(210,95,0,0.08);
 }
 
 .search-icon-header {
-    padding: 10px 8px;
     color: #94a3b8;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.search-box-header:focus-within .search-icon-header {
+    color: #d25f00;
+    transform: scale(1.1);
 }
 
 .search-box-header input {
@@ -138,78 +193,250 @@
     border: none;
     background: transparent;
     padding: 10px 8px;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     outline: none;
+    color: #1e293b;
+    font-weight: 400;
+    min-width: 100px;
+}
+
+.search-box-header input::placeholder {
+    color: #94a3b8;
+    font-weight: 300;
+    transition: all 0.3s ease;
+}
+
+.search-box-header:focus-within input::placeholder {
+    color: #cbd5e1;
+    transform: translateX(5px);
 }
 
 .search-btn-header {
     background: linear-gradient(135deg, #d25f00, #a84a00);
     border: none;
     border-radius: 50px;
-    width: 36px;
-    height: 36px;
+    padding: 8px 20px 8px 16px;
     cursor: pointer;
     color: white;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
 }
 
+.search-btn-header::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.search-btn-header:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.search-btn-header:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 24px rgba(210,95,0,0.35);
+}
+
+.search-btn-header:active {
+    transform: scale(0.96);
+}
+
+.search-btn-header i {
+    font-size: 0.9rem;
+    position: relative;
+    z-index: 1;
+}
+
+.search-btn-text {
+    position: relative;
+    z-index: 1;
+    letter-spacing: 0.3px;
+}
+
+/* ========== باکس پیشنهادات جستجو ========== */
 .search-suggestions {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 10px);
     right: 0;
     left: 0;
     background: white;
-    border-radius: 16px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.06);
     display: none;
-    max-height: 400px;
+    max-height: 450px;
     overflow-y: auto;
     z-index: 1001;
-    margin-top: 8px;
-    padding: 8px 0;
+    padding: 6px 0;
+    border: 1px solid rgba(226,232,240,0.5);
+    backdrop-filter: blur(12px);
 }
 
 .search-suggestions.show {
     display: block;
+    animation: suggestionSlideDown 0.25s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+@keyframes suggestionSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.search-suggestions::-webkit-scrollbar {
+    width: 6px;
+}
+
+.search-suggestions::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+    margin: 6px 0;
+}
+
+.search-suggestions::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #d25f00, #f59e0b);
+    border-radius: 10px;
 }
 
 .suggestion-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 16px;
+    gap: 14px;
+    padding: 12px 18px;
     cursor: pointer;
     text-decoration: none;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f8fafc;
+    position: relative;
 }
 
-.suggestion-item:not(:last-child) {
-    border-bottom: 1px solid #f1f5f9;
+.suggestion-item:last-child {
+    border-bottom: none;
 }
 
 .suggestion-item:hover {
-    background: #fef5ed;
+    background: linear-gradient(135deg, #fef5ed, #fde8d6);
+    padding-right: 22px;
+}
+
+.suggestion-item::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%) scaleX(0);
+    width: 4px;
+    height: 30px;
+    background: linear-gradient(180deg, #d25f00, #f59e0b);
+    border-radius: 0 4px 4px 0;
+    transition: all 0.3s ease;
+}
+
+.suggestion-item:hover::before {
+    transform: translateY(-50%) scaleX(1);
 }
 
 .suggestion-img {
-    width: 45px;
-    height: 45px;
+    width: 48px;
+    height: 48px;
     background: #f8fafc;
-    border-radius: 12px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     border: 1px solid #eef2f7;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.suggestion-item:hover .suggestion-img {
+    border-color: #d25f00;
+    box-shadow: 0 2px 8px rgba(210,95,0,0.08);
 }
 
 .suggestion-img img {
     width: 100%;
     height: 100%;
     object-fit: contain;
+    transition: transform 0.3s ease;
 }
 
-/* ========== منوی اصلی - کاملاً ریسپانسیو ========== */
+.suggestion-item:hover .suggestion-img img {
+    transform: scale(1.05);
+}
+
+.suggestion-img i {
+    font-size: 24px;
+    color: #cbd5e1;
+    transition: color 0.3s ease;
+}
+
+.suggestion-item:hover .suggestion-img i {
+    color: #d25f00;
+}
+
+.suggestion-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.suggestion-info h4 {
+    margin: 0 0 4px;
+    font-size: 0.85rem;
+    color: #1e293b;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.suggestion-item:hover .suggestion-info h4 {
+    color: #d25f00;
+}
+
+.suggestion-info p {
+    margin: 0;
+    font-size: 0.65rem;
+    color: #94a3b8;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.suggestion-info p .type-badge {
+    background: #f1f5f9;
+    padding: 1px 10px;
+    border-radius: 20px;
+    font-size: 0.55rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.suggestion-item:hover .suggestion-info p .type-badge {
+    background: #fef5ed;
+    color: #d25f00;
+}
+
+/* ========== منوی اصلی ========== */
 .desktop-nav-accordion {
     display: flex;
     gap: 8px;
@@ -242,7 +469,6 @@
     color: #d25f00;
 }
 
-/* لیست دسته بندی سطح اول */
 .accordion-content {
     position: absolute;
     top: 100%;
@@ -265,7 +491,6 @@
     transform: translateY(0);
 }
 
-/* آیتم دسته بندی */
 .category-item-menu {
     position: relative;
 }
@@ -297,7 +522,6 @@
     color: #cbd5e1;
 }
 
-/* ========== منوی 3 ستونه ========== */
 .mega-3col-menu {
     position: absolute;
     top: 0;
@@ -379,7 +603,6 @@
     width: 100%;
 }
 
-/* ========== استایل برندها ========== */
 .brands-list-mega {
     display: flex;
     flex-direction: column;
@@ -440,7 +663,6 @@
     color: #64748b;
 }
 
-/* ========== کاتالوگ‌ها ========== */
 .catalogs-list-mega {
     display: flex;
     flex-direction: column;
@@ -488,7 +710,6 @@
     color: #94a3b8;
 }
 
-/* ========== پرفروش‌ها ========== */
 .bestsellers-list-mega {
     display: flex;
     flex-direction: column;
@@ -607,57 +828,8 @@
     cursor: pointer;
 }
 
-/* ========== ریسپانسیو بهبود یافته ========== */
+/* ========== ریسپانسیو ========== */
 
-/* لپ‌تاپ بزرگ (1280px تا 1400px) - منو کوچک‌تر می‌شود ولی مخفی نمی‌شود */
-@media (max-width: 1280px) {
-    .mega-3col-menu {
-        width: 680px;
-    }
-
-    .mega-3col {
-        gap: 12px;
-        padding: 16px;
-    }
-
-    .accordion-header {
-        padding: 6px 12px;
-        font-size: 0.8rem;
-    }
-}
-
-/* لپ‌تاپ متوسط (1150px تا 1280px) */
-@media (max-width: 1150px) {
-    .mega-3col-menu {
-        width: 600px;
-        right: auto;
-        left: -50px;
-    }
-
-    .accordion-header {
-        padding: 6px 10px;
-        font-size: 0.75rem;
-    }
-
-    .header-right-side {
-        gap: 12px;
-    }
-}
-
-/* لپ‌تاپ کوچک (تا 1050px) - منوی دسکتاپ هنوز نمایش داده می‌شود */
-@media (max-width: 1050px) {
-    .mega-3col-menu {
-        width: 550px;
-        left: -80px;
-    }
-
-    .accordion-header {
-        padding: 5px 8px;
-        font-size: 0.7rem;
-    }
-}
-
-/* نقطه شکست اصلی - فقط در عرض کمتر از 992px منوی همبرگر نمایش داده می‌شود */
 @media (max-width: 992px) {
     .desktop-nav-accordion {
         display: none;
@@ -667,10 +839,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 38px;
-        height: 38px;
+        width: 42px;
+        height: 42px;
         background: #f1f5f9;
-        border-radius: 10px;
+        border-radius: 12px;
+        font-size: 1.2rem;
     }
 
     .mega-3col-menu {
@@ -712,65 +885,93 @@
         overflow-y: auto;
         border-radius: 0;
     }
-}
 
-/* تبلت (768px تا 992px) */
-@media (max-width: 768px) {
-    .main-header {
-        padding: 10px 12px;
-        gap: 10px;
+    .search-wrapper {
+        max-width: 100%;
+        min-width: unset;
+        flex: 1 1 100%;
+        order: 3;
+        margin-top: 8px;
     }
 
-    .header-right-side {
-        gap: 10px;
+    .search-box-header {
+        border-radius: 40px;
+        padding: 4px 4px 4px 10px;
+        border-width: 1.5px;
+        background: #f1f5f9;
     }
 
-    .menu-toggle-mobile {
-        width: 34px;
-        height: 34px;
-    }
-    .menu-toggle-mobile i {
-        font-size: 1.1rem;
-    }
-
-    .logo-icon-side img {
-        height: 32px;
+    .search-box-header:focus-within {
+        transform: scale(1);
+        background: white;
+        border-color: #d25f00;
+        box-shadow: 0 4px 16px rgba(210,95,0,0.1);
     }
 
-    .header-logo-text strong {
+    .search-box-header::after {
+        display: none;
+    }
+
+    .search-icon-wrapper {
+        width: 38px;
+        height: 38px;
+    }
+
+    .search-icon-header {
         font-size: 0.9rem;
     }
 
-    .header-logo-text span {
-        font-size: 0.5rem;
-    }
-
-    .search-wrapper {
-        order: 3;
-        width: 100%;
-        max-width: none;
-        flex: auto;
-        margin-top: 6px;
-    }
-
-
-    .search-icon-header {
-        padding: 7px 5px;
-        font-size: 0.75rem;
-    }
-
     .search-box-header input {
-        padding: 7px 5px;
-        font-size: 0.75rem;
+        padding: 10px 8px;
+        font-size: 0.85rem;
+        min-width: 60px;
+    }
+
+    .search-box-header input::placeholder {
+        font-size: 0.8rem;
     }
 
     .search-btn-header {
-        width: 30px;
-        height: 30px;
+        padding: 8px 18px 8px 14px;
+        border-radius: 30px;
+        gap: 6px;
+        font-size: 0.75rem;
+        min-width: 48px;
+    }
+
+    .search-btn-text {
+        display: inline;
+        font-size: 0.75rem;
     }
 
     .search-btn-header i {
-        font-size: 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .search-suggestions {
+        top: calc(100% + 8px);
+        border-radius: 16px;
+        max-height: 340px;
+        padding: 6px 0;
+    }
+
+    .suggestion-item {
+        padding: 12px 16px;
+        gap: 12px;
+    }
+
+    .suggestion-img {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+    }
+
+    .suggestion-img i {
+        font-size: 20px !important;
+    }
+
+    .suggestion-info h4 {
+        font-size: 0.82rem;
     }
 
     .header-actions {
@@ -778,12 +979,107 @@
     }
 
     .icon-btn-header {
-        width: 34px;
-        height: 34px;
+        width: 42px;
+        height: 42px;
     }
 
     .icon-btn-header i {
         font-size: 20px;
+    }
+
+    .badge-count {
+        width: 18px;
+        height: 18px;
+        font-size: 0.55rem;
+        top: -4px;
+        right: -4px;
+    }
+
+    .header-logo-text strong {
+        font-size: 1.1rem;
+    }
+
+    .logo-icon-side img {
+        height: 38px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-header {
+        padding: 10px 14px;
+        gap: 8px;
+    }
+
+    .header-right-side {
+        gap: 10px;
+    }
+
+    .menu-toggle-mobile {
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+    }
+
+    .logo-icon-side img {
+        height: 34px;
+    }
+
+    .header-logo-text strong {
+        font-size: 1rem;
+    }
+
+    .header-logo-text span {
+        font-size: 0.5rem;
+    }
+
+    .search-wrapper {
+        margin-top: 6px;
+    }
+
+    .search-box-header {
+        padding: 3px 3px 3px 8px;
+        border-radius: 34px;
+    }
+
+    .search-icon-wrapper {
+        width: 34px;
+        height: 34px;
+    }
+
+    .search-icon-header {
+        font-size: 0.8rem;
+    }
+
+    .search-box-header input {
+        padding: 8px 6px;
+        font-size: 0.8rem;
+    }
+
+    .search-box-header input::placeholder {
+        font-size: 0.75rem;
+    }
+
+    .search-btn-header {
+        padding: 6px 14px;
+        min-width: 42px;
+        font-size: 0.7rem;
+    }
+
+    .search-btn-text {
+        font-size: 0.7rem;
+    }
+
+    .search-btn-header i {
+        font-size: 0.75rem;
+    }
+
+    .icon-btn-header {
+        width: 38px;
+        height: 38px;
+    }
+
+    .icon-btn-header i {
+        font-size: 18px;
     }
 
     .badge-count {
@@ -796,37 +1092,44 @@
 
     .search-suggestions {
         max-height: 300px;
-        border-radius: 12px;
+        border-radius: 14px;
     }
 
     .suggestion-item {
-        padding: 8px 12px;
+        padding: 10px 14px;
         gap: 10px;
     }
 
     .suggestion-img {
         width: 38px;
         height: 38px;
+        border-radius: 10px;
+    }
+
+    .suggestion-img i {
+        font-size: 18px !important;
+    }
+
+    .suggestion-info h4 {
+        font-size: 0.75rem;
     }
 }
 
-/* موبایل خیلی کوچک */
 @media (max-width: 480px) {
     .main-header {
         padding: 8px 10px;
-        gap: 8px;
+        gap: 6px;
     }
 
     .header-right-side {
-        gap: 8px;
+        gap: 6px;
     }
 
     .menu-toggle-mobile {
-        width: 30px;
-        height: 30px;
-    }
-    .menu-toggle-mobile i {
+        width: 34px;
+        height: 34px;
         font-size: 1rem;
+        border-radius: 10px;
     }
 
     .logo-icon-side img {
@@ -834,43 +1137,112 @@
     }
 
     .header-logo-text strong {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
     }
 
     .header-logo-text span {
-        font-size: 0.45rem;
+        font-size: 0.4rem;
     }
 
-    .icon-btn-header {
-        width: 30px;
-        height: 30px;
+    .search-wrapper {
+        margin-top: 4px;
     }
 
-    .icon-btn-header i {
-        font-size:20px;
+    .search-box-header {
+        border-radius: 28px;
+        padding: 2px 2px 2px 6px;
+        border-width: 1px;
     }
 
-    .search-box-header input {
-        font-size: 0.7rem;
-        padding: 6px 4px;
-    }
-
-    .search-icon-header {
-        font-size: 0.7rem;
-        padding: 5px 3px;
-    }
-
-    .search-btn-header {
+    .search-icon-wrapper {
         width: 28px;
         height: 28px;
     }
 
-    .search-btn-header i {
+    .search-icon-header {
+        font-size: 0.7rem;
+    }
+
+    .search-box-header input {
+        padding: 6px 4px;
+        font-size: 0.7rem;
+        min-width: 40px;
+    }
+
+    .search-box-header input::placeholder {
         font-size: 0.65rem;
+    }
+
+    .search-btn-header {
+        padding: 5px 10px;
+        min-width: 34px;
+        border-radius: 24px;
+        font-size: 0.6rem;
+    }
+
+    .search-btn-text {
+        display: none;
+    }
+
+    .search-btn-header i {
+        font-size: 0.7rem;
+        margin: 0;
+    }
+
+    .icon-btn-header {
+        width: 36px;
+        height: 36px;
+    }
+
+    .icon-btn-header i {
+        font-size: 15px;
+    }
+
+    .badge-count {
+        width: 22px;
+        height: 19px;
+        font-size: 10px;
+        top: -13px;
+        right: -3px;
+    }
+
+    .search-suggestions {
+        max-height: 250px;
+        border-radius: 12px;
+        padding: 4px 0;
+        top: calc(100% + 4px);
+    }
+
+    .suggestion-item {
+        padding: 8px 12px;
+        gap: 8px;
+    }
+
+    .suggestion-img {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+    }
+
+    .suggestion-img i {
+        font-size: 14px !important;
+    }
+
+    .suggestion-info h4 {
+        font-size: 0.68rem;
+        margin-bottom: 1px;
+    }
+
+    .suggestion-info p {
+        font-size: 0.5rem;
+    }
+
+    .suggestion-info p .type-badge {
+        font-size: 0.45rem;
+        padding: 0 6px;
     }
 }
 
-/* سایدبار موبایل */
 .sidebar {
     transition: transform 0.3s ease;
 }
@@ -892,7 +1264,120 @@
         transform: translateX(0);
     }
 }
+
+/* ===== تغییرات گلس مورفی برای هدر ===== */
+.main-header {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* افکت شیشه‌ای روی باکس جستجو */
+.search-box-header {
+    background: rgba(248, 250, 252, 0.7) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border-color: rgba(226, 232, 240, 0.6) !important;
+}
+
+.search-box-header:focus-within {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-color: #d25f00 !important;
+    box-shadow: 0 4px 20px rgba(210, 95, 0, 0.12), 0 0 0 4px rgba(210, 95, 0, 0.05) !important;
+}
+
+/* دکمه‌های منو با افکت شیشه‌ای */
+.accordion-header {
+    background: rgba(241, 245, 249, 0.6) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+}
+
+.accordion-header:hover {
+    background: rgba(226, 232, 240, 0.8) !important;
+}
+
+/* آیکون‌های اکشن با افکت شیشه‌ای */
+.icon-btn-header {
+    background: rgba(241, 245, 249, 0.6) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+}
+
+.icon-btn-header:hover {
+    background: rgba(226, 232, 240, 0.8) !important;
+}
+
+/* دکمه منوی موبایل با افکت شیشه‌ای */
+.menu-toggle-mobile {
+    background: rgba(241, 245, 249, 0.6) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+}
+
+/* باکس پیشنهادات با افکت شیشه‌ای */
+.search-suggestions {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* منوی دسکتاپ با افکت شیشه‌ای */
+.accordion-content {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+}
+
+.mega-3col-menu {
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.mega-col-title {
+    background: transparent !important;
+}
+
+/* ریسپانسیو - در موبایل شفافیت بیشتر */
+@media (max-width: 992px) {
+    .main-header {
+        background: rgba(255, 255, 255, 0.6) !important;
+        backdrop-filter: blur(24px) !important;
+        -webkit-backdrop-filter: blur(24px) !important;
+    }
+
+    .search-box-header {
+        background: rgba(248, 250, 252, 0.8) !important;
+    }
+
+    .search-box-header:focus-within {
+        background: rgba(255, 255, 255, 0.95) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-header {
+        background: rgba(255, 255, 255, 0.65) !important;
+        backdrop-filter: blur(24px) !important;
+        -webkit-backdrop-filter: blur(24px) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-header {
+        background: rgba(255, 255, 255, 0.7) !important;
+        backdrop-filter: blur(24px) !important;
+        -webkit-backdrop-filter: blur(24px) !important;
+    }
+}
 </style>
+
+
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -1034,10 +1519,11 @@ function setupSearch() {
             if (result.status === 'success' && result.data && result.data.length > 0) {
                 suggestionsBox.innerHTML = result.data.map(item => {
                     let defaultIcon = 'fa-tag';
-                    if (item.type === 'product') defaultIcon = 'fa-box-open';
-                    if (item.type === 'brand') defaultIcon = 'fa-building';
-                    if (item.type === 'category') defaultIcon = 'fa-folder-open';
-                    if (item.type === 'catalog') defaultIcon = 'fa-file-pdf';
+                    let typeLabel = 'عمومی';
+                    if (item.type === 'product') { defaultIcon = 'fa-box-open'; typeLabel = 'محصول'; }
+                    if (item.type === 'brand') { defaultIcon = 'fa-building'; typeLabel = 'برند'; }
+                    if (item.type === 'category') { defaultIcon = 'fa-folder-open'; typeLabel = 'دسته‌بندی'; }
+                    if (item.type === 'catalog') { defaultIcon = 'fa-file-pdf'; typeLabel = 'کاتالوگ'; }
 
                     return `
                     <a href="${item.url}" class="suggestion-item">
@@ -1047,14 +1533,20 @@ function setupSearch() {
                                 `<i class="fas ${defaultIcon}" style="font-size: 22px; color: #cbd5e1;"></i>`
                             }
                         </div>
-                        <div class="suggestion-info" style="flex: 1;">
-                            <h4 style="margin:0 0 4px; font-size:0.8rem; color: #1e293b;">${escapeHtml(item.title)}</h4>
-                            <p style="margin:0; font-size:0.65rem; color:#64748b; font-weight: 500;">${escapeHtml(item.type_name || item.type)}</p>
+                        <div class="suggestion-info">
+                            <h4>${escapeHtml(item.title)}</h4>
+                            <p><span class="type-badge">${typeLabel}</span></p>
                         </div>
                     </a>`;
                 }).join('');
             } else {
-                suggestionsBox.innerHTML = `<div style="padding:20px;text-align:center;color:#94a3b8;">نتیجه‌ای برای "${escapeHtml(query)}" یافت نشد</div>`;
+                suggestionsBox.innerHTML = `
+                    <div style="padding:24px;text-align:center;color:#94a3b8;display:flex;flex-direction:column;align-items:center;gap:8px;">
+                        <i class="fas fa-search" style="font-size:28px;color:#e2e8f0;"></i>
+                        <span>نتیجه‌ای برای "${escapeHtml(query)}" یافت نشد</span>
+                        <span style="font-size:0.65rem;">کلمات کلیدی دیگری را امتحان کنید</span>
+                    </div>
+                `;
             }
         } catch (error) {
             console.error('Search error:', error);

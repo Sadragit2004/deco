@@ -12,8 +12,8 @@
 
 <!-- top-info-bar اصلی با طراحی جدید -->
 <div class="top-info-bar">
-    <div class="user-info" id="profileTriggerTop">
-        <div class="user-avatar">
+    <div class="user-info">
+        <div class="user-avatar" id="profileTriggerTop" style="cursor:pointer;">
             <img src="/media/images/profile.jpg" onerror="this.src='/media/images/p1.jpg'" alt="پروفایل">
             <div class="verified-badge">
                 <i class="fas fa-check-circle"></i>
@@ -26,9 +26,10 @@
                     <i class="fas fa-store"></i>
                     <span id="shopNameText">بارگذاری...</span>
                 </span>
-                <span class="tier-badge" id="tierName">
+                <span class="tier-badge" id="tierName" style="cursor:pointer;">
                     <i class="fas fa-gem"></i>
                     <span style='color:#333;' id="tierValue"></span>
+                    <i class="fas fa-chevron-down" style="font-size:10px; color:#999;"></i>
                 </span>
             </div>
         </div>
@@ -44,6 +45,106 @@
             <i class="fas fa-wallet"></i>
             <span id="walletValue">۰</span>
             <span>تومان</span>
+        </div>
+    </div>
+</div>
+
+<!-- ===== مودال چشم‌انداز سطوح ===== -->
+<div id="tierModal" style="display:none;">
+    <div class="modal-backdrop-tier"></div>
+    <div class="tier-modal-container">
+        <div class="tier-modal-card">
+            <div class="tier-modal-header">
+                <h3><i class="fas fa-flag-checkered"></i> چشم‌انداز سطوح</h3>
+                <button class="tier-modal-close" id="closeTierModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="tier-modal-body">
+                <!-- سطح فعلی -->
+                <div class="tier-current-info">
+                    <div class="tier-current-badge" id="tierModalCurrentBadge">
+                        <i class="fas fa-crown"></i>
+                        <span id="tierModalCurrentName">طلایی</span>
+                    </div>
+                    <div class="tier-current-progress">
+                        <span>پیشرفت به سطح بعدی</span>
+                        <div class="tier-progress-bar">
+                            <div class="tier-progress-fill" id="tierModalProgressFill" style="width:65%;"></div>
+                        </div>
+                        <div class="tier-progress-text">
+                            <span id="tierModalCurrentAmount">۵۰۰,۰۰۰,۰۰۰ تومان</span>
+                            <span id="tierModalNextTarget">۹۵۰,۰۰۰,۰۰۰ تومان</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- لیست سطوح -->
+                <div class="tier-list">
+                    <!-- سطح ۱: انتخاب -->
+                    <div class="tier-list-item completed" data-tier="select">
+                        <div class="tier-list-icon"><i class="fas fa-user"></i></div>
+                        <div class="tier-list-content">
+                            <div class="tier-list-name">انتخاب</div>
+                            <div class="tier-list-requirement">تا ۲۵۰ میلیون تومان</div>
+                            <ul class="tier-list-benefits">
+                                <li><i class="fas fa-check-circle"></i> امتیاز پایه</li>
+                                <li><i class="fas fa-check-circle"></i> پشتیبانی معمولی</li>
+                            </ul>
+                        </div>
+                        <div class="tier-list-status status-done"><i class="fas fa-check-circle"></i> دریافت شد</div>
+                    </div>
+
+                    <!-- سطح ۲: نخبگان -->
+                    <div class="tier-list-item active" data-tier="premium">
+                        <div class="tier-list-icon"><i class="fas fa-star"></i></div>
+                        <div class="tier-list-content">
+                            <div class="tier-list-name">نخبگان</div>
+                            <div class="tier-list-requirement">۲۵۰ تا ۵۰۰ میلیون تومان</div>
+                            <ul class="tier-list-benefits">
+                                <li><i class="fas fa-check-circle"></i> ۱۵٪ تخفیف ویژه</li>
+                                <li><i class="fas fa-check-circle"></i> ۴ سکه B2B</li>
+                                <li><i class="fas fa-check-circle"></i> ارسال رایگان</li>
+                            </ul>
+                        </div>
+                        <div class="tier-list-status status-current"><i class="fas fa-flag"></i> فعلی</div>
+                    </div>
+
+                    <!-- سطح ۳: طلایی -->
+                    <div class="tier-list-item locked" data-tier="elite">
+                        <div class="tier-list-icon"><i class="fas fa-crown"></i></div>
+                        <div class="tier-list-content">
+                            <div class="tier-list-name">طلایی</div>
+                            <div class="tier-list-requirement">۵۰۰ تا ۹۵۰ میلیون تومان</div>
+                            <ul class="tier-list-benefits">
+                                <li><i class="fas fa-check-circle"></i> ۲۵٪ تخفیف ویژه</li>
+                                <li><i class="fas fa-check-circle"></i> ۱۰ سکه B2B</li>
+                                <li><i class="fas fa-check-circle"></i> ارسال رایگان</li>
+                                <li><i class="fas fa-check-circle"></i> پشتیبانی VIP</li>
+                            </ul>
+                        </div>
+                        <div class="tier-list-status status-locked"><i class="fas fa-lock"></i> قفل</div>
+                    </div>
+
+                    <!-- سطح ۴: خصوصی -->
+                    <div class="tier-list-item locked" data-tier="private">
+                        <div class="tier-list-icon"><i class="fas fa-gem"></i></div>
+                        <div class="tier-list-content">
+                            <div class="tier-list-name">خصوصی</div>
+                            <div class="tier-list-requirement">۹۵۰ میلیون تومان +</div>
+                            <ul class="tier-list-benefits">
+                                <li><i class="fas fa-check-circle"></i> ۵۰٪ تخفیف ویژه</li>
+                                <li><i class="fas fa-check-circle"></i> ۲۰ سکه B2B</li>
+                                <li><i class="fas fa-check-circle"></i> ارسال رایگان</li>
+                                <li><i class="fas fa-check-circle"></i> پشتیبانی اختصاصی</li>
+                                <li><i class="fas fa-check-circle"></i> دعوت به رویدادها</li>
+                            </ul>
+                        </div>
+                        <div class="tier-list-status status-locked"><i class="fas fa-lock"></i> قفل</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -118,7 +219,7 @@
     font-size: 12px;
 }
 
-/* ========== TOP INFO BAR - مرتب و کلاسیک ========== */
+/* ========== TOP INFO BAR ========== */
 .top-info-bar {
     background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
     padding: 16px 24px;
@@ -135,7 +236,6 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    cursor: pointer;
     flex: 1;
     min-width: 200px;
 }
@@ -222,6 +322,13 @@
     gap: 6px;
     white-space: nowrap;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tier-badge:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(243,156,18,0.3);
 }
 
 .tier-badge i {
@@ -271,7 +378,308 @@
     border-left: 1px solid rgba(230,126,34,0.2);
 }
 
-/* ========== TIER COLORS ========== */
+/* ===== TIER MODAL ===== */
+.modal-backdrop-tier {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(12px);
+    z-index: 9998;
+    animation: tierFadeIn 0.3s ease;
+}
+
+@keyframes tierFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes tierSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.tier-modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.tier-modal-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    border-radius: 28px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+    animation: tierSlideUp 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.tier-modal-header {
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #1a1a2e, #2c3e50);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.tier-modal-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tier-modal-header h3 i {
+    color: #f39c12;
+}
+
+.tier-modal-close {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: white;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.tier-modal-close:hover {
+    background: rgba(255,255,255,0.25);
+    transform: rotate(90deg);
+}
+
+.tier-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    background: #f8f9fa;
+}
+
+/* Current info */
+.tier-current-info {
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.tier-current-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(243,156,18,0.3);
+}
+
+.tier-current-badge i {
+    font-size: 16px;
+}
+
+.tier-current-progress span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2d3436;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.tier-progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #e9ecef;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.tier-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f39c12, #e67e22);
+    border-radius: 20px;
+    transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tier-progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #7f8c8d;
+    font-weight: 500;
+}
+
+/* Tier list */
+.tier-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tier-list-item {
+    background: white;
+    border-radius: 18px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.tier-list-item:hover {
+    transform: translateX(-4px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.tier-list-item.completed {
+    border-color: #2ecc71;
+    background: linear-gradient(135deg, #f0fff4, #e8f8ef);
+}
+
+.tier-list-item.active {
+    border-color: #f39c12;
+    background: linear-gradient(135deg, #fffcf0, #fff8e7);
+    box-shadow: 0 4px 20px rgba(243,156,18,0.15);
+}
+
+.tier-list-item.locked {
+    opacity: 0.7;
+    border-color: #dee2e6;
+    background: #f8f9fa;
+}
+
+.tier-list-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    background: #e9ecef;
+    color: #6c757d;
+}
+
+.tier-list-item.completed .tier-list-icon {
+    background: #2ecc71;
+    color: white;
+}
+
+.tier-list-item.active .tier-list-icon {
+    background: #f39c12;
+    color: white;
+}
+
+.tier-list-item.locked .tier-list-icon {
+    background: #dee2e6;
+    color: #adb5bd;
+}
+
+.tier-list-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.tier-list-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: #2d3436;
+    margin-bottom: 2px;
+}
+
+.tier-list-requirement {
+    font-size: 12px;
+    color: #7f8c8d;
+    margin-bottom: 6px;
+}
+
+.tier-list-benefits {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+}
+
+.tier-list-benefits li {
+    font-size: 12px;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tier-list-benefits li i {
+    color: #2ecc71;
+    font-size: 11px;
+}
+
+.tier-list-item.locked .tier-list-benefits li i {
+    color: #adb5bd;
+}
+
+.tier-list-status {
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: 4px 12px;
+    border-radius: 20px;
+    flex-shrink: 0;
+}
+
+.status-done {
+    color: #2ecc71;
+    background: rgba(46,204,113,0.12);
+}
+
+.status-current {
+    color: #f39c12;
+    background: rgba(243,156,18,0.15);
+}
+
+.status-locked {
+    color: #adb5bd;
+    background: rgba(173,181,189,0.15);
+}
+
+/* ===== TIER COLORS ===== */
 .tier-bronze {
     background: linear-gradient(135deg, #cd7f32, #b87333);
     -webkit-background-clip: text;
@@ -299,219 +707,6 @@
     background-clip: text;
     color: transparent;
     font-weight: 800;
-}
-
-/* ========== MODAL STYLES (بدون تغییر) ========== */
-@keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-30px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-@keyframes modalFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(8px);
-    z-index: 9998;
-    animation: modalFadeIn 0.2s ease;
-}
-
-.address-modal-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    animation: modalFadeIn 0.2s ease;
-    padding: 16px;
-}
-
-.address-modal-card {
-    background: #ffffff;
-    width: 100%;
-    max-width: 550px;
-    max-height: 85vh;
-    border-radius: 28px;
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3);
-    animation: modalSlideIn 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-.modal-header-custom {
-    padding: 20px 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-header-custom h3 {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.modal-close-btn {
-    background: rgba(255,255,255,0.2);
-    border: none;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    cursor: pointer;
-    color: white;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-}
-
-.modal-close-btn:hover {
-    background: rgba(255,255,255,0.3);
-    transform: rotate(90deg);
-}
-
-.address-list-custom {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-    background: #f8f9fa;
-}
-
-.address-item-custom {
-    background: white;
-    border-radius: 20px;
-    padding: 18px;
-    margin-bottom: 14px;
-    transition: all 0.3s ease;
-    border: 1px solid #e9ecef;
-    cursor: pointer;
-}
-
-.address-item-custom:hover {
-    transform: translateX(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    border-color: #3498db;
-}
-
-.address-item-custom.selected {
-    border: 2px solid #3498db;
-    background: linear-gradient(135deg, #f0f9ff, #e8f4fd);
-}
-
-.address-badge-custom {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.badge-default {
-    background: linear-gradient(135deg, #28a745, #20c997);
-    color: white;
-}
-
-.badge-home {
-    background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
-}
-
-.badge-work {
-    background: linear-gradient(135deg, #6f42c1, #6610f2);
-    color: white;
-}
-
-.badge-other {
-    background: linear-gradient(135deg, #6c757d, #5a6268);
-    color: white;
-}
-
-.btn-primary-custom {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    padding: 14px;
-    border-radius: 14px;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: 100%;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.btn-primary-custom:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102,126,234,0.4);
-}
-
-.btn-outline-custom {
-    background: white;
-    border: 1px solid #dee2e6;
-    padding: 12px;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-}
-
-.btn-outline-custom:hover {
-    background: #f8f9fa;
-    border-color: #3498db;
-}
-
-.form-input-custom {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1px solid #dee2e6;
-    border-radius: 14px;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-    background: white;
-}
-
-.form-input-custom:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
-}
-
-.float-btn {
-    position: sticky;
-    bottom: 16px;
-    margin: 0 20px 20px 20px;
-    width: calc(100% - 40px);
 }
 
 /* ========== RESPONSIVE ========== */
@@ -578,25 +773,38 @@
         border-left: none;
     }
 
-    .address-modal-card {
-        max-height: 90vh;
+    .tier-modal-card {
+        max-height: 95vh;
         border-radius: 20px;
     }
 
-    .modal-header-custom {
+    .tier-modal-header {
         padding: 16px 20px;
     }
 
-    .modal-header-custom h3 {
+    .tier-modal-header h3 {
         font-size: 1rem;
     }
 
-    .address-list-custom {
+    .tier-modal-body {
         padding: 16px;
     }
 
-    .address-item-custom {
+    .tier-list-item {
         padding: 14px;
+        flex-wrap: wrap;
+    }
+
+    .tier-list-status {
+        width: 100%;
+        text-align: center;
+        padding: 4px 0;
+    }
+
+    .tier-progress-text {
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
     }
 }
 
@@ -626,9 +834,9 @@
         font-size: 15px;
     }
 
-    .float-btn {
-        margin: 0 12px 12px 12px;
-        width: calc(100% - 24px);
+    .tier-list-benefits {
+        flex-direction: column;
+        gap: 2px;
     }
 }
 </style>
@@ -692,6 +900,10 @@
     </div>
 </div>
 
+<style>
+
+</style>
+
 <script>
 // ==================== تابع تنظیم رنگ و متن پلن ====================
 function updateTier(tier) {
@@ -700,19 +912,88 @@ function updateTier(tier) {
 
     tierSpan.classList.remove('tier-bronze', 'tier-silver', 'tier-gold', 'tier-platinum');
 
-    if (tier === 'bronze') {
-        tierSpan.innerText = '';
-        tierSpan.classList.add('tier-bronze');
-    } else if (tier === 'silver') {
-        tierSpan.innerText = '';
-        tierSpan.classList.add('tier-silver');
-    } else if (tier === 'gold') {
-        tierSpan.innerText = '';
-        tierSpan.classList.add('tier-gold');
-    } else if (tier === 'platinum') {
-        tierSpan.innerText = '';
-        tierSpan.classList.add('tier-platinum');
+    const tierMap = {
+        'select': { text: 'انتخاب', class: '' },
+        'premium': { text: 'نخبگان', class: 'tier-bronze' },
+        'elite': { text: 'طلایی', class: 'tier-gold' },
+        'private': { text: 'خصوصی', class: 'tier-platinum' }
+    };
+
+    const info = tierMap[tier] || tierMap['select'];
+    tierSpan.innerText = info.text;
+    if (info.class) {
+        tierSpan.classList.add(info.class);
     }
+}
+
+// ==================== آپدیت مودال سطوح ====================
+function updateTierModal(data) {
+    const tiers = ['select', 'premium', 'elite', 'private'];
+    const tierNames = {
+        'select': 'انتخاب',
+        'premium': 'نخبگان',
+        'elite': 'طلایی',
+        'private': 'خصوصی'
+    };
+    const tierThresholds = {
+        'select': 0,
+        'premium': 250000000,
+        'elite': 500000000,
+        'private': 950000000
+    };
+
+    const currentTier = data.loyalty?.current_tier || 'select';
+    const lifetimePurchase = data.loyalty?.lifetime_purchase || 0;
+    const currentIndex = tiers.indexOf(currentTier);
+
+    // بروزرسانی نشان سطح فعلی در مودال
+    document.getElementById('tierModalCurrentName').innerText = tierNames[currentTier] || 'انتخاب';
+
+    // محاسبه درصد پیشرفت
+    let progressPercent = 0;
+    let nextTarget = 0;
+    let currentAmount = lifetimePurchase;
+
+    if (currentIndex < tiers.length - 1) {
+        const currentThreshold = tierThresholds[tiers[currentIndex]];
+        const nextThreshold = tierThresholds[tiers[currentIndex + 1]];
+        const diff = nextThreshold - currentThreshold;
+        const earned = Math.max(0, lifetimePurchase - currentThreshold);
+        progressPercent = Math.min(100, (earned / diff) * 100);
+        nextTarget = nextThreshold;
+    } else {
+        progressPercent = 100;
+        nextTarget = lifetimePurchase;
+    }
+
+    // بروزرسانی نوار پیشرفت
+    document.getElementById('tierModalProgressFill').style.width = progressPercent + '%';
+    document.getElementById('tierModalCurrentAmount').innerText = currentAmount.toLocaleString() + ' تومان';
+    document.getElementById('tierModalNextTarget').innerText = nextTarget.toLocaleString() + ' تومان';
+
+    // بروزرسانی لیست سطوح
+    const items = document.querySelectorAll('.tier-list-item');
+    items.forEach(item => {
+        const tier = item.dataset.tier;
+        const index = tiers.indexOf(tier);
+        const statusEl = item.querySelector('.tier-list-status');
+
+        item.classList.remove('completed', 'active', 'locked');
+
+        if (index < currentIndex) {
+            item.classList.add('completed');
+            statusEl.className = 'tier-list-status status-done';
+            statusEl.innerHTML = '<i class="fas fa-check-circle"></i> دریافت شد';
+        } else if (index === currentIndex) {
+            item.classList.add('active');
+            statusEl.className = 'tier-list-status status-current';
+            statusEl.innerHTML = '<i class="fas fa-flag"></i> فعلی';
+        } else {
+            item.classList.add('locked');
+            statusEl.className = 'tier-list-status status-locked';
+            statusEl.innerHTML = '<i class="fas fa-lock"></i> قفل';
+        }
+    });
 }
 
 // ==================== API CALLS ====================
@@ -734,6 +1015,10 @@ async function getUserInfo() {
 
             if (data.loyalty && data.loyalty.current_tier) {
                 updateTier(data.loyalty.current_tier);
+                // آپدیت مودال اگر باز است
+                if (document.getElementById('tierModal').style.display === 'block') {
+                    updateTierModal(data);
+                }
             }
         }
     } catch(e) {
@@ -942,11 +1227,70 @@ function resetFormFields() {
     document.getElementById('isDefault').checked = false;
 }
 
+// ==================== باز کردن مودال سطوح ====================
+async function openTierModal() {
+    const modal = document.getElementById('tierModal');
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+
+    // دریافت داده‌های به‌روز
+    try {
+        const res = await fetch('/accounts/api/user/dashboard/');
+        const result = await res.json();
+        if (result.success) {
+            updateTierModal(result.data);
+        }
+    } catch(e) {
+        console.error(e);
+    }
+}
+
+function closeTierModal() {
+    document.getElementById('tierModal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     getUserInfo();
     getShopName();
     refreshAddressList();
 
+    // ===== فقط آواتار پنل کاربری رو باز میکنه =====
+    const profileTrigger = document.getElementById('profileTriggerTop');
+    const panel = document.getElementById('profilePanel');
+
+    if (profileTrigger && panel) {
+        profileTrigger.onclick = function(e) {
+            e.stopPropagation();
+            panel.classList.toggle('open');
+        };
+    }
+
+    // ===== رویداد کلیک روی tierName =====
+    const tierName = document.getElementById('tierName');
+    if (tierName) {
+        tierName.onclick = function(e) {
+            e.stopPropagation();
+            openTierModal();
+        };
+    }
+
+    // ===== بستن مودال سطوح =====
+    const closeTierBtn = document.getElementById('closeTierModal');
+    if (closeTierBtn) {
+        closeTierBtn.onclick = closeTierModal;
+    }
+
+    const tierModal = document.getElementById('tierModal');
+    if (tierModal) {
+        tierModal.addEventListener('click', function(e) {
+            if (e.target === tierModal || e.target.classList?.contains('modal-backdrop-tier')) {
+                closeTierModal();
+            }
+        });
+    }
+
+    // ===== مودال آدرس =====
     const modal = document.getElementById('addressModal');
     const openBtn = document.getElementById('openAddressModal');
     const closeBtn = document.getElementById('closeModalBtn');

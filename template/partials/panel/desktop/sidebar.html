@@ -20,10 +20,7 @@
             <span class="sidebar-text">سفارشات غیر چاپی</span>
         </div>
 
-        <div class="sidebar-item" data-url="{% url 'panel:admin_print_orders_panel' %}">
-            <div class="sidebar-icon"><i class="fas fa-print"></i></div>
-            <span class="sidebar-text">سفارشات چاپی</span>
-        </div>
+
 
         <div class="sidebar-item" data-url="{% url 'panel:admin_payments_panel' %}">
             <div class="sidebar-icon"><i class="fas fa-credit-card"></i></div>
@@ -35,23 +32,23 @@
             <span class="sidebar-text">تنظیمات سایت</span>
         </div>
         <div class="sidebar-item" data-url="{% url 'panel:userindex' %}">
-            <div class="sidebar-icon"><i class="fas fa-sliders-h"></i></div>
-            <span class="sidebar-text"> کاربران</span>
+            <div class="sidebar-icon"><i class="fas fa-users"></i></div>
+            <span class="sidebar-text">کاربران</span>
         </div>
         <div class="sidebar-item" data-url="{% url 'panel:productindex' %}">
-            <div class="sidebar-icon"><i class="fas fa-sliders-h"></i></div>
-            <span class="sidebar-text"> پنل محصولات</span>
+            <div class="sidebar-icon"><i class="fas fa-boxes"></i></div>
+            <span class="sidebar-text">پنل محصولات</span>
         </div>
         <div class="sidebar-item" data-url="{% url 'panel:role_panel' %}">
-            <div class="sidebar-icon"><i class="fas fa-sliders-h"></i></div>
+            <div class="sidebar-icon"><i class="fas fa-lock"></i></div>
             <span class="sidebar-text">سیستم مجوزات</span>
         </div>
         <div class="sidebar-item" data-url="{% url 'panel:operator_dashboard' %}">
-            <div class="sidebar-icon"><i class="fas fa-sliders-h"></i></div>
+            <div class="sidebar-icon"><i class="fas fa-paint-brush"></i></div>
             <span class="sidebar-text">پنل فوتوشاپ</span>
         </div>
         <div class="sidebar-item" data-url="{% url 'panel:admin_check_list' %}">
-            <div class="sidebar-icon"><i class="fas fa-sliders-h"></i></div>
+            <div class="sidebar-icon"><i class="fas fa-check-double"></i></div>
             <span class="sidebar-text">پنل چک</span>
         </div>
     </div>
@@ -245,12 +242,27 @@
         display: flex;
         flex-direction: column;
         z-index: 100;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /* استایل اسکرول سایدبار */
+    .desktop-sidebar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .desktop-sidebar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .desktop-sidebar::-webkit-scrollbar-thumb {
+        background: #667eea;
+        border-radius: 10px;
     }
 
     .sidebar-logo {
         padding: 30px 20px;
         text-align: center;
         border-bottom: 1px solid rgba(102,126,234,0.15);
+        flex-shrink: 0;
     }
 
     .logo-icon {
@@ -271,6 +283,8 @@
     .sidebar-menu {
         flex: 1;
         padding: 15px;
+        overflow-y: auto;
+        min-height: 0;
     }
 
     .sidebar-item {
@@ -294,7 +308,7 @@
         border: 1px solid rgba(102,126,234,0.2);
     }
 
-    .sidebar-icon i { color: #94a3b8; font-size: 1.1rem; }
+    .sidebar-icon i { color: #94a3b8; font-size: 1.1rem; width: 20px; }
     .sidebar-item:hover .sidebar-icon i,
     .sidebar-item.active .sidebar-icon i { color: #667eea; }
 
@@ -303,6 +317,8 @@
     .sidebar-actions {
         padding: 20px;
         border-top: 1px solid rgba(102,126,234,0.15);
+        flex-shrink: 0;
+        background: #0f172a;
     }
 
     .sidebar-btn {
@@ -352,22 +368,37 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.95);
+        background: rgba(0,0,0,0.85);
         backdrop-filter: blur(8px);
         z-index: 1001;
         justify-content: center;
         align-items: center;
+        padding: 20px;
     }
 
     .modal-content {
         background: linear-gradient(135deg, #1e293b, #0f172a);
         border-radius: 24px;
         padding: 28px;
-        width: 550px;
-        max-width: 90%;
-        max-height: 85vh;
+        width: 100%;
+        max-width: 550px;
+        max-height: 90vh;
         overflow-y: auto;
         border: 1px solid rgba(102,126,234,0.3);
+        position: relative;
+    }
+
+    /* استایل اسکرول مودال */
+    .modal-content::-webkit-scrollbar {
+        width: 5px;
+    }
+    .modal-content::-webkit-scrollbar-track {
+        background: #0f172a;
+        border-radius: 10px;
+    }
+    .modal-content::-webkit-scrollbar-thumb {
+        background: #667eea;
+        border-radius: 10px;
     }
 
     .modal-header {
@@ -377,6 +408,7 @@
         margin-bottom: 24px;
         padding-bottom: 16px;
         border-bottom: 1px solid rgba(102,126,234,0.2);
+        flex-shrink: 0;
     }
 
     .modal-header h3 {
@@ -396,6 +428,7 @@
         font-size: 20px;
         cursor: pointer;
         transition: all 0.3s;
+        flex-shrink: 0;
     }
 
     .modal-close:hover {
@@ -426,6 +459,7 @@
         border-radius: 12px;
         color: #fff;
         font-size: 0.85rem;
+        transition: border-color 0.3s;
     }
 
     .form-group input:focus,
@@ -433,6 +467,11 @@
     .form-group textarea:focus {
         outline: none;
         border-color: #667eea;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 60px;
     }
 
     .form-row {
@@ -460,9 +499,21 @@
         margin: 0 auto 12px;
         cursor: pointer;
         overflow: hidden;
+        border: 2px solid rgba(102,126,234,0.3);
+        transition: all 0.3s;
+    }
+
+    .avatar-preview:hover {
+        border-color: #667eea;
+        transform: scale(1.02);
     }
 
     .avatar-preview i { font-size: 2rem; color: white; }
+    .avatar-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 
     .avatar-btn {
         background: rgba(102,126,234,0.2);
@@ -472,6 +523,11 @@
         color: #667eea;
         font-size: 0.7rem;
         cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .avatar-btn:hover {
+        background: rgba(102,126,234,0.3);
     }
 
     /* آدرس */
@@ -484,6 +540,11 @@
         color: #667eea;
         cursor: pointer;
         margin-bottom: 16px;
+        transition: all 0.3s;
+    }
+
+    .address-btn:hover {
+        background: rgba(102,126,234,0.2);
     }
 
     .address-preview {
@@ -491,10 +552,11 @@
         border-radius: 12px;
         padding: 12px;
         margin-bottom: 16px;
+        border: 1px solid rgba(102,126,234,0.2);
     }
 
     .address-preview p { color: #94a3b8; font-size: 0.7rem; margin-bottom: 5px; }
-    .address-preview #addressText { color: #cbd5e1; font-size: 0.8rem; }
+    .address-preview #addressText { color: #cbd5e1; font-size: 0.8rem; line-height: 1.6; }
 
     /* تایید مدیر */
     .admin-confirm {
@@ -516,6 +578,7 @@
         display: inline-block;
         width: 50px;
         height: 26px;
+        flex-shrink: 0;
     }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
@@ -548,10 +611,12 @@
         display: flex;
         gap: 12px;
         margin-top: 24px;
+        flex-wrap: wrap;
     }
 
     .btn-submit, .btn-cancel {
         flex: 1;
+        min-width: 100px;
         padding: 12px;
         border: none;
         border-radius: 12px;
@@ -565,23 +630,88 @@
         color: white;
     }
 
-    .btn-submit:hover { transform: translateY(-2px); }
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+    }
 
     .btn-cancel {
         background: rgba(239,68,68,0.2);
         color: #ef4444;
     }
 
-    .btn-cancel:hover { background: rgba(239,68,68,0.3); }
+    .btn-cancel:hover {
+        background: rgba(239,68,68,0.3);
+    }
 
     .file-input {
         padding: 8px !important;
     }
 
-    /* اسکرول */
-    .modal-content::-webkit-scrollbar { width: 5px; }
-    .modal-content::-webkit-scrollbar-track { background: #0f172a; border-radius: 10px; }
-    .modal-content::-webkit-scrollbar-thumb { background: #667eea; border-radius: 10px; }
+    /* ========== ریسپانسیو ========== */
+    @media (max-width: 768px) {
+        .desktop-sidebar {
+            width: 220px;
+        }
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        .modal-content {
+            padding: 20px;
+            max-height: 95vh;
+        }
+        .sidebar-logo {
+            padding: 20px 15px;
+        }
+        .sidebar-menu {
+            padding: 10px;
+        }
+        .sidebar-actions {
+            padding: 15px;
+        }
+        .admin-confirm {
+            flex-wrap: wrap;
+        }
+        .modal-buttons {
+            flex-direction: column;
+        }
+        .btn-submit, .btn-cancel {
+            min-width: auto;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .desktop-sidebar {
+            width: 100%;
+            height: auto;
+            max-height: 100vh;
+            position: fixed;
+            bottom: 0;
+            top: auto;
+            border-left: none;
+            border-top: 1px solid rgba(102,126,234,0.15);
+        }
+        .sidebar-logo {
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .sidebar-logo .logo-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0;
+        }
+        .sidebar-logo .logo-icon i {
+            font-size: 20px;
+        }
+        .logo-text h2 {
+            font-size: 0.9rem;
+        }
+        .sidebar-menu {
+            max-height: 300px;
+        }
+    }
 </style>
 
 <script>
@@ -601,20 +731,27 @@
     // ========== توابع مودال ==========
     function closeModal(id) {
         document.getElementById(id).style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    function openModal(id) {
+        document.getElementById(id).style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
 
     document.getElementById('openUserModalBtn')?.addEventListener('click', () => {
-        document.getElementById('addUserModal').style.display = 'flex';
+        openModal('addUserModal');
     });
 
     document.getElementById('openProductModalBtn')?.addEventListener('click', () => {
-        document.getElementById('addProductModal').style.display = 'flex';
+        openModal('addProductModal');
     });
 
     // بستن با کلیک خارج
     window.onclick = function(e) {
         if (e.target.classList.contains('modal')) {
             e.target.style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
     }
 
@@ -624,7 +761,7 @@
         if (e.target.files && e.target.files[0]) {
             const reader = new FileReader();
             reader.onload = function(ev) {
-                preview.innerHTML = `<img src="${ev.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
+                preview.innerHTML = `<img src="${ev.target.result}" alt="آواتار">`;
             }
             reader.readAsDataURL(e.target.files[0]);
         }
@@ -640,7 +777,7 @@
     let savedAddress = null;
 
     window.openAddressModal = function() {
-        document.getElementById('addressModal').style.display = 'flex';
+        openModal('addressModal');
     }
 
     window.saveAddress = function() {
@@ -699,10 +836,11 @@
                 alert('✅ کاربر با موفقیت اضافه شد');
                 location.reload();
             } else {
-                alert('❌ خطا: ' + result.message);
+                alert('❌ خطا: ' + (result.message || 'خطای ناشناخته'));
             }
         } catch(error) {
             alert('❌ خطا در ارتباط با سرور');
+            console.error('Error:', error);
         }
     });
 
@@ -730,10 +868,11 @@
                 alert('✅ محصول با موفقیت اضافه شد');
                 location.reload();
             } else {
-                alert('❌ خطا: ' + result.message);
+                alert('❌ خطا: ' + (result.message || 'خطای ناشناخته'));
             }
         } catch(error) {
             alert('❌ خطا در ارتباط با سرور');
+            console.error('Error:', error);
         }
     });
 

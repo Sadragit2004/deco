@@ -19,13 +19,49 @@ def admin_check_list(request):
     return render(request, 'panel_app/dashboard/check.html')
 
 
-def check_receipt_verified(check):
-    """بررسی تایید بودن رسید پرداخت"""
+def check_receipt_status_for_verify(check):
+    """
+    بررسی وضعیت رسید برای تایید چک
+    برگرداندن: (قابل_تایید_است, پیام_خطا)
+
+    قوانین:
+    - اگر رسید وجود نداشته باشد → قابل تایید است ✅
+    - اگر رسید تایید شده باشد → قابل تایید است ✅
+    - اگر رسید در انتظار باشد → غیر قابل تایید ❌ (نیاز به تایید رسید)
+    - اگر رسید رد شده باشد → غیر قابل تایید ❌ (نیاز به رسید جدید)
+    """
+    # اگر سفارش وجود ندارد
+    if not check.order and not check.pro_order:
+        return True, None
+
+    # بررسی رسید سفارش عادی
     if check.order:
-        return check.order.receipt_verified
-    elif check.pro_order:
-        return getattr(check.pro_order, 'receipt_verified', False)
-    return False
+        if hasattr(check.order, 'payment_receipt'):
+            receipt = check.order.payment_receipt
+            if receipt.status == PaymentReceipt.ReceiptStatus.VERIFIED:
+                return True, None
+            elif receipt.status == PaymentReceipt.ReceiptStatus.PENDING:
+                return False, '⚠️ رسید پرداخت در انتظار تایید است. ابتدا رسید را تایید کنید.'
+            elif receipt.status == PaymentReceipt.ReceiptStatus.REJECTED:
+                return False, '⚠️ رسید پرداخت رد شده است. لطفاً رسید جدیدی آپلود کنید.'
+        else:
+            # بدون رسید → قابل تایید است
+            return True, None
+
+    # بررسی رسید سفارش چاپی
+    if check.pro_order:
+        if hasattr(check.pro_order, 'payment_receipt'):
+            receipt = check.pro_order.payment_receipt
+            if receipt.status == PaymentReceipt.ReceiptStatus.VERIFIED:
+                return True, None
+            elif receipt.status == PaymentReceipt.ReceiptStatus.PENDING:
+                return False, '⚠️ رسید پرداخت در انتظار تایید است. ابتدا رسید را تایید کنید.'
+            elif receipt.status == PaymentReceipt.ReceiptStatus.REJECTED:
+                return False, '⚠️ رسید پرداخت رد شده است. لطفاً رسید جدیدی آپلود کنید.'
+        else:
+            return True, None
+
+    return True, None
 
 
 def get_receipt_data(order):
@@ -245,17 +281,19 @@ def admin_check_detail(request, check_id):
 @csrf_exempt
 @require_http_methods(["POST"])
 def admin_check_verify(request, check_id):
-    """تایید چک توسط ادمین (فقط در صورتی که رسید تایید شده باشد)"""
+    """تایید چک توسط ادمین"""
     try:
         check = CheckPayment.objects.get(id=check_id)
 
         if check.status != CheckPaymentStatus.PENDING.value:
             return JsonResponse({'success': False, 'error': 'فقط چک‌های در انتظار قابل تایید هستند'})
 
-        if not check_receipt_verified(check):
+        # بررسی وضعیت رسید با تابع جدید
+        can_verify, error_message = check_receipt_status_for_verify(check)
+        if not can_verify:
             return JsonResponse({
                 'success': False,
-                'error': '⚠️ ابتدا رسید پرداخت را تایید کنید'
+                'error': error_message
             })
 
         note = request.POST.get('note', '')
@@ -384,12 +422,14 @@ def admin_check_bulk_action(request):
 
         with transaction.atomic():
             for check in checks:
-                if action == 'verify' and not check_receipt_verified(check):
-                    skipped_count += 1
-                    skipped_ids.append(check.tracking_number)
-                    continue
-
                 if action == 'verify':
+                    # بررسی وضعیت رسید با تابع جدید
+                    can_verify, error_message = check_receipt_status_for_verify(check)
+                    if not can_verify:
+                        skipped_count += 1
+                        skipped_ids.append(check.tracking_number)
+                        continue
+
                     check.status = CheckPaymentStatus.VERIFIED.value
                     check.verified_by = admin_user
                     check.verified_at = timezone.now()
@@ -428,6 +468,51 @@ def admin_check_bulk_action(request):
         })
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def admin_check_export_csv(request):
+    """خروجی CSV از چک‌ها"""
+    import csv
+    from django.http import HttpResponse
+
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="checks_export.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow([
+        'شماره پیگیری', 'کاربر', 'موبایل', 'بانک', 'شماره چک', 'مبلغ',
+        'وضعیت', 'تاریخ ثبت', 'تاریخ تایید', 'نهایی شده', 'وضعیت رسید'
+    ])
+
+    checks = CheckPayment.objects.all().select_related('user', 'order')
+    for check in checks:
+        receipt_status = 'بدون رسید'
+        if check.order and hasattr(check.order, 'payment_receipt'):
+            receipt = check.order.payment_receipt
+            if receipt.status == PaymentReceipt.ReceiptStatus.VERIFIED:
+                receipt_status = 'تایید شده'
+            elif receipt.status == PaymentReceipt.ReceiptStatus.REJECTED:
+                receipt_status = 'رد شده'
+            else:
+                receipt_status = 'در انتظار تایید'
+
+        writer.writerow([
+            check.tracking_number,
+            f"{check.user.name} {check.user.family}".strip() or check.user.mobileNumber,
+            check.user.mobileNumber,
+            check.bank_name or '',
+            check.check_number or '',
+            str(check.check_amount) if check.check_amount else '',
+            check.get_status_display(),
+            check.created_at.strftime('%Y/%m/%d %H:%M'),
+            check.verified_at.strftime('%Y/%m/%d %H:%M') if check.verified_at else '',
+            'بله' if check.is_finalized else 'خیر',
+            receipt_status
+        ])
+
+    return response
 
 
 # =============== ویوهای مدیریت رسید ===============
@@ -499,48 +584,3 @@ def admin_receipt_reject(request, order_ref):
         return JsonResponse({'success': False, 'error': 'سفارش یافت نشد'}, status=404)
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
-
-
-@csrf_exempt
-@require_http_methods(["GET"])
-def admin_check_export_csv(request):
-    """خروجی CSV از چک‌ها"""
-    import csv
-    from django.http import HttpResponse
-
-    response = HttpResponse(content_type='text/csv; charset=utf-8')
-    response['Content-Disposition'] = 'attachment; filename="checks_export.csv"'
-
-    writer = csv.writer(response)
-    writer.writerow([
-        'شماره پیگیری', 'کاربر', 'موبایل', 'بانک', 'شماره چک', 'مبلغ',
-        'وضعیت', 'تاریخ ثبت', 'تاریخ تایید', 'نهایی شده', 'وضعیت رسید'
-    ])
-
-    checks = CheckPayment.objects.all().select_related('user', 'order')
-    for check in checks:
-        receipt_status = 'بدون رسید'
-        if check.order and hasattr(check.order, 'payment_receipt'):
-            receipt = check.order.payment_receipt
-            if receipt.status == PaymentReceipt.ReceiptStatus.VERIFIED:
-                receipt_status = 'تایید شده'
-            elif receipt.status == PaymentReceipt.ReceiptStatus.REJECTED:
-                receipt_status = 'رد شده'
-            else:
-                receipt_status = 'در انتظار تایید'
-
-        writer.writerow([
-            check.tracking_number,
-            f"{check.user.name} {check.user.family}".strip() or check.user.mobileNumber,
-            check.user.mobileNumber,
-            check.bank_name or '',
-            check.check_number or '',
-            str(check.check_amount) if check.check_amount else '',
-            check.get_status_display(),
-            check.created_at.strftime('%Y/%m/%d %H:%M'),
-            check.verified_at.strftime('%Y/%m/%d %H:%M') if check.verified_at else '',
-            'بله' if check.is_finalized else 'خیر',
-            receipt_status
-        ])
-
-    return response

@@ -1,5 +1,4 @@
 <!-- templates/chat/chat.html -->
-
 <style>
     /* ===== همه استایل‌ها با پیشوند chat- برای ایزوله کردن ===== */
     .chat-fab-wrapper * {
@@ -321,6 +320,35 @@
         font-weight: 500;
     }
 
+    /* ===== نشان دیده شده مانند تلگرام ===== */
+    .chat-fab-wrapper .message .seen-badge {
+        font-size: 11px;
+        margin-left: 6px;
+        font-weight: 600;
+        display: inline-block;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .chat-fab-wrapper .message .seen-badge.seen {
+        color: #4ade80;
+        animation: chat-seen-pop 0.3s ease;
+    }
+    .chat-fab-wrapper .message .seen-badge.sending {
+        color: #fbbf24;
+        animation: chat-pulse-seen 1s infinite;
+    }
+    .chat-fab-wrapper .message .seen-badge.delivered {
+        color: #9ca3af;
+    }
+    @keyframes chat-seen-pop {
+        0% { transform: scale(0.5); opacity: 0; }
+        50% { transform: scale(1.4); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes chat-pulse-seen {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+
     .chat-fab-wrapper .message-file {
         margin-top: 6px;
         padding: 8px 14px;
@@ -593,6 +621,37 @@
         to { opacity: 0; transform: translateX(-50%) translateY(-30px) scale(0.92); }
     }
 
+    /* ===== تایپینگ ایندیکیتور ===== */
+    .chat-fab-wrapper .typing-indicator {
+        display: none;
+        padding: 8px 18px;
+        font-size: 12px;
+        color: #888;
+        background: rgba(255,255,255,0.6);
+        backdrop-filter: blur(4px);
+        border-radius: 12px;
+        margin: 4px 0;
+        align-self: flex-start;
+        animation: chat-fadeIn 0.3s ease;
+        font-family: 'Tahoma', sans-serif;
+    }
+    .chat-fab-wrapper .typing-indicator.show {
+        display: inline-block;
+    }
+    .chat-fab-wrapper .typing-indicator .dots {
+        display: inline-block;
+        animation: chat-dots 1.4s infinite;
+    }
+    @keyframes chat-dots {
+        0% { opacity: 0.2; }
+        20% { opacity: 1; }
+        100% { opacity: 0.2; }
+    }
+    @keyframes chat-fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
     /* ===== Responsive ===== */
     @media (max-width: 576px) {
         .chat-fab-wrapper .chat-container {
@@ -606,8 +665,8 @@
             backdrop-filter: blur(8px);
         }
         .chat-fab-wrapper .chat-fab {
-            bottom: max(20px, env(safe-area-inset-bottom, 20px));
-            right: max(20px, env(safe-area-inset-right, 20px));
+            bottom: max(100px, env(safe-area-inset-bottom, 20px));
+            right: max(3px, env(safe-area-inset-right, 20px));
             width: 60px;
             height: 60px;
             font-size: 28px;
@@ -690,6 +749,12 @@
         <!-- استاتوس بار -->
         <div class="status-bar" id="status-bar"><i class="fas fa-spinner fa-spin"></i> در حال بارگذاری...</div>
 
+        <!-- تایپینگ ایندیکیتور -->
+        <div class="typing-indicator" id="typing-indicator">
+            <i class="fas fa-edit"></i>
+            <span class="dots">...</span> در حال تایپ
+        </div>
+
         <!-- پیام‌ها -->
         <div class="chat-messages" id="chat-messages">
             <div class="empty-state" id="empty-state">
@@ -728,7 +793,7 @@
 
 <script>
     // ============================================================
-    //  اسکریپت چت - کاملاً ایزوله با صدا
+    //  اسکریپت چت - کامل با SEEN و رفع دوتایی شدن
     // ============================================================
     (function() {
         'use strict';
@@ -756,9 +821,10 @@
         const previewName = document.getElementById('preview-name');
         const previewSize = document.getElementById('preview-size');
         const previewRemove = document.getElementById('preview-remove');
+        const typingIndicator = document.getElementById('typing-indicator');
 
         // ============================================================
-        //  صدا - با پشتیبانی کامل
+        //  صدا
         // ============================================================
         let notificationSound = null;
         let soundLoaded = false;
@@ -767,33 +833,24 @@
             try {
                 const audio = new Audio('/media/audio/sms.mp3');
                 audio.preload = 'auto';
-
                 audio.addEventListener('canplaythrough', function() {
                     soundLoaded = true;
-                    console.log('🔊 فایل صوتی بارگذاری شد: /media/audio/sms.mp3');
+                    console.log('🔊 فایل صوتی بارگذاری شد');
                 });
-
                 audio.addEventListener('error', function() {
                     console.warn('⚠️ فایل صوتی پیدا نشد، استفاده از صدای جایگزین');
                     createFallbackSound();
                 });
-
                 notificationSound = audio;
-
                 if (audio.readyState >= 3) {
                     soundLoaded = true;
-                    console.log('🔊 فایل صوتی آماده است');
                 }
-
                 setTimeout(function() {
                     if (!soundLoaded && notificationSound) {
-                        console.warn('⚠️ زمان بارگذاری صدا زیاد شد، استفاده از صدای جایگزین');
                         createFallbackSound();
                     }
                 }, 2000);
-
             } catch (e) {
-                console.warn('⚠️ خطا در تنظیم صدا:', e);
                 createFallbackSound();
             }
         }
@@ -802,7 +859,6 @@
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 const audioCtx = new AudioContext();
-
                 notificationSound = {
                     play: function() {
                         try {
@@ -816,53 +872,21 @@
                             gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
                             oscillator.start();
                             oscillator.stop(audioCtx.currentTime + 0.3);
-                            console.log('🔊 صدای جایگزین پخش شد');
-                        } catch (e) {
-                            console.warn('⚠️ خطا در پخش صدای جایگزین:', e);
-                        }
-                    },
-                    currentTime: 0
+                        } catch (e) {}
+                    }
                 };
                 soundLoaded = true;
-                console.log('🔊 صدای جایگزین ایجاد شد');
             } catch (e) {
-                console.warn('⚠️ خطا در ایجاد صدای جایگزین:', e);
-                notificationSound = {
-                    play: function() {}
-                };
+                notificationSound = { play: function() {} };
             }
         }
 
         function playNotificationSound() {
             try {
-                if (notificationSound) {
-                    if (typeof notificationSound.play === 'function') {
-                        notificationSound.play();
-                    } else if (notificationSound.play instanceof Function) {
-                        notificationSound.play();
-                    } else {
-                        notificationSound.currentTime = 0;
-                        const playPromise = notificationSound.play();
-                        if (playPromise !== undefined) {
-                            playPromise.catch(function() {
-                                if (!soundLoaded) {
-                                    createFallbackSound();
-                                    if (notificationSound) {
-                                        notificationSound.play();
-                                    }
-                                }
-                            });
-                        }
-                    }
-                } else {
-                    createFallbackSound();
-                    if (notificationSound) {
-                        notificationSound.play();
-                    }
+                if (notificationSound && typeof notificationSound.play === 'function') {
+                    notificationSound.play();
                 }
-            } catch (e) {
-                console.warn('⚠️ خطا در پخش صدا:', e);
-            }
+            } catch (e) {}
         }
 
         initSound();
@@ -874,12 +898,14 @@
         let isConnected = false;
         let reconnectAttempts = 0;
         let currentUserId = null;
-        let pendingMessages = [];
         let selectedFile = null;
         let selectedFileType = 'file';
         let selectedFileData = null;
         let unreadCount = 0;
         let isChatOpen = false;
+        let typingTimeout = null;
+        let isTyping = false;
+        let processedMessageIds = new Set();
 
         // ============================================================
         //  مدیریت باز/بسته شدن چت
@@ -985,11 +1011,16 @@
                 const emptyState = document.getElementById('empty-state');
                 if (emptyState) emptyState.remove();
 
+                processedMessageIds.clear();
+
                 if (data.status === 'success' && data.messages.length > 0) {
                     messagesContainer.innerHTML = '';
                     data.messages.forEach(function(msg) {
                         const isAdmin = msg.is_admin || false;
                         const senderName = isAdmin ? '🛡️ ادمین' : (msg.sender_name || 'شما');
+                        if (msg.id) {
+                            processedMessageIds.add(String(msg.id));
+                        }
                         addMessageToUI(msg, senderName, isAdmin);
                     });
                     statusBar.innerHTML = '<i class="fas fa-envelope"></i> ' + data.messages.length + ' پیام';
@@ -1053,42 +1084,196 @@
                 }
             };
 
+            // ============================================================
+            // 🔥 دریافت پیام از WebSocket - اصلاح کامل
+            // ============================================================
             ws.onmessage = function(e) {
                 try {
                     const data = JSON.parse(e.data);
-                    console.log('📩 پیام جدید:', data);
+                    console.log('📩 پیام جدید از سرور:', data);
 
-                    const emptyState = document.getElementById('empty-state');
-                    if (emptyState) emptyState.remove();
-
-                    const isOwnMessage = data.sender_id && data.sender_id === currentUserId;
-
-                    if (isOwnMessage) {
-                        console.log('⏭️ پیام از خود');
+                    // ===== بروزرسانی دیده شدن =====
+                    if (data.type === 'message_seen_update') {
+                        console.log('👁️ پیام شما دیده شد:', data.message_id);
+                        updateMessageSeenUI(data.message_id);
                         return;
                     }
 
-                    const isAdmin = data.is_admin || false;
-                    let senderName = isAdmin ? '🛡️ ادمین' : (data.sender_name || 'کاربر');
-
-                    if (isChatOpen) {
-                        addMessageToUI(data, senderName, isAdmin);
-                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                    } else {
-                        incrementUnread();
+                    if (data.type === 'messages_seen_update') {
+                        console.log('👁️ تمام پیام‌های شما دیده شدند:', data.count);
+                        updateAllMessagesSeenUI();
+                        return;
                     }
 
-                    if (isAdmin) {
-                        statusBar.innerHTML = '<i class="fas fa-bell"></i> پیام جدید از ادمین';
-                        setTimeout(function() {
-                            if (isConnected) statusBar.innerHTML = '<i class="fas fa-circle" style="color:#4ade80;font-size:10px;"></i> متصل';
-                        }, 2000);
+                    // ===== تایپینگ =====
+                    if (data.type === 'typing') {
+                        if (data.is_typing) {
+                            typingIndicator.classList.add('show');
+                            clearTimeout(typingTimeout);
+                            typingTimeout = setTimeout(function() {
+                                typingIndicator.classList.remove('show');
+                            }, 3000);
+                        } else {
+                            typingIndicator.classList.remove('show');
+                        }
+                        return;
+                    }
+
+                    // ============================================================
+                    // 🔥 پیام‌های عادی
+                    // ============================================================
+
+                    const isOwnMessage = data.sender_id && data.sender_id === currentUserId;
+
+                    // ===== STEP 1: پیام با temp_id =====
+                    if (data.temp_id) {
+                        console.log('📌 پیام با temp_id:', data.temp_id, 'message_id:', data.message_id);
+
+                        // پیدا کردن پیام موقتی در UI
+                        const tempElement = document.querySelector(`.message[data-temp-id="${data.temp_id}"]`);
+
+                        if (tempElement) {
+                            // ===== پیام موقتی پیدا شد - حذف می‌کنیم =====
+                            console.log('🗑️ حذف پیام موقتی از UI:', data.temp_id);
+                            tempElement.remove();
+
+                            // اگر پیام از خود کاربر است، پیام واقعی را اضافه نکن (قبلاً اضافه شده)
+                            if (isOwnMessage) {
+                                console.log('⏭️ پیام از خود، قبلاً اضافه شده');
+                                return;
+                            }
+
+                            // اگر پیام از ادمین است، اضافه کن
+                            if (data.message_id && !processedMessageIds.has(String(data.message_id))) {
+                                processedMessageIds.add(String(data.message_id));
+                                const emptyState = document.getElementById('empty-state');
+                                if (emptyState) emptyState.remove();
+
+                                const isAdmin = data.is_admin || false;
+                                let senderName = isAdmin ? '🛡️ ادمین' : (data.sender_name || 'کاربر');
+                                addMessageToUI(data, senderName, isAdmin);
+                                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                            }
+                        } else {
+                            // ===== پیام موقتی پیدا نشد =====
+                            if (isOwnMessage) {
+                                console.log('⏭️ پیام از خود (temp_id بدون المان موقتی)');
+                                return;
+                            }
+
+                            if (data.message_id && !processedMessageIds.has(String(data.message_id))) {
+                                processedMessageIds.add(String(data.message_id));
+                                const emptyState = document.getElementById('empty-state');
+                                if (emptyState) emptyState.remove();
+
+                                const isAdmin = data.is_admin || false;
+                                let senderName = isAdmin ? '🛡️ ادمین' : (data.sender_name || 'کاربر');
+                                addMessageToUI(data, senderName, isAdmin);
+                                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                            }
+                        }
+                        return;
+                    }
+
+                    // ===== STEP 2: پیام بدون temp_id =====
+                    if (isOwnMessage) {
+                        console.log('⏭️ پیام از خود (بدون temp_id)');
+                        return;
+                    }
+
+                    if (data.message_id && !processedMessageIds.has(String(data.message_id))) {
+                        processedMessageIds.add(String(data.message_id));
+
+                        const emptyState = document.getElementById('empty-state');
+                        if (emptyState) emptyState.remove();
+
+                        const isAdmin = data.is_admin || false;
+                        let senderName = isAdmin ? '🛡️ ادمین' : (data.sender_name || 'کاربر');
+
+                        if (isChatOpen) {
+                            addMessageToUI(data, senderName, isAdmin);
+                            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                        } else {
+                            incrementUnread();
+                        }
+
+                        if (isAdmin) {
+                            statusBar.innerHTML = '<i class="fas fa-bell"></i> پیام جدید از ادمین';
+                            setTimeout(function() {
+                                if (isConnected) statusBar.innerHTML = '<i class="fas fa-circle" style="color:#4ade80;font-size:10px;"></i> متصل';
+                            }, 2000);
+                        }
                     }
                 } catch (err) {
-                    console.log('❌ خطا:', err);
+                    console.log('❌ خطا در پردازش پیام:', err);
                 }
             };
         }
+
+        // ============================================================
+        //  به‌روزرسانی UI برای دیده شدن
+        // ============================================================
+        function updateMessageSeenUI(messageId) {
+            const messages = messagesContainer.querySelectorAll('.message');
+            for (let i = 0; i < messages.length; i++) {
+                const msg = messages[i];
+                if (msg.dataset.messageId == messageId) {
+                    const badge = msg.querySelector('.seen-badge');
+                    if (badge) {
+                        badge.textContent = '✓✓';
+                        badge.className = 'seen-badge seen';
+                        badge.style.animation = 'none';
+                        setTimeout(function() {
+                            badge.style.animation = 'chat-seen-pop 0.3s ease';
+                        }, 10);
+                    }
+                    break;
+                }
+            }
+        }
+
+        function updateAllMessagesSeenUI() {
+            const messages = messagesContainer.querySelectorAll('.message');
+            for (let i = 0; i < messages.length; i++) {
+                const msg = messages[i];
+                const badge = msg.querySelector('.seen-badge');
+                if (badge && (badge.classList.contains('sending') || badge.textContent === '✓')) {
+                    badge.textContent = '✓✓';
+                    badge.className = 'seen-badge seen';
+                    badge.style.animation = 'none';
+                    setTimeout(function() {
+                        badge.style.animation = 'chat-seen-pop 0.3s ease';
+                    }, 10 + (i * 20));
+                }
+            }
+        }
+
+        // ============================================================
+        //  تایپینگ ایندیکیتور
+        // ============================================================
+        let typingTimer = null;
+
+        msgInput.addEventListener('input', function() {
+            if (isConnected && ws) {
+                clearTimeout(typingTimer);
+                if (!isTyping) {
+                    isTyping = true;
+                    ws.send(JSON.stringify({
+                        type: 'typing',
+                        is_typing: true
+                    }));
+                }
+                typingTimer = setTimeout(function() {
+                    isTyping = false;
+                    if (ws && isConnected) {
+                        ws.send(JSON.stringify({
+                            type: 'typing',
+                            is_typing: false
+                        }));
+                    }
+                }, 2000);
+            }
+        });
 
         // ============================================================
         //  افزودن پیام به UI
@@ -1097,6 +1282,17 @@
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message ' + (isAdmin ? 'received' : 'sent');
 
+            if (data.temp_id) {
+                msgDiv.setAttribute('data-temp-id', data.temp_id);
+            }
+            if (data.message_id || data.id) {
+                const msgId = data.message_id || data.id;
+                msgDiv.setAttribute('data-message-id', msgId);
+                if (msgId) {
+                    processedMessageIds.add(String(msgId));
+                }
+            }
+
             const time = data.timestamp ? new Date(data.timestamp).toLocaleTimeString('fa-IR', {
                 hour: '2-digit',
                 minute: '2-digit'
@@ -1104,6 +1300,19 @@
                 hour: '2-digit',
                 minute: '2-digit'
             });
+
+            let seenBadge = '';
+            if (!isAdmin) {
+                const isSeen = data.is_seen || false;
+                const isSending = data.temp_id ? true : false;
+                if (isSeen) {
+                    seenBadge = `<span class="seen-badge seen">✓✓</span>`;
+                } else if (isSending) {
+                    seenBadge = `<span class="seen-badge sending">✓</span>`;
+                } else {
+                    seenBadge = `<span class="seen-badge delivered">✓</span>`;
+                }
+            }
 
             let contentHTML = '';
             const messageText = data.content || data.message || '';
@@ -1144,7 +1353,7 @@
             msgDiv.innerHTML = `
                 <div class="sender-name"><i class="fas fa-user-circle"></i> ${senderName}</div>
                 ${contentHTML}
-                <span class="time"><i class="far fa-clock"></i> ${time}</span>
+                <span class="time"><i class="far fa-clock"></i> ${time} ${seenBadge}</span>
             `;
 
             messagesContainer.appendChild(msgDiv);
@@ -1238,6 +1447,8 @@
                 return;
             }
 
+            const tempId = 'temp-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+
             try {
                 const payload = {};
                 if (message) payload.message = message;
@@ -1246,18 +1457,27 @@
                     payload.file_name = selectedFile.name;
                     payload.file_type = selectedFileType;
                 }
+                payload.temp_id = tempId;
 
                 ws.send(JSON.stringify(payload));
 
                 const data = {
+                    temp_id: tempId,
                     content: message,
                     timestamp: new Date().toISOString(),
                     message_type: selectedFile ? selectedFileType : 'text',
                     file_url: selectedFile ? URL.createObjectURL(selectedFile) : null,
                     file_name: selectedFile ? selectedFile.name : null,
                     file_size: selectedFile ? formatFileSize(selectedFile.size) : null,
+                    sender_id: currentUserId || 'me',
+                    is_seen: false,
                 };
+
+                const emptyState = document.getElementById('empty-state');
+                if (emptyState) emptyState.remove();
+
                 addMessageToUI(data, 'شما', false);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
                 msgInput.value = '';
                 clearFilePreview();
@@ -1266,6 +1486,16 @@
                 setTimeout(function() {
                     if (isConnected) statusBar.innerHTML = '<i class="fas fa-circle" style="color:#4ade80;font-size:10px;"></i> متصل';
                 }, 1500);
+
+                if (isTyping) {
+                    isTyping = false;
+                    if (ws && isConnected) {
+                        ws.send(JSON.stringify({
+                            type: 'typing',
+                            is_typing: false
+                        }));
+                    }
+                }
 
             } catch (error) {
                 console.error('❌ خطا:', error);
@@ -1319,9 +1549,6 @@
         getCurrentUserId();
         connectWebSocket();
 
-        // ============================================================
-        //  تنظیمات اضافی
-        // ============================================================
         setInterval(function() {
             if (isConnected) statusBar.className = 'status-bar online';
         }, 5000);

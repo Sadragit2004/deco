@@ -12,11 +12,12 @@ from apps.user.models.profile import Wallet, WalletTransaction
 from apps.check.models import CheckPayment, CheckPaymentStatus
 
 
-AMOUNT_PER_COIN = Decimal('50000000')
-COIN_VALUE = Decimal('500000')
+AMOUNT_PER_COIN = Decimal('50000000')  # هر ۵۰ میلیون تومان = ۱ سکه
+COIN_VALUE = Decimal('500000')  # ارزش هر سکه = ۵۰۰ هزار تومان
 
 
 def calculate_new_coins_and_wallet_amount(old_lifetime, new_lifetime):
+    """محاسبه سکه‌های جدید و مبلغ شارژ کیف پول"""
     if new_lifetime <= old_lifetime:
         return 0, 0
     old_coins = int(old_lifetime // AMOUNT_PER_COIN)
@@ -29,6 +30,7 @@ def calculate_new_coins_and_wallet_amount(old_lifetime, new_lifetime):
 
 
 def add_wallet_transaction(user, amount, description, reference_id=None, trans_type='bonus'):
+    """افزایش موجودی کیف پول کاربر"""
     if amount <= 0:
         return None
     wallet, created = Wallet.objects.get_or_create(user=user)
@@ -50,6 +52,7 @@ def add_wallet_transaction(user, amount, description, reference_id=None, trans_t
 
 
 def update_user_tier(loyalty):
+    """بروزرسانی سطح کاربر بر اساس خرید"""
     lifetime = loyalty.lifetime_purchase
     if lifetime >= 950000000:
         new_tier = 'private'
@@ -78,6 +81,7 @@ def update_user_tier(loyalty):
 
 
 def get_tier_b2b_coins(tier):
+    """سکه‌های B2B برای هر سطح"""
     b2b_coins = {
         'premium': 4,
         'elite': 10,
@@ -88,6 +92,7 @@ def get_tier_b2b_coins(tier):
 
 
 def deduct_product_stock(order):
+    """کسر موجودی محصولات"""
     for item in order.items.all():
         if item.product:
             product = item.product
@@ -98,6 +103,7 @@ def deduct_product_stock(order):
 
 
 def deduct_wallet_after_confirmation(order):
+    """کسر مبلغ استفاده شده از کیف پول بعد از تایید سفارش"""
     if not order.user:
         return False
     if order.used_from_wallet <= 0:
@@ -129,29 +135,59 @@ def deduct_wallet_after_confirmation(order):
     return False
 
 
-def assign_coins_and_wallet_bonus(order, original_total=None):
+def assign_coins_and_wallet_bonus(order, paid_amount=None):
+    """
+    تخصیص سکه و شارژ کیف پول بر اساس مبلغ واقعی پرداختی
+
+    Args:
+        order: سفارش
+        paid_amount: مبلغ واقعی پرداختی (اختیاری)
+    """
     if not order.user:
         return None, None
-    if original_total is None:
-        main_amount = order.subtotal - order.discount_amount - order.coupon_discount + order.shipping_cost
-    else:
-        main_amount = original_total
+
+    # محاسبه مبلغ واقعی پرداختی
+    if paid_amount is None:
+        # مبلغ کل سفارش - تخفیف‌ها + هزینه ارسال - استفاده از کیف پول
+        paid_amount = order.subtotal - order.discount_amount - order.coupon_discount + order.shipping_cost - order.used_from_wallet
+
+    # اگر مبلغ پرداختی صفر یا منفی بود، سکه تعلق نمی‌گیرد
+    if paid_amount <= 0:
+        return 0, 0
+
+    # دریافت یا ایجاد لایفتایم کاربر
     loyalty, created = CustomerLoyalty.objects.get_or_create(user=order.user)
     old_lifetime = loyalty.lifetime_purchase
     old_tier = loyalty.current_tier
-    new_lifetime = old_lifetime + main_amount
+
+    # اضافه کردن مبلغ واقعی پرداختی به لایفتایم
+    new_lifetime = old_lifetime + paid_amount
     loyalty.lifetime_purchase = new_lifetime
     loyalty.save(update_fields=['lifetime_purchase'])
+
+    # بروزرسانی سطح کاربر
     new_tier = update_user_tier(loyalty)
+
+    # محاسبه سکه‌های جدید بر اساس افزایش لایفتایم
     new_coins, wallet_amount = calculate_new_coins_and_wallet_amount(old_lifetime, new_lifetime)
+
+    # محاسبه سکه‌های B2B بر اساس تغییر سطح
     old_b2b_coins = get_tier_b2b_coins(old_tier)
     new_b2b_coins = get_tier_b2b_coins(new_tier)
     b2b_coins_earned = new_b2b_coins - old_b2b_coins
+
+    # جمع کل سکه‌های جدید
     total_new_coins = new_coins + b2b_coins_earned
-    if total_new_coins == 0 and new_coins == 0:
+
+    # اگر سکه جدیدی وجود نداشت، برمی‌گردیم
+    if total_new_coins == 0:
         return 0, 0
+
+    # اضافه کردن سکه‌ها به لایفتایم
     loyalty.total_coins += total_new_coins
     loyalty.save(update_fields=['total_coins'])
+
+    # ثبت تراکنش سکه برای سکه‌های معمولی
     if new_coins > 0:
         LoyaltyTransaction.objects.create(
             loyalty=loyalty,
@@ -160,6 +196,8 @@ def assign_coins_and_wallet_bonus(order, original_total=None):
             order_id=order.order_number,
             description=f"کسب {new_coins} سکه از مجموع خرید {new_lifetime:,.0f} تومانی"
         )
+
+    # ثبت تراکنش سکه برای سکه‌های B2B
     if b2b_coins_earned > 0:
         LoyaltyTransaction.objects.create(
             loyalty=loyalty,
@@ -168,6 +206,8 @@ def assign_coins_and_wallet_bonus(order, original_total=None):
             order_id=order.order_number,
             description=f"کسب {b2b_coins_earned} سکه B2B بابت ارتقا سطح به {new_tier}"
         )
+
+    # شارژ کیف پول به ازای سکه‌های معمولی (نه B2B)
     if wallet_amount > 0:
         add_wallet_transaction(
             user=order.user,
@@ -176,14 +216,19 @@ def assign_coins_and_wallet_bonus(order, original_total=None):
             reference_id=order.order_number,
             trans_type='bonus'
         )
+
+    # ذخیره سکه‌های کسب شده در سفارش
     order.earned_points = total_new_coins
     order.save(update_fields=['earned_points'])
+
+    # ثبت ارتقا سطح در تاریخچه
     if old_tier != new_tier:
         OrderStatusHistory.objects.create(
             order=order,
             status=order.status,
             note=f"🎖️ سطح عضویت شما از {old_tier} به {new_tier} ارتقا یافت"
         )
+
     return total_new_coins, wallet_amount
 
 
@@ -192,9 +237,13 @@ def finalize_order_payment(order):
     if order.status == 'paid':
         return True
 
-    original_total = order.subtotal - order.discount_amount - order.coupon_discount + order.shipping_cost
+    # محاسبه مبلغ واقعی پرداختی
+    paid_amount = order.subtotal - order.discount_amount - order.coupon_discount + order.shipping_cost - order.used_from_wallet
+
+    # کسر مبلغ کیف پول
     deduct_wallet_after_confirmation(order)
 
+    # ایجاد یا بروزرسانی پرداخت
     payment, _ = Peyment.objects.get_or_create(
         order=order,
         customer=order.user,
@@ -209,18 +258,24 @@ def finalize_order_payment(order):
         }
     )
 
+    # بروزرسانی وضعیت سفارش
     order.status = 'paid'
     order.paid_at = timezone.now()
     order.save(update_fields=['status', 'paid_at'])
 
+    # ثبت تاریخچه
     OrderStatusHistory.objects.create(
         order=order,
         status='paid',
         note=f"✅ پرداخت سفارش نهایی شد - مبلغ: {order.total:,.0f} تومان"
     )
 
+    # کسر موجودی محصولات
     deduct_product_stock(order)
-    assign_coins_and_wallet_bonus(order, original_total)
+
+    # تخصیص سکه و شارژ کیف پول (با مبلغ واقعی پرداختی)
+    assign_coins_and_wallet_bonus(order, paid_amount)
+
     return True
 
 
@@ -228,6 +283,7 @@ def finalize_order_payment(order):
 
 @receiver(pre_save, sender=Order)
 def store_old_status(sender, instance, **kwargs):
+    """ذخیره وضعیت قبلی سفارش برای استفاده در سیگنال بعدی"""
     if instance.pk:
         try:
             old_order = Order.objects.get(pk=instance.pk)
@@ -275,7 +331,7 @@ def receipt_verified_signal(sender, instance, created, **kwargs):
     if instance.status == 'paid':
         return
 
-    # چک تایید نشده وجود دارد؟
+    # آیا چک تایید نشده وجود دارد؟
     pending_checks = CheckPayment.objects.filter(
         order=instance,
         status=CheckPaymentStatus.PENDING.value
@@ -301,6 +357,7 @@ def online_payment_signal(sender, instance, created, **kwargs):
     if order.status == 'paid':
         return
 
+    # آیا چک تایید نشده وجود دارد؟
     pending_checks = CheckPayment.objects.filter(
         order=order,
         status=CheckPaymentStatus.PENDING.value
@@ -314,6 +371,7 @@ def online_payment_signal(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=OrderItem)
 def update_order_totals(sender, instance, created, **kwargs):
+    """بروزرسانی مبالغ سفارش بعد از تغییر آیتم‌ها"""
     order = instance.order
     items = order.items.all()
     if items.exists():
@@ -332,6 +390,7 @@ def update_order_totals(sender, instance, created, **kwargs):
 
 @receiver(pre_save, sender=Order)
 def calculate_total_with_wallet(sender, instance, **kwargs):
+    """محاسبه مبلغ نهایی با در نظر گرفتن استفاده از کیف پول"""
     if instance.pk:
         try:
             old = Order.objects.get(pk=instance.pk)
@@ -349,6 +408,7 @@ def calculate_total_with_wallet(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Order)
 def order_status_notification(sender, instance, created, **kwargs):
+    """ایجاد نوتیفیکیشن برای تغییر وضعیت سفارش"""
     if created:
         return
     if not instance.user:

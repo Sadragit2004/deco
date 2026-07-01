@@ -55,7 +55,7 @@ def send_request(request, order_id):
         amount_param = request.GET.get('amount')
 
         if amount_param:
-            amount = int(amount_param)
+            amount = int(amount_param) * 10
         else:
             order.refresh_from_db()
             amount = int(order.subtotal - order.discount_amount - order.coupon_discount + order.shipping_cost - order.used_from_wallet)

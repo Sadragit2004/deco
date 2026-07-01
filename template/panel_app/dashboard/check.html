@@ -587,7 +587,6 @@
         to { opacity: 1; transform: translateX(-50%) translateY(0); }
     }
 
-    /* اسکرول‌بار مودال */
     .modal-content-mobile::-webkit-scrollbar {
         width: 4px;
     }
@@ -603,7 +602,6 @@
 </style>
 
 <div class="check-mobile-container">
-    <!-- کارت‌های آمار -->
     <div class="stats-grid-mobile">
         <div class="stat-card-mobile total">
             <div class="number" id="mStatTotal">-</div>
@@ -623,7 +621,6 @@
         </div>
     </div>
 
-    <!-- فیلترها -->
     <div class="filter-box-mobile">
         <div class="filter-group-mobile">
             <label>وضعیت چک</label>
@@ -672,7 +669,6 @@
         </div>
     </div>
 
-    <!-- عملیات گروهی -->
     <div class="table-actions-mobile">
         <button class="btn-mobile btn-success-mobile" onclick="bulkActionMobile('verify')">✅ تایید</button>
         <button class="btn-mobile btn-danger-mobile" onclick="bulkActionMobile('reject')">❌ رد</button>
@@ -683,16 +679,13 @@
         </span>
     </div>
 
-    <!-- لیست چک‌ها -->
     <div class="checks-list-mobile" id="mChecksList">
         <div class="loading-mobile">در حال بارگذاری...</div>
     </div>
 
-    <!-- پیجینیشن -->
     <div class="pagination-mobile" id="mPagination"></div>
 </div>
 
-<!-- مودال‌های موبایل -->
 <div id="mDetailModal" class="modal-mobile">
     <div class="modal-content-mobile">
         <div class="modal-header-mobile">
@@ -742,7 +735,6 @@
 </div>
 
 <script>
-    // ===== کد جاوااسکریپت موبایل =====
     let mobilePage = 1;
     let mobileFilters = {};
     let mobileRejectId = null;
@@ -781,7 +773,6 @@
     function showToast(message, type = 'info') {
         const existing = document.querySelector('.toast-mobile');
         if (existing) existing.remove();
-
         const toast = document.createElement('div');
         toast.className = `toast-mobile ${type}`;
         toast.textContent = message;
@@ -804,23 +795,19 @@
     async function loadMobileChecks() {
         const list = document.getElementById('mChecksList');
         list.innerHTML = '<div class="loading-mobile">در حال بارگذاری...</div>';
-
         const params = new URLSearchParams({
             page: mobilePage,
             page_size: 20,
             ...mobileFilters
         });
-
         try {
             const response = await fetch(`/panel/admin/api/check/list/?${params}`);
             const data = await response.json();
-
             if (data.status === 'success') {
                 document.getElementById('mStatTotal').innerText = formatNumber(data.stats.total);
                 document.getElementById('mStatPending').innerText = formatNumber(data.stats.pending);
                 document.getElementById('mStatVerified').innerText = formatNumber(data.stats.verified);
                 document.getElementById('mStatRejected').innerText = formatNumber(data.stats.rejected);
-
                 renderMobileCards(data.checks);
                 renderMobilePagination(data.pagination);
                 updateMobileSelectedCount();
@@ -862,6 +849,12 @@
                                       receiptStatus === 'rejected' ? 'rejected' : '';
             const showVerifyReceiptBtn = check.status === 'pending' && receiptStatus === 'pending' && check.order_display;
 
+            // چک‌های با رسید تایید شده، بدون رسید، یا در انتظار تایید رسید → قابل تایید هستند
+            const canVerifyCheck = check.status === 'pending' &&
+                                  (receiptStatus === 'verified' ||
+                                   receiptStatus === 'none' ||
+                                   receiptStatus === 'pending');
+
             return `
             <div class="check-card-mobile">
                 <div class="check-card-header-mobile">
@@ -897,7 +890,6 @@
                 </div>
                 ` : ''}
 
-                <!-- بخش رسید -->
                 ${check.receipt_image ? `
                 <div class="check-row-mobile" style="justify-content:center; border-top:1px dashed rgba(102,126,234,0.1); padding-top:0.5rem;">
                     <div style="display:flex; flex-direction:column; align-items:center; gap:0.25rem; width:100%;">
@@ -933,10 +925,14 @@
                 <div class="check-actions-mobile">
                     <button class="btn-sm-mobile btn-sm-detail-mobile" onclick="viewMobileDetail('${check.id}')">👁 جزئیات</button>
                     ${check.status === 'pending' ? `
-                        ${receiptStatus === 'verified' ? `
+                        ${canVerifyCheck ? `
                             <button class="btn-sm-mobile btn-sm-verify-mobile" onclick="verifyMobileCheck('${check.id}')">✅ تایید</button>
                         ` : `
-                            <button class="btn-sm-mobile btn-sm-disabled-mobile" title="ابتدا رسید پرداخت را تایید کنید" disabled>⛔ تایید</button>
+                            ${receiptStatus === 'rejected' ? `
+                                <button class="btn-sm-mobile btn-sm-disabled-mobile" title="رسید پرداخت رد شده است" disabled>⛔ تایید</button>
+                            ` : `
+                                <button class="btn-sm-mobile btn-sm-disabled-mobile" title="رسید پرداخت در انتظار تایید است" disabled>⛔ تایید</button>
+                            `}
                         `}
                         <button class="btn-sm-mobile btn-sm-reject-mobile" onclick="rejectMobileCheck('${check.id}')">❌ رد</button>
                     ` : ''}
@@ -959,20 +955,16 @@
             container.innerHTML = '';
             return;
         }
-
         let html = '';
         if (pagination.has_previous) {
             html += `<button onclick="goToMobilePage(${pagination.current_page - 1})">قبلی</button>`;
         }
-
         const startPage = Math.max(1, pagination.current_page - 2);
         const endPage = Math.min(pagination.total_pages, startPage + 4);
-
         for (let i = startPage; i <= endPage; i++) {
             const active = i === pagination.current_page ? 'active' : '';
             html += `<button onclick="goToMobilePage(${i})" class="${active}">${i}</button>`;
         }
-
         if (pagination.has_next) {
             html += `<button onclick="goToMobilePage(${pagination.current_page + 1})">بعدی</button>`;
         }
@@ -1023,14 +1015,12 @@
         document.getElementById('mSelectedCount').innerText = mobileSelectedChecks.length;
     }
 
-    // ===== تایید رسید موبایل =====
     async function verifyReceiptMobile(orderRef) {
         if (!orderRef) {
             showToast('شماره سفارش یافت نشد', 'warning');
             return;
         }
         if (!confirm('آیا از تایید رسید پرداخت این سفارش اطمینان دارید؟')) return;
-
         try {
             const response = await fetch(`/panel/admin/receipt/verify/${orderRef}/`, {
                 method: 'POST',
@@ -1051,12 +1041,10 @@
         }
     }
 
-    // ===== جزئیات موبایل =====
     async function viewMobileDetail(id) {
         try {
             const response = await fetch(`/panel/admin/api/check/${id}/`);
             const data = await response.json();
-
             if (data.status === 'success') {
                 const c = data.check;
                 document.getElementById('mDetailTitle').innerText = `📄 جزئیات چک - ${c.tracking_number}`;
@@ -1071,6 +1059,11 @@
                 const receiptStatus = c.receipt?.status_display || 'بدون رسید';
                 const receiptColor = c.receipt?.status_class === 'verified' ? '#34d399' :
                                     c.receipt?.status_class === 'rejected' ? '#ef4444' : '#fbbf24';
+                const receiptClass = c.receipt?.status_class || 'none';
+                const canVerify = c.status === 'pending' &&
+                                 (receiptClass === 'verified' ||
+                                  receiptClass === 'none' ||
+                                  receiptClass === 'pending');
 
                 let bodyHtml = `
                     <div class="detail-section-mobile">
@@ -1094,7 +1087,6 @@
                     bodyHtml += `<div style="text-align:center;margin-top:0.5rem;"><img src="${c.check_image}" class="detail-image-mobile" onclick="window.open(this.src)"></div>`;
                 }
 
-                // بخش رسید
                 if (c.receipt && c.receipt.image) {
                     bodyHtml += `
                         <div class="detail-section-mobile" style="border:1px solid ${receiptColor};">
@@ -1119,13 +1111,23 @@
 
                 let actionsHtml = `<button class="btn-mobile btn-secondary-mobile" onclick="closeMobileModal('mDetailModal')">بستن</button>`;
                 if (c.status === 'pending') {
-                    if (c.receipt?.status_class === 'verified') {
+                    if (canVerify) {
+                        let verifyLabel = '✅ تایید';
+                        if (receiptClass === 'none') {
+                            verifyLabel = '✅ تایید (بدون رسید)';
+                        } else if (receiptClass === 'pending') {
+                            verifyLabel = '✅ تایید (رسید در انتظار)';
+                        }
                         actionsHtml += `
-                            <button class="btn-mobile btn-success-mobile" onclick="verifyMobileCheck('${c.id}')">✅ تایید</button>
+                            <button class="btn-mobile btn-success-mobile" onclick="verifyMobileCheck('${c.id}')">${verifyLabel}</button>
                         `;
                     } else {
+                        let disabledReason = '⛔ تایید (رسید تایید نشده)';
+                        if (receiptClass === 'rejected') {
+                            disabledReason = '⛔ تایید (رسید رد شده)';
+                        }
                         actionsHtml += `
-                            <button class="btn-mobile btn-secondary-mobile" style="opacity:0.5;cursor:not-allowed;" disabled>⛔ تایید (رسید تایید نشده)</button>
+                            <button class="btn-mobile btn-secondary-mobile" style="opacity:0.5;cursor:not-allowed;" disabled>${disabledReason}</button>
                         `;
                     }
                     actionsHtml += `
@@ -1136,7 +1138,6 @@
                     actionsHtml += `<button class="btn-mobile btn-primary-mobile" onclick="finalizeMobileCheck('${c.id}')">🏁 نهایی‌سازی</button>`;
                 }
                 document.getElementById('mDetailActions').innerHTML = actionsHtml;
-
                 openMobileModal('mDetailModal');
             }
         } catch(error) {
@@ -1144,10 +1145,8 @@
         }
     }
 
-    // ===== تایید چک موبایل =====
     async function verifyMobileCheck(id) {
         if (!confirm('آیا از تایید این چک اطمینان دارید؟')) return;
-
         try {
             const response = await fetch(`/panel/admin/check/verify/${id}/`, {
                 method: 'POST',
@@ -1170,7 +1169,6 @@
         }
     }
 
-    // ===== رد چک موبایل =====
     function rejectMobileCheck(id) {
         mobileRejectId = id;
         document.getElementById('mRejectReason').value = '';
@@ -1183,7 +1181,6 @@
             showToast('لطفاً دلیل رد را وارد کنید', 'warning');
             return;
         }
-
         try {
             const response = await fetch(`/panel/admin/check/reject/${mobileRejectId}/`, {
                 method: 'POST',
@@ -1207,10 +1204,8 @@
         }
     }
 
-    // ===== نهایی‌سازی موبایل =====
     async function finalizeMobileCheck(id) {
         if (!confirm('آیا از نهایی‌سازی این پرداخت اطمینان دارید؟')) return;
-
         try {
             const response = await fetch(`/panel/admin/check/finalize/${id}/`, {
                 method: 'POST',
@@ -1232,23 +1227,19 @@
         }
     }
 
-    // ===== عملیات گروهی موبایل =====
     function bulkActionMobile(action) {
         const checked = document.querySelectorAll('.m-check-item:checked');
         if (checked.length === 0) {
             showToast('لطفاً حداقل یک چک را انتخاب کنید', 'warning');
             return;
         }
-
         mobileSelectedChecks = Array.from(checked).map(cb => cb.value);
         mobileBulkActionType = action;
-
         const modal = document.getElementById('mBulkModal');
         const title = document.getElementById('mBulkTitle');
         const message = document.getElementById('mBulkMessage');
         const reasonGroup = document.getElementById('mBulkReasonGroup');
         const confirmBtn = document.getElementById('mBulkConfirmBtn');
-
         if (action === 'verify') {
             title.textContent = '✅ تایید گروهی';
             message.textContent = `${mobileSelectedChecks.length} چک تایید می‌شوند.`;
@@ -1263,7 +1254,6 @@
             confirmBtn.className = 'btn-mobile btn-danger-mobile';
             confirmBtn.textContent = '❌ رد';
         }
-
         openMobileModal('mBulkModal');
     }
 
@@ -1272,11 +1262,9 @@
             showToast('هیچ چکی انتخاب نشده است', 'warning');
             return;
         }
-
         const formData = new URLSearchParams();
         mobileSelectedChecks.forEach(id => formData.append('check_ids[]', id));
         formData.append('action', mobileBulkActionType);
-
         if (mobileBulkActionType === 'reject') {
             const reason = document.getElementById('mBulkReason').value.trim();
             if (!reason) {
@@ -1285,7 +1273,6 @@
             }
             formData.append('reason', reason);
         }
-
         try {
             const response = await fetch('/panel/admin/check/bulk-action/', {
                 method: 'POST',
@@ -1308,18 +1295,15 @@
         }
     }
 
-    // ===== Event Listeners موبایل =====
     document.getElementById('mFilterStatus').addEventListener('change', applyMobileFilters);
     document.getElementById('mFilterReceipt').addEventListener('change', applyMobileFilters);
     document.getElementById('mFilterSort').addEventListener('change', applyMobileFilters);
     document.getElementById('mFilterDateFrom').addEventListener('change', applyMobileFilters);
     document.getElementById('mFilterDateTo').addEventListener('change', applyMobileFilters);
-
     document.getElementById('mSearchInput').addEventListener('input', function() {
         clearTimeout(mobileSearchTimeout);
         mobileSearchTimeout = setTimeout(applyMobileFilters, 500);
     });
-
     document.querySelectorAll('.modal-mobile').forEach(modal => {
         modal.addEventListener('click', function(e) {
             if (e.target === this) {
@@ -1328,8 +1312,6 @@
             }
         });
     });
-
-    // بارگذاری اولیه موبایل
     document.addEventListener('DOMContentLoaded', loadMobileChecks);
 </script>
 {% endblock %}
@@ -1337,7 +1319,6 @@
 <!-- ===== بخش دسکتاپ ===== -->
 {% block pc %}
 <style>
-    /* ===== استایل‌های دسکتاپ ===== */
     .pc-checks-container {
         padding: 1.5rem;
         animation: fadeIn 0.5s ease;
@@ -1927,7 +1908,6 @@
         gap: 2px;
     }
 
-    /* اسکرول‌بار مودال */
     .pc-modal-content::-webkit-scrollbar {
         width: 4px;
     }
@@ -1959,7 +1939,6 @@
 </style>
 
 <div class="pc-checks-container">
-    <!-- کارت‌های آمار -->
     <div class="pc-stats-grid">
         <div class="pc-stat-card total">
             <div class="number" id="pcStatTotal">-</div>
@@ -1979,7 +1958,6 @@
         </div>
     </div>
 
-    <!-- فیلترها -->
     <div class="pc-filter-box">
         <div class="pc-filter-grid">
             <div class="pc-filter-group">
@@ -2030,7 +2008,6 @@
         </div>
     </div>
 
-    <!-- عملیات گروهی -->
     <div class="pc-table-actions">
         <button class="pc-btn pc-btn-success" onclick="pcBulkAction('verify')">✅ تایید گروهی</button>
         <button class="pc-btn pc-btn-danger" onclick="pcBulkAction('reject')">❌ رد گروهی</button>
@@ -2041,7 +2018,6 @@
         </span>
     </div>
 
-    <!-- جدول -->
     <div class="pc-table-wrapper">
         <table class="pc-table">
             <thead>
@@ -2063,11 +2039,9 @@
         </table>
     </div>
 
-    <!-- پیجینیشن -->
     <div class="pc-pagination" id="pcPagination"></div>
 </div>
 
-<!-- مودال‌های دسکتاپ -->
 <div id="pcDetailModal" class="pc-modal">
     <div class="pc-modal-content">
         <div class="pc-modal-header">
@@ -2117,7 +2091,6 @@
 </div>
 
 <script>
-    // ===== کد جاوااسکریپت دسکتاپ =====
     let pcPage = 1;
     let pcFilters = {};
     let pcRejectId = null;
@@ -2156,7 +2129,6 @@
     function pcShowToast(message, type = 'info') {
         const existing = document.querySelector('.pc-toast');
         if (existing) existing.remove();
-
         const toast = document.createElement('div');
         toast.className = `pc-toast ${type}`;
         toast.textContent = message;
@@ -2179,23 +2151,19 @@
     async function loadPcChecks() {
         const tbody = document.getElementById('pcTableBody');
         tbody.innerHTML = '<tr><td colspan="9" class="pc-loading">در حال بارگذاری...</td></tr>';
-
         const params = new URLSearchParams({
             page: pcPage,
             page_size: 20,
             ...pcFilters
         });
-
         try {
             const response = await fetch(`/panel/admin/api/check/list/?${params}`);
             const data = await response.json();
-
             if (data.status === 'success') {
                 document.getElementById('pcStatTotal').innerText = pcFormatNumber(data.stats.total);
                 document.getElementById('pcStatPending').innerText = pcFormatNumber(data.stats.pending);
                 document.getElementById('pcStatVerified').innerText = pcFormatNumber(data.stats.verified);
                 document.getElementById('pcStatRejected').innerText = pcFormatNumber(data.stats.rejected);
-
                 renderPcTable(data.checks);
                 renderPcPagination(data.pagination);
                 updatePcSelectedCount();
@@ -2236,6 +2204,11 @@
             const receiptBorderClass = receiptStatus === 'verified' ? 'verified' :
                                       receiptStatus === 'rejected' ? 'rejected' : '';
             const showVerifyReceiptBtn = check.status === 'pending' && receiptStatus === 'pending' && check.order_display;
+
+            const canVerifyCheck = check.status === 'pending' &&
+                                  (receiptStatus === 'verified' ||
+                                   receiptStatus === 'none' ||
+                                   receiptStatus === 'pending');
 
             return `
             <tr>
@@ -2284,10 +2257,14 @@
                     <div class="pc-action-btns">
                         <button class="pc-btn-sm pc-btn-sm-detail" onclick="viewPcDetail('${check.id}')">👁</button>
                         ${check.status === 'pending' ? `
-                            ${receiptStatus === 'verified' ? `
+                            ${canVerifyCheck ? `
                                 <button class="pc-btn-sm pc-btn-sm-verify" onclick="verifyPcCheck('${check.id}')">✅</button>
                             ` : `
-                                <button class="pc-btn-sm pc-btn-sm-disabled" title="ابتدا رسید را تایید کنید" disabled>⛔</button>
+                                ${receiptStatus === 'rejected' ? `
+                                    <button class="pc-btn-sm pc-btn-sm-disabled" title="رسید پرداخت رد شده است" disabled>⛔</button>
+                                ` : `
+                                    <button class="pc-btn-sm pc-btn-sm-disabled" title="رسید پرداخت در انتظار تایید است" disabled>⛔</button>
+                                `}
                             `}
                             <button class="pc-btn-sm pc-btn-sm-reject" onclick="rejectPcCheck('${check.id}')">❌</button>
                         ` : ''}
@@ -2312,20 +2289,16 @@
             container.innerHTML = '';
             return;
         }
-
         let html = '';
         if (pagination.has_previous) {
             html += `<button onclick="goToPcPage(${pagination.current_page - 1})">قبلی</button>`;
         }
-
         const startPage = Math.max(1, pagination.current_page - 2);
         const endPage = Math.min(pagination.total_pages, startPage + 4);
-
         for (let i = startPage; i <= endPage; i++) {
             const active = i === pagination.current_page ? 'active' : '';
             html += `<button onclick="goToPcPage(${i})" class="${active}">${i}</button>`;
         }
-
         if (pagination.has_next) {
             html += `<button onclick="goToPcPage(${pagination.current_page + 1})">بعدی</button>`;
         }
@@ -2376,14 +2349,12 @@
         document.getElementById('pcSelectedCount').innerText = pcSelectedChecks.length + ' انتخاب شده';
     }
 
-    // ===== تایید رسید دسکتاپ =====
     async function verifyReceiptPc(orderRef) {
         if (!orderRef) {
             pcShowToast('شماره سفارش یافت نشد', 'warning');
             return;
         }
         if (!confirm('آیا از تایید رسید پرداخت این سفارش اطمینان دارید؟')) return;
-
         try {
             const response = await fetch(`/panel/admin/receipt/verify/${orderRef}/`, {
                 method: 'POST',
@@ -2404,12 +2375,10 @@
         }
     }
 
-    // ===== جزئیات دسکتاپ =====
     async function viewPcDetail(id) {
         try {
             const response = await fetch(`/panel/admin/api/check/${id}/`);
             const data = await response.json();
-
             if (data.status === 'success') {
                 const c = data.check;
                 document.getElementById('pcDetailTitle').innerText = `📄 جزئیات چک - ${c.tracking_number}`;
@@ -2424,6 +2393,11 @@
                 const receiptStatus = c.receipt?.status_display || 'بدون رسید';
                 const receiptColor = c.receipt?.status_class === 'verified' ? '#34d399' :
                                     c.receipt?.status_class === 'rejected' ? '#ef4444' : '#fbbf24';
+                const receiptClass = c.receipt?.status_class || 'none';
+                const canVerify = c.status === 'pending' &&
+                                 (receiptClass === 'verified' ||
+                                  receiptClass === 'none' ||
+                                  receiptClass === 'pending');
 
                 let bodyHtml = `
                     <div class="pc-detail-section">
@@ -2451,7 +2425,6 @@
                     bodyHtml += `<div style="text-align:center;margin-top:0.5rem;"><img src="${c.check_image}" class="pc-detail-image" onclick="window.open(this.src)"></div>`;
                 }
 
-                // بخش رسید
                 if (c.receipt && c.receipt.image) {
                     bodyHtml += `
                         <div class="pc-detail-section" style="border:1px solid ${receiptColor};">
@@ -2490,13 +2463,23 @@
 
                 let actionsHtml = `<button class="pc-btn pc-btn-secondary" onclick="closePcModal('pcDetailModal')">بستن</button>`;
                 if (c.status === 'pending') {
-                    if (c.receipt?.status_class === 'verified') {
+                    if (canVerify) {
+                        let verifyLabel = '✅ تایید';
+                        if (receiptClass === 'none') {
+                            verifyLabel = '✅ تایید (بدون رسید)';
+                        } else if (receiptClass === 'pending') {
+                            verifyLabel = '✅ تایید (رسید در انتظار)';
+                        }
                         actionsHtml += `
-                            <button class="pc-btn pc-btn-success" onclick="verifyPcCheck('${c.id}')">✅ تایید</button>
+                            <button class="pc-btn pc-btn-success" onclick="verifyPcCheck('${c.id}')">${verifyLabel}</button>
                         `;
                     } else {
+                        let disabledReason = '⛔ تایید (رسید تایید نشده)';
+                        if (receiptClass === 'rejected') {
+                            disabledReason = '⛔ تایید (رسید رد شده)';
+                        }
                         actionsHtml += `
-                            <button class="pc-btn pc-btn-secondary" style="opacity:0.5;cursor:not-allowed;" disabled>⛔ تایید (رسید تایید نشده)</button>
+                            <button class="pc-btn pc-btn-secondary" style="opacity:0.5;cursor:not-allowed;" disabled>${disabledReason}</button>
                         `;
                     }
                     actionsHtml += `
@@ -2507,7 +2490,6 @@
                     actionsHtml += `<button class="pc-btn pc-btn-primary" onclick="finalizePcCheck('${c.id}')">🏁 نهایی‌سازی</button>`;
                 }
                 document.getElementById('pcDetailActions').innerHTML = actionsHtml;
-
                 openPcModal('pcDetailModal');
             }
         } catch(error) {
@@ -2515,10 +2497,8 @@
         }
     }
 
-    // ===== تایید چک دسکتاپ =====
     async function verifyPcCheck(id) {
         if (!confirm('آیا از تایید این چک اطمینان دارید؟')) return;
-
         try {
             const response = await fetch(`/panel/admin/check/verify/${id}/`, {
                 method: 'POST',
@@ -2541,7 +2521,6 @@
         }
     }
 
-    // ===== رد چک دسکتاپ =====
     function rejectPcCheck(id) {
         pcRejectId = id;
         document.getElementById('pcRejectReason').value = '';
@@ -2554,7 +2533,6 @@
             pcShowToast('لطفاً دلیل رد را وارد کنید', 'warning');
             return;
         }
-
         try {
             const response = await fetch(`/panel/admin/check/reject/${pcRejectId}/`, {
                 method: 'POST',
@@ -2578,10 +2556,8 @@
         }
     }
 
-    // ===== نهایی‌سازی دسکتاپ =====
     async function finalizePcCheck(id) {
         if (!confirm('آیا از نهایی‌سازی این پرداخت اطمینان دارید؟')) return;
-
         try {
             const response = await fetch(`/panel/admin/check/finalize/${id}/`, {
                 method: 'POST',
@@ -2603,26 +2579,22 @@
         }
     }
 
-    // ===== عملیات گروهی دسکتاپ =====
     function pcBulkAction(action) {
         const checked = document.querySelectorAll('.pc-check-item:checked');
         if (checked.length === 0) {
             pcShowToast('لطفاً حداقل یک چک را انتخاب کنید', 'warning');
             return;
         }
-
         pcSelectedChecks = Array.from(checked).map(cb => cb.value);
         pcBulkActionType = action;
-
         const modal = document.getElementById('pcBulkModal');
         const title = document.getElementById('pcBulkTitle');
         const message = document.getElementById('pcBulkMessage');
         const reasonGroup = document.getElementById('pcBulkReasonGroup');
         const confirmBtn = document.getElementById('pcBulkConfirmBtn');
-
         if (action === 'verify') {
             title.textContent = '✅ تایید گروهی چک‌ها';
-            message.textContent = `${pcSelectedChecks.length} چک انتخاب شده تایید می‌شوند. (فقط چک‌هایی که رسید تایید شده دارند عملیات می‌شوند)`;
+            message.textContent = `${pcSelectedChecks.length} چک انتخاب شده تایید می‌شوند.`;
             reasonGroup.style.display = 'none';
             confirmBtn.className = 'pc-btn pc-btn-success';
             confirmBtn.textContent = '✅ تایید گروهی';
@@ -2634,7 +2606,6 @@
             confirmBtn.className = 'pc-btn pc-btn-danger';
             confirmBtn.textContent = '❌ رد گروهی';
         }
-
         openPcModal('pcBulkModal');
     }
 
@@ -2643,11 +2614,9 @@
             pcShowToast('هیچ چکی انتخاب نشده است', 'warning');
             return;
         }
-
         const formData = new URLSearchParams();
         pcSelectedChecks.forEach(id => formData.append('check_ids[]', id));
         formData.append('action', pcBulkActionType);
-
         if (pcBulkActionType === 'reject') {
             const reason = document.getElementById('pcBulkReason').value.trim();
             if (!reason) {
@@ -2656,7 +2625,6 @@
             }
             formData.append('reason', reason);
         }
-
         try {
             const response = await fetch('/panel/admin/check/bulk-action/', {
                 method: 'POST',
@@ -2679,18 +2647,15 @@
         }
     }
 
-    // ===== Event Listeners دسکتاپ =====
     document.getElementById('pcFilterStatus').addEventListener('change', applyPcFilters);
     document.getElementById('pcFilterReceipt').addEventListener('change', applyPcFilters);
     document.getElementById('pcFilterSort').addEventListener('change', applyPcFilters);
     document.getElementById('pcFilterDateFrom').addEventListener('change', applyPcFilters);
     document.getElementById('pcFilterDateTo').addEventListener('change', applyPcFilters);
-
     document.getElementById('pcSearchInput').addEventListener('input', function() {
         clearTimeout(pcSearchTimeout);
         pcSearchTimeout = setTimeout(applyPcFilters, 500);
     });
-
     document.querySelectorAll('.pc-modal').forEach(modal => {
         modal.addEventListener('click', function(e) {
             if (e.target === this) {
@@ -2699,11 +2664,7 @@
             }
         });
     });
-
-    // بارگذاری اولیه دسکتاپ
     document.addEventListener('DOMContentLoaded', loadPcChecks);
-
-    // آپدیت خودکار هر 30 ثانیه
     setInterval(loadPcChecks, 30000);
 </script>
 {% endblock %}

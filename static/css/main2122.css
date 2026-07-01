@@ -2143,3 +2143,10 @@
     flex: 0 0 240px;
     width: 240px;
 }
+
+
+
+.bottom-item.active-bottom {
+  color: var(--primary);
+  border-radius: 12px;
+}

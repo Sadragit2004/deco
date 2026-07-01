@@ -125,10 +125,10 @@ class WalletTransaction(models.Model):
 class CustomerLoyalty(models.Model):
     """مدل سیستم امتیازدهی مشتری (لویالتی)"""
     TIER_CHOICES = (
-        ('select', 'انتخاب شده'),
-        ('premium', 'پریمیوم'),
-        ('elite', 'الیت'),
-        ('private', 'پرایویت'),
+        ('select', 'select'),
+        ('premium', 'premium'),
+        ('elite', 'elite'),
+        ('private', 'private'),
     )
 
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='loyalty', verbose_name="کاربر")
@@ -145,10 +145,10 @@ class CustomerLoyalty(models.Model):
 
     def __str__(self):
         tier_display_map = {
-            'select': 'انتخاب شده',
-            'premium': 'پریمیوم',
-            'elite': 'الیت',
-            'private': 'پرایویت',
+            'select': 'select',
+            'premium': 'premium',
+            'elite': 'elite',
+            'private': 'private',
         }
         return f"{self.user.mobileNumber} - {self.total_points} امتیاز - {tier_display_map.get(self.current_tier, self.current_tier)}"
 

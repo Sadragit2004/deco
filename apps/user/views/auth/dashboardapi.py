@@ -34,11 +34,11 @@ class UserDashboardAPIView(LoginRequiredMixin, View):
 
         # نام فارسی سطوح جدید
         tier_persian = {
-            'premium': 'پریمیوم',
-            'elite': 'الیت',
-            'private': 'پرایویت',
-            'انتخاب شده': 'select'
-        }.get(loyalty.current_tier, 'انتخاب شده')
+            'premium': 'premium',
+            'elite': 'elite',
+            'private': 'private',
+            'select': 'select'
+        }.get(loyalty.current_tier, 'select')
 
         avatar_url = user.avatar.url if user.avatar else '/media/images/default-avatar.jpg'
 

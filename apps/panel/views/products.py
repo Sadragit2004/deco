@@ -28,13 +28,11 @@ from apps.discount.models import Discount, DiscountScope, DiscountType
 
 
 def generate_random_slug(length=10):
-    """تولید اسلاگ تصادفی انگلیسی با حروف کوچک و اعداد"""
     chars = string.ascii_lowercase + string.digits
     return ''.join(random.choices(chars, k=length))
 
 
 def generate_unique_slug(model_class, base_slug=None):
-    """تولید اسلاگ یکتا برای هر مدل"""
     if base_slug:
         base_slug = re.sub(r'[^a-zA-Z0-9]', '', base_slug.lower())
         if base_slug and len(base_slug) >= 4:
@@ -48,17 +46,51 @@ def generate_unique_slug(model_class, base_slug=None):
             return random_slug
 
 
+def save_base64_image_to_model(instance, base64_string, field_name='image'):
+    """ذخیره تصویر از base64 به هر مدلی که فیلد image داشته باشد"""
+    try:
+        if not base64_string:
+            return False
+
+        if ';base64,' in base64_string:
+            format, imgstr = base64_string.split(';base64,')
+            ext = format.split('/')[-1]
+        else:
+            imgstr = base64_string
+            ext = 'png'
+
+        image_data = base64.b64decode(imgstr)
+        filename = f"{instance.__class__.__name__.lower()}_{instance.id}_{int(timezone.now().timestamp())}.{ext}"
+
+        old_file = getattr(instance, field_name)
+        if old_file and old_file.name:
+            try:
+                old_file.delete(save=False)
+            except:
+                pass
+
+        getattr(instance, field_name).save(filename, ContentFile(image_data), save=False)
+        instance.save()
+        return True
+    except Exception as e:
+        print(f"Error saving image: {e}")
+        return False
+
+
+def generate_random_name_en(length=8):
+    """تولید نام انگلیسی تصادفی"""
+    chars = string.ascii_lowercase
+    return ''.join(random.choices(chars, k=length))
+
+
 # ==================== صفحه پنل ====================
 @staff_member_required
 def product_admin_index(request):
-    """صفحه اصلی پنل مدیریت محصولات"""
     return render(request, 'panel_app/dashboard/products.html')
 
 
 # ==================== API محصولات ====================
 class ProductAPIView(View):
-    """API اصلی محصولات"""
-
     def get(self, request, product_id=None):
         if product_id:
             return self.get_product_detail(product_id)
@@ -173,29 +205,48 @@ class ProductAPIView(View):
 
         slug = generate_unique_slug(Product, data.get('title'))
 
+        sales_unit_id = None
+        if data.get('sales_unit_id') and data['sales_unit_id'] not in ['', 'null', 'None', 'ندارد']:
+            try:
+                sales_unit_id = int(data['sales_unit_id'])
+            except (ValueError, TypeError):
+                pass
+
+        package_unit_id = None
+        if data.get('package_unit_id') and data['package_unit_id'] not in ['', 'null', 'None', 'ندارد']:
+            try:
+                package_unit_id = int(data['package_unit_id'])
+            except (ValueError, TypeError):
+                pass
+
         product = Product.objects.create(
             title=data.get('title'),
             slug=slug,
             code=data.get('code') or f"PROD-{int(timezone.now().timestamp())}",
-            price=Decimal(str(data['price'])) if data.get('price') else None,
-            stock=Decimal(str(data.get('stock', 0))),
-            brand_id=int(data['brand_id']) if data.get('brand_id') else None,
-            catalog_id=int(data['catalog_id']) if data.get('catalog_id') else None,
-            sales_unit_id=int(data['sales_unit_id']) if data.get('sales_unit_id') else None,
+            price=Decimal(str(data['price'])) if data.get('price') and data['price'] not in ['', 'null', 'None'] else None,
+            stock=Decimal(str(data.get('stock', 0))) if data.get('stock') is not None else Decimal(0),
+            brand_id=int(data['brand_id']) if data.get('brand_id') and data['brand_id'] not in ['', 'null', 'None'] else None,
+            catalog_id=int(data['catalog_id']) if data.get('catalog_id') and data['catalog_id'] not in ['', 'null', 'None'] else None,
+            sales_unit_id=sales_unit_id,
             status=data.get('status', True) in [True, 'true', 'True', 1, '1'],
             use_packaging=data.get('use_packaging', False) in [True, 'true', 'True', 1, '1'],
-            package_unit_id=int(data['package_unit_id']) if data.get('package_unit_id') and data['package_unit_id'] not in ['', 'null', 'ندارد'] else None,
-            package_size=Decimal(str(data.get('package_size', 1))),
-            min_order=Decimal(str(data.get('min_order', 1))),
-            step=Decimal(str(data.get('step', 1))),
+            package_unit_id=package_unit_id,
+            package_size=Decimal(str(data.get('package_size', 1))) if data.get('package_size') else Decimal(1),
+            min_order=Decimal(str(data.get('min_order', 1))) if data.get('min_order') else Decimal(1),
+            step=Decimal(str(data.get('step', 1))) if data.get('step') else Decimal(1),
             description=data.get('description', ''),
         )
 
         if data.get('categories'):
-            product.categories.set(data['categories'])
+            try:
+                category_ids = [int(c) for c in data['categories'] if c and c not in ['', 'null', 'None']]
+                if category_ids:
+                    product.categories.set(category_ids)
+            except (ValueError, TypeError):
+                pass
 
         if data.get('image_base64'):
-            self.save_base64_image(product, data['image_base64'], 'image')
+            save_base64_image_to_model(product, data['image_base64'], 'image')
 
         return JsonResponse({
             'success': True,
@@ -221,7 +272,7 @@ class ProductAPIView(View):
         ]
 
         for field in updatable_fields:
-            if field in data and data[field] is not None and data[field] != '':
+            if field in data and data[field] is not None and data[field] != '' and data[field] != 'null':
                 value = data[field]
 
                 if field in ['price', 'stock', 'package_size', 'min_order', 'step']:
@@ -231,12 +282,12 @@ class ProductAPIView(View):
                         value = Decimal(0) if field != 'price' else None
 
                 elif field == 'status':
-                    value = value in [True, 'true', 'True', 1, '1', 'true']
+                    value = value in [True, 'true', 'True', 1, '1']
                 elif field == 'use_packaging':
-                    value = value in [True, 'true', 'True', 1, '1', 'true']
+                    value = value in [True, 'true', 'True', 1, '1']
 
                 elif field in ['brand_id', 'catalog_id', 'sales_unit_id', 'package_unit_id']:
-                    if value and value not in ['', 'null', 'ندارد']:
+                    if value and value not in ['', 'null', 'None', 'ندارد']:
                         try:
                             value = int(value)
                         except:
@@ -252,33 +303,22 @@ class ProductAPIView(View):
         product.save()
 
         if 'categories' in data and data['categories']:
-            product.categories.set(data['categories'])
+            try:
+                category_ids = [int(c) for c in data['categories'] if c and c not in ['', 'null', 'None']]
+                if category_ids:
+                    product.categories.set(category_ids)
+                else:
+                    product.categories.clear()
+            except (ValueError, TypeError):
+                pass
 
         if data.get('image_base64'):
-            self.save_base64_image(product, data['image_base64'], 'image')
+            save_base64_image_to_model(product, data['image_base64'], 'image')
 
         return JsonResponse({
             'success': True,
             'message': 'محصول با موفقیت بروزرسانی شد'
         })
-
-    def save_base64_image(self, product, base64_string, field_name='image'):
-        try:
-            if ';base64,' in base64_string:
-                format, imgstr = base64_string.split(';base64,')
-                ext = format.split('/')[-1]
-            else:
-                imgstr = base64_string
-                ext = 'png'
-
-            image_data = base64.b64decode(imgstr)
-            filename = f"product_{product.id}_{int(timezone.now().timestamp())}.{ext}"
-            getattr(product, field_name).save(filename, ContentFile(image_data), save=False)
-            product.save()
-            return True
-        except Exception as e:
-            print(f"Error saving image: {e}")
-            return False
 
     def delete(self, request, product_id):
         try:
@@ -291,8 +331,6 @@ class ProductAPIView(View):
 
 # ==================== API برندها ====================
 class BrandAPIView(View):
-    """API مدیریت برندها"""
-
     def get(self, request, brand_id=None):
         if brand_id:
             return self.get_brand_detail(brand_id)
@@ -319,7 +357,8 @@ class BrandAPIView(View):
                     'slug': b.slug,
                     'status': b.status,
                     'is_catalog': b.isCatalog,
-                    'description': b.description or ''
+                    'description': b.description or '',
+                    'image': b.image.url if b.image else None,
                 }
                 for b in paginated
             ],
@@ -341,7 +380,8 @@ class BrandAPIView(View):
                     'slug': brand.slug,
                     'status': brand.status,
                     'is_catalog': brand.isCatalog,
-                    'description': brand.description or ''
+                    'description': brand.description or '',
+                    'image': brand.image.url if brand.image else None,
                 }
             })
         except Brand.DoesNotExist:
@@ -372,6 +412,9 @@ class BrandAPIView(View):
             description=data.get('description', '')
         )
 
+        if data.get('image_base64'):
+            save_base64_image_to_model(brand, data['image_base64'], 'image')
+
         return JsonResponse({'success': True, 'message': 'برند با موفقیت ایجاد شد', 'id': brand.id})
 
     def update_brand(self, request, brand_id):
@@ -395,6 +438,9 @@ class BrandAPIView(View):
         if 'description' in data:
             brand.description = data['description']
 
+        if data.get('image_base64'):
+            save_base64_image_to_model(brand, data['image_base64'], 'image')
+
         brand.save()
         return JsonResponse({'success': True, 'message': 'برند با موفقیت بروزرسانی شد'})
 
@@ -409,8 +455,6 @@ class BrandAPIView(View):
 
 # ==================== API دسته‌بندی ====================
 class CategoryAPIView(View):
-    """API مدیریت دسته‌بندی‌ها"""
-
     def get(self, request, category_id=None):
         if category_id:
             return self.get_category_detail(category_id)
@@ -438,7 +482,8 @@ class CategoryAPIView(View):
                     'parent_id': c.parent_id,
                     'parent_title': c.parent.title if c.parent else None,
                     'status': c.status,
-                    'brands': [{'id': b.id, 'title': b.title} for b in c.brands.all()]
+                    'brands': [{'id': b.id, 'title': b.title} for b in c.brands.all()],
+                    'image': c.image.url if c.image else None,
                 }
                 for c in paginated
             ],
@@ -460,7 +505,8 @@ class CategoryAPIView(View):
                     'slug': category.slug,
                     'parent_id': category.parent_id,
                     'status': category.status,
-                    'brands': list(category.brands.values_list('id', flat=True))
+                    'brands': list(category.brands.values_list('id', flat=True)),
+                    'image': category.image.url if category.image else None,
                 }
             })
         except Category.DoesNotExist:
@@ -496,6 +542,9 @@ class CategoryAPIView(View):
         if brands:
             category.brands.set(brands)
 
+        if data.get('image_base64'):
+            save_base64_image_to_model(category, data['image_base64'], 'image')
+
         return JsonResponse({'success': True, 'message': 'دسته‌بندی با موفقیت ایجاد شد', 'id': category.id})
 
     def update_category(self, request, category_id):
@@ -518,6 +567,9 @@ class CategoryAPIView(View):
             category.status = data['status'] in [True, 'true', 'True', 1, '1']
         if 'brands' in data:
             category.brands.set(data['brands'])
+
+        if data.get('image_base64'):
+            save_base64_image_to_model(category, data['image_base64'], 'image')
 
         category.save()
         return JsonResponse({'success': True, 'message': 'دسته‌بندی با موفقیت بروزرسانی شد'})
@@ -552,8 +604,6 @@ class CategoryAPIView(View):
 
 # ==================== API کاتالوگ ====================
 class CatalogAPIView(View):
-    """API مدیریت کاتالوگ‌ها"""
-
     def get(self, request, catalog_id=None):
         if catalog_id:
             return self.get_catalog_detail(catalog_id)
@@ -580,7 +630,8 @@ class CatalogAPIView(View):
                     'slug': c.slug,
                     'brand_id': c.brand_id,
                     'brand_title': c.brand.title if c.brand else None,
-                    'status': c.status
+                    'status': c.status,
+                    'image': c.image.url if c.image else None,
                 }
                 for c in paginated
             ],
@@ -601,7 +652,8 @@ class CatalogAPIView(View):
                     'title': catalog.title,
                     'slug': catalog.slug,
                     'brand_id': catalog.brand_id,
-                    'status': catalog.status
+                    'status': catalog.status,
+                    'image': catalog.image.url if catalog.image else None,
                 }
             })
         except Catalog.DoesNotExist:
@@ -631,6 +683,9 @@ class CatalogAPIView(View):
             status=True
         )
 
+        if data.get('image_base64'):
+            save_base64_image_to_model(catalog, data['image_base64'], 'image')
+
         return JsonResponse({'success': True, 'message': 'کاتالوگ با موفقیت ایجاد شد', 'id': catalog.id})
 
     def update_catalog(self, request, catalog_id):
@@ -652,6 +707,9 @@ class CatalogAPIView(View):
         if 'status' in data:
             catalog.status = data['status'] in [True, 'true', 'True', 1, '1']
 
+        if data.get('image_base64'):
+            save_base64_image_to_model(catalog, data['image_base64'], 'image')
+
         catalog.save()
         return JsonResponse({'success': True, 'message': 'کاتالوگ با موفقیت بروزرسانی شد'})
 
@@ -664,10 +722,8 @@ class CatalogAPIView(View):
             return JsonResponse({'success': False, 'error': 'کاتالوگ یافت نشد'}, status=404)
 
 
-# ==================== API واحدها ====================
+# ==================== API واحد فروش (اصلاح شده با کپی کردن) ====================
 class SalesUnitAPIView(View):
-    """API واحدهای فروش"""
-
     def get(self, request):
         queryset = SalesUnit.objects.all()
         return JsonResponse({
@@ -690,23 +746,40 @@ class SalesUnitAPIView(View):
         except:
             data = request.POST.dict()
 
+        # دریافت نام واحد (اجباری)
         name = data.get('title') or data.get('name')
         if not name:
             return JsonResponse({'success': False, 'error': 'نام واحد الزامی است'}, status=400)
 
+        # ====== تولید نام انگلیسی تصادفی ======
+        name_en = generate_random_name_en(8)
+
+        # ====== symbol = همان name کپی شود ======
+        symbol = name
+
+        # ایجاد واحد فروش
         unit = SalesUnit.objects.create(
             name=name,
-            name_en=data.get('name_en'),
-            symbol=data.get('symbol'),
+            name_en=name_en,
+            symbol=symbol,
             status=True
         )
 
-        return JsonResponse({'success': True, 'message': 'واحد فروش ایجاد شد', 'id': unit.id})
+        return JsonResponse({
+            'success': True,
+            'message': 'واحد فروش با موفقیت ایجاد شد',
+            'id': unit.id,
+            'data': {
+                'id': unit.id,
+                'name': unit.name,
+                'name_en': unit.name_en,
+                'symbol': unit.symbol
+            }
+        })
 
 
+# ==================== API واحد بسته‌بندی (اصلاح شده با کپی کردن) ====================
 class PackageUnitAPIView(View):
-    """API واحدهای بسته‌بندی"""
-
     def get(self, request):
         queryset = PackageUnit.objects.all()
         return JsonResponse({
@@ -716,6 +789,7 @@ class PackageUnitAPIView(View):
                     'id': u.id,
                     'title': u.name or str(u.id),
                     'name': u.name,
+                    'name_en': u.name_en,
                     'symbol': u.symbol,
                     'icon': u.icon
                 }
@@ -729,25 +803,45 @@ class PackageUnitAPIView(View):
         except:
             data = request.POST.dict()
 
+        # دریافت نام واحد (اجباری)
         name = data.get('title') or data.get('name')
         if not name:
             return JsonResponse({'success': False, 'error': 'نام واحد بسته‌بندی الزامی است'}, status=400)
 
+        # ====== تولید نام انگلیسی تصادفی ======
+        name_en = generate_random_name_en(8)
+
+        # ====== symbol = همان name کپی شود ======
+        symbol = name
+
+        # آیکون پیش‌فرض
+        icon = 'fa-box'
+
+        # ایجاد واحد بسته‌بندی
         unit = PackageUnit.objects.create(
             name=name,
-            name_en=data.get('name_en'),
-            symbol=data.get('symbol'),
-            icon=data.get('icon', 'fa-box'),
+            name_en=name_en,
+            symbol=symbol,
+            icon=icon,
             status=True
         )
 
-        return JsonResponse({'success': True, 'message': 'واحد بسته‌بندی ایجاد شد', 'id': unit.id})
+        return JsonResponse({
+            'success': True,
+            'message': 'واحد بسته‌بندی با موفقیت ایجاد شد',
+            'id': unit.id,
+            'data': {
+                'id': unit.id,
+                'name': unit.name,
+                'name_en': unit.name_en,
+                'symbol': unit.symbol,
+                'icon': unit.icon
+            }
+        })
 
 
 # ==================== API ویژگی‌ها ====================
 class AttributeAPIView(View):
-    """API ویژگی‌ها"""
-
     def get(self, request, attr_id=None):
         if attr_id:
             return self.get_attribute_detail(attr_id)
@@ -827,8 +921,6 @@ class AttributeAPIView(View):
 
 # ==================== API تخفیف‌ها ====================
 class DiscountAPIView(View):
-    """API تخفیف‌ها"""
-
     def get(self, request, discount_id=None):
         if discount_id:
             return self.get_discount_detail(discount_id)
@@ -935,10 +1027,8 @@ class DiscountAPIView(View):
             return JsonResponse({'success': False, 'error': 'تخفیف یافت نشد'}, status=404)
 
 
-# ==================== آمار ====================
+# ==================== API آمار ====================
 class StatsAPIView(View):
-    """آمار داشبورد"""
-
     def get(self, request):
         total_products = Product.objects.count()
         total_brands = Brand.objects.count()
@@ -969,10 +1059,8 @@ class StatsAPIView(View):
         })
 
 
-# ==================== تولید انبوه ====================
+# ==================== تولید انبوه محصولات ====================
 class BulkProductCreateView(View):
-    """تولید انبوه محصولات با اسلاگ تصادفی و یکتا"""
-
     def post(self, request):
         try:
             data = json.loads(request.body)
@@ -988,6 +1076,22 @@ class BulkProductCreateView(View):
 
         if not code_start or not code_end:
             return JsonResponse({'success': False, 'error': 'کد شروع و پایان الزامی است'}, status=400)
+
+        # پردازش sales_unit_id
+        sales_unit_id = None
+        if data.get('sales_unit_id') and data['sales_unit_id'] not in ['', 'null', 'None', 'ندارد']:
+            try:
+                sales_unit_id = int(data['sales_unit_id'])
+            except (ValueError, TypeError):
+                pass
+
+        # پردازش package_unit_id
+        package_unit_id = None
+        if data.get('package_unit_id') and data['package_unit_id'] not in ['', 'null', 'None', 'ندارد']:
+            try:
+                package_unit_id = int(data['package_unit_id'])
+            except (ValueError, TypeError):
+                pass
 
         start_match = re.search(r'(\D*)(\d+)(\D*)', code_start)
         end_match = re.search(r'(\d+)', code_end)
@@ -1007,6 +1111,9 @@ class BulkProductCreateView(View):
         created_ids = []
         errors = []
 
+        brand_obj = Brand.objects.filter(id=int(brand_id)).first()
+        brand_name = brand_obj.title if brand_obj else ""
+
         for num in range(start_num, end_num + 1):
             code = f"{prefix}{num}{suffix}"
 
@@ -1016,33 +1123,65 @@ class BulkProductCreateView(View):
 
             product_slug = generate_unique_slug(Product)
 
-            brand_obj = Brand.objects.filter(id=int(brand_id)).first()
-            brand_name = brand_obj.title if brand_obj else ""
             product_title = f"{code}"
             if brand_name:
                 product_title = f"{product_title} - {brand_name}"
 
             try:
+                price_value = data.get('base_price', 0)
+                if price_value in ['', 'null', 'None', 'ندارد']:
+                    price_value = 0
+                price = Decimal(str(price_value)) if price_value is not None else None
+
+                stock_value = data.get('stock', 0)
+                if stock_value in ['', 'null', 'None', 'ندارد']:
+                    stock_value = 0
+                stock = Decimal(str(stock_value)) if stock_value is not None else Decimal(0)
+
+                package_size = data.get('package_size', 1)
+                if package_size in ['', 'null', 'None']:
+                    package_size = 1
+                package_size = Decimal(str(package_size))
+
+                min_order = data.get('min_order', 1)
+                if min_order in ['', 'null', 'None']:
+                    min_order = 1
+                min_order = Decimal(str(min_order))
+
+                step = data.get('step', 1)
+                if step in ['', 'null', 'None']:
+                    step = 1
+                step = Decimal(str(step))
+
+                use_packaging = data.get('use_packaging', False)
+                if isinstance(use_packaging, str):
+                    use_packaging = use_packaging in ['true', 'True', '1']
+
                 product = Product.objects.create(
                     title=product_title,
                     slug=product_slug,
                     code=code,
                     brand_id=int(brand_id),
-                    catalog_id=int(data['catalog_id']) if data.get('catalog_id') and data['catalog_id'] not in ['', 'null'] else None,
-                    price=Decimal(str(data.get('base_price', 0))),
-                    stock=Decimal(str(data.get('stock', 0))),
-                    sales_unit_id=int(data['sales_unit_id']) if data.get('sales_unit_id') and data['sales_unit_id'] not in ['', 'null'] else None,
-                    use_packaging=data.get('use_packaging', False),
-                    package_unit_id=int(data['package_unit_id']) if data.get('package_unit_id') and data['package_unit_id'] not in ['', 'null'] else None,
-                    package_size=Decimal(str(data.get('package_size', 1))),
-                    min_order=Decimal(str(data.get('min_order', 1))),
-                    step=Decimal(str(data.get('step', 1))),
+                    catalog_id=int(data['catalog_id']) if data.get('catalog_id') and data['catalog_id'] not in ['', 'null', 'None'] else None,
+                    price=price,
+                    stock=stock,
+                    sales_unit_id=sales_unit_id,
+                    use_packaging=use_packaging,
+                    package_unit_id=package_unit_id,
+                    package_size=package_size,
+                    min_order=min_order,
+                    step=step,
                     description=data.get('description', ''),
                     status=True
                 )
 
                 if data.get('categories'):
-                    product.categories.set(data['categories'])
+                    try:
+                        category_ids = [int(c) for c in data['categories'] if c and c not in ['', 'null', 'None']]
+                        if category_ids:
+                            product.categories.set(category_ids)
+                    except (ValueError, TypeError):
+                        pass
 
                 created_count += 1
                 created_ids.append(product.id)
@@ -1061,8 +1200,6 @@ class BulkProductCreateView(View):
 
 # ==================== تغییر قیمت دسته‌جمعی ====================
 class BulkPriceUpdateView(View):
-    """تغییر قیمت دسته‌جمعی"""
-
     def post(self, request):
         try:
             data = json.loads(request.body)

@@ -371,9 +371,10 @@
     .loading { text-align: center; padding: 50px; color: #94a3b8; }
     .bulk-actions-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; padding: 12px 24px; border-radius: 50px; display: flex; gap: 12px; z-index: 1000; border: 1px solid #667eea; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
 
-    .manager-list-item { background: #0f172a; padding: 12px 16px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .manager-list-item { background: #0f172a; padding: 12px 16px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
     .manager-list-item strong { color: #fff; font-size: 1rem; }
     .manager-list-item small { color: #94a3b8; font-size: 0.8rem; margin-right: 8px; }
+    .manager-list-item .brand-image { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; border: 2px solid #334155; }
 
     @media (max-width: 768px) {
         .product-admin-container { padding: 12px; }
@@ -383,6 +384,8 @@
         .panel-card { padding: 16px; }
         .products-table th, .products-table td { padding: 8px; font-size: 0.75rem; }
         .btn-primary, .btn-danger, .btn-success, .btn-warning { padding: 6px 12px; font-size: 0.75rem; }
+        .manager-list-item { flex-direction: column; align-items: stretch; }
+        .manager-list-item .brand-image { width: 30px; height: 30px; }
     }
 </style>
 
@@ -408,6 +411,7 @@
         <button class="tab-btn" data-tab="attributes">🏷️ ویژگی‌ها</button>
     </div>
 
+    <!-- ====== تب محصولات ====== -->
     <div id="productsTab" class="tab-panel">
         <div class="panel-card">
             <div class="panel-title">🔍 فیلتر و جستجو</div>
@@ -428,7 +432,8 @@
             <div style="overflow-x: auto;">
                 <table class="products-table">
                     <thead>
-                        <tr><th style="width:30px;"><input type="checkbox" id="selectAllCheckbox"></th><th>کد</th><th>تصویر</th><th>عنوان</th><th>برند</th><th>قیمت (تومان)</th><th>موجودی</th><th>واحد</th><th>تخفیف</th><th>وضعیت</th><th>عملیات</th> </thead>
+                        <tr><th style="width:30px;"><input type="checkbox" id="selectAllCheckbox"></th><th>کد</th><th>تصویر</th><th>عنوان</th><th>برند</th><th>قیمت (تومان)</th><th>موجودی</th><th>واحد</th><th>تخفیف</th><th>وضعیت</th><th>عملیات</th></tr>
+                    </thead>
                     <tbody id="productsTableBody"><tr><td colspan="11" class="loading">در حال بارگذاری...</td></tr></tbody>
                 </table>
             </div>
@@ -436,7 +441,7 @@
         </div>
     </div>
 
-    <!-- ====== تب برندها با ویرایش کامل ====== -->
+    <!-- ====== تب برندها با آپلود عکس در ایجاد و ویرایش ====== -->
     <div id="brandsTab" class="tab-panel" style="display:none;">
         <div class="panel-card">
             <div class="panel-title">🏷️ مدیریت برندها</div>
@@ -466,13 +471,26 @@
                             <option value="false">❌ خیر</option>
                         </select>
                     </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>🖼️ تصویر برند</label>
+                        <div class="image-upload-area" id="brandImageUploadArea" onclick="document.getElementById('brandImageInput').click()">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #667eea;"></i>
+                            <p style="color: #94a3b8; margin-top: 8px;">برای آپلود تصویر برند کلیک کنید</p>
+                            <p style="color: #64748b; font-size: 0.75rem;">فرمت‌های مجاز: JPG, PNG, GIF</p>
+                            <input type="file" id="brandImageInput" accept="image/*" style="display:none;" onchange="previewBrandImage()">
+                        </div>
+                        <div id="brandImagePreview" style="display:none; margin-top:10px; text-align:center;">
+                            <img id="brandPreviewImg" class="image-preview" style="width:100px; height:100px; border-radius:12px; object-fit:cover;">
+                            <button class="btn-danger" onclick="clearBrandImage()" style="padding:4px 12px; margin-top:8px;">🗑️ حذف تصویر</button>
+                        </div>
+                    </div>
                 </div>
                 <button class="btn-success" onclick="quickAddBrand()" style="width:100%; padding:12px;">➕ افزودن برند</button>
             </div>
         </div>
     </div>
 
-    <!-- ====== تب دسته‌بندی با قابلیت انتخاب چند برند ====== -->
+    <!-- ====== تب دسته‌بندی با آپلود عکس در ایجاد و ویرایش ====== -->
     <div id="categoriesTab" class="tab-panel" style="display:none;">
         <div class="panel-card">
             <div class="panel-title">📂 مدیریت دسته‌بندی</div>
@@ -497,12 +515,26 @@
                         </select>
                         <small style="color:#64748b; display:block; margin-top:5px;">برای انتخاب چند برند، کلید Ctrl (یا Cmd در مک) را نگه دارید و کلیک کنید</small>
                     </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>🖼️ تصویر دسته‌بندی</label>
+                        <div class="image-upload-area" id="categoryImageUploadArea" onclick="document.getElementById('categoryImageInput').click()">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #667eea;"></i>
+                            <p style="color: #94a3b8; margin-top: 8px;">برای آپلود تصویر دسته‌بندی کلیک کنید</p>
+                            <p style="color: #64748b; font-size: 0.75rem;">فرمت‌های مجاز: JPG, PNG, GIF</p>
+                            <input type="file" id="categoryImageInput" accept="image/*" style="display:none;" onchange="previewCategoryImage()">
+                        </div>
+                        <div id="categoryImagePreview" style="display:none; margin-top:10px; text-align:center;">
+                            <img id="categoryPreviewImg" class="image-preview" style="width:100px; height:100px; border-radius:12px; object-fit:cover;">
+                            <button class="btn-danger" onclick="clearCategoryImage()" style="padding:4px 12px; margin-top:8px;">🗑️ حذف تصویر</button>
+                        </div>
+                    </div>
                 </div>
                 <button class="btn-success" onclick="quickAddCategory()" style="width:100%; padding:12px;">➕ افزودن دسته‌بندی</button>
             </div>
         </div>
     </div>
 
+    <!-- ====== تب کاتالوگ ====== -->
     <div id="catalogsTab" class="tab-panel" style="display:none;">
         <div class="panel-card">
             <div class="panel-title">📁 مدیریت کاتالوگ</div>
@@ -515,6 +547,7 @@
         </div>
     </div>
 
+    <!-- ====== تب تولید انبوه ====== -->
     <div id="bulkTab" class="tab-panel" style="display:none;">
         <div class="panel-card">
             <div class="panel-title">🏭 تولید انبوه محصولات جدید</div>
@@ -538,6 +571,7 @@
         </div>
     </div>
 
+    <!-- ====== تب ویرایش انبوه ====== -->
     <div id="bulkEditTab" class="tab-panel" style="display:none;">
         <div class="panel-card">
             <div class="panel-title">✏️ ویرایش انبوه محصولات</div>
@@ -552,6 +586,7 @@
         </div>
     </div>
 
+    <!-- ====== تب تغییر قیمت ====== -->
     <div id="priceTab" class="tab-panel" style="display:none;">
         <div class="panel-card">
             <div class="panel-title">💰 تغییر قیمت دسته‌جمعی</div>
@@ -567,6 +602,7 @@
         <div id="pricePreviewPanel" class="panel-card" style="display:none;"></div>
     </div>
 
+    <!-- ====== تب تخفیف‌ها ====== -->
     <div id="discountsTab" class="tab-panel" style="display:none;">
         <div class="panel-card">
             <div class="panel-title">➕ ایجاد تخفیف پیشرفته</div>
@@ -589,6 +625,7 @@
         <div class="panel-card"><div class="panel-title">📋 لیست تخفیف‌ها</div><div id="discountsList"></div></div>
     </div>
 
+    <!-- ====== تب ویژگی‌ها ====== -->
     <div id="attributesTab" class="tab-panel" style="display:none;">
         <div class="panel-card">
             <div class="panel-title">🏷️ مدیریت ویژگی‌ها</div>
@@ -646,6 +683,37 @@
     </div>
 </div>
 
+<!-- ====== مودال‌های ویرایش برند و دسته‌بندی ====== -->
+<div id="editBrandModal" class="modal">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+            <h3 id="editBrandModalTitle" style="color:#fff;">✏️ ویرایش برند</h3>
+            <button onclick="closeModal('editBrandModal')" style="background:#ef4444; border:none; width:34px; height:34px; border-radius:50%; color:white; cursor:pointer; font-size:1.2rem;">&times;</button>
+        </div>
+        <div id="editBrandModalBody"></div>
+    </div>
+</div>
+
+<div id="editCategoryModal" class="modal">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+            <h3 id="editCategoryModalTitle" style="color:#fff;">✏️ ویرایش دسته‌بندی</h3>
+            <button onclick="closeModal('editCategoryModal')" style="background:#ef4444; border:none; width:34px; height:34px; border-radius:50%; color:white; cursor:pointer; font-size:1.2rem;">&times;</button>
+        </div>
+        <div id="editCategoryModalBody"></div>
+    </div>
+</div>
+
+<div id="editCategoryBrandsModal" class="modal">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+            <h3 id="editCategoryBrandsModalTitle" style="color:#fff;">✏️ ویرایش برندهای دسته‌بندی</h3>
+            <button onclick="closeModal('editCategoryBrandsModal')" style="background:#ef4444; border:none; width:34px; height:34px; border-radius:50%; color:white; cursor:pointer; font-size:1.2rem;">&times;</button>
+        </div>
+        <div id="editCategoryBrandsModalBody"></div>
+    </div>
+</div>
+
 <script>
     let currentPage = 1, currentSort = '-created_at', currentTab = 'products';
     let selectedProducts = new Set();
@@ -653,6 +721,12 @@
     let pendingImageFile = null;
     let pendingProductIdForImage = null;
     let searchTimeout;
+
+    // متغیرهای تصاویر برند و دسته‌بندی
+    let pendingBrandImage = null;
+    let pendingCategoryImage = null;
+    let pendingEditBrandImage = null;
+    let pendingEditCategoryImage = null;
 
     function getCSRFToken() {
         return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
@@ -671,11 +745,119 @@
     }
 
     function closeModal(id) {
-        document.getElementById(id).style.display = 'none';
+        const modal = document.getElementById(id);
+        if(modal) modal.style.display = 'none';
         pendingImageFile = null;
         pendingProductIdForImage = null;
+        pendingEditBrandImage = null;
+        pendingEditCategoryImage = null;
     }
 
+    // ==================== تبدیل فایل به Base64 ====================
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // ==================== پیش‌نمایش تصویر برند (ایجاد) ====================
+    function previewBrandImage() {
+        const input = document.getElementById('brandImageInput');
+        if (input.files && input.files[0]) {
+            pendingBrandImage = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('brandPreviewImg').src = e.target.result;
+                document.getElementById('brandImageUploadArea').style.display = 'none';
+                document.getElementById('brandImagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function clearBrandImage() {
+        pendingBrandImage = null;
+        document.getElementById('brandImageInput').value = '';
+        document.getElementById('brandImageUploadArea').style.display = 'block';
+        document.getElementById('brandImagePreview').style.display = 'none';
+    }
+
+    // ==================== پیش‌نمایش تصویر دسته‌بندی (ایجاد) ====================
+    function previewCategoryImage() {
+        const input = document.getElementById('categoryImageInput');
+        if (input.files && input.files[0]) {
+            pendingCategoryImage = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('categoryPreviewImg').src = e.target.result;
+                document.getElementById('categoryImageUploadArea').style.display = 'none';
+                document.getElementById('categoryImagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function clearCategoryImage() {
+        pendingCategoryImage = null;
+        document.getElementById('categoryImageInput').value = '';
+        document.getElementById('categoryImageUploadArea').style.display = 'block';
+        document.getElementById('categoryImagePreview').style.display = 'none';
+    }
+
+    // ==================== پیش‌نمایش تصویر محصول ====================
+    function previewUploadImage() {
+        const input = document.getElementById('modalImageInput');
+        if (input.files && input.files[0]) {
+            pendingImageFile = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('uploadPreviewImg').src = e.target.result;
+                document.getElementById('modalImageUploadArea').style.display = 'none';
+                document.getElementById('uploadImagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function cancelImageUpload() {
+        pendingImageFile = null;
+        pendingProductIdForImage = null;
+        closeModal('uploadImageModal');
+    }
+
+    async function confirmImageUpload() {
+        if (!pendingImageFile || !pendingProductIdForImage) return;
+        const imageBase64 = await fileToBase64(pendingImageFile);
+        try {
+            const res = await fetch(`/panel/api/products/${pendingProductIdForImage}/update/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                body: JSON.stringify({ image_base64: imageBase64 })
+            });
+            const result = await res.json();
+            if(result.success) {
+                showToast('تصویر با موفقیت آپلود شد');
+                closeModal('uploadImageModal');
+                loadProducts();
+            } else {
+                showToast('خطا: ' + result.error, true);
+            }
+        } catch(e) { showToast('خطا در آپلود', true); }
+    }
+
+    function openUploadModal(productId) {
+        pendingProductIdForImage = productId;
+        pendingImageFile = null;
+        document.getElementById('uploadImagePreview').style.display = 'none';
+        document.getElementById('modalImageUploadArea').style.display = 'block';
+        document.getElementById('modalImageInput').value = '';
+        document.getElementById('uploadImageModal').style.display = 'flex';
+    }
+
+    // ==================== آمار ====================
     async function loadStats() {
         try {
             const res = await fetch('/panel/api/stats/');
@@ -691,6 +873,7 @@
         } catch(e) { console.error(e); }
     }
 
+    // ==================== محصولات ====================
     async function loadProducts() {
         const search = document.getElementById('productSearch')?.value || '';
         const brand_id = document.getElementById('productBrandFilter')?.value || '';
@@ -713,7 +896,7 @@
             if(data.success && data.data){
                 const tbody = document.getElementById('productsTableBody');
                 if(data.data.length === 0) {
-                    tbody.innerHTML = '<td><td colspan="11" class="loading">محصولی یافت نشد</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="11" class="loading">محصولی یافت نشد</td></tr>';
                     return;
                 }
 
@@ -721,7 +904,7 @@
                     <tr data-id="${p.id}">
                         <td><input type="checkbox" class="product-checkbox" value="${p.id}" onchange="toggleProductSelect(${p.id})"></td>
                         <td>${p.code || '-'}</td>
-                        <td>${p.image ? `<img src="${p.image}" class="product-image" onclick="openUploadModal(${p.id})" title="تغییر تصویر">` : `<div class="product-image" style="background:#0f172a; display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="openUploadModal(${p.id})"><span style="color:#64748b;">+</span></div>`}</div></td>
+                        <td>${p.image ? `<img src="${p.image}" class="product-image" onclick="openUploadModal(${p.id})" title="تغییر تصویر">` : `<div class="product-image" style="background:#0f172a; display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="openUploadModal(${p.id})"><span style="color:#64748b;">+</span></div>`}</td>
                         <td><span class="editable-cell" onclick="inlineEdit(this, 'title', ${p.id}, '${(p.title || '').replace(/'/g, "\\'")}')">${p.title || '-'}</span></td>
                         <td>${p.brand_title || '-'}</td>
                         <td><span class="editable-cell price-tag" onclick="inlineEdit(this, 'price', ${p.id}, ${p.price})">${p.price_display} تومان</span></td>
@@ -849,7 +1032,6 @@
                 body: JSON.stringify({ status: !currentStatus })
             });
             const result = await response.json();
-
             if(result.success) {
                 showToast('وضعیت محصول تغییر کرد');
                 loadProducts();
@@ -859,31 +1041,25 @@
             }
         } catch(e) {
             showToast('خطا در ارتباط با سرور', true);
-            console.error(e);
         }
     }
 
     async function deleteProduct(id) {
         if(!confirm('آیا از حذف این محصول اطمینان دارید؟')) return;
-
         try {
             const response = await fetch(`/panel/api/products/${id}/delete/`, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() }
+                headers: { 'X-CSRFToken': getCSRFToken() }
             });
             const result = await response.json();
-
             if(result.success) {
-                showToast(result.message || 'محصول با موفقیت حذف شد');
+                showToast('محصول با موفقیت حذف شد');
                 loadProducts();
                 loadStats();
             } else {
                 showToast(result.error || 'خطا در حذف محصول', true);
             }
-        } catch(e) {
-            showToast('خطا در ارتباط با سرور', true);
-            console.error(e);
-        }
+        } catch(e) { showToast('خطا در ارتباط با سرور', true); }
     }
 
     function toggleProductSelect(id) {
@@ -1012,6 +1188,7 @@
         else showToast(result.error, true);
     }
 
+    // ==================== مودال محصول ====================
     async function showProductModal(product = null) {
         editingProductId = product?.id || null;
         document.getElementById('productModalTitle').innerHTML = product ? '✏️ ویرایش محصول' : '➕ محصول جدید';
@@ -1080,7 +1257,7 @@
             });
             const result = await res.json();
             if(result.success) {
-                showToast(result.message || 'محصول ذخیره شد');
+                showToast('محصول ذخیره شد');
                 closeModal('productModal');
                 loadProducts();
                 loadStats();
@@ -1096,60 +1273,6 @@
         if(data.success) showProductModal(data.data);
     }
 
-    // ==================== آپلود تصویر ====================
-    function openUploadModal(productId) {
-        pendingProductIdForImage = productId;
-        pendingImageFile = null;
-        document.getElementById('uploadImagePreview').style.display = 'none';
-        document.getElementById('modalImageUploadArea').style.display = 'block';
-        document.getElementById('modalImageInput').value = '';
-        document.getElementById('uploadImageModal').style.display = 'flex';
-    }
-
-    function previewUploadImage() {
-        const input = document.getElementById('modalImageInput');
-        if (input.files && input.files[0]) {
-            pendingImageFile = input.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('uploadPreviewImg').src = e.target.result;
-                document.getElementById('modalImageUploadArea').style.display = 'none';
-                document.getElementById('uploadImagePreview').style.display = 'block';
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    async function confirmImageUpload() {
-        if (!pendingImageFile || !pendingProductIdForImage) return;
-
-        const reader = new FileReader();
-        reader.readAsDataURL(pendingImageFile);
-        reader.onload = async function() {
-            try {
-                const res = await fetch(`/panel/api/products/${pendingProductIdForImage}/update/`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
-                    body: JSON.stringify({ image_base64: reader.result })
-                });
-                const result = await res.json();
-                if(result.success) {
-                    showToast('تصویر با موفقیت آپلود شد');
-                    closeModal('uploadImageModal');
-                    loadProducts();
-                } else {
-                    showToast('خطا: ' + result.error, true);
-                }
-            } catch(e) { showToast('خطا در آپلود', true); }
-        };
-    }
-
-    function cancelImageUpload() {
-        pendingImageFile = null;
-        pendingProductIdForImage = null;
-        closeModal('uploadImageModal');
-    }
-
     // ==================== برندها ====================
     async function loadBrands() {
         const res = await fetch('/panel/api/brands/?page_size=100');
@@ -1157,13 +1280,17 @@
         if(data.success) {
             document.getElementById('brandsList').innerHTML = data.data.map(b => `
                 <div class="manager-list-item">
-                    <div>
-                        <strong>🏷️ ${b.title}</strong>
-                        <small>${b.is_catalog ? '📁 کاتالوگ' : ''}</small>
-                        <small style="color:#64748b;">${b.description || ''}</small>
-                        <span class="badge ${b.status ? 'badge-active' : 'badge-inactive'}" style="font-size:0.65rem; padding:2px 8px; margin-right:5px;">
-                            ${b.status ? '✅ فعال' : '❌ غیرفعال'}
-                        </span>
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        ${b.image ? `<img src="${b.image}" class="brand-image">` :
+                        `<div style="width:40px; height:40px; border-radius:10px; background:#0f172a; display:flex; align-items:center; justify-content:center; border:2px solid #334155;"><span style="color:#64748b; font-size:1.2rem;">🏷️</span></div>`}
+                        <div>
+                            <strong style="color:#fff;">${b.title}</strong>
+                            <small style="color:#94a3b8;">${b.is_catalog ? '📁 کاتالوگ' : ''}</small>
+                            <small style="color:#64748b; display:block; font-size:0.7rem;">${b.description || ''}</small>
+                            <span class="badge ${b.status ? 'badge-active' : 'badge-inactive'}" style="font-size:0.65rem; padding:2px 8px;">
+                                ${b.status ? '✅ فعال' : '❌ غیرفعال'}
+                            </span>
+                        </div>
                     </div>
                     <div style="display:flex; gap:6px;">
                         <button class="btn-warning btn-sm" onclick="editBrand(${b.id})" style="padding:4px 10px; font-size:0.75rem;">✏️</button>
@@ -1174,6 +1301,7 @@
         }
     }
 
+    // ==================== ایجاد برند ====================
     async function quickAddBrand() {
         const name = document.getElementById('newBrandName')?.value.trim();
         if(!name) { showToast('نام برند را وارد کنید', true); return; }
@@ -1181,6 +1309,11 @@
         const description = document.getElementById('newBrandDescription')?.value || '';
         const status = document.getElementById('newBrandStatus')?.value === 'true';
         const isCatalog = document.getElementById('newBrandIsCatalog')?.value === 'true';
+
+        let imageBase64 = null;
+        if (pendingBrandImage) {
+            imageBase64 = await fileToBase64(pendingBrandImage);
+        }
 
         try {
             const res = await fetch('/panel/api/brands/create/', {
@@ -1190,7 +1323,8 @@
                     title: name,
                     description: description,
                     status: status,
-                    is_catalog: isCatalog
+                    is_catalog: isCatalog,
+                    image_base64: imageBase64
                 })
             });
             const result = await res.json();
@@ -1200,37 +1334,55 @@
                 loadSelectOptions();
                 document.getElementById('newBrandName').value = '';
                 document.getElementById('newBrandDescription').value = '';
+                clearBrandImage();
             } else {
                 showToast(result.error, true);
             }
         } catch(e) { showToast('خطا در ارتباط', true); }
     }
 
+    // ==================== حذف برند ====================
     async function deleteBrand(id){
         if(!confirm('آیا از حذف این برند اطمینان دارید؟')) return;
-
         try {
             const response = await fetch(`/panel/api/brands/${id}/delete/`, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() }
+                headers: { 'X-CSRFToken': getCSRFToken() }
             });
             const result = await response.json();
-
             if(result.success){
-                showToast(result.message || 'برند با موفقیت حذف شد');
+                showToast('برند با موفقیت حذف شد');
                 loadBrands();
                 loadSelectOptions();
                 loadStats();
             } else {
                 showToast(result.error || 'خطا در حذف برند', true);
             }
-        } catch(e) {
-            showToast('خطا در ارتباط با سرور', true);
-            console.error(e);
+        } catch(e) { showToast('خطا در ارتباط با سرور', true); }
+    }
+
+    // ==================== ویرایش برند (با آپلود عکس) ====================
+    function previewEditBrandImage() {
+        const input = document.getElementById('editBrandImageInput');
+        if (input.files && input.files[0]) {
+            pendingEditBrandImage = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('editBrandPreviewImg').src = e.target.result;
+                document.getElementById('editBrandImageUploadArea').style.display = 'none';
+                document.getElementById('editBrandImagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
         }
     }
 
-    // ====== ویرایش برند ======
+    function clearEditBrandImage() {
+        pendingEditBrandImage = null;
+        document.getElementById('editBrandImageInput').value = '';
+        document.getElementById('editBrandImageUploadArea').style.display = 'block';
+        document.getElementById('editBrandImagePreview').style.display = 'none';
+    }
+
     async function editBrand(brandId) {
         const res = await fetch(`/panel/api/brands/${brandId}/`);
         const data = await res.json();
@@ -1265,6 +1417,19 @@
                         <option value="false" ${!brand.is_catalog ? 'selected' : ''}>❌ خیر</option>
                     </select>
                 </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>🖼️ تصویر برند</label>
+                    ${brand.image ? `<div style="margin-bottom:10px;"><img src="${brand.image}" style="width:80px; height:80px; border-radius:12px; object-fit:cover; border:2px solid #667eea;"></div>` : ''}
+                    <div class="image-upload-area" id="editBrandImageUploadArea" onclick="document.getElementById('editBrandImageInput').click()">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #667eea;"></i>
+                        <p style="color: #94a3b8; margin-top: 8px;">برای آپلود تصویر جدید کلیک کنید</p>
+                        <input type="file" id="editBrandImageInput" accept="image/*" style="display:none;" onchange="previewEditBrandImage()">
+                    </div>
+                    <div id="editBrandImagePreview" style="display:none; margin-top:10px; text-align:center;">
+                        <img id="editBrandPreviewImg" class="image-preview" style="width:100px; height:100px; border-radius:12px; object-fit:cover;">
+                        <button class="btn-danger" onclick="clearEditBrandImage()" style="padding:4px 12px; margin-top:8px;">🗑️ حذف</button>
+                    </div>
+                </div>
             </div>
             <div style="display:flex; gap:10px; margin-top:15px;">
                 <button class="btn-success" onclick="saveEditBrand(${brandId})" style="flex:1;">💾 ذخیره</button>
@@ -1272,7 +1437,9 @@
             </div>
         `;
 
-        showModal('editBrandModal', '✏️ ویرایش برند', modalHtml);
+        document.getElementById('editBrandModalTitle').innerHTML = '✏️ ویرایش برند';
+        document.getElementById('editBrandModalBody').innerHTML = modalHtml;
+        document.getElementById('editBrandModal').style.display = 'flex';
     }
 
     async function saveEditBrand(brandId) {
@@ -1282,11 +1449,17 @@
             return;
         }
 
+        let imageBase64 = null;
+        if (pendingEditBrandImage) {
+            imageBase64 = await fileToBase64(pendingEditBrandImage);
+        }
+
         const data = {
             title: title,
             description: document.getElementById('editBrandDescription').value || '',
             status: document.getElementById('editBrandStatus').value === 'true',
-            is_catalog: document.getElementById('editBrandIsCatalog').value === 'true'
+            is_catalog: document.getElementById('editBrandIsCatalog').value === 'true',
+            image_base64: imageBase64
         };
 
         try {
@@ -1301,6 +1474,7 @@
                 closeModal('editBrandModal');
                 loadBrands();
                 loadSelectOptions();
+                pendingEditBrandImage = null;
             } else {
                 showToast(result.error || 'خطا در ویرایش', true);
             }
@@ -1316,18 +1490,22 @@
         if(data.success) {
             document.getElementById('categoriesList').innerHTML = data.data.map(c => `
                 <div class="manager-list-item">
-                    <div>
-                        <strong>📂 ${c.title}</strong>
-                        <small>${c.parent_title ? `(والد: ${c.parent_title})` : ''}</small>
-                        <div style="margin-top:4px; display:flex; flex-wrap:wrap; gap:4px;">
-                            ${c.brands && c.brands.length > 0 ?
-                                c.brands.map(b => `<span class="badge badge-active" style="font-size:0.65rem; padding:2px 10px;">🏷️ ${b.title}</span>`).join('') :
-                                `<span style="color:#64748b; font-size:0.75rem;">بدون برند</span>`
-                            }
+                    <div style="display:flex; align-items:center; gap:12px; flex:1;">
+                        ${c.image ? `<img src="${c.image}" style="width:40px; height:40px; border-radius:10px; object-fit:cover; border:2px solid #334155;">` :
+                        `<div style="width:40px; height:40px; border-radius:10px; background:#0f172a; display:flex; align-items:center; justify-content:center; border:2px solid #334155;"><span style="color:#64748b; font-size:1.2rem;">📂</span></div>`}
+                        <div>
+                            <strong style="color:#fff;">${c.title}</strong>
+                            <small style="color:#94a3b8;">${c.parent_title ? `(والد: ${c.parent_title})` : ''}</small>
+                            <div style="margin-top:4px; display:flex; flex-wrap:wrap; gap:4px;">
+                                ${c.brands && c.brands.length > 0 ?
+                                    c.brands.map(b => `<span class="badge badge-active" style="font-size:0.65rem; padding:2px 10px;">🏷️ ${b.title}</span>`).join('') :
+                                    `<span style="color:#64748b; font-size:0.75rem;">بدون برند</span>`
+                                }
+                            </div>
                         </div>
                     </div>
                     <div style="display:flex; gap:6px; align-items:center;">
-                        <button class="btn-warning btn-sm" onclick="editCategoryBrands(${c.id}, '${c.title}')" style="padding:4px 10px; font-size:0.75rem;">✏️ برندها</button>
+                        <button class="btn-warning btn-sm" onclick="editCategory(${c.id})" style="padding:4px 10px; font-size:0.75rem;">✏️</button>
                         <button class="btn-danger btn-sm" onclick="deleteCategory(${c.id})" style="padding:4px 10px; font-size:0.75rem;">🗑️</button>
                     </div>
                 </div>
@@ -1335,6 +1513,7 @@
         }
     }
 
+    // ==================== ایجاد دسته‌بندی ====================
     async function quickAddCategory() {
         const name = document.getElementById('newCategoryName')?.value;
         if(!name) { showToast('نام دسته را وارد کنید', true); return; }
@@ -1343,6 +1522,11 @@
         const brandsSelect = document.getElementById('newCategoryBrands');
         const selectedBrands = Array.from(brandsSelect?.selectedOptions || []).map(opt => parseInt(opt.value));
 
+        let imageBase64 = null;
+        if (pendingCategoryImage) {
+            imageBase64 = await fileToBase64(pendingCategoryImage);
+        }
+
         try {
             const res = await fetch('/panel/api/categories/create/', {
                 method: 'POST',
@@ -1350,7 +1534,8 @@
                 body: JSON.stringify({
                     title: name,
                     parent_id: parent || null,
-                    brands: selectedBrands
+                    brands: selectedBrands,
+                    image_base64: imageBase64
                 })
             });
             const result = await res.json();
@@ -1362,40 +1547,170 @@
                 if(brandsSelect) {
                     Array.from(brandsSelect.options).forEach(opt => opt.selected = false);
                 }
+                clearCategoryImage();
             } else {
                 showToast(result.error, true);
             }
         } catch(e) { showToast('خطا در ارتباط', true); }
     }
 
+    // ==================== حذف دسته‌بندی ====================
     async function deleteCategory(id){
         if(!confirm('آیا از حذف این دسته‌بندی اطمینان دارید؟')) return;
-
         try {
             const response = await fetch(`/panel/api/categories/${id}/delete/`, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() }
+                headers: { 'X-CSRFToken': getCSRFToken() }
             });
             const result = await response.json();
-
             if(result.success){
-                showToast(result.message || 'دسته‌بندی با موفقیت حذف شد');
+                showToast('دسته‌بندی با موفقیت حذف شد');
                 loadCategories();
                 loadSelectOptions();
             } else {
                 showToast(result.error || 'خطا در حذف دسته‌بندی', true);
             }
-        } catch(e) {
-            showToast('خطا در ارتباط با سرور', true);
-            console.error(e);
+        } catch(e) { showToast('خطا در ارتباط با سرور', true); }
+    }
+
+    // ==================== ویرایش دسته‌بندی (با آپلود عکس) ====================
+    function previewEditCategoryImage() {
+        const input = document.getElementById('editCategoryImageInput');
+        if (input.files && input.files[0]) {
+            pendingEditCategoryImage = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('editCategoryPreviewImg').src = e.target.result;
+                document.getElementById('editCategoryImageUploadArea').style.display = 'none';
+                document.getElementById('editCategoryImagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
         }
     }
 
-    // ====== ویرایش برندهای دسته‌بندی ======
+    function clearEditCategoryImage() {
+        pendingEditCategoryImage = null;
+        document.getElementById('editCategoryImageInput').value = '';
+        document.getElementById('editCategoryImageUploadArea').style.display = 'block';
+        document.getElementById('editCategoryImagePreview').style.display = 'none';
+    }
+
+    async function editCategory(categoryId) {
+        const res = await fetch(`/panel/api/categories/${categoryId}/`);
+        const data = await res.json();
+        if(!data.success) {
+            showToast('خطا در دریافت اطلاعات', true);
+            return;
+        }
+
+        const category = data.data;
+
+        // دریافت لیست برندها برای انتخاب
+        const brandsRes = await fetch('/panel/api/brands/?page_size=100');
+        const brandsData = await brandsRes.json();
+
+        // دریافت لیست دسته‌بندی‌ها برای والد
+        const catsRes = await fetch('/panel/api/categories/?page_size=100');
+        const catsData = await catsRes.json();
+
+        const modalHtml = `
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>نام دسته‌بندی <span style="color:#ef4444;">*</span></label>
+                    <input type="text" id="editCategoryName" class="form-control" value="${category.title}">
+                </div>
+                <div class="form-group">
+                    <label>دسته والد (اختیاری)</label>
+                    <select id="editCategoryParent" class="form-control">
+                        <option value="">بدون والد</option>
+                        ${catsData.success ? catsData.data.map(c => `
+                            <option value="${c.id}" ${c.id === category.parent_id ? 'selected' : ''}>${c.title}</option>
+                        `).join('') : ''}
+                    </select>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>برندهای مرتبط با این دسته‌بندی</label>
+                    <select id="editCategoryBrands" class="form-control" multiple style="min-height:120px;">
+                        ${brandsData.success ? brandsData.data.map(b => `
+                            <option value="${b.id}" ${category.brands.includes(b.id) ? 'selected' : ''}>${b.title}</option>
+                        `).join('') : ''}
+                    </select>
+                    <small style="color:#64748b; display:block; margin-top:5px;">برای انتخاب چند برند، کلید Ctrl (یا Cmd در مک) را نگه دارید و کلیک کنید</small>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>🖼️ تصویر دسته‌بندی</label>
+                    ${category.image ? `<div style="margin-bottom:10px;"><img src="${category.image}" style="width:80px; height:80px; border-radius:12px; object-fit:cover; border:2px solid #667eea;"></div>` : ''}
+                    <div class="image-upload-area" id="editCategoryImageUploadArea" onclick="document.getElementById('editCategoryImageInput').click()">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #667eea;"></i>
+                        <p style="color: #94a3b8; margin-top: 8px;">برای آپلود تصویر جدید کلیک کنید</p>
+                        <input type="file" id="editCategoryImageInput" accept="image/*" style="display:none;" onchange="previewEditCategoryImage()">
+                    </div>
+                    <div id="editCategoryImagePreview" style="display:none; margin-top:10px; text-align:center;">
+                        <img id="editCategoryPreviewImg" class="image-preview" style="width:100px; height:100px; border-radius:12px; object-fit:cover;">
+                        <button class="btn-danger" onclick="clearEditCategoryImage()" style="padding:4px 12px; margin-top:8px;">🗑️ حذف</button>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="btn-success" onclick="saveEditCategory(${categoryId})" style="flex:1;">💾 ذخیره</button>
+                <button class="btn-danger" onclick="closeModal('editCategoryModal')" style="flex:1;">❌ انصراف</button>
+            </div>
+        `;
+
+        document.getElementById('editCategoryModalTitle').innerHTML = '✏️ ویرایش دسته‌بندی';
+        document.getElementById('editCategoryModalBody').innerHTML = modalHtml;
+        document.getElementById('editCategoryModal').style.display = 'flex';
+    }
+
+    async function saveEditCategory(categoryId) {
+        const title = document.getElementById('editCategoryName').value.trim();
+        if(!title) {
+            showToast('نام دسته‌بندی الزامی است', true);
+            return;
+        }
+
+        const parent = document.getElementById('editCategoryParent').value;
+        const brandsSelect = document.getElementById('editCategoryBrands');
+        const selectedBrands = Array.from(brandsSelect?.selectedOptions || []).map(opt => parseInt(opt.value));
+
+        let imageBase64 = null;
+        if (pendingEditCategoryImage) {
+            imageBase64 = await fileToBase64(pendingEditCategoryImage);
+        }
+
+        const data = {
+            title: title,
+            parent_id: parent || null,
+            brands: selectedBrands,
+            image_base64: imageBase64,
+            status: true
+        };
+
+        try {
+            const res = await fetch(`/panel/api/categories/${categoryId}/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if(result.success) {
+                showToast('دسته‌بندی با موفقیت ویرایش شد');
+                closeModal('editCategoryModal');
+                loadCategories();
+                loadSelectOptions();
+                pendingEditCategoryImage = null;
+            } else {
+                showToast(result.error || 'خطا در ویرایش', true);
+            }
+        } catch(e) {
+            showToast('خطا در ارتباط با سرور', true);
+        }
+    }
+
+    // ==================== ویرایش برندهای دسته‌بندی ====================
     async function editCategoryBrands(categoryId, categoryTitle) {
         const res = await fetch(`/panel/api/categories/${categoryId}/`);
         const data = await res.json();
-
         if(!data.success) {
             showToast('خطا در دریافت اطلاعات', true);
             return;
@@ -1431,7 +1746,9 @@
             </div>
         `;
 
-        showModal('editCategoryBrandsModal', '✏️ ویرایش برندهای دسته‌بندی', modalHtml);
+        document.getElementById('editCategoryBrandsModalTitle').innerHTML = '✏️ ویرایش برندهای دسته‌بندی';
+        document.getElementById('editCategoryBrandsModalBody').innerHTML = modalHtml;
+        document.getElementById('editCategoryBrandsModal').style.display = 'flex';
     }
 
     async function saveCategoryBrands(categoryId) {
@@ -1457,29 +1774,6 @@
         }
     }
 
-    // ====== تابع نمایش مودال ======
-    function showModal(modalId, title, bodyHtml) {
-        let modal = document.getElementById(modalId);
-        if(!modal) {
-            modal = document.createElement('div');
-            modal.id = modalId;
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-                        <h3 id="${modalId}Title" style="color:#fff;">${title}</h3>
-                        <button onclick="closeModal('${modalId}')" style="background:#ef4444; border:none; width:34px; height:34px; border-radius:50%; color:white; cursor:pointer; font-size:1.2rem;">&times;</button>
-                    </div>
-                    <div id="${modalId}Body"></div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-        document.getElementById(`${modalId}Title`).innerHTML = title;
-        document.getElementById(`${modalId}Body`).innerHTML = bodyHtml;
-        modal.style.display = 'flex';
-    }
-
     // ==================== کاتالوگ ====================
     async function loadCatalogs() {
         const res = await fetch('/panel/api/catalogs/?page_size=100');
@@ -1487,7 +1781,11 @@
         if(data.success) {
             document.getElementById('catalogsList').innerHTML = data.data.map(c => `
                 <div class="manager-list-item">
-                    <div><strong>📁 ${c.title}</strong> <small>${c.brand_title ? `(${c.brand_title})` : ''}</small></div>
+                    <div>
+                        <strong style="color:#fff;">📁 ${c.title}</strong>
+                        <small style="color:#94a3b8;">${c.brand_title ? `(${c.brand_title})` : ''}</small>
+                        ${c.image ? `<img src="${c.image}" style="width:30px; height:30px; border-radius:8px; object-fit:cover; margin-right:10px;">` : ''}
+                    </div>
                     <button class="btn-danger" onclick="deleteCatalog(${c.id})">🗑️ حذف</button>
                 </div>
             `).join('');
@@ -1519,25 +1817,20 @@
 
     async function deleteCatalog(id){
         if(!confirm('آیا از حذف این کاتالوگ اطمینان دارید؟')) return;
-
         try {
             const response = await fetch(`/panel/api/catalogs/${id}/delete/`, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() }
+                headers: { 'X-CSRFToken': getCSRFToken() }
             });
             const result = await response.json();
-
             if(result.success){
-                showToast(result.message || 'کاتالوگ با موفقیت حذف شد');
+                showToast('کاتالوگ با موفقیت حذف شد');
                 loadCatalogs();
                 loadSelectOptions();
             } else {
                 showToast(result.error || 'خطا در حذف کاتالوگ', true);
             }
-        } catch(e) {
-            showToast('خطا در ارتباط با سرور', true);
-            console.error(e);
-        }
+        } catch(e) { showToast('خطا در ارتباط با سرور', true); }
     }
 
     // ==================== ویژگی‌ها ====================
@@ -1547,7 +1840,7 @@
         if(data.success) {
             document.getElementById('attributesList').innerHTML = data.data.map(a => `
                 <div class="manager-list-item">
-                    <div><strong>🏷️ ${a.name}</strong> <small>کد: ${a.code || '-'}</small></div>
+                    <div><strong style="color:#fff;">🏷️ ${a.name}</strong> <small style="color:#94a3b8;">کد: ${a.code || '-'}</small></div>
                     <button class="btn-danger" onclick="deleteAttribute(${a.id})">🗑️ حذف</button>
                 </div>
             `).join('');
@@ -1577,24 +1870,19 @@
 
     async function deleteAttribute(id){
         if(!confirm('آیا از حذف این ویژگی اطمینان دارید؟')) return;
-
         try {
             const response = await fetch(`/panel/api/attributes/${id}/delete/`, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() }
+                headers: { 'X-CSRFToken': getCSRFToken() }
             });
             const result = await response.json();
-
             if(result.success){
-                showToast(result.message || 'ویژگی با موفقیت حذف شد');
+                showToast('ویژگی با موفقیت حذف شد');
                 loadAttributes();
             } else {
                 showToast(result.error || 'خطا در حذف ویژگی', true);
             }
-        } catch(e) {
-            showToast('خطا در ارتباط با سرور', true);
-            console.error(e);
-        }
+        } catch(e) { showToast('خطا در ارتباط با سرور', true); }
     }
 
     // ==================== واحد فروش ====================
