@@ -31,7 +31,7 @@
 <style>
     /* ============================================
        PRODUCT PAGE - DYNAMIC SALES UNIT - FINAL WITH WISHLIST & CART COUNTER
-       Version: 36.0 - Fixed No Photo default image
+       Version: 37.0 - Fixed No Photo default image + Disabled Add to Cart on Out of Stock
     ============================================ */
 
     :root {
@@ -643,6 +643,12 @@
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(233, 101, 0, 0.3);
     }
+    .sticky-add-btn:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
     .sticky-stock {
         text-align: center;
         font-size: 0.7rem;
@@ -765,6 +771,10 @@
         gap: 5px;
         cursor: pointer;
         white-space: nowrap;
+    }
+    .mobile-add-btn:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
     }
     .mobile-package-info {
         margin-top: 8px;
@@ -945,6 +955,17 @@
         font-size: 3rem;
         color: #cbd5e1;
     }
+
+    /* Stock badge */
+    .stock-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 40px;
+        font-size: 0.7rem;
+        font-weight: 700;
+    }
+    .stock-badge.in-stock { background: #dcfce7; color: #166534; }
+    .stock-badge.out-of-stock { background: #fee2e2; color: #991b1b; }
 </style>
 
 <div class="product-page">
@@ -1056,6 +1077,16 @@
 
                         <h1 class="product-title">{{ product.title }}</h1>
                         <div class="product-code"><i class="fas fa-barcode"></i> کد: {{ product.code|default:'نامشخص' }}</div>
+
+                        <!-- Stock Badge -->
+                        <div>
+                            {% if has_stock %}
+                                <span class="stock-badge in-stock"><i class="fas fa-check-circle"></i> موجود</span>
+                            {% else %}
+                                <span class="stock-badge out-of-stock"><i class="fas fa-times-circle"></i> ناموجود</span>
+                            {% endif %}
+                        </div>
+
                         <div class="description-text">{{ product.description|default:'مناسب برای دکوراسیون مدرن و کلاسیک، مقاوم در برابر رطوبت، نصب آسان.'|truncatewords:35 }}</div>
 
                         <div class="features-wrapper">
@@ -1137,9 +1168,9 @@
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <div class="sticky-input-wrapper">
-                                <button class="sticky-qty-btn" id="stickyMinus">−</button>
-                                <input type="text" class="sticky-qty-input" id="stickyQtyInput" value="{{ order_summary.requested_quantity|default:1 }}">
-                                <button class="sticky-qty-btn" id="stickyPlus">+</button>
+                                <button class="sticky-qty-btn" id="stickyMinus" {% if not has_stock %}disabled style="opacity:0.4;cursor:not-allowed;"{% endif %}>−</button>
+                                <input type="text" class="sticky-qty-input" id="stickyQtyInput" value="{{ order_summary.requested_quantity|default:1 }}" {% if not has_stock %}disabled{% endif %}>
+                                <button class="sticky-qty-btn" id="stickyPlus" {% if not has_stock %}disabled style="opacity:0.4;cursor:not-allowed;"{% endif %}>+</button>
                                 <span class="sticky-unit-symbol" id="stickyUnitSymbol">{{ sales_unit_info.symbol }}</span>
                             </div>
                             <div class="calc-icon-btn" id="pcCalcIcon">
@@ -1172,12 +1203,12 @@
                     <div class="sticky-total-price" id="stickyTotal">{{ order_summary.total_price_display }} تومان</div>
                 </div>
 
-                <button class="sticky-add-btn" id="stickyAddBtn">
-                    <i class="fas fa-shopping-bag"></i> افزودن به سبد خرید
+                <button class="sticky-add-btn" id="stickyAddBtn" {% if not has_stock %}disabled{% endif %}>
+                    <i class="fas fa-shopping-bag"></i> {% if has_stock %}افزودن به سبد خرید{% else %}ناموجود{% endif %}
                 </button>
 
                 <div class="sticky-stock">
-                    <i class="fas fa-check-circle" style="color: var(--success);"></i> {{ stock_status }}
+                    <i class="fas {% if has_stock %}fa-check-circle" style="color: var(--success);{% else %}fa-times-circle" style="color: var(--error);{% endif %}"></i> {{ stock_status }}
                     {% if has_stock and product.stock %}
                         | موجودی:
                         {% if package_info.use_packaging %}
@@ -1209,15 +1240,15 @@
         </div>
         <div class="mobile-controls">
             <div class="mobile-qty-box">
-                <button class="mobile-qty-btn" id="mobileMinus">−</button>
-                <input type="text" class="mobile-qty-input" id="mobileQtyInput" value="{{ order_summary.requested_quantity|default:1 }}">
-                <button class="mobile-qty-btn" id="mobilePlus">+</button>
+                <button class="mobile-qty-btn" id="mobileMinus" {% if not has_stock %}disabled style="opacity:0.4;cursor:not-allowed;"{% endif %}>−</button>
+                <input type="text" class="mobile-qty-input" id="mobileQtyInput" value="{{ order_summary.requested_quantity|default:1 }}" {% if not has_stock %}disabled{% endif %}>
+                <button class="mobile-qty-btn" id="mobilePlus" {% if not has_stock %}disabled style="opacity:0.4;cursor:not-allowed;"{% endif %}>+</button>
             </div>
             <button class="mobile-calc-btn" id="mobileCalcIcon">
                 <i class="fas fa-calculator"></i>
             </button>
-            <button class="mobile-add-btn" id="mobileAddBtn">
-                <i class="fas fa-shopping-bag"></i> خرید
+            <button class="mobile-add-btn" id="mobileAddBtn" {% if not has_stock %}disabled{% endif %}>
+                <i class="fas fa-shopping-bag"></i> {% if has_stock %}خرید{% else %}ناموجود{% endif %}
             </button>
         </div>
     </div>
@@ -1284,6 +1315,7 @@
     const originalPrice = {{ product.price|default:0 }};
     const hasDiscount = {{ show_discount_badge|yesno:"true,false" }};
     const discountPercent = {{ discount_percent|default:0 }};
+    const hasStock = {{ has_stock|yesno:"true,false" }};
 
     // فیلتر کردن تصاویر خالی و جایگزینی با DEFAULT_IMAGE
     if (galleryImages && galleryImages.length > 0) {
@@ -1480,6 +1512,10 @@
     }
 
     function increment() {
+        if (!hasStock) {
+            showToast("این محصول ناموجود است", true);
+            return;
+        }
         let newVal = requestedQuantity + packageConfig.step;
         if (packageConfig.maxStockPackages > 0) {
             if (packageConfig.usePackaging) {
@@ -1499,6 +1535,7 @@
     }
 
     function decrement() {
+        if (!hasStock) return;
         if (requestedQuantity > packageConfig.minOrder) {
             setQuantity(requestedQuantity - packageConfig.step);
         } else {
@@ -1583,20 +1620,16 @@
         const cartPanel = document.getElementById('cartPanel');
         if (!cartPanel) return;
 
-        // Clear any existing timeout to reset the timer
         if (cartPanelTimeout) {
             clearTimeout(cartPanelTimeout);
         }
 
-        // Open the cart panel
         cartPanel.classList.add('open');
 
-        // Refresh cart content to ensure it's up to date
         if (typeof window.renderCart === 'function') {
             window.renderCart();
         }
 
-        // Set timeout to close after 3 seconds
         cartPanelTimeout = setTimeout(() => {
             cartPanel.classList.remove('open');
             cartPanelTimeout = null;
@@ -1607,6 +1640,12 @@
     // Add to Cart with API + Auto open cart panel
     // ============================================
     async function addToCartWithAPI() {
+        // اگر محصول موجود نیست، اجازه نده
+        if (!hasStock) {
+            showToast("این محصول ناموجود است", true);
+            return false;
+        }
+
         let isOverStock = false;
         if (packageConfig.usePackaging) {
             if (packages > packageConfig.maxStockPackages) isOverStock = true;
@@ -1664,7 +1703,6 @@
                     await updateCartCounter();
                 }
 
-                // 🚀 OPEN CART PANEL AUTOMATICALLY AFTER ADDING TO CART
                 openCartPanelTemporary();
 
                 window.dispatchEvent(new CustomEvent('cartUpdated'));
@@ -1680,11 +1718,13 @@
         } finally {
             if (stickyBtn) {
                 stickyBtn.innerHTML = originalStickyText;
-                stickyBtn.disabled = false;
+                if (!hasStock) stickyBtn.disabled = true;
+                else stickyBtn.disabled = false;
             }
             if (mobileBtn) {
                 mobileBtn.innerHTML = originalMobileText;
-                mobileBtn.disabled = false;
+                if (!hasStock) mobileBtn.disabled = true;
+                else mobileBtn.disabled = false;
             }
         }
     }
@@ -1896,7 +1936,6 @@ const CartAPI = {
 };
 
 // تابع ایجاد سفارش و هدایت به checkout
-// تابع ایجاد سفارش و هدایت به checkout با دیباگ
 async function createOrderAndRedirect() {
     console.log("===== createOrderAndRedirect CALLED =====");
 
@@ -1911,7 +1950,6 @@ async function createOrderAndRedirect() {
         checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال ایجاد سفارش...';
         checkoutBtn.disabled = true;
 
-        // اول تست کن ببین ویو تست کار می‌کند یا نه
         console.log("Sending request to test endpoint...");
         const testResponse = await fetch('/order/test/', {
             method: 'GET',
@@ -1927,7 +1965,6 @@ async function createOrderAndRedirect() {
         if (testResult.success) {
             console.log("Test view works! Now trying real order creation...");
 
-            // حالا درخواست واقعی
             const response = await fetch('/order/create/', {
                 method: 'GET',
                 headers: {
@@ -2054,7 +2091,6 @@ function renderCart() {
     const cartCountElem = document.getElementById('cartCount');
     if (cartCountElem) cartCountElem.innerText = totalQty;
 
-    // اتصال دکمه ثبت سفارش
     const finalCheckoutBtn = document.getElementById('finalCheckoutBtn');
     if (finalCheckoutBtn) {
         finalCheckoutBtn.onclick = createOrderAndRedirect;

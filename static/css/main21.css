@@ -122,7 +122,7 @@
         }
 
         .logo-icon-side {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+
             width: 48px;
             height: 48px;
             border-radius: 16px;
@@ -131,7 +131,7 @@
             justify-content: center;
             color: white;
             font-size: 1.5rem;
-            box-shadow: 0 10px 20px rgba(232, 122, 31, 0.3);
+
             overflow: hidden;
             transition: all 0.3s ease;
         }
@@ -207,7 +207,7 @@
             align-items: center;
             gap: 12px;
             cursor: pointer;
-            padding: 4px 12px;
+
             border-radius: 20px;
             transition: 0.3s;
             background: rgba(255,255,255,0.05);
@@ -217,8 +217,8 @@
             transform: scale(1.02);
         }
         .top-info-bar .user-info img {
-            width: 42px;
-            height: 42px;
+            width: 65px;
+            height: 57px;
             border-radius: 50%;
             border: 2px solid var(--primary);
             transition: transform 0.3s;
@@ -288,16 +288,16 @@
         .header-right-side {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 1px;
         }
         .header-logo {
             display: none;
             align-items: center;
-            gap: 10px;
+            gap: 1px;
         }
         .header-logo .logo-icon-side {
-            width: 40px;
-            height: 40px;
+            width: 72px;
+            height: 60px;
             font-size: 1.2rem;
             border-radius: 12px;
             overflow: hidden;

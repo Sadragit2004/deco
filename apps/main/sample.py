@@ -12,7 +12,7 @@ from .models import Portfolio, PortfolioGallery
 def portfolio_list_api(request):
     """API لیست همه نمونه کارها"""
     if request.method == 'GET':
-        portfolios = Portfolio.objects.filter().order_by('-created_at')
+        portfolios = Portfolio.objects.filter(is_active=True).order_by('-created_at')
 
         data = []
         for p in portfolios:

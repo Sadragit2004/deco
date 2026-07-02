@@ -1,9 +1,9 @@
 <header class="main-header">
     <div class="header-right-side">
-        <div class="menu-toggle-mobile" id="mobileMenuBtn"><i class="fas fa-bars"></i></div>
+        <div style="background: none; box-shadow: none; border: none;" class="menu-toggle-mobile"  id="mobileMenuBtn"><i style="font-size:20px;" class="fas fa-bars"></i></div>
         <div class="header-logo">
             <div class="logo-icon-side">
-                <img src="/media/images/logo1.jpg" alt="Logo">
+                <img src="/media/images/Deco.png" alt="Logo">
             </div>
             <div class="header-logo-text"><strong>Deco B2B</strong><span>تخصصی B2B</span></div>
         </div>
@@ -34,8 +34,8 @@
         </div>
     </div>
 
-    <div class="search-wrapper">
-        <div class="search-box-header">
+    <div style=" height: 45px;" class="search-wrapper">
+        <div style="height: 45px;" class="search-box-header">
             <div class="search-icon-wrapper">
                 <i class="fas fa-search search-icon-header"></i>
             </div>
@@ -48,7 +48,7 @@
         <div class="search-suggestions" id="searchSuggestions"></div>
     </div>
 
-    <div class="header-actions">
+    <div style="padding:6px;" class="header-actions">
         <div class="icon-btn-header" id="cartIcon"><i class="fas fa-shopping-bag"></i><span class="badge-count" id="cartCount">0</span></div>
         <div class="icon-btn-header" id="notifIcon"><i class="far fa-bell"></i><span class="badge-count">0</span></div>
     </div>
@@ -86,7 +86,7 @@
 .header-logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+
 }
 
 .logo-icon-side img {
@@ -928,7 +928,7 @@
     }
 
     .search-box-header input::placeholder {
-        font-size: 0.8rem;
+        font-size: 15px;
     }
 
     .search-btn-header {
@@ -995,12 +995,10 @@
         right: -4px;
     }
 
-    .header-logo-text strong {
-        font-size: 1.1rem;
-    }
+
 
     .logo-icon-side img {
-        height: 38px;
+        height: 67px;
     }
 }
 
@@ -1011,7 +1009,7 @@
     }
 
     .header-right-side {
-        gap: 10px;
+        gap: 1px;
     }
 
     .menu-toggle-mobile {
@@ -1021,12 +1019,10 @@
     }
 
     .logo-icon-side img {
-        height: 34px;
+        height: 67px;
     }
 
-    .header-logo-text strong {
-        font-size: 1rem;
-    }
+
 
     .header-logo-text span {
         font-size: 0.5rem;
@@ -1122,7 +1118,7 @@
     }
 
     .header-right-side {
-        gap: 6px;
+        gap: 1px;
     }
 
     .menu-toggle-mobile {
@@ -1133,19 +1129,20 @@
     }
 
     .logo-icon-side img {
-        height: 28px;
+        height: 67px;
     }
 
     .header-logo-text strong {
-        font-size: 0.85rem;
+        font-size: 15px;
     }
 
     .header-logo-text span {
-        font-size: 0.4rem;
+        font-size: 10px;
     }
 
     .search-wrapper {
         margin-top: 4px;
+
     }
 
     .search-box-header {
@@ -1170,7 +1167,8 @@
     }
 
     .search-box-header input::placeholder {
-        font-size: 0.65rem;
+        font-size: 12px;
+        font-weight: 700;
     }
 
     .search-btn-header {
@@ -1312,8 +1310,7 @@
 
 /* دکمه منوی موبایل با افکت شیشه‌ای */
 .menu-toggle-mobile {
-    background: rgba(241, 245, 249, 0.6) !important;
-    backdrop-filter: blur(8px) !important;
+
     -webkit-backdrop-filter: blur(8px) !important;
 }
 
