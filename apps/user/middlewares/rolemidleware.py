@@ -31,7 +31,9 @@ class RolePermissionMiddleware:
             '/admin/',
             '/static/',
             '/media/',
-            '/admin/'
+            '/admin/',
+            '/accounts/register/',
+            '/accounts/register/success/',
         ]
 
         # بررسی مسیرهای عمومی

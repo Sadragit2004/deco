@@ -80,16 +80,19 @@
         max-width: calc(100vw - 60px);
         height: 580px;
         max-height: calc(100vh - 180px);
-        background: rgba(255, 255, 255, 0.92);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        background-image: url('/media/chat-background.jpg');
+        background-size: cover;
+        background-position: center;
+        background-color: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(18px) saturate(180%);
+        -webkit-backdrop-filter: blur(18px) saturate(180%);
         border-radius: 28px;
-        box-shadow: 0 30px 90px rgba(0,0,0,0.22), 0 0 0 1px rgba(255,255,255,0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+        box-shadow: 0 30px 90px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.2), inset 0 1px 0 rgba(255,255,255,0.3);
         display: none !important;
         flex-direction: column;
         overflow: hidden;
         font-family: 'Tahoma', 'Segoe UI', sans-serif;
-        border: 1px solid rgba(255,255,255,0.3);
+        border: 1px solid rgba(255,255,255,0.25);
     }
     .chat-fab-wrapper .chat-container.open {
         display: flex !important;
@@ -226,8 +229,9 @@
         flex: 1;
         padding: 18px 18px;
         overflow-y: auto;
-        background: rgba(229, 221, 213, 0.5);
+        background: rgba(255, 255, 255, 0.08);
         backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
         display: flex;
         flex-direction: column;
         gap: 6px;
@@ -737,7 +741,7 @@
         <div class="chat-header">
             <div class="avatar"><i class="fas fa-headset"></i></div>
             <div class="info">
-                <h3>پشتیبانی فروشگاه</h3>
+                <h3>پشتیبانی B2B</h3>
                 <small id="connection-status">
                     <span class="online-dot" id="status-dot"></span>
                     در حال اتصال...
@@ -1563,6 +1567,59 @@
         });
 
         console.log('✅ چت آماده است!');
+
+        // ============================================================
+        //  ارسال پیام خوش‌آمدگویی خودکار - فقط UI
+        // ============================================================
+        const WELCOME_KEY = 'chat_welcome_sent_' + window.location.host;
+
+        function showWelcomeMessage() {
+            if (localStorage.getItem(WELCOME_KEY) === 'true') return;
+            if (document.querySelectorAll('.message').length > 0) {
+                localStorage.setItem(WELCOME_KEY, 'true');
+                return;
+            }
+
+            const emptyState = document.getElementById('empty-state');
+            if (emptyState) emptyState.remove();
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message received';
+            msgDiv.innerHTML = `
+                <div class="sender-name"><i class="fas fa-user-circle"></i> 🛡️ پشتیبانی</div>
+                <div class="message-text">سلام! وقت بخیر 😊<br>چه کمکی می‌تونم بکنم؟</div>
+                <span class="time"><i class="far fa-clock"></i> ${new Date().toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'})}</span>
+            `;
+
+            messagesContainer.appendChild(msgDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            localStorage.setItem(WELCOME_KEY, 'true');
+            console.log('✅ پیام خوش‌آمدگویی نمایش داده شد');
+        }
+
+        // وقتی چت باز میشه
+        const observer = new MutationObserver(() => {
+            if (chatContainer.classList.contains('open')) {
+                setTimeout(showWelcomeMessage, 500);
+            }
+        });
+        observer.observe(chatContainer, { attributes: true, attributeFilter: ['class'] });
+
+        // اگه از قبل باز بود
+        setTimeout(() => {
+            if (chatContainer.classList.contains('open')) {
+                showWelcomeMessage();
+            }
+        }, 1000);
+
+        // همچنین وقتی تاریخچه بارگذاری میشه
+        const originalLoad = loadChatHistory;
+        loadChatHistory = function() {
+            originalLoad();
+            setTimeout(showWelcomeMessage, 500);
+        };
+
+        console.log('✅ سیستم خوش‌آمدگویی فعال شد');
 
     })();
 </script>

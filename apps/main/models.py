@@ -153,11 +153,13 @@ class Portfolio(models.Model):
         related_name="portfolios",
         verbose_name="کاربر مربوطه"
     )
+    
     is_active = models.BooleanField(
         default=False,
         verbose_name="تایید شده",
         help_text="آیا این نمونه کار تایید و منتشر شود؟"
     )
+
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ثبت")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="تاریخ بروزرسانی")
 

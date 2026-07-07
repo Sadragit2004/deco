@@ -1,4 +1,6 @@
+
 {% load static %}
+{% load humanize %}
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">
 <head>
@@ -946,7 +948,7 @@
                                         <i class="fas fa-wallet"></i>
                                         <span>کیف پول</span>
                                     </div>
-                                    <div class="wallet-balance" id="walletBalance">{{ wallet_balance_display|default:"۰" }} تومان</div>
+                                    <div class="wallet-balance" id="walletBalance">{{ wallet_balance_display|intcomma }} تومان</div>
                                 </div>
                                 <div id="walletUseSection" style="{% if used_from_wallet > 0 %}display:none;{% endif %}">
                                     <div class="info-box-wallet">
@@ -973,13 +975,13 @@
                                         <div class="used-info">
                                             <i class="fas fa-check-circle"></i>
                                             <span>استفاده از کیف پول:</span>
-                                            <strong id="usedAmountDisplay">{{ used_from_wallet_display|default:"۰" }} تومان</strong>
+                                            <strong id="usedAmountDisplay">{{ used_from_wallet_display|intcomma }} تومان</strong>
                                             <button type="button" id="cancelWalletBtn" class="btn-cancel-wallet">لغو</button>
                                         </div>
                                         <div class="used-info" style="background: #fff3cd; margin-bottom: 0;">
                                             <i class="fas fa-info-circle" style="color: #856404;"></i>
                                             <span>مانده کیف پول پس از کسر:</span>
-                                            <strong id="remainingWallet">{{ remaining_wallet_display|default:wallet_balance_display|default:"۰" }} تومان</strong>
+                                            <strong id="remainingWallet">{{ remaining_wallet_display|default:wallet_balance_display|intcomma }} تومان</strong>
                                         </div>
                                     </div>
                                 </div>
@@ -1121,7 +1123,7 @@
                                     <option value="">انتخاب روش ارسال</option>
                                     {% for method in shipping_methods %}
                                         <option value="{{ method.id }}" data-cost="{{ method.base_cost }}">
-                                            {{ method.name }} - {{ method.base_cost|floatformat:0 }} تومان
+                                            {{ method.name }} - {{ method.base_cost|floatformat }} تومان
                                             {% if method.delivery_time %} | {{ method.delivery_time }}{% endif %}
                                         </option>
                                     {% endfor %}
@@ -1185,8 +1187,8 @@
                                 {% endif %}
                             </div>
                             <div class="order-item-price">
-                                {% if item.discount_percent > 0 %}<div class="original-price">{{ item.unit_price_before_discount|floatformat:0 }}</div>{% endif %}
-                                <div class="final-price">{{ item.total|floatformat:0 }} تومان</div>
+                                {% if item.discount_percent > 0 %}<div class="original-price">{{ item.unit_price_before_discount|intcomma }}</div>{% endif %}
+                                <div class="final-price">{{ item.total|intcomma }} تومان</div>
                             </div>
                         </div>
                     {% empty %}
@@ -1195,20 +1197,20 @@
                 </div>
 
                 <div class="summary-totals">
-                    <div class="total-row"><span>مبلغ کل کالاها</span><span>{{ order.subtotal|floatformat:0 }} تومان</span></div>
+                    <div class="total-row"><span>مبلغ کل کالاها</span><span>{{ order.subtotal|intcomma }} تومان</span></div>
                     {% if order.discount_amount > 0 %}
                     <div class="total-row discount-row"><span><i class="fas fa-tag"></i> سود شما از خرید</span><span>{{ order.discount_amount|floatformat:0 }} تومان</span></div>
                     {% endif %}
                     <div class="total-row"><span><i class="fas fa-motorcycle"></i> هزینه ارسال</span><span id="shippingCost">{{ order.shipping_cost|floatformat:0 }} تومان</span></div>
                     <div class="total-row wallet-row" id="walletRow" style="{% if used_from_wallet == 0 %}display:none;{% endif %}">
                         <span><i class="fas fa-wallet"></i> استفاده از کیف پول</span>
-                        <span id="usedWalletAmount">- {{ used_from_wallet_display|default:"۰" }} تومان</span>
+                        <span id="usedWalletAmount">- {{ used_from_wallet_display|intcomma }} تومان</span>
                     </div>
                     <div class="total-row" id="checkRow" style="display:none;">
                         <span><i class="fas fa-money-check-alt"></i> پرداخت با چک</span>
                         <span id="checkDeductAmount">- ۰ تومان</span>
                     </div>
-                    <div class="total-row grand-total"><span>مبلغ قابل پرداخت</span><span id="grandTotal">{{ final_total|default:order.total|floatformat:0 }} تومان</span></div>
+                    <div class="total-row grand-total"><span>مبلغ قابل پرداخت</span><span id="grandTotal">{{ final_total|default:order.total|intcomma }} تومان</span></div>
                 </div>
 
                 <button type="button" class="desktop-pay-btn" id="submitOrderBtn">
@@ -1228,7 +1230,7 @@
             <div class="modal-body">
                 <div style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 20px; border-radius: 16px; text-align: center; margin-bottom: 20px;">
                     <div style="font-size: 13px; opacity: 0.9;">مبلغ قابل پرداخت</div>
-                    <div style="font-size: 28px; font-weight: 800; margin-top: 5px;" id="modalTotal">{{ final_total|default:order.total|floatformat:0 }} <span style="font-size: 14px;">تومان</span></div>
+                    <div style="font-size: 28px; font-weight: 800; margin-top: 5px;" id="modalTotal">{{ final_total|default:order.total|intcomma:0 }} <span style="font-size: 14px;">تومان</span></div>
                 </div>
                 <div style="background: #f8fafc; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
@@ -1991,3 +1993,7 @@
     </script>
 </body>
 </html>
+
+<script>
+
+</script>

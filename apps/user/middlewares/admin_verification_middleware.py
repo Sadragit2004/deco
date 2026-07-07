@@ -20,6 +20,8 @@ class AdminVerificationMiddleware(MiddlewareMixin):
     CUSTOM_PUBLIC_PATHS = [
         '/accounts/login/',
         '/admin/',
+        '/accounts/register/',
+        '/accounts/register/success/',
         '/accounts/verify/',
         '/accounts/verify-code/',
         '/accounts/logout/',

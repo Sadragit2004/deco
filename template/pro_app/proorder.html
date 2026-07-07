@@ -7,118 +7,38 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: 'Segoe UI', 'Tahoma', system-ui, sans-serif;
-            color: #1a1a2e;
-            position: relative;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-
-        #bgCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            display: block;
-            pointer-events: none;
-        }
-
-        .header, .progress-wrap, .main, .bottom-fixed, .floating-tools, .tools-panel, .color-panel {
-            position: relative;
-            z-index: 10;
-        }
-
-        .header {
-            background: rgba(26, 26, 46, 0.85);
-            backdrop-filter: blur(12px);
-            padding: 14px 20px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            transition: all 0.2s;
-            border-bottom: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', 'Tahoma', system-ui, sans-serif; color: #1a1a2e; position: relative; overflow-x: hidden; min-height: 100vh; }
+        #bgCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; display: block; pointer-events: none; }
+        .header, .progress-wrap, .main, .bottom-fixed, .floating-tools, .tools-panel, .color-panel { position: relative; z-index: 10; }
+        .header { background: rgba(26, 26, 46, 0.85); backdrop-filter: blur(12px); padding: 14px 20px; position: sticky; top: 0; z-index: 100; transition: all 0.2s; border-bottom: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
         .header.hide-header { display: none; }
         .header h1 { color: #e67e22; font-size: 1.3rem; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .header p { color: rgba(255,255,255,0.9); font-size: 0.7rem; margin-top: 4px; }
-
-        .progress-wrap {
-            background: rgba(255,255,255,0.75);
-            backdrop-filter: blur(12px);
-            padding: 10px 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.3);
-        }
+        .progress-wrap { background: rgba(255,255,255,0.75); backdrop-filter: blur(12px); padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.3); }
         .progress-wrap.hide-progress { display: none; }
-
-        .progress-steps {
-            display: flex;
-            justify-content: space-around;
-            max-width: 550px;
-            margin: 0 auto;
-        }
+        .progress-steps { display: flex; justify-content: space-around; max-width: 550px; margin: 0 auto; }
         .step { text-align: center; flex: 1; }
-        .step-badge {
-            width: 32px; height: 32px; margin: 0 auto 5px;
-            background: rgba(0,0,0,0.2); backdrop-filter: blur(4px);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 0.75rem; color: #333;
-        }
+        .step-badge { width: 32px; height: 32px; margin: 0 auto 5px; background: rgba(0,0,0,0.2); backdrop-filter: blur(4px); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; color: #333; }
         .step-badge.active { background: #e67e22; color: white; box-shadow: 0 0 12px rgba(230,126,34,0.5); }
         .step-badge.done { background: #27ae60; color: white; }
         .step-label { font-size: 9px; color: #fff; font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
         .step.active .step-label { color: #e67e22; font-weight: bold; }
-
-        .main {
-            padding: 16px 12px 80px;
-            min-height: calc(100vh - 110px);
-        }
+        .main { padding: 16px 12px 80px; min-height: calc(100vh - 110px); }
         .main.fullscreen-mode { padding: 0; height: 100vh; display: flex; flex-direction: column; }
         .container { max-width: 600px; margin: 0 auto; }
         .main.fullscreen-mode .container { max-width: 100%; height: 100%; display: flex; flex-direction: column; }
-
-        .card {
-            border-radius: 20px; padding: 16px; margin-bottom: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            backdrop-filter: blur(8px);
-            background: rgba(255, 255, 255, 0.85);
-        }
-        .card-title {
-            font-size: 1.1rem; font-weight: bold; margin-bottom: 16px;
-            border-right: 3px solid #e67e22; padding-right: 10px;
-            display: flex; align-items: center; gap: 8px; color: #1e293b;
-        }
+        .card { border-radius: 20px; padding: 16px; margin-bottom: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(8px); background: rgba(0,0,0,0.3); }
+        .card-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 16px; border-right: 3px solid #e67e22; padding-right: 10px; display: flex; align-items: center; gap: 8px; color: #ffffff; }
         .step-container { display: none; }
         .step-container.active { display: block; }
         .step-container.fullscreen-step { flex: 1; display: flex; flex-direction: column; height: 100%; }
-        .step-container.fullscreen-step .card {
-            flex: 1; border-radius: 0; margin-bottom: 0; display: flex; flex-direction: column;
-            padding: 12px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);
-        }
+        .step-container.fullscreen-step .card { flex: 1; border-radius: 0; margin-bottom: 0; display: flex; flex-direction: column; padding: 12px; background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); }
         .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .installation-item, .material-item, .pdf-item, .template-item {
-            background: rgba(248, 249, 250, 0.8); backdrop-filter: blur(4px);
-            border-radius: 16px; padding: 12px; text-align: center; cursor: pointer;
-            border: 2px solid transparent; transition: all 0.2s;
-        }
-        .installation-item.selected, .material-item.selected, .pdf-item.selected, .template-item.selected {
-            border-color: #e67e22; background: rgba(255, 248, 240, 0.95);
-            box-shadow: 0 4px 12px rgba(230,126,34,0.2);
-        }
+        .installation-item, .material-item, .pdf-item, .template-item { border-radius: 16px; padding: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; background: rgba(255,255,255,0.1); }
+        .installation-item.selected, .material-item.selected, .pdf-item.selected, .template-item.selected { border-color: #e67e22; box-shadow: 0 4px 12px rgba(230,126,34,0.2); background: rgba(230,126,34,0.15); }
         .installation-img { width: 70px; height: 70px; object-fit: cover; border-radius: 14px; margin-bottom: 6px; }
-        .installation-title, .material-title { font-weight: bold; font-size: 0.85rem; margin-top: 6px; color: #1e293b; }
+        .installation-title, .material-title { font-weight: bold; font-size: 0.85rem; margin-top: 6px; color: #ffffff; }
         .form-group { margin-bottom: 14px; }
         label { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.8rem; margin-bottom: 6px; color: #1e293b; }
         input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; font-size: 0.85rem; background: rgba(255,255,255,0.9); }
@@ -128,17 +48,17 @@
         .code-group { display: flex; gap: 8px; }
         .btn-verify { background: #e67e22; color: white; border: none; padding: 0 18px; border-radius: 12px; font-weight: bold; cursor: pointer; }
         .design-options { display: flex; gap: 12px; margin: 16px 0; }
-        .design-opt { flex: 1; background: rgba(248, 249, 250, 0.8); border-radius: 16px; padding: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; }
+        .design-opt { flex: 1; background: rgba(248,249,250,0.8); border-radius: 16px; padding: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; }
         .design-opt i { font-size: 28px; color: #e67e22; }
-        .design-opt.selected { border-color: #e67e22; background: rgba(255, 248, 240, 0.9); }
+        .design-opt.selected { border-color: #e67e22; background: rgba(255,248,240,0.9); }
         .design-area { position: relative; flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.03); border-radius: 20px; overflow: hidden; border: 1px solid rgba(0,0,0,0.08); min-height: 0; }
         .canvas-wrapper { flex: 1; position: relative; background-image: linear-gradient(to right, rgba(203,213,225,0.4) 1px, transparent 1px), linear-gradient(to bottom, rgba(203,213,225,0.4) 1px, transparent 1px); background-size: 25px 25px; background-color: rgba(255,255,255,0.6); overflow: hidden; touch-action: none; }
         #designCanvas { display: block; width: 100%; height: 100%; cursor: crosshair; position: absolute; top: 0; left: 0; }
         .floating-tools { position: fixed; bottom: 100px; right: 20px; z-index: 200; display: none; }
         .step5-active .floating-tools { display: block; }
-        .float-btn { width: 48px; height: 48px; background: rgba(26, 26, 46, 0.95); backdrop-filter: blur(8px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25); transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); color: white; font-size: 22px; border: none; }
+        .float-btn { width: 48px; height: 48px; background: rgba(26,26,46,0.95); backdrop-filter: blur(8px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.25); transition: all 0.3s cubic-bezier(0.68,-0.55,0.265,1.55); color: white; font-size: 22px; border: none; }
         .float-btn.active { background: #e67e22; transform: scale(1.1) rotate(15deg); box-shadow: 0 0 20px rgba(230,126,34,0.6); }
-        .tools-panel { position: fixed; bottom: 160px; right: 20px; background: rgba(30, 30, 40, 0.95); backdrop-filter: blur(20px); border-radius: 40px; padding: 8px; display: flex; flex-direction: column; gap: 8px; z-index: 199; transform: scale(0) translateY(30px); opacity: 0; visibility: hidden; transition: all 0.25s cubic-bezier(0.34, 1.2, 0.64, 1); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
+        .tools-panel { position: fixed; bottom: 160px; right: 20px; background: rgba(30,30,40,0.95); backdrop-filter: blur(20px); border-radius: 40px; padding: 8px; display: flex; flex-direction: column; gap: 8px; z-index: 199; transform: scale(0) translateY(30px); opacity: 0; visibility: hidden; transition: all 0.25s cubic-bezier(0.34,1.2,0.64,1); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
         .tools-panel.open { transform: scale(1) translateY(0); opacity: 1; visibility: visible; }
         .tool-item { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 30px; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.1); }
         .tool-item i { font-size: 20px; color: #e67e22; }
@@ -146,85 +66,41 @@
         .tool-item.active { background: #e67e22; box-shadow: 0 0 12px rgba(230,126,34,0.5); }
         .tool-item.active i { color: white; }
         .divider { height: 1px; background: rgba(255,255,255,0.2); margin: 4px 0; }
-        .color-panel { position: fixed; bottom: 160px; right: 80px; background: rgba(30,30,40,0.95); backdrop-filter: blur(20px); border-radius: 40px; padding: 8px 12px; display: flex; gap: 12px; z-index: 198; transform: scale(0) translateY(30px); opacity: 0; visibility: hidden; transition: all 0.25s cubic-bezier(0.34, 1.2, 0.64, 1); border: 1px solid rgba(255,255,255,0.2); align-items: center; }
+        .color-panel { position: fixed; bottom: 160px; right: 80px; background: rgba(30,30,40,0.95); backdrop-filter: blur(20px); border-radius: 40px; padding: 8px 12px; display: flex; gap: 12px; z-index: 198; transform: scale(0) translateY(30px); opacity: 0; visibility: hidden; transition: all 0.25s cubic-bezier(0.34,1.2,0.64,1); border: 1px solid rgba(255,255,255,0.2); align-items: center; }
         .color-panel.open { transform: scale(1) translateY(0); opacity: 1; visibility: visible; }
         .color-panel input { width: 40px; height: 40px; border-radius: 50%; border: 2px solid white; cursor: pointer; background: transparent; }
-        .status-bar { background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px); color: white; padding: 8px 16px; border-radius: 40px; font-size: 12px; position: absolute; bottom: 20px; left: 20px; z-index: 200; font-family: monospace; font-weight: 500; display: flex; align-items: center; gap: 8px; pointer-events: none; }
+        .status-bar { background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); color: white; padding: 8px 16px; border-radius: 40px; font-size: 12px; position: absolute; bottom: 20px; left: 20px; z-index: 200; font-family: monospace; font-weight: 500; display: flex; align-items: center; gap: 8px; pointer-events: none; }
         .selected-toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(230,126,34,0.95); backdrop-filter: blur(8px); color: white; padding: 8px 16px; border-radius: 40px; font-size: 12px; z-index: 300; display: none; white-space: nowrap; font-weight: bold; }
-        .invoice { background: rgba(250, 249, 254, 0.8); backdrop-filter: blur(8px); border-radius: 16px; padding: 16px; }
+        .invoice { background: rgba(250,249,254,0.8); backdrop-filter: blur(8px); border-radius: 16px; padding: 16px; }
         .invoice p { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.08); font-size: 0.85rem; }
         .invoice i { width: 28px; color: #e67e22; }
-        .previews-section {
-            margin-bottom: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .preview-card {
-            background: rgba(255,255,255,0.9);
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid rgba(230,126,34,0.3);
-        }
-        .preview-title {
-            font-size: 0.8rem;
-            color: #e67e22;
-            padding: 10px 12px;
-            background: rgba(230,126,34,0.1);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: bold;
-            border-bottom: 1px solid rgba(230,126,34,0.2);
-        }
-        .preview-container {
-            padding: 12px;
-            text-align: center;
-            background: #f8f9fa;
-        }
-        .preview-container img {
-            max-width: 100%;
-            max-height: 180px;
-            object-fit: contain;
-            display: block;
-            margin: 0 auto;
-            border-radius: 8px;
-        }
-        .view-full-btn {
-            background: none;
-            border: none;
-            color: #e67e22;
-            font-size: 0.7rem;
-            cursor: pointer;
-            padding: 6px 12px;
-            margin-top: 6px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.2s;
-        }
-        .view-full-btn:hover {
-            color: #d35400;
-            transform: scale(1.05);
-        }
-        .empty-preview {
-            color: #999;
-            font-size: 0.75rem;
-            padding: 20px;
-            text-align: center;
-        }
-        .toast-success { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(39,174,96,0.95); backdrop-filter: blur(12px); color: white; padding: 22px 32px; border-radius: 28px; text-align: center; z-index: 2000; box-shadow: 0 20px 35px rgba(0,0,0,0.2); animation: fadeInUp 0.3s ease; display: flex; flex-direction: column; gap: 12px; }
+        .previews-section { margin-bottom: 16px; display: flex; flex-direction: column; gap: 16px; }
+        .preview-card { background: rgba(255,255,255,0.9); border-radius: 16px; overflow: hidden; border: 1px solid rgba(230,126,34,0.3); }
+        .preview-title { font-size: 0.8rem; color: #e67e22; padding: 10px 12px; background: rgba(230,126,34,0.1); display: flex; align-items: center; gap: 6px; font-weight: bold; border-bottom: 1px solid rgba(230,126,34,0.2); }
+        .preview-container { padding: 12px; text-align: center; background: #f8f9fa; }
+        .preview-container img { max-width: 100%; max-height: 180px; object-fit: contain; display: block; margin: 0 auto; border-radius: 8px; }
+        .view-full-btn { background: none; border: none; color: #e67e22; font-size: 0.7rem; cursor: pointer; padding: 6px 12px; margin-top: 6px; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s; }
+        .view-full-btn:hover { color: #d35400; transform: scale(1.05); }
+        .empty-preview { color: #999; font-size: 0.75rem; padding: 20px; text-align: center; }
+        .toast-success { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(39,174,96,0.95); backdrop-filter: blur(12px); color: white; padding: 22px 32px; border-radius: 28px; text-align: center; z-index: 2000; box-shadow: 0 20px 35px rgba(0,0,0,0.2); animation: fadeInUp 0.3s ease; display: flex; flex-direction: column; gap: 12px; }
         .toast-success button { background: white; color: #27ae60; border: none; padding: 8px 24px; border-radius: 40px; font-weight: bold; cursor: pointer; margin-top: 8px; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
-        .bottom-fixed { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; gap: 12px; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08); max-width: 600px; margin: 0 auto; z-index: 99; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translate(-50%,-50%) scale(0.9); } to { opacity: 1; transform: translate(-50%,-50%) scale(1); } }
+        .bottom-fixed { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; gap: 12px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); max-width: 600px; margin: 0 auto; z-index: 99; }
         .btn { flex: 1; padding: 12px; border-radius: 40px; font-weight: bold; cursor: pointer; border: none; font-size: 0.85rem; }
         .btn-primary { background: #e67e22; color: white; }
-        .btn-secondary { background: rgba(233, 236, 239, 0.9); color: #2c3e50; }
+        .btn-secondary { background: rgba(233,236,239,0.9); color: #2c3e50; }
         .hidden { display: none; }
-        .loading { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .loading { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .loading.active { display: flex; }
         .spinner { width: 45px; height: 45px; border: 5px solid rgba(255,255,255,0.3); border-top-color: #e67e22; border-radius: 50%; animation: spin 0.7s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .pdf-download-btn { display: inline-flex; align-items: center; gap: 8px; background: #dc3545; color: white; padding: 6px 14px; border-radius: 30px; text-decoration: none; font-size: 0.75rem; font-weight: bold; margin-top: 8px; border: none; cursor: pointer; transition: all 0.2s; }
+        .pdf-download-btn:hover { background: #c82333; transform: scale(1.05); }
+        .pdf-download-btn i { font-size: 14px; }
+        .pdf-item-content { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .pdf-code-badge { background: rgba(0,0,0,0.2); padding: 2px 10px; border-radius: 12px; font-size: 0.7rem; color: #fff; }
+        .step-container { display: none; }
+        .step-container.active { display: block; }
     </style>
 </head>
 <body>
@@ -235,7 +111,7 @@
 <div class="selected-toast" id="selectedToast">✅ انتخاب شد | می‌توانید جابجا، ویرایش یا حذف کنید</div>
 
 <div class="header" id="mainHeader">
-    <h1>✨ سقف کشسان | نصبیات حرفه‌ای</h1>
+    <h1>سفارش چاپی DECO B2B</h1>
     <p>طراحی خط‌روند + متن | لمس کنید، بکشید، تغییر دهید</p>
 </div>
 
@@ -470,6 +346,53 @@
 
     // ==================== کد اصلی اپلیکیشن ====================
     const API_BASE = '/pro/api';
+
+    // بازیابی state از localStorage در صورت وجود
+    function loadState() {
+        try {
+            const saved = localStorage.getItem('designerState');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                // فقط state های معتبر رو بازیابی کن
+                if (parsed.installation) state.installation = parsed.installation;
+                if (parsed.material) state.material = parsed.material;
+                if (parsed.pdf) state.pdf = parsed.pdf;
+                if (parsed.pdfCode) state.pdfCode = parsed.pdfCode;
+                if (parsed.designType) state.designType = parsed.designType;
+                if (parsed.selectedTemplate) state.selectedTemplate = parsed.selectedTemplate;
+                if (parsed.selectedTemplateImage) state.selectedTemplateImage = parsed.selectedTemplateImage;
+                if (parsed.uploadedImage) state.uploadedImage = parsed.uploadedImage;
+                if (parsed.length) document.getElementById('length').value = parsed.length;
+                if (parsed.width) document.getElementById('width').value = parsed.width;
+                if (parsed.notes) document.getElementById('notes').value = parsed.notes;
+                // مرحله رو هم بازیابی کن
+                if (parsed.step) return parsed.step;
+            }
+        } catch(e) { console.log('State load error:', e); }
+        return 1;
+    }
+
+    // ذخیره state در localStorage
+    function saveState() {
+        try {
+            const toSave = {
+                step: state.step,
+                installation: state.installation,
+                material: state.material,
+                pdf: state.pdf,
+                pdfCode: state.pdfCode,
+                designType: state.designType,
+                selectedTemplate: state.selectedTemplate,
+                selectedTemplateImage: state.selectedTemplateImage,
+                uploadedImage: state.uploadedImage,
+                length: document.getElementById('length').value,
+                width: document.getElementById('width').value,
+                notes: document.getElementById('notes').value
+            };
+            localStorage.setItem('designerState', JSON.stringify(toSave));
+        } catch(e) { console.log('State save error:', e); }
+    }
+
     let state = {
         step: 1,
         installation: null,
@@ -514,6 +437,14 @@
                     <div class="installation-title">${ins.title}</div>
                 </div>
             `).join('');
+            // اگر state قبلی داشت، هایلایتش کن
+            if (state.installation) {
+                document.querySelectorAll('.installation-item').forEach(el => {
+                    if (el.textContent.trim() === state.installation.title) {
+                        el.classList.add('selected');
+                    }
+                });
+            }
         }
     }
 
@@ -521,6 +452,7 @@
         document.querySelectorAll('.installation-item').forEach(i => i.classList.remove('selected'));
         event.currentTarget.classList.add('selected');
         state.installation = { id, title };
+        saveState();
         goToStep(2);
         loadMaterials(id);
     };
@@ -534,6 +466,13 @@
                     <div class="material-title">${mat.title}</div>
                 </div>
             `).join('');
+            if (state.material) {
+                document.querySelectorAll('.material-item').forEach(el => {
+                    if (el.textContent.trim() === state.material.title) {
+                        el.classList.add('selected');
+                    }
+                });
+            }
         }
     }
 
@@ -541,6 +480,7 @@
         document.querySelectorAll('.material-item').forEach(i => i.classList.remove('selected'));
         event.currentTarget.classList.add('selected');
         state.material = { id, title };
+        saveState();
         goToStep(3);
         loadPdfs(id);
     };
@@ -548,12 +488,32 @@
     async function loadPdfs(materialId) {
         const res = await apiCall(`/materials/${materialId}/pdfs/`);
         if (res.status === 'success') {
-            document.getElementById('pdfsList').innerHTML = res.data.map(pdf => `
-                <div class="pdf-item" onclick="selectPdf(${pdf.id}, '${pdf.code}', '${pdf.title}')">
-                    <i class="fas fa-file-pdf" style="font-size:24px;color:#e63946"></i>
-                    <div><strong>${pdf.title}</strong><br><code>${pdf.code}</code></div>
-                </div>
-            `).join('');
+            document.getElementById('pdfsList').innerHTML = res.data.map(pdf => {
+                const pdfDownloadLink = `https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf`;
+                return `
+                    <div class="pdf-item" onclick="selectPdf(${pdf.id}, '${pdf.code}', '${pdf.title}')">
+                        <div class="pdf-item-content">
+                            <i class="fas fa-file-pdf" style="font-size:28px;color:#e63946"></i>
+                            <div style='color:#ffff;'><strong>${pdf.title}</strong></div>
+                            <span class="pdf-code-badge">${pdf.code}</span>
+                            <a href="${pdfDownloadLink}" download="${pdf.title}.pdf" class="pdf-download-btn" onclick="event.stopPropagation();">
+                                <i class="fas fa-download"></i> دانلود PDF
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            if (state.pdf) {
+                document.querySelectorAll('.pdf-item').forEach(el => {
+                    if (el.textContent.includes(state.pdf.title)) {
+                        el.classList.add('selected');
+                    }
+                });
+                if (state.pdfCode) {
+                    document.getElementById('pdfCode').value = state.pdfCode;
+                    document.getElementById('verifyResult').innerHTML = `<span style="color:#27ae60">✅ کد تایید شد: ${state.pdfCode}</span>`;
+                }
+            }
         }
     }
 
@@ -564,6 +524,7 @@
         state.pdfCode = code;
         document.getElementById('pdfCode').value = code;
         document.getElementById('verifyResult').innerHTML = `<span style="color:#27ae60">✅ کد تایید شد: ${code}</span>`;
+        saveState();
     };
 
     async function verifyPdfCode() {
@@ -574,6 +535,7 @@
             state.pdf = { id: res.id, title: res.title };
             state.pdfCode = code;
             document.getElementById('verifyResult').innerHTML = `<span style="color:#27ae60">✅ ${res.title}</span>`;
+            saveState();
         } else {
             document.getElementById('verifyResult').innerHTML = '<span style="color:#e67e22">❌ کد معتبر نیست</span>';
         }
@@ -595,8 +557,27 @@
                     document.getElementById('uploadBox').classList.remove('hidden');
                     state.selectedTemplateImage = null;
                 }
+                saveState();
             };
         });
+        // بازیابی انتخاب قبلی
+        if (state.designType) {
+            document.querySelectorAll('.design-opt').forEach(opt => {
+                if (opt.getAttribute('data-type') === state.designType) {
+                    opt.classList.add('selected');
+                    if (state.designType === 'ready') {
+                        document.getElementById('readyTemplatesBox').classList.remove('hidden');
+                        loadReadyTemplates();
+                    } else if (state.designType === 'upload') {
+                        document.getElementById('uploadBox').classList.remove('hidden');
+                        if (state.uploadedImage) {
+                            document.getElementById('previewImg').src = state.uploadedImage;
+                            document.getElementById('uploadPreview').classList.remove('hidden');
+                        }
+                    }
+                }
+            });
+        }
     }
 
     async function loadReadyTemplates() {
@@ -608,6 +589,13 @@
                     <strong>${t.title}</strong>
                 </div>
             `).join('');
+            if (state.selectedTemplateImage) {
+                document.querySelectorAll('.template-item').forEach(el => {
+                    if (el.querySelector('img')?.src === state.selectedTemplateImage) {
+                        el.classList.add('selected');
+                    }
+                });
+            }
         }
     }
 
@@ -616,6 +604,7 @@
         event.currentTarget.classList.add('selected');
         state.selectedTemplate = id;
         state.selectedTemplateImage = imageUrl;
+        saveState();
     };
 
     document.getElementById('uploadFile').onchange = (e) => {
@@ -626,10 +615,15 @@
                 state.uploadedImage = ev.target.result;
                 document.getElementById('previewImg').src = ev.target.result;
                 document.getElementById('uploadPreview').classList.remove('hidden');
+                saveState();
             };
             reader.readAsDataURL(file);
         }
     };
+
+    document.getElementById('length').addEventListener('change', saveState);
+    document.getElementById('width').addEventListener('change', saveState);
+    document.getElementById('notes').addEventListener('change', saveState);
 
     let canvas = null;
     let currentTool = 'polyline';
@@ -803,100 +797,65 @@
         const previewsSection = document.getElementById('previewsSection');
         previewsSection.innerHTML = '';
 
-        // نمایش طرح آماده (اگر وجود داشته باشد)
         if (state.designType === 'ready' && state.selectedTemplateImage) {
             const templateCard = document.createElement('div');
             templateCard.className = 'preview-card';
             templateCard.innerHTML = `
-                <div class="preview-title">
-                    <i class="fas fa-th-large"></i> طرح آماده انتخابی
-                </div>
+                <div class="preview-title"><i class="fas fa-th-large"></i> طرح آماده انتخابی</div>
                 <div class="preview-container">
-                    <img id="templatePreviewImg" src="${state.selectedTemplateImage}" alt="طرح آماده">
-                    <button class="view-full-btn" data-img="${state.selectedTemplateImage}">
-                        <i class="fas fa-expand"></i> مشاهده بزرگ
-                    </button>
+                    <img src="${state.selectedTemplateImage}" alt="طرح آماده">
+                    <button class="view-full-btn" data-img="${state.selectedTemplateImage}"><i class="fas fa-expand"></i> مشاهده بزرگ</button>
                 </div>
             `;
             previewsSection.appendChild(templateCard);
         }
 
-        // نمایش عکس آپلود شده (اگر وجود داشته باشد)
         if (state.designType === 'upload' && state.uploadedImage) {
             const uploadCard = document.createElement('div');
             uploadCard.className = 'preview-card';
             uploadCard.innerHTML = `
-                <div class="preview-title">
-                    <i class="fas fa-cloud-upload-alt"></i> عکس آپلود شده
-                </div>
+                <div class="preview-title"><i class="fas fa-cloud-upload-alt"></i> عکس آپلود شده</div>
                 <div class="preview-container">
-                    <img id="uploadPreviewImg" src="${state.uploadedImage}" alt="عکس آپلود شده">
-                    <button class="view-full-btn" data-img="${state.uploadedImage}">
-                        <i class="fas fa-expand"></i> مشاهده بزرگ
-                    </button>
+                    <img src="${state.uploadedImage}" alt="عکس آپلود شده">
+                    <button class="view-full-btn" data-img="${state.uploadedImage}"><i class="fas fa-expand"></i> مشاهده بزرگ</button>
                 </div>
             `;
             previewsSection.appendChild(uploadCard);
         }
 
-        // نمایش پلن دستی طراحی شده در مرحله 5
         const canvasImage = getCanvasImageUrl();
         if (canvasImage && canvasImage !== 'data:image/png;base64,') {
             const planCard = document.createElement('div');
             planCard.className = 'preview-card';
             planCard.innerHTML = `
-                <div class="preview-title">
-                    <i class="fas fa-draw-polygon"></i> پلن طراحی شده دستی (مرحله ۵)
-                </div>
+                <div class="preview-title"><i class="fas fa-draw-polygon"></i> پلن طراحی شده دستی (مرحله ۵)</div>
                 <div class="preview-container">
-                    <img id="planPreviewImg" src="${canvasImage}" alt="پلن طراحی شده">
-                    <button class="view-full-btn" data-img="${canvasImage}">
-                        <i class="fas fa-expand"></i> مشاهده بزرگ
-                    </button>
+                    <img src="${canvasImage}" alt="پلن طراحی شده">
+                    <button class="view-full-btn" data-img="${canvasImage}"><i class="fas fa-expand"></i> مشاهده بزرگ</button>
                 </div>
             `;
             previewsSection.appendChild(planCard);
         }
 
-        // اگر هیچ پیش‌نمایشی وجود نداشت
         if (previewsSection.children.length === 0) {
             previewsSection.innerHTML = '<div class="empty-preview">⚠️ هیچ طرح یا پلنی انتخاب نشده است</div>';
         }
 
-        // اضافه کردن event listener برای دکمه‌های مشاهده بزرگ
         document.querySelectorAll('.view-full-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const imgSrc = btn.getAttribute('data-img');
-                if (imgSrc) {
-                    showFullscreenImage(imgSrc);
-                }
+                if (imgSrc) showFullscreenImage(imgSrc);
             });
         });
     }
 
     function showFullscreenImage(imgSrc) {
         const modal = document.createElement('div');
-        modal.style.position = 'fixed';
-        modal.style.top = '0';
-        modal.style.left = '0';
-        modal.style.width = '100%';
-        modal.style.height = '100%';
-        modal.style.backgroundColor = 'rgba(0,0,0,0.95)';
-        modal.style.zIndex = '10000';
-        modal.style.display = 'flex';
-        modal.style.alignItems = 'center';
-        modal.style.justifyContent = 'center';
-        modal.style.cursor = 'pointer';
-
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:10000;display:flex;align-items:center;justify-content:center;cursor:pointer;';
         const fullImg = document.createElement('img');
         fullImg.src = imgSrc;
-        fullImg.style.maxWidth = '90%';
-        fullImg.style.maxHeight = '90%';
-        fullImg.style.objectFit = 'contain';
-        fullImg.style.borderRadius = '12px';
-        fullImg.style.boxShadow = '0 0 30px rgba(230,126,34,0.3)';
-
+        fullImg.style.cssText = 'max-width:90%;max-height:90%;object-fit:contain;border-radius:12px;box-shadow:0 0 30px rgba(230,126,34,0.3);';
         modal.appendChild(fullImg);
         modal.onclick = () => modal.remove();
         document.body.appendChild(modal);
@@ -910,31 +869,23 @@
         const wid = parseFloat(document.getElementById('width').value) || 0;
         document.getElementById('finalDim').innerText = len && wid ? `${len} × ${wid} متر` : '-';
         document.getElementById('finalArea').innerText = (len * wid).toFixed(2);
-
         displayPreviews();
     }
 
     async function submitOrderWithRedirect() {
         const length = parseFloat(document.getElementById('length').value) || 0;
         const width = parseFloat(document.getElementById('width').value) || 0;
-
-        if(length <= 0 || width <= 0) {
-            alert('لطفاً طول و عرض را وارد کنید');
-            return;
-        }
-
+        if(length <= 0 || width <= 0) { alert('لطفاً طول و عرض را وارد کنید'); return; }
         const orderData = {
             installation_id: state.installation?.id,
             material_id: state.material?.id,
             pdf_id: state.pdf?.id,
             template_id: state.selectedTemplate,
             design_type: state.designType || 'custom',
-            length: length,
-            width: width,
+            length, width,
             notes: document.getElementById('notes').value || '',
             plan_image: getCanvasImage()
         };
-
         showLoading();
         try {
             const res = await fetch('/pro/api/create-order/', {
@@ -944,14 +895,10 @@
             });
             const result = await res.json();
             hideLoading();
-
-            if(result.status === 'success' && result.redirect_url) {
-                window.location.href = result.redirect_url;
-            } else if(result.redirect_url) {
-                window.location.href = result.redirect_url;
-            } else if(result.order_id) {
-                window.location.href = `/order/checkout/${result.order_id}/`;
-            } else {
+            if(result.status === 'success' && result.redirect_url) window.location.href = result.redirect_url;
+            else if(result.redirect_url) window.location.href = result.redirect_url;
+            else if(result.order_id) window.location.href = `/order/checkout/${result.order_id}/`;
+            else {
                 const toastDiv = document.createElement('div');
                 toastDiv.className = 'toast-success';
                 toastDiv.innerHTML = `
@@ -964,7 +911,6 @@
             }
         } catch(err) {
             hideLoading();
-            console.error('Error:', err);
             const toastDiv = document.createElement('div');
             toastDiv.className = 'toast-success';
             toastDiv.innerHTML = `
@@ -987,16 +933,20 @@
 
     function goToStep(step) {
         document.querySelectorAll('.step-container').forEach(s => s.classList.remove('active'));
-        document.getElementById(`step${step}`).classList.add('active');
-        for (let i=1;i<=6;i++) { const badge = document.getElementById(`step${i}Badge`); if(i<step) { badge.classList.add('done'); badge.classList.remove('active'); } else if(i===step) { badge.classList.add('active'); badge.classList.remove('done'); } else badge.classList.remove('active','done'); }
+        const target = document.getElementById(`step${step}`);
+        if (target) target.classList.add('active');
+        for (let i=1;i<=6;i++) {
+            const badge = document.getElementById(`step${i}Badge`);
+            if (!badge) continue;
+            if(i<step) { badge.classList.add('done'); badge.classList.remove('active'); }
+            else if(i===step) { badge.classList.add('active'); badge.classList.remove('done'); }
+            else badge.classList.remove('active','done');
+        }
         state.step = step;
+        saveState();
         if(step===5) {
             toggleFullscreenMode(true);
-            setTimeout(() => {
-                initCanvasDesign();
-                setupFloatingMenu();
-                setTimeout(resizeCanvas, 50);
-            }, 100);
+            setTimeout(() => { initCanvasDesign(); setupFloatingMenu(); setTimeout(resizeCanvas, 50); }, 100);
         } else {
             toggleFullscreenMode(false);
         }
@@ -1026,8 +976,24 @@
     document.getElementById('prevBtn').onclick = prevStep;
     document.getElementById('verifyBtn').onclick = verifyPdfCode;
 
-    loadInstallations();
-    goToStep(1);
+    // بارگذاری اولیه با بازیابی state
+    (async function init() {
+        await loadInstallations();
+        const savedStep = loadState();
+        // اگر state ذخیره شده داشت، برو به همون مرحله
+        if (savedStep > 1) {
+            // ولی برای اینکه آیتم‌ها لود بشن، مرحله به مرحله بریم
+            if (state.installation) {
+                await loadMaterials(state.installation.id);
+            }
+            if (state.material) {
+                await loadPdfs(state.material.id);
+            }
+            goToStep(savedStep);
+        } else {
+            goToStep(1);
+        }
+    })();
 </script>
 </body>
 </html>

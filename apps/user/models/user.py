@@ -50,6 +50,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # آنلاین/آفلاین
     last_activity = models.DateTimeField(default=timezone.now, verbose_name="آخرین فعالیت")
     is_online = models.BooleanField(default=False, verbose_name="آنلاین")
+    nationCard = models.ImageField(upload_to='nationsCards/', blank=True, null=True, verbose_name="عکس کارت ملی")
+    visitCard = models.ImageField(upload_to='visitcards/', blank=True, null=True, verbose_name="عکس کارت ویزیت ")
+    shopImage = models.ImageField(upload_to='shopImage/', blank=True, null=True, verbose_name="عکس فروشگاه")
+
 
     # نقش‌های کاربر - از string استفاده کن نه import مستقیم
     roles = models.ManyToManyField('Role', blank=True, related_name='users', verbose_name="نقش‌ها")

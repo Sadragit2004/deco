@@ -1,0 +1,1303 @@
+{% load static %}
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazir:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazir', 'Tahoma', sans-serif;
+            background: linear-gradient(135deg, #6C3CE1 0%, #4A1A8A 50%, #2D0B5E 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -30%;
+            left: -30%;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(circle, rgba(108, 60, 225, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            height: 100vh;
+            max-height: 900px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 40px 50px 100px 50px;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            animation: fadeInUp 0.6s ease-out;
+            margin: 20px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #6C3CE1, #4A1A8A);
+            border-radius: 10px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 10px 0 25px 0;
+            flex-shrink: 0;
+        }
+
+        .header .icon {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            color: #6b6b8a;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .progress-container {
+            flex-shrink: 0;
+            padding: 10px 0 25px 0;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            padding: 0 5px;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 18px;
+            left: 25px;
+            right: 25px;
+            height: 3px;
+            background: #e8e8f0;
+            border-radius: 10px;
+            z-index: 1;
+        }
+
+        .progress-bar .progress-line {
+            position: absolute;
+            top: 18px;
+            left: 25px;
+            height: 3px;
+            background: linear-gradient(90deg, #6C3CE1, #A78BFA);
+            border-radius: 10px;
+            z-index: 2;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0%;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 3;
+            cursor: pointer;
+            flex: 1;
+            gap: 6px;
+        }
+
+        .step .step-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e8e8f0;
+            color: #8a8aa8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid #e8e8f0;
+        }
+
+        .step.active .step-number {
+            background: linear-gradient(135deg, #6C3CE1, #8B5CF6);
+            color: white;
+            border-color: #6C3CE1;
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(108, 60, 225, 0.35);
+        }
+
+        .step.completed .step-number {
+            background: #10B981;
+            color: white;
+            border-color: #10B981;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .step .step-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: #a0a0b8;
+            transition: color 0.3s ease;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+
+        .step.active .step-label {
+            color: #1a1a2e;
+            font-weight: 600;
+        }
+
+        .step.completed .step-label {
+            color: #10B981;
+        }
+
+        .messages {
+            flex-shrink: 0;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            padding: 12px 18px;
+            border-radius: 14px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .message-error {
+            background: #FEE2E2;
+            color: #991B1B;
+            border-right: 4px solid #EF4444;
+        }
+
+        .message-success {
+            background: #D1FAE5;
+            color: #065F46;
+            border-right: 4px solid #10B981;
+        }
+
+        .form-steps-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+            margin-bottom: 10px;
+        }
+
+        .form-steps-wrapper::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .form-steps-wrapper::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #6C3CE1, #4A1A8A);
+            border-radius: 10px;
+        }
+
+        .form-step {
+            display: none;
+            animation: fadeStep 0.4s ease;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        @keyframes fadeStep {
+            from {
+                opacity: 0;
+                transform: translateX(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f8;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title .badge {
+            background: linear-gradient(135deg, #6C3CE1, #8B5CF6);
+            color: white;
+            font-size: 10px;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .section-title .step-counter {
+            margin-right: auto;
+            font-size: 12px;
+            color: #8a8aa8;
+            font-weight: 400;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 4px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #3a3a52;
+            font-size: 13px;
+        }
+
+        .form-group label .required {
+            color: #EF4444;
+            margin-right: 2px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 11px 16px;
+            border: 2px solid #e8e8f0;
+            border-radius: 14px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: #f8f8fc;
+            color: #1a1a2e;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #6C3CE1;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(108, 60, 225, 0.1);
+            outline: none;
+        }
+
+        .form-group input.error,
+        .form-group select.error,
+        .form-group textarea.error {
+            border-color: #EF4444;
+            background: #FFF5F5;
+        }
+
+        .form-group .error-message {
+            color: #EF4444;
+            font-size: 11px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .form-group .error-message.show {
+            display: block;
+            animation: slideIn 0.2s ease;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .file-upload {
+            position: relative;
+            border: 2px dashed #e8e8f0;
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            background: #f8f8fc;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload:hover {
+            border-color: #6C3CE1;
+            background: #f3f0ff;
+            transform: translateY(-2px);
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload .file-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #4a4a62;
+            font-size: 13px;
+            pointer-events: none;
+        }
+
+        .file-upload .file-label .icon {
+            font-size: 26px;
+        }
+
+        .file-upload .file-label .file-name {
+            color: #8a8aa8;
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        .file-upload.has-file {
+            border-color: #10B981;
+            background: #ECFDF5;
+        }
+
+        .file-upload.error {
+            border-color: #EF4444;
+            background: #FFF5F5;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #F3F0FF, #EDE9FE);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-top: 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border: 1px solid rgba(108, 60, 225, 0.1);
+        }
+
+        .info-box .info-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .info-box .info-text {
+            color: #4a1a8a;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .info-box .info-text strong {
+            color: #1a1a2e;
+        }
+
+        .floating-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 50px 25px 50px;
+            background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.95) 30%, rgba(255,255,255,1) 100%);
+            border-radius: 0 0 40px 40px;
+            display: flex;
+            gap: 14px;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            padding: 13px 35px;
+            border: none;
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-prev {
+            background: #f0f0f8;
+            color: #4a4a62;
+        }
+
+        .btn-prev:hover {
+            background: #e8e8f0;
+            transform: translateX(-3px);
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #6C3CE1, #8B5CF6);
+            color: white;
+            box-shadow: 0 8px 30px rgba(108, 60, 225, 0.35);
+            margin-right: auto;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(108, 60, 225, 0.45);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.35);
+            margin-right: auto;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.45);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .btn.loading .spinner {
+            display: inline-block;
+        }
+
+        .btn.loading .btn-text {
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .step-counter-text {
+            font-size: 13px;
+            color: #8a8aa8;
+            font-weight: 400;
+            padding: 0 10px;
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                max-height: none;
+                height: auto;
+                min-height: 100vh;
+                border-radius: 0;
+                margin: 0;
+                padding: 30px 30px 100px 30px;
+            }
+
+            .floating-nav {
+                padding: 16px 30px 20px 30px;
+                border-radius: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 18px 90px 18px;
+                border-radius: 0;
+            }
+
+            .form-row,
+            .form-row-3 {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .header .icon {
+                font-size: 32px;
+            }
+
+            .section-title {
+                font-size: 15px;
+            }
+
+            .step .step-number {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+
+            .step .step-label {
+                font-size: 10px;
+            }
+
+            .progress-bar::before,
+            .progress-bar .progress-line {
+                top: 16px;
+                left: 18px;
+                right: 18px;
+            }
+
+            .floating-nav {
+                padding: 14px 18px 18px 18px;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                padding: 11px 22px;
+                font-size: 13px;
+                flex: 1;
+                justify-content: center;
+                min-width: 80px;
+            }
+
+            .btn-next,
+            .btn-submit {
+                margin-right: 0;
+            }
+
+            .step-counter-text {
+                display: none;
+            }
+
+            .info-box {
+                flex-direction: column;
+                text-align: center;
+                padding: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px 12px 80px 12px;
+            }
+
+            .header h1 {
+                font-size: 17px;
+            }
+
+            .header p {
+                font-size: 12px;
+            }
+
+            .btn {
+                padding: 10px 16px;
+                font-size: 12px;
+                min-width: 60px;
+            }
+
+            .floating-nav {
+                padding: 12px 12px 16px 12px;
+                gap: 8px;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+
+            .step .step-label {
+                display: none;
+            }
+
+            .step .step-number {
+                width: 28px;
+                height: 28px;
+                font-size: 11px;
+            }
+
+            .progress-bar::before,
+            .progress-bar .progress-line {
+                top: 14px;
+                left: 12px;
+                right: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="icon">🏪</span>
+            <h1>{{ page_title }}</h1>
+            <p>اطلاعات را در مراحل زیر تکمیل کنید</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-line" id="progressLine"></div>
+
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">اطلاعات شخصی</div>
+                </div>
+
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">فایل‌ها</div>
+                </div>
+
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">فروشگاه</div>
+                </div>
+
+                <div class="step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">تصاویر</div>
+                </div>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message message-{{ message.tags }}">
+                    <span>{% if message.tags == 'error' %}❌{% else %}✅{% endif %}</span>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="form-steps-wrapper">
+            <form method="post" enctype="multipart/form-data" id="registrationForm">
+                {% csrf_token %}
+
+                <!-- STEP 1 -->
+                <div class="form-step active" data-step="1">
+                    <div class="section">
+                        <div class="section-title">
+                            👤 اطلاعات شخصی
+                            <span class="badge">ضروری</span>
+                            <span class="step-counter">مرحله ۱ از ۴</span>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="first_name">نام <span class="required">*</span></label>
+                                <input type="text" id="first_name" name="first_name" placeholder="نام خود را وارد کنید" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="last_name">نام خانوادگی <span class="required">*</span></label>
+                                <input type="text" id="last_name" name="last_name" placeholder="نام خانوادگی خود را وارد کنید" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="national_code">کد ملی <span class="required">*</span></label>
+                                <input type="text" id="national_code" name="national_code" maxlength="10" placeholder="۱۲۳۴۵۶۷۸۹۰" required>
+                                <div class="error-message" id="nationalCodeError">کد ملی باید ۱۰ رقم باشد</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="birth_date">تاریخ تولد <span class="required">*</span></label>
+                                <input type="text" id="birth_date" name="birth_date" placeholder="مثال: ۱۳۸۸/۰۳/۱۲" required>
+                                <div class="error-message" id="birthDateError">فرمت: ۱۳۸۸/۰۳/۱۲</div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="mobile_number">شماره موبایل <span class="required">*</span></label>
+                                <input type="tel" id="mobile_number" name="mobile_number" maxlength="11" placeholder="۰۹۱۲۳۴۵۶۷۸۹" required>
+                                <div class="error-message" id="mobileError">شماره موبایل معتبر نیست</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone_number">تلفن ثابت</label>
+                                <input type="tel" id="phone_number" name="phone_number" maxlength="11" placeholder="۰۲۱۱۲۳۴۵۶۷۸">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">ایمیل</label>
+                            <input type="email" id="email" name="email" placeholder="example@email.com">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2 -->
+                <div class="form-step" data-step="2">
+                    <div class="section">
+                        <div class="section-title">
+                            📁 آپلود فایل‌ها
+                            <span class="badge">ضروری</span>
+                            <span class="step-counter">مرحله ۲ از ۴</span>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="profile_image">عکس پروفایل</label>
+                                <div class="file-upload" id="profileUpload">
+                                    <input type="file" id="profile_image" name="profile_image" accept="image/*">
+                                    <div class="file-label">
+                                        <span class="icon">🖼️</span>
+                                        <span>آپلود عکس پروفایل</span>
+                                        <span class="file-name">حداکثر ۲ مگابایت</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="national_card_image">عکس کارت ملی <span class="required">*</span></label>
+                                <div class="file-upload" id="nationalCardUpload">
+                                    <input type="file" id="national_card_image" name="national_card_image" accept="image/*" required>
+                                    <div class="file-label">
+                                        <span class="icon">🪪</span>
+                                        <span>آپلود عکس کارت ملی</span>
+                                        <span class="file-name">حداکثر ۲ مگابایت</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3 -->
+                <div class="form-step" data-step="3">
+                    <div class="section">
+                        <div class="section-title">
+                            🏬 اطلاعات فروشگاه
+                            <span class="badge">ضروری</span>
+                            <span class="step-counter">مرحله ۳ از ۴</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="shop_name">نام فروشگاه <span class="required">*</span></label>
+                            <input type="text" id="shop_name" name="shop_name" placeholder="نام فروشگاه خود را وارد کنید" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="province">استان <span class="required">*</span></label>
+                                <select id="province" name="province" required>
+                                    <option value="">انتخاب استان</option>
+                                    {% for province in provinces %}
+                                        <option value="{{ province.id }}">{{ province.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="city">شهر <span class="required">*</span></label>
+                                <select id="city" name="city" required>
+                                    <option value="">ابتدا استان را انتخاب کنید</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label for="street">خیابان <span class="required">*</span></label>
+                                <input type="text" id="street" name="street" placeholder="نام خیابان" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="alley">کوچه</label>
+                                <input type="text" id="alley" name="alley" placeholder="نام کوچه">
+                            </div>
+                            <div class="form-group">
+                                <label for="plaque">پلاک</label>
+                                <input type="text" id="plaque" name="plaque" placeholder="شماره پلاک">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address_text">آدرس کامل</label>
+                            <textarea id="address_text" name="address_text" rows="2" placeholder="آدرس کامل فروشگاه را وارد کنید"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="postal_code">کد پستی</label>
+                            <input type="text" id="postal_code" name="postal_code" maxlength="10" placeholder="کد پستی ۱۰ رقمی">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 4 -->
+                <div class="form-step" data-step="4">
+                    <div class="section">
+                        <div class="section-title">
+                            📸 تصاویر فروشگاه
+                            <span class="step-counter">مرحله ۴ از ۴</span>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="visit_card_image">عکس کارت ویزیت</label>
+                                <div class="file-upload" id="visitCardUpload">
+                                    <input type="file" id="visit_card_image" name="visit_card_image" accept="image/*">
+                                    <div class="file-label">
+                                        <span class="icon">📇</span>
+                                        <span>آپلود کارت ویزیت</span>
+                                        <span class="file-name">حداکثر ۲ مگابایت</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="shop_image">عکس فروشگاه</label>
+                                <div class="file-upload" id="shopImageUpload">
+                                    <input type="file" id="shop_image" name="shop_image" accept="image/*">
+                                    <div class="file-label">
+                                        <span class="icon">🏢</span>
+                                        <span>آپلود عکس فروشگاه</span>
+                                        <span class="file-name">حداکثر ۲ مگابایت</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-box">
+                            <span class="info-icon">💡</span>
+                            <div class="info-text">
+                                <strong>پس از ثبت درخواست</strong><br>
+                                درخواست شما توسط ادمین بررسی شده و پس از تایید، حساب کاربری شما فعال خواهد شد.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="floating-nav">
+            <button type="button" class="btn btn-prev" id="prevBtn" style="display:none;">
+                ➜ قبلی
+            </button>
+
+            <span class="step-counter-text" id="stepCounter">مرحله ۱ از ۴</span>
+
+            <button type="button" class="btn btn-next" id="nextBtn">
+                بعدی ➜
+            </button>
+
+            <button type="submit" class="btn btn-submit" id="submitBtn" style="display:none;" form="registrationForm">
+                <span class="btn-text">📝 ثبت درخواست</span>
+                <span class="spinner"></span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+        const form = document.getElementById('registrationForm');
+        const steps = document.querySelectorAll('.form-step');
+        const stepIndicators = document.querySelectorAll('.step');
+        const progressLine = document.getElementById('progressLine');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const stepCounter = document.getElementById('stepCounter');
+
+        function updateStep(step) {
+            steps.forEach((s, index) => {
+                s.classList.remove('active');
+                if (index + 1 === step) {
+                    s.classList.add('active');
+                }
+            });
+
+            stepIndicators.forEach((indicator, index) => {
+                const num = index + 1;
+                indicator.classList.remove('active', 'completed');
+                if (num === step) {
+                    indicator.classList.add('active');
+                } else if (num < step) {
+                    indicator.classList.add('completed');
+                }
+            });
+
+            const progress = ((step - 1) / (totalSteps - 1)) * 100;
+            progressLine.style.width = progress + '%';
+
+            prevBtn.style.display = step === 1 ? 'none' : 'inline-flex';
+
+            if (step === totalSteps) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'inline-flex';
+            } else {
+                nextBtn.style.display = 'inline-flex';
+                submitBtn.style.display = 'none';
+            }
+
+            stepCounter.textContent = `مرحله ${step} از ${totalSteps}`;
+            document.querySelector('.form-steps-wrapper').scrollTop = 0;
+        }
+
+        function clearAllErrors(stepElement) {
+            stepElement.querySelectorAll('.error').forEach(el => {
+                el.classList.remove('error');
+            });
+            stepElement.querySelectorAll('.error-message.show').forEach(el => {
+                el.classList.remove('show');
+            });
+            stepElement.querySelectorAll('.file-upload.error').forEach(el => {
+                el.classList.remove('error');
+            });
+        }
+
+        function validateStep(step) {
+            const currentStepElement = document.querySelector(`.form-step[data-step="${step}"]`);
+            clearAllErrors(currentStepElement);
+
+            let isValid = true;
+
+            const inputs = currentStepElement.querySelectorAll('input[required], select[required]');
+            inputs.forEach(input => {
+                const group = input.closest('.form-group');
+                const errorMsg = group ? group.querySelector('.error-message') : null;
+
+                if (!input.value.trim()) {
+                    input.classList.add('error');
+                    if (errorMsg) errorMsg.classList.add('show');
+                    isValid = false;
+                }
+            });
+
+            if (step === 1) {
+                const nationalCode = document.getElementById('national_code');
+                const nationalError = document.getElementById('nationalCodeError');
+                if (nationalCode.value && !/^[0-9]{10}$/.test(nationalCode.value)) {
+                    nationalCode.classList.add('error');
+                    nationalError.classList.add('show');
+                    isValid = false;
+                }
+
+                const mobile = document.getElementById('mobile_number');
+                const mobileError = document.getElementById('mobileError');
+                if (mobile.value && !/^09[0-9]{9}$/.test(mobile.value)) {
+                    mobile.classList.add('error');
+                    mobileError.classList.add('show');
+                    isValid = false;
+                }
+
+                const birthDate = document.getElementById('birth_date');
+                const birthError = document.getElementById('birthDateError');
+                if (birthDate.value) {
+                    const parts = birthDate.value.split('/');
+                    if (parts.length !== 3 || parts[0].length !== 4 || parts[1].length !== 2 || parts[2].length !== 2) {
+                        birthDate.classList.add('error');
+                        birthError.classList.add('show');
+                        isValid = false;
+                    } else {
+                        const year = parseInt(parts[0]);
+                        const month = parseInt(parts[1]);
+                        const day = parseInt(parts[2]);
+                        if (year < 1300 || year > 1500 || month < 1 || month > 12 || day < 1 || day > 31) {
+                            birthDate.classList.add('error');
+                            birthError.classList.add('show');
+                            isValid = false;
+                        }
+                    }
+                }
+            }
+
+            if (step === 2) {
+                const nationalCard = document.getElementById('national_card_image');
+                const uploadDiv = nationalCard.closest('.file-upload');
+                if (!nationalCard.files || !nationalCard.files[0]) {
+                    uploadDiv.classList.add('error');
+                    isValid = false;
+                }
+            }
+
+            if (step === 3) {
+                const province = document.getElementById('province');
+                const city = document.getElementById('city');
+                if (!province.value) {
+                    province.classList.add('error');
+                    isValid = false;
+                }
+                if (!city.value) {
+                    city.classList.add('error');
+                    isValid = false;
+                }
+            }
+
+            if (!isValid) {
+                const firstError = currentStepElement.querySelector('.error');
+                if (firstError) {
+                    firstError.focus();
+                }
+            }
+
+            return isValid;
+        }
+
+        function nextStep() {
+            if (validateStep(currentStep)) {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    updateStep(currentStep);
+                }
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStep(currentStep);
+            }
+        }
+
+        stepIndicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', function() {
+                const step = parseInt(this.dataset.step);
+                if (step < currentStep) {
+                    currentStep = step;
+                    updateStep(currentStep);
+                }
+            });
+        });
+
+        prevBtn.addEventListener('click', prevStep);
+        nextBtn.addEventListener('click', nextStep);
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const activeStep = document.querySelector('.form-step.active');
+                if (activeStep) {
+                    const step = parseInt(activeStep.dataset.step);
+                    if (step === totalSteps) {
+                        form.dispatchEvent(new Event('submit'));
+                    } else {
+                        nextStep();
+                    }
+                }
+                e.preventDefault();
+            }
+        });
+
+        document.getElementById('province').addEventListener('change', function() {
+            const provinceId = this.value;
+            const citySelect = document.getElementById('city');
+
+            if (!provinceId) {
+                citySelect.innerHTML = '<option value="">ابتدا استان را انتخاب کنید</option>';
+                return;
+            }
+
+            citySelect.innerHTML = '<option value="">در حال بارگذاری...</option>';
+
+            fetch(`/accounts/get-cities/?province_id=${provinceId}`)
+                .then(response => response.json())
+                .then(data => {
+                    citySelect.innerHTML = '<option value="">انتخاب شهر</option>';
+                    if (data.cities && data.cities.length > 0) {
+                        data.cities.forEach(city => {
+                            const option = document.createElement('option');
+                            option.value = city.id;
+                            option.textContent = city.name;
+                            citySelect.appendChild(option);
+                        });
+                    } else {
+                        citySelect.innerHTML = '<option value="">شهری یافت نشد</option>';
+                    }
+                })
+                .catch(() => {
+                    citySelect.innerHTML = '<option value="">خطا در بارگذاری</option>';
+                });
+        });
+
+        document.querySelectorAll('.file-upload input[type="file"]').forEach(input => {
+            input.addEventListener('change', function() {
+                const parent = this.closest('.file-upload');
+                const label = parent.querySelector('.file-label .file-name');
+                parent.classList.remove('error');
+
+                if (this.files && this.files[0]) {
+                    parent.classList.add('has-file');
+                    label.textContent = this.files[0].name;
+                } else {
+                    parent.classList.remove('has-file');
+                    label.textContent = 'حداکثر ۲ مگابایت';
+                }
+            });
+        });
+
+        document.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('blur', function() {
+                const group = this.closest('.form-group');
+                const errorMsg = group ? group.querySelector('.error-message') : null;
+
+                if (this.hasAttribute('required') && !this.value.trim()) {
+                    this.classList.add('error');
+                    if (errorMsg) errorMsg.classList.add('show');
+                } else {
+                    this.classList.remove('error');
+                    if (errorMsg) errorMsg.classList.remove('show');
+                }
+            });
+
+            input.addEventListener('input', function() {
+                this.classList.remove('error');
+                const group = this.closest('.form-group');
+                const errorMsg = group ? group.querySelector('.error-message') : null;
+                if (errorMsg) errorMsg.classList.remove('show');
+            });
+        });
+
+        // تاریخ تولد شمسی - هر سال 1300 تا 1500 قبول کن
+        document.getElementById('birth_date').addEventListener('input', function() {
+            let value = this.value.replace(/[^۰-۹0-9\/\-]/g, '');
+            const digits = value.replace(/[\/\-]/g, '');
+            let formatted = '';
+
+            for (let i = 0; i < digits.length; i++) {
+                if (i === 4 || i === 6) {
+                    formatted += '/';
+                }
+                formatted += digits[i];
+            }
+
+            this.value = formatted;
+
+            const errorMsg = document.getElementById('birthDateError');
+            if (formatted.length === 10) {
+                const parts = formatted.split('/');
+                if (parts.length === 3) {
+                    const year = parseInt(parts[0]);
+                    const month = parseInt(parts[1]);
+                    const day = parseInt(parts[2]);
+
+                    if (year >= 1300 && year <= 1500 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+                        this.classList.remove('error');
+                        errorMsg.classList.remove('show');
+                        return;
+                    }
+                }
+            }
+
+            if (formatted.length === 10) {
+                this.classList.add('error');
+                errorMsg.classList.add('show');
+            }
+        });
+
+        document.getElementById('birth_date').addEventListener('keydown', function(e) {
+            if (!/[0-9۰-۹\/\-]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab') {
+                e.preventDefault();
+            }
+        });
+
+        form.addEventListener('submit', function(e) {
+            if (!validateStep(currentStep)) {
+                e.preventDefault();
+                return false;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+        });
+
+        document.getElementById('national_code').addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 10);
+        });
+
+        document.getElementById('mobile_number').addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 11);
+        });
+
+        updateStep(1);
+    </script>
+</body>
+</html>

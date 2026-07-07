@@ -1,7 +1,8 @@
 from django.urls import path
-from .views.auth import login,logout,verify
+from .views.auth import login,logout,verify,registration
 from .views.auth.dashboardapi import UserDashboardAPIView,UploadAvatarAPIView,DeleteAvatarAPIView
 from .views.auth.addressapi import get_shop_name,DeleteAddressAPIView,AddAddressAPIView,ProvinceCityAPIView,UserAddressesAPIView,SetDefaultAddressAPIView
+
 
 app_name = 'account'
 
@@ -18,5 +19,9 @@ urlpatterns = [
         # به urls.py اضافه کن:
     path('api/user/upload-avatar/', UploadAvatarAPIView.as_view(), name='upload-avatar-api'),
     path('api/user/delete-avatar/', DeleteAvatarAPIView.as_view(), name='delete-avatar-api'),
-    path('api/shop_name/',get_shop_name,name='shop_name_get')
+    path('api/shop_name/',get_shop_name,name='shop_name_get'),
+    # ==================
+    path('register/', registration.RegistrationFormView.as_view(), name='registration_form'),
+    path('register/success/', registration.RegistrationSuccessView.as_view(), name='registration_success'),
+    path('get-cities/', registration.GetCitiesView.as_view(), name='get_cities'),
 ]

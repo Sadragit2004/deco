@@ -19,15 +19,23 @@ def verify_code(request):
         user = CustomUser.objects.get(mobileNumber=mobile)
         security = AuthService.get_or_create_security(user)
     except CustomUser.DoesNotExist:
-        messages.error(request, "کاربر یافت نشد.")
+        messages.error(request, "شما در لیست عضویت نیستید. لطفاً ثبت‌نام کنید.")
+        request.session.pop("mobileNumber", None)
+        request.session.pop("next_url", None)
+        return redirect("account:send_mobile")
+
+    # ===== بررسی کاربر غیرفعال =====
+    if not user.is_active:
+        messages.error(request, "حساب کاربری شما هنوز تایید نشده است. لطفاً منتظر تایید ادمین باشید.")
+        request.session.pop("mobileNumber", None)
+        request.session.pop("next_url", None)
         return redirect("account:send_mobile")
 
     # بررسی درخواست ارسال مجدد (AJAX)
     if request.method == "POST" and request.POST.get("resend") == "true":
         try:
-            new_code = AuthService.send_activation_code(security, mobile)
+            AuthService.send_activation_code(security, mobile)
 
-            # محاسبه زمان جدید
             remaining_seconds = 0
             if security.expireCode:
                 remaining_seconds = max(0, int((security.expireCode - timezone.now()).total_seconds()))
@@ -51,10 +59,9 @@ def verify_code(request):
         remaining_seconds = max(0, int((security.expireCode - timezone.now()).total_seconds()))
         can_resend = remaining_seconds <= 0
 
-    # تبدیل ثانیه به فرمت دقیقه:ثانیه
     remaining_time = f"{remaining_seconds // 60:02d}:{remaining_seconds % 60:02d}"
 
-    # پردازش کد تایید (ارسال عادی فرم)
+    # پردازش کد تایید
     if request.method == "POST" and "verification_code" in request.POST:
         form = VerificationCodeForm(request.POST)
         if form.is_valid():
@@ -64,6 +71,8 @@ def verify_code(request):
                 AuthService.activate_user(user)
                 login(request, user)
                 messages.success(request, "ورود با موفقیت انجام شد.")
+                request.session.pop("mobileNumber", None)
+                request.session.pop("next_url", None)
                 return redirect(next_url or "main:index")
             except Exception as e:
                 messages.error(request, str(e))

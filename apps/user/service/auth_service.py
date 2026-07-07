@@ -29,7 +29,7 @@ class AuthService:
         return security
 
     @staticmethod
-    def send_activation_code(security,mobile='',code_length=5, expire_minutes=2,):
+    def send_activation_code(security, mobile='', code_length=5, expire_minutes=2):
         """
         تولید و ذخیره کد فعال‌سازی
         """
@@ -40,7 +40,6 @@ class AuthService:
         security.expireCode = expire_time
         security.isBan = False
         security.save()
-
         return code
 
     @staticmethod
@@ -60,5 +59,24 @@ class AuthService:
 
     @staticmethod
     def activate_user(user):
+        """
+        فعال کردن کاربر
+        """
         user.is_active = True
         user.save()
+
+    # ===== متد جدید برای بررسی وضعیت کاربر =====
+    @staticmethod
+    def check_user_status(mobile):
+        """
+        بررسی وضعیت کاربر بر اساس شماره موبایل
+        Returns: (user, status, message)
+        status: 'not_found', 'inactive', 'active'
+        """
+        try:
+            user = CustomUser.objects.get(mobileNumber=mobile)
+            if not user.is_active:
+                return user, 'inactive', 'حساب کاربری شما هنوز تایید نشده است. لطفاً منتظر تایید ادمین باشید.'
+            return user, 'active', 'کاربر فعال'
+        except CustomUser.DoesNotExist:
+            return None, 'not_found', 'شما در لیست عضویت نیستید. لطفاً ثبت‌نام کنید.'

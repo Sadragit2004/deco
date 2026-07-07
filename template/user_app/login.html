@@ -108,10 +108,8 @@
         }
 
         .form-group {
-
             margin-bottom: 1.6rem;
             position: relative;
-            
         }
 
         .input-label {
@@ -180,13 +178,12 @@
             background: rgba(40, 167, 69, 0.02) !important;
         }
 
-        /* ===== فضای ثابت بدون حرکت ===== */
         .live-feedback {
             margin-top: 6px;
             font-weight: 600;
             font-size: 0.75rem;
             text-align: center;
-            height: 28px; /* ارتفاع ثابت */
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -205,7 +202,7 @@
             transition: opacity 0.25s ease, transform 0.25s ease;
             transform: translateZ(0);
             will-change: transform;
-            opacity: 0; /* مخفی پیش‌فرض */
+            opacity: 0;
             transform: scale(0.95);
             pointer-events: none;
             position: absolute;
@@ -235,7 +232,6 @@
             box-shadow: 0 1px 6px rgba(220, 53, 69, 0.08);
         }
 
-        /* ===== ارور لیست هم ثابت ===== */
         .error-list {
             list-style: none;
             margin-top: 6px;
@@ -300,6 +296,54 @@
             opacity: 0.75;
             cursor: wait;
         }
+
+        .btn-register {
+            width: 100%;
+            background: transparent;
+            border: 2px solid #2a5f8a;
+            padding: 0.8rem 1rem;
+            border-radius: 80px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1e3a5f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: 'IRANYekan', 'Vazirmatn', sans-serif;
+            margin-top: 0.8rem;
+            background: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+        }
+        .btn-register:hover {
+            background: #2a5f8a;
+            color: white;
+            border-color: #2a5f8a;
+            box-shadow: 0 8px 20px -8px rgba(28, 75, 100, 0.3);
+        }
+        .btn-register:active {
+            transform: scale(0.97);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.2rem 0 0.5rem;
+            color: #7a9bb0;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #b8d0de, transparent);
+        }
+
         .spinner {
             display: inline-block;
             width: 18px;
@@ -349,7 +393,7 @@
                 padding: 0.15rem 0.8rem;
             }
             .error-list {
-                height: 0px;
+                height: 24px;
             }
             .error-list li {
                 font-size: 0.7rem;
@@ -359,6 +403,15 @@
                 padding: 0.8rem 1rem;
                 font-size: 0.9rem;
                 margin-top: 0.2rem;
+            }
+            .btn-register {
+                padding: 0.7rem 1rem;
+                font-size: 0.85rem;
+                margin-top: 0.6rem;
+            }
+            .divider {
+                margin: 1rem 0 0.3rem;
+                font-size: 0.7rem;
             }
             .terms-note {
                 margin-top: 1rem;
@@ -418,6 +471,16 @@
             <span>دریافت کد تایید</span>
             <i class="fa-regular fa-paper-plane"></i>
         </button>
+
+        <div class="divider">
+            <span>یا</span>
+        </div>
+
+        <a href="{% url 'account:registration_form' %}" class="btn-register">
+            <i class="fa-regular fa-user-plus"></i>
+            <span>درخواست عضویت</span>
+        </a>
+
         <div class="terms-note">
             ورود به منزله پذیرش <a href="#">قوانین دکو</a> و <a href="#">حریم خصوصی</a> است.
         </div>
@@ -467,7 +530,6 @@
             const isValid = isValidIranMobile(digits);
             mobileInput.classList.remove('error-input', 'valid-input');
 
-            // حذف همه محتواهای قبلی
             liveFeedback.innerHTML = '';
             errorContainer.innerHTML = '';
 
@@ -572,7 +634,6 @@
             }
         }
 
-        // ===== رویدادها =====
         mobileInput.addEventListener('input', function() {
             let val = mobileInput.value;
             let cleaned = val.replace(/\D/g, '').slice(0, 11);
@@ -595,7 +656,6 @@
 
         form.addEventListener('submit', handleFormSubmit);
 
-        // مقدار اولیه
         if (mobileInput.value) {
             let cleaned = mobileInput.value.replace(/\D/g, '').slice(0, 11);
             mobileInput.value = cleaned;
