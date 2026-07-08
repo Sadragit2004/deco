@@ -193,7 +193,7 @@
         }
     }
 
-    // ========== رندر اسلایدر حراجی (فقط عکس + لینک روی کل کارت) ==========
+    // ========== رندر اسلایدر حراجی با متن زیر عکس ==========
     function renderSaleSliders(slidersData) {
         const sliderContainer = document.getElementById('saleSlider');
         sliderContainer.innerHTML = '';
@@ -211,7 +211,6 @@
             saleItem.setAttribute('data-link', linkUrl);
             saleItem.setAttribute('data-index', index);
 
-            // فقط عکس و هیچ متن یا دکمه‌ای به جز لینک روی کل کارت
             saleItem.innerHTML = `
                 <a href="${linkUrl}" class="sale-card-link">
                     <div class="sale-image">
@@ -221,6 +220,7 @@
                             <img src="${pcImage}" alt="${slider.title || 'حراج ویژه'}">
                         </picture>
                     </div>
+                    <div class="sale-caption">فروش ویژه گلس مورفی حرفه‌ای</div>
                 </a>
             `;
 
@@ -560,7 +560,7 @@
         min-width: 280px;
     }
 
-    /* ==================== اسلایدر مربعی حراجی (فقط عکس) ==================== */
+    /* ==================== اسلایدر مربعی حراجی ==================== */
     .sale-slider-wrapper {
         flex: 1;
         min-width: 280px;
@@ -608,6 +608,7 @@
         width: 100%;
         height: 100%;
         text-decoration: none;
+        position: relative;
     }
 
     .sale-image {
@@ -627,6 +628,26 @@
 
     .sale-card:hover .sale-image img {
         transform: scale(1.05);
+    }
+
+    /* استایل کپشن اسلایدر حراجی */
+    .sale-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 70%, transparent 100%);
+        color: #fff;
+        text-align: center;
+        padding: 40px 15px 20px 15px;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        border-radius: 0 0 20px 20px;
+        z-index: 2;
+        pointer-events: none;
+        direction: rtl;
     }
 
     /* دکمه‌های ناوبری اسلایدر حراجی */
@@ -665,7 +686,7 @@
     /* دات‌های اسلایدر حراجی */
     .sale-slider-dots {
         position: absolute;
-        bottom: 15px;
+        bottom: 60px;
         left: 50%;
         transform: translateX(-50%);
         display: flex;
@@ -959,6 +980,8 @@
         .dot { width: 12px; height: 12px; }
         .dot.active { width: 30px; }
         .sale-slider { min-height: 450px; }
+        .sale-caption { font-size: 20px; padding: 45px 20px 25px 20px; }
+        .sale-slider-dots { bottom: 70px; }
     }
 
     /* استایل موبایل */
@@ -983,6 +1006,8 @@
         .dot.active { width: 15px; }
         .sale-slider { min-height: 280px; }
         .sale-slider-btn { width: 28px; height: 28px; font-size: 14px; }
+        .sale-caption { font-size: 14px; padding: 30px 10px 15px 10px; }
+        .sale-slider-dots { bottom: 50px; }
         .lightbox-nav { width: 40px; height: 40px; font-size: 20px; }
         .lightbox-close { top: 10px; right: 15px; font-size: 36px; width: 40px; height: 40px; }
     }
@@ -993,6 +1018,8 @@
         .banner-caption h3 { font-size: 18px; }
         .banner-caption p { font-size: 12px; }
         .sale-slider { min-height: 380px; }
+        .sale-caption { font-size: 16px; padding: 35px 12px 18px 12px; }
+        .sale-slider-dots { bottom: 60px; }
     }
 </style>
 

@@ -139,22 +139,22 @@ function escapeHtml(text) {
 }
 
 // ============================================
-// رندر محصولات از API
+// رندر محصولات با گلس مورفی
 // ============================================
 function renderProductCard(product, showDiscount = true) {
     let productTitle = product.name || product.title || '';
-    let truncatedTitle = productTitle.length > 35 ? productTitle.substring(0, 35) + '...' : productTitle;
+    let truncatedTitle = productTitle.length > 30 ? productTitle.substring(0, 30) + '...' : productTitle;
 
     let discountText = '';
     if (showDiscount && (product.hasDiscount || product.discountPercent || product.discount)) {
         if (product.discountPercent) {
-            discountText = `🔥 ${product.discountPercent}٪ تخفیف`;
+            discountText = `🔥 ${product.discountPercent}٪`;
         } else if (product.discount && typeof product.discount === 'string' && product.discount.includes('%')) {
             discountText = `🔥 ${product.discount}`;
         } else if (product.discount) {
-            discountText = `🔥 ${product.discount} تخفیف`;
+            discountText = `🔥 ${product.discount}`;
         } else if (product.hasDiscount) {
-            discountText = `🔥 تخفیف ویژه`;
+            discountText = `🔥 ویژه`;
         }
     }
 
@@ -165,9 +165,16 @@ function renderProductCard(product, showDiscount = true) {
 
     const productImage = getValidImage(product.img || product.image);
 
+    // وضعیت موجودی
+    const inStock = product.in_stock !== false;
+    const stockBadge = inStock
+        ? '<span class="stock-badge">✓ موجود</span>'
+        : '<span class="stock-badge out-of-stock">✗ ناموجود</span>';
+
     return `
         <div class="product-card-item" data-product-id="${product.id || product.product_id}">
             ${discountText ? `<div class="discount-badge">${discountText}</div>` : ''}
+            ${stockBadge}
             <a href="/product/${product.slug || '#'}" class="product-img-link">
                 <img src="${productImage}" onerror="this.src='${DEFAULT_IMAGE}'" alt="${escapeHtml(productTitle)}">
             </a>
@@ -181,10 +188,12 @@ function renderProductCard(product, showDiscount = true) {
             </div>
             <div class="product-meta">
                 <span><i class="fas fa-ruler-combined"></i> ${product.meter || ' '}</span>
-                <span class="product-code"><i class="fas fa-barcode"></i> ${product.code || 'کد نامشخص'}</span>
+                <span class="product-code"><i class="fas fa-barcode"></i> ${product.code || '---'}</span>
             </div>
             <div class="price-row">
-                
+                <div class="add-icon" onclick="addToCartById(${product.id || product.product_id}, 1, true)">
+                    <i class="fas fa-plus"></i>
+                </div>
             </div>
         </div>
     `;
@@ -209,7 +218,8 @@ async function fetchAndRenderLatestProducts() {
                 code: p.code,
                 brand: p.brand,
                 img: p.img,
-                slug: p.slug
+                slug: p.slug,
+                in_stock: p.in_stock !== false
             }));
             container.innerHTML = apiProducts.map(p => renderProductCard(p, true)).join('');
         } else {
@@ -240,7 +250,8 @@ async function fetchAndRenderBestsellers() {
                 code: p.code,
                 brand: p.brand,
                 img: getValidImage(p.image),
-                slug: p.slug
+                slug: p.slug,
+                in_stock: p.in_stock !== false
             }));
             container.innerHTML = products.map(p => renderProductCard(p, true)).join('');
         } else {
@@ -1057,7 +1068,6 @@ async function renderWishlist() {
                             <button class="btn-remove-wishlist" onclick="removeFromWishlist(${item.product_id})">
                                 <i class="fas fa-trash-alt"></i> حذف
                             </button>
-
                         </div>
                     </div>
                 </div>
@@ -1229,81 +1239,443 @@ document.addEventListener('click', (e) => {
 });
 
 // ============================================
-// استایل‌ها
+// استایل‌های گلس مورفی
 // ============================================
-function addProductCardStyles() {
-    if (document.getElementById('product-card-styles')) return;
+function addGlassmorphismStyles() {
+    if (document.getElementById('glassmorphism-styles')) return;
     const styles = document.createElement('style');
-    styles.id = 'product-card-styles';
+    styles.id = 'glassmorphism-styles';
     styles.textContent = `
+        /* ============================================
+           گلس مورفی حرفه‌ای برای کارت محصولات
+           ============================================ */
+
         .product-card-item {
-            background: white; border-radius: 16px; overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: all 0.3s ease;
-            position: relative; display: flex; flex-direction: column; height: 100%;
-            border: 1px solid #eee;
+            background: rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(20px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.25) !important;
+            border-radius: 24px !important;
+            overflow: hidden;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 380px;
+            max-height: 420px;
+            padding: 12px !important;
+            margin: 6px;
         }
-        .product-card-item:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-        .product-img-link { display: block; overflow: hidden; }
-        .product-card-item img { width: 100%; aspect-ratio: 1 / 0.9; object-fit: cover; transition: transform 0.3s ease; }
-        .product-card-item:hover img { transform: scale(1.02); }
-        .product-title-link { text-decoration: none; padding: 8px 10px 0 10px; display: block; }
+
+        .product-card-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 24px;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.2) 0%,
+                rgba(255, 255, 255, 0.05) 40%,
+                rgba(255, 255, 255, 0.2) 80%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .product-card-item::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 26px;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0%,
+                rgba(233, 101, 0, 0.3) 25%,
+                rgba(255, 200, 0, 0.3) 50%,
+                rgba(233, 101, 0, 0.3) 75%,
+                transparent 100%
+            );
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            z-index: -1;
+            animation: spinBorder 6s linear infinite;
+        }
+
+        .product-card-item:hover::after {
+            opacity: 1;
+        }
+
+        @keyframes spinBorder {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .product-card-item:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow:
+                0 20px 60px rgba(233, 101, 0, 0.15),
+                0 0 40px rgba(233, 101, 0, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+            background: rgba(255, 255, 255, 0.25) !important;
+        }
+
+        .product-img-link {
+            display: block;
+            overflow: hidden;
+            border-radius: 16px;
+            position: relative;
+            z-index: 2;
+            aspect-ratio: 1 / 0.85;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .product-card-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border-radius: 16px;
+        }
+
+        .product-card-item:hover img {
+            transform: scale(1.08);
+        }
+
+        .product-img-link::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                transparent 30%,
+                transparent 70%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            border-radius: 16px;
+            pointer-events: none;
+        }
+
+        .product-title-link {
+            text-decoration: none;
+            padding: 8px 4px 0 4px;
+            display: block;
+            z-index: 2;
+            position: relative;
+        }
+
         .product-title-text {
-            font-size: 0.85rem; font-weight: 600; line-height: 1.4; margin: 0;
-            color: #1e2a3e; display: -webkit-box; -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical; overflow: hidden; min-height: 38px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin: 0;
+            color: #1a1a2e;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 38px;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
         }
-        .product-price-wrapper { padding: 6px 10px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; }
-        .final-price { font-size: 1rem; font-weight: 800; color: #e96500; }
-        .original-price { font-size: 0.7rem; color: #94a3b8; text-decoration: line-through; }
-        .price-per-meter { font-size: 0.65rem; color: #64748b; }
-        .product-meta { padding: 0 10px 6px; display: flex; justify-content: space-between; font-size: 0.65rem; color: #64748b; gap: 8px; }
-        .product-meta span { display: flex; align-items: center; gap: 3px; }
-        .price-row { padding: 6px 10px 10px; display: flex; justify-content: flex-end; }
+
+        .product-price-wrapper {
+            padding: 4px 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 2;
+            position: relative;
+            flex-wrap: wrap;
+        }
+
+        .final-price {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #e96500;
+            background: linear-gradient(135deg, #e96500, #b85500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .original-price {
+            font-size: 0.7rem;
+            color: rgba(100, 116, 139, 0.7);
+            text-decoration: line-through;
+            -webkit-text-fill-color: #94a3b8;
+        }
+
+        .price-per-meter {
+            font-size: 0.65rem;
+            color: rgba(100, 116, 139, 0.6);
+            font-weight: 400;
+        }
+
+        .product-meta {
+            padding: 0 4px 4px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.6rem;
+            color: rgba(100, 116, 139, 0.6);
+            gap: 8px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .product-meta span {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .price-row {
+            padding: 4px 4px;
+            display: flex;
+            justify-content: flex-end;
+            z-index: 2;
+            position: relative;
+            margin-top: auto;
+        }
+
         .add-icon {
-            width: 32px; height: 32px; background: linear-gradient(135deg, #e96500, #b85500);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.2s; color: white;
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, #e96500, #b85500);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            color: white;
+            box-shadow: 0 4px 15px rgba(233, 101, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .add-icon:hover { transform: scale(1.05); }
+
+        .add-icon:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 6px 25px rgba(233, 101, 0, 0.5);
+            background: linear-gradient(135deg, #f57c00, #e96500);
+        }
+
         .discount-badge {
-            position: absolute; top: 8px; right: 8px;
-            background: #fee2e2; color: #b91c1c; padding: 2px 8px;
-            border-radius: 20px; font-size: 0.6rem; font-weight: 700; z-index: 2;
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #b91c1c;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(185, 28, 28, 0.15);
         }
+
+        .stock-badge {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            background: rgba(16, 185, 129, 0.9);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 0.55rem;
+            font-weight: 600;
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stock-badge.out-of-stock {
+            background: rgba(239, 68, 68, 0.9);
+        }
+
+        .products-scroll,
+        .catalog-vertical-grid,
+        .brands-horizontal,
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            padding: 8px;
+            scroll-behavior: smooth;
+            cursor: grab;
+        }
+
+        @media (max-width: 768px) {
+            .products-scroll,
+            .catalog-vertical-grid,
+            .brands-horizontal,
+            .portfolio-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 8px;
+                padding: 4px;
+            }
+
+            .product-card-item {
+                min-height: 320px;
+                max-height: 360px;
+                padding: 8px !important;
+                border-radius: 18px !important;
+            }
+
+            .product-title-text {
+                font-size: 0.75rem;
+                min-height: 32px;
+            }
+
+            .final-price {
+                font-size: 0.9rem;
+            }
+
+            .add-icon {
+                width: 28px;
+                height: 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .products-scroll,
+            .catalog-vertical-grid,
+            .brands-horizontal,
+            .portfolio-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 6px;
+            }
+
+            .product-card-item {
+                min-height: 280px;
+                max-height: 320px;
+                padding: 6px !important;
+                border-radius: 14px !important;
+            }
+
+            .product-title-text {
+                font-size: 0.7rem;
+                min-height: 28px;
+            }
+
+            .product-meta {
+                font-size: 0.5rem;
+            }
+
+            .product-meta span {
+                padding: 1px 6px;
+            }
+        }
+
+        @keyframes glassFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .product-card-item {
+            animation: glassFadeIn 0.6s ease forwards;
+        }
+
+        .product-card-item:nth-child(1) { animation-delay: 0.05s; }
+        .product-card-item:nth-child(2) { animation-delay: 0.1s; }
+        .product-card-item:nth-child(3) { animation-delay: 0.15s; }
+        .product-card-item:nth-child(4) { animation-delay: 0.2s; }
+        .product-card-item:nth-child(5) { animation-delay: 0.25s; }
+        .product-card-item:nth-child(6) { animation-delay: 0.3s; }
+        .product-card-item:nth-child(7) { animation-delay: 0.35s; }
+        .product-card-item:nth-child(8) { animation-delay: 0.4s; }
+        .product-card-item:nth-child(9) { animation-delay: 0.45s; }
+        .product-card-item:nth-child(10) { animation-delay: 0.5s; }
+        .product-card-item:nth-child(11) { animation-delay: 0.55s; }
+        .product-card-item:nth-child(12) { animation-delay: 0.6s; }
+
         .portfolio-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center;
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
         }
+
         .portfolio-modal-content {
-            background: white; border-radius: 20px; max-width: 800px; width: 90%;
-            max-height: 90vh; overflow-y: auto; padding: 20px; position: relative;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
+
         .portfolio-gallery {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
         }
+
         .portfolio-gallery img {
-            width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px;
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 12px;
         }
-        .portfolio-user-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
-        }
-        .portfolio-user-gallery {
-            display: flex; gap: 10px; margin-top: 10px; position: relative;
-        }
-        .portfolio-user-gallery img {
-            width: 80px; height: 80px; object-fit: cover; border-radius: 8px;
-        }
-        .gallery-more {
-            width: 80px; height: 80px; background: rgba(0,0,0,0.7); border-radius: 8px;
-            display: flex; align-items: center; justify-content: center; color: white;
-        }
+
         .empty-state, .error-state {
-            text-align: center; padding: 40px; color: #94a3b8;
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
         }
+
+        .empty-cart {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-cart i {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
         @keyframes slideInRight {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+
         @keyframes slideOutRight {
             from { transform: translateX(0); opacity: 1; }
             to { transform: translateX(100%); opacity: 0; }
@@ -1312,26 +1684,9 @@ function addProductCardStyles() {
     document.head.appendChild(styles);
 }
 
-function addNotificationStyles() {
-    if (document.getElementById('notification-styles')) return;
-    const styles = document.createElement('style');
-    styles.id = 'notification-styles';
-    styles.textContent = `
-        .notif-item.unread { background: #fef3e8; border-right: 3px solid #e96500; }
-        .notif-dot { width: 8px; height: 8px; background: #e96500; border-radius: 50%; margin-right: 10px; }
-        .pending-order-card {
-            background: linear-gradient(135deg, #fff5eb, #ffe8d6); border-radius: 16px;
-            padding: 16px; margin-bottom: 20px; border: 1px solid #ffd9b5;
-        }
-        .pending-pay-btn {
-            width: 100%; background: linear-gradient(135deg, #e96500, #b85500);
-            color: white; border: none; padding: 12px; border-radius: 12px;
-            font-weight: 700; margin: 12px 0; cursor: pointer;
-        }
-    `;
-    document.head.appendChild(styles);
-}
-
+// ============================================
+// اسکرول خودکار
+// ============================================
 function setupAutoScroll(containerId, scrollAmount = 280, intervalTime = 3000) {
     const container = document.getElementById(containerId);
     if (!container) return null;
@@ -1367,8 +1722,7 @@ function setupAutoScroll(containerId, scrollAmount = 280, intervalTime = 3000) {
 // ============================================
 // اجرای اولیه
 // ============================================
-addProductCardStyles();
-addNotificationStyles();
+addGlassmorphismStyles();
 fetchAndRenderLatestProducts();
 fetchAndRenderBestsellers();
 fetchAndRenderCategories();
@@ -1385,8 +1739,13 @@ addMarkAllButton();
 
 setTimeout(() => {
     setupAutoScroll('newProductsList', 280, 3000);
-    setupAutoScroll('topProductsList', 280, 3000);
     setupAutoScroll('bestsellersList', 280, 3000);
 }, 1000);
 
 window.addEventListener('beforeunload', stopNotificationPolling);
+
+// ============================================
+// پایان فایل
+// ============================================
+console.log('✅ تمام سیستم‌ها با موفقیت بارگذاری شدند');
+console.log('✨ گلس مورفی حرفه‌ای فعال شد');

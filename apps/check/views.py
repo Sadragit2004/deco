@@ -112,7 +112,7 @@ class UserCheckPaymentDetailView(LoginRequiredMixin, DetailView):
     نمایش جزئیات یک چک خاص
     """
     model = CheckPayment
-    template_name = 'payment/user_check_detail.html'
+    template_name = 'check_app/user_check_detail.html'
     context_object_name = 'check'
     slug_field = 'tracking_number'
     slug_url_kwarg = 'tracking_number'
