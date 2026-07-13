@@ -2,6 +2,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth import login
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from ..models.user import CustomUser
 from ..models.security import UserSecurity
 from ..validators.common import generate_activation_code
@@ -10,15 +11,16 @@ import utils
 
 class AuthService:
     @staticmethod
-    def get_or_create_user(mobile):
+    def get_active_user(mobile):
         """
-        بررسی وجود کاربر یا ساخت کاربر جدید
+        دریافت کاربر فعال بر اساس شماره موبایل
+        فقط کاربرانی که وجود دارند و is_active=True هستند برگردانده می‌شوند
         """
-        user, created = CustomUser.objects.get_or_create(mobileNumber=mobile)
-        if created:
-            user.is_active = False
-            user.save()
-        return user
+        try:
+            user = CustomUser.objects.get(mobileNumber=mobile, is_active=True)
+            return user
+        except CustomUser.DoesNotExist:
+            raise ValidationError("کاربری با این شماره موبایل یافت نشد یا غیرفعال است.")
 
     @staticmethod
     def get_or_create_security(user):
@@ -48,9 +50,9 @@ class AuthService:
         بررسی صحت و انقضای کد
         """
         if security.expireCode < timezone.now():
-            raise ValueError(" کد منقضی شده است.")
+            raise ValueError("کد منقضی شده است.")
         if not validate_activation_code(security, code):
-            raise ValueError(" کد واردشده معتبر نیست")
+            raise ValueError("کد واردشده معتبر نیست")
         # پاکسازی کد بعد از موفقیت
         security.activeCode = None
         security.expireCode = None
@@ -58,25 +60,9 @@ class AuthService:
         return True
 
     @staticmethod
-    def activate_user(user):
+    def login_user(request, user):
         """
-        فعال کردن کاربر
+        لاگین کاربر
         """
-        user.is_active = True
-        user.save()
-
-    # ===== متد جدید برای بررسی وضعیت کاربر =====
-    @staticmethod
-    def check_user_status(mobile):
-        """
-        بررسی وضعیت کاربر بر اساس شماره موبایل
-        Returns: (user, status, message)
-        status: 'not_found', 'inactive', 'active'
-        """
-        try:
-            user = CustomUser.objects.get(mobileNumber=mobile)
-            if not user.is_active:
-                return user, 'inactive', 'حساب کاربری شما هنوز تایید نشده است. لطفاً منتظر تایید ادمین باشید.'
-            return user, 'active', 'کاربر فعال'
-        except CustomUser.DoesNotExist:
-            return None, 'not_found', 'شما در لیست عضویت نیستید. لطفاً ثبت‌نام کنید.'
+        login(request, user)
+        return True

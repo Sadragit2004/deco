@@ -199,6 +199,8 @@ web/settings/*.py
 /media/*
 /media/**/*
 
+!media/images/
+!media/audio/
 # Specific media directories
 **/media/
 **/media/*

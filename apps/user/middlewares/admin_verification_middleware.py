@@ -21,6 +21,7 @@ class AdminVerificationMiddleware(MiddlewareMixin):
         '/accounts/login/',
         '/admin/',
         '/accounts/register/',
+        '/accounts/get-cities/',
         '/accounts/register/success/',
         '/accounts/verify/',
         '/accounts/verify-code/',

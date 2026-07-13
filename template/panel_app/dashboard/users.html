@@ -93,6 +93,7 @@
 <script>
     let mobilePage = 1, mobileFilters = {}, mobileSearchTimeout = null;
     let currentUserRoles = [], allRolesList = [];
+    let mobileSearchValue = ''; // متغیر گلوبال برای جستجو
 
     function getCSRFToken() { return document.querySelector('[name=csrfmiddlewaretoken]')?.value || document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1]; }
     function formatNumber(num) { if (num === undefined || num === null) return '۰'; return new Intl.NumberFormat('fa-IR').format(num); }
@@ -113,14 +114,28 @@
         } catch(e) { alert('خطا'); return false; }
     }
 
+    // ===== تابع بارگذاری کاربران با جستجو =====
     async function loadMobileUsers() {
-        const params = new URLSearchParams({ page: mobilePage, page_size: 10, ...mobileFilters });
+        const params = new URLSearchParams({
+            page: mobilePage,
+            page_size: 10,
+            ...mobileFilters,
+            search: mobileSearchValue // استفاده از متغیر گلوبال برای جستجو
+        });
+
         try {
             const response = await fetch(`/panel/api/users/?${params}`);
             const data = await response.json();
-            if (data.success) { renderMobileUsers(data.data.users); renderMobilePagination(data.data.pagination); loadMobileStats(); }
-            else { document.getElementById('mobileUsersList').innerHTML = '<div class="loading">خطا</div>'; }
-        } catch(e) { document.getElementById('mobileUsersList').innerHTML = '<div class="loading">خطا</div>'; }
+            if (data.success) {
+                renderMobileUsers(data.data.users);
+                renderMobilePagination(data.data.pagination);
+                loadMobileStats();
+            } else {
+                document.getElementById('mobileUsersList').innerHTML = '<div class="loading">خطا</div>';
+            }
+        } catch(e) {
+            document.getElementById('mobileUsersList').innerHTML = '<div class="loading">خطا</div>';
+        }
     }
 
     async function loadMobileStats() {
@@ -175,14 +190,18 @@
 
     function goToMobilePage(page) { mobilePage = page; loadMobileUsers(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
+    // ===== تابع اعمال فیلترها با جستجو =====
     function applyMobileFilters() {
         let status = document.getElementById('mobileStatusFilter').value;
         let role = document.getElementById('mobileRoleFilter').value;
         let gender = document.getElementById('mobileGenderFilter').value;
         let verified = document.getElementById('mobileVerifiedFilter').value;
         let payment = document.getElementById('mobilePaymentFilter').value;
+
+        // ذخیره مقدار جستجو در متغیر گلوبال
+        mobileSearchValue = document.getElementById('mobileSearchInput').value;
+
         mobileFilters = {
-            search: document.getElementById('mobileSearchInput').value,
             is_active: status === 'active' ? 'true' : (status === 'inactive' ? 'false' : ''),
             is_banned: status === 'banned' ? 'true' : '',
             is_online: status === 'online' ? 'true' : '',
@@ -191,8 +210,12 @@
             is_verified: verified === 'verified' ? 'true' : (verified === 'not_verified' ? 'false' : ''),
             is_payment: payment === 'active' ? 'true' : (payment === 'inactive' ? 'false' : '')
         };
+
+        // حذف فیلدهای خالی
         Object.keys(mobileFilters).forEach(k => { if (!mobileFilters[k]) delete mobileFilters[k]; });
-        mobilePage = 1; loadMobileUsers();
+
+        mobilePage = 1;
+        loadMobileUsers();
     }
 
     function resetMobileFilters() {
@@ -202,7 +225,10 @@
         document.getElementById('mobileGenderFilter').value = '';
         document.getElementById('mobileVerifiedFilter').value = '';
         document.getElementById('mobilePaymentFilter').value = '';
-        mobileFilters = {}; mobilePage = 1; loadMobileUsers();
+        mobileSearchValue = ''; // ریست کردن جستجو
+        mobileFilters = {};
+        mobilePage = 1;
+        loadMobileUsers();
     }
 
     // ==================== نقش‌های کاربر ====================
@@ -371,7 +397,11 @@
 
     function closeMobileModal() { document.getElementById('mobileUserModal').style.display = 'none'; }
 
-    document.getElementById('mobileSearchInput').addEventListener('input', function() { clearTimeout(mobileSearchTimeout); mobileSearchTimeout = setTimeout(() => applyMobileFilters(), 500); });
+    // ===== رویدادهای جستجو =====
+    document.getElementById('mobileSearchInput').addEventListener('input', function() {
+        clearTimeout(mobileSearchTimeout);
+        mobileSearchTimeout = setTimeout(() => applyMobileFilters(), 500);
+    });
     document.getElementById('mobileStatusFilter').addEventListener('change', applyMobileFilters);
     document.getElementById('mobileRoleFilter').addEventListener('change', applyMobileFilters);
     document.getElementById('mobileGenderFilter').addEventListener('change', applyMobileFilters);
@@ -459,6 +489,7 @@
 <script>
     let currentPage = 1, currentSort = '-createAt', currentFilters = {}, searchTimeoutDesktop = null;
     let pcUserRoles = [], pcAllRoles = [];
+    let desktopSearchValue = ''; // متغیر گلوبال برای جستجو
 
     function getCSRFToken() { return document.querySelector('[name=csrfmiddlewaretoken]')?.value || document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1]; }
     function formatNumber(n) { if (n === undefined || n === null) return '۰'; return new Intl.NumberFormat('fa-IR').format(n); }
@@ -469,9 +500,24 @@
         try { const res = await fetch(url, { method: 'POST', headers: { 'X-CSRFToken': getCSRFToken() } }); const data = await res.json(); if (data.success) loadUsers(); else alert(data.message); } catch(e) { alert('خطا'); }
     }
 
+    // ===== تابع بارگذاری کاربران با جستجو =====
     async function loadUsers() {
-        const params = new URLSearchParams({ page: currentPage, sort_by: currentSort, ...currentFilters });
-        try { const res = await fetch(`/panel/api/users/?${params}`); const data = await res.json(); if (data.success) { updateStats(); updateTable(data.data.users); updatePagination(data.data.pagination); } } catch(e) { console.error(e); }
+        const params = new URLSearchParams({
+            page: currentPage,
+            sort_by: currentSort,
+            ...currentFilters,
+            search: desktopSearchValue // استفاده از متغیر گلوبال برای جستجو
+        });
+
+        try {
+            const res = await fetch(`/panel/api/users/?${params}`);
+            const data = await res.json();
+            if (data.success) {
+                updateStats();
+                updateTable(data.data.users);
+                updatePagination(data.data.pagination);
+            }
+        } catch(e) { console.error(e); }
     }
 
     async function updateStats() {
@@ -502,17 +548,24 @@
         container.innerHTML = html;
     }
 
+    // ===== تابع اعمال فیلترها با جستجو =====
     function applyFilters() {
+        // ذخیره مقدار جستجو در متغیر گلوبال
+        desktopSearchValue = document.getElementById('searchInput').value;
+
         currentFilters = {
-            search: document.getElementById('searchInput').value,
             is_active: (s=document.getElementById('filterStatus').value) === 'active' ? 'true' : (s === 'inactive' ? 'false' : ''),
             is_banned: (b=document.getElementById('filterBan').value) === 'banned' ? 'true' : (b === 'not_banned' ? 'false' : ''),
             is_online: (o=document.getElementById('filterOnline').value) === 'online' ? 'true' : (o === 'offline' ? 'false' : ''),
             is_verified: (v=document.getElementById('filterVerified').value) === 'verified' ? 'true' : (v === 'not_verified' ? 'false' : ''),
             is_payment: (p=document.getElementById('filterPayment').value) === 'active' ? 'true' : (p === 'inactive' ? 'false' : '')
         };
+
+        // حذف فیلدهای خالی
         Object.keys(currentFilters).forEach(k => { if (!currentFilters[k]) delete currentFilters[k]; });
-        currentPage = 1; loadUsers();
+
+        currentPage = 1;
+        loadUsers();
     }
 
     function resetFilters() {
@@ -522,7 +575,10 @@
         document.getElementById('filterOnline').value = '';
         document.getElementById('filterVerified').value = '';
         document.getElementById('filterPayment').value = '';
-        currentFilters = {}; currentPage = 1; loadUsers();
+        desktopSearchValue = ''; // ریست کردن جستجو
+        currentFilters = {};
+        currentPage = 1;
+        loadUsers();
     }
 
     function sortUsers(field) { currentSort = currentSort === field ? `-${field}` : field; loadUsers(); }
@@ -610,7 +666,11 @@
         try { const res = await fetch(`/panel/api/users/${userId}/update-points/`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() }, body: JSON.stringify({ points: parseInt(points), operation }) }); const data = await res.json(); if (data.success) { alert(data.message); loadUsers(); closeModal('userDetailModal'); } else { alert(data.error); } } catch(e) { alert('خطا'); }
     }
 
-    document.getElementById('searchInput').addEventListener('input', function() { clearTimeout(searchTimeoutDesktop); searchTimeoutDesktop = setTimeout(() => applyFilters(), 500); });
+    // ===== رویدادهای جستجو =====
+    document.getElementById('searchInput').addEventListener('input', function() {
+        clearTimeout(searchTimeoutDesktop);
+        searchTimeoutDesktop = setTimeout(() => applyFilters(), 500);
+    });
     document.getElementById('filterStatus').addEventListener('change', applyFilters);
     document.getElementById('filterBan').addEventListener('change', applyFilters);
     document.getElementById('filterOnline').addEventListener('change', applyFilters);

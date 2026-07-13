@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.utils import timezone
 from django.http import JsonResponse
+from django.core.exceptions import ValidationError
 from ...forms.auth.verify_form import VerificationCodeForm
 from ...models.user import CustomUser
 from ...service.auth_service import AuthService
@@ -16,20 +17,16 @@ def verify_code(request):
         return redirect("account:send_mobile")
 
     try:
-        user = CustomUser.objects.get(mobileNumber=mobile)
+        # فقط کاربر فعال را دریافت می‌کنیم
+        user = AuthService.get_active_user(mobile)
         security = AuthService.get_or_create_security(user)
-    except CustomUser.DoesNotExist:
-        messages.error(request, "شما در لیست عضویت نیستید. لطفاً ثبت‌نام کنید.")
+    except ValidationError as e:
+        messages.error(request, str(e))
         request.session.pop("mobileNumber", None)
         request.session.pop("next_url", None)
         return redirect("account:send_mobile")
 
-    # ===== بررسی کاربر غیرفعال =====
-    if not user.is_active:
-        messages.error(request, "حساب کاربری شما هنوز تایید نشده است. لطفاً منتظر تایید ادمین باشید.")
-        request.session.pop("mobileNumber", None)
-        request.session.pop("next_url", None)
-        return redirect("account:send_mobile")
+    # دیگر نیازی به بررسی is_active نیست چون get_active_user آن را تضمین می‌کند
 
     # بررسی درخواست ارسال مجدد (AJAX)
     if request.method == "POST" and request.POST.get("resend") == "true":
@@ -68,8 +65,7 @@ def verify_code(request):
             code = form.cleaned_data.get('activeCode') or request.POST.get('verification_code')
             try:
                 AuthService.verify_code(security, code)
-                AuthService.activate_user(user)
-                login(request, user)
+                AuthService.login_user(request, user)
                 messages.success(request, "ورود با موفقیت انجام شد.")
                 request.session.pop("mobileNumber", None)
                 request.session.pop("next_url", None)

@@ -28,6 +28,7 @@ class RolePermissionMiddleware:
             '/accounts/login/',
             '/accounts/logout/',
             '/accounts/verify/',
+            '/accounts/get-cities/',
             '/admin/',
             '/static/',
             '/media/',
