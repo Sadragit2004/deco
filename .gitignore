@@ -199,8 +199,6 @@ web/settings/*.py
 /media/*
 /media/**/*
 
-!media/images/
-!media/audio/
 # Specific media directories
 **/media/
 **/media/*
@@ -260,7 +258,6 @@ web/settings/*.py
 
 # Archive files (usually uploads)
 *.zip
-*.rar
 *.7z
 *.tar
 *.gz
