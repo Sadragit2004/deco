@@ -717,3 +717,40 @@ def api_user_update_roles(request, user_id):
 
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
+
+
+# apps/admin_panel/api_views.py
+
+@admin_required
+def api_user_toggle_active(request, user_id):
+    """
+    API تغییر وضعیت فعال/غیرفعال کاربر
+    این دکمه برای تایید یا رد کاربر توسط مدیر استفاده می‌شود
+    """
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'}, status=405)
+
+    user = get_object_or_404(CustomUser, id=user_id)
+
+    # جلوگیری از غیرفعال کردن خود مدیر
+    if request.user.id == user.id:
+        return JsonResponse({
+            'success': False,
+            'error': 'شما نمی‌توانید حساب خودتان را غیرفعال کنید'
+        })
+
+    user.is_active = not user.is_active
+    user.save()
+
+    # ثبت لاگ در صورت نیاز
+    # LogEntry.objects.log_action(...)
+
+    status_text = "تایید شد ✅" if user.is_active else "رد شد ❌"
+
+    return JsonResponse({
+        'success': True,
+        'is_active': user.is_active,
+        'message': f'کاربر با موفقیت {status_text}',
+        'status_display': 'فعال' if user.is_active else 'غیرفعال',
+        'status_class': 'success' if user.is_active else 'danger'
+    })

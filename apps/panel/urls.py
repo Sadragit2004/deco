@@ -75,6 +75,7 @@ urlpatterns = [
     # ویرایش کاربر
     path('api/users/<uuid:user_id>/update/', users.api_user_update, name='api_user_update'),
 
+    path('api/users/<uuid:user_id>/toggle-active/', users.api_user_toggle_active, name='api_user_toggle_active'),
     # حذف کاربر (سافت یا هارد دیلیت)
     path('api/users/<uuid:user_id>/delete/', users.api_user_delete, name='api_user_delete'),
 

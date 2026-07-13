@@ -15,12 +15,12 @@ class RolePermissionMiddleware:
         current_path = request.path
 
         # ========== دیباگ ==========
-        print("\n" + "=" * 80)
-        print(f"🔍 میدلور اجرا شد")
-        print(f"📍 مسیر درخواستی: {current_path}")
-        print(f"👤 کاربر: {request.user}")
-        print(f"🔐 لاگین: {request.user.is_authenticated}")
-        print(f"👑 سوپرادمین: {request.user.is_superuser}")
+        # print("\n" + "=" * 80)
+        # print(f"🔍 میدلور اجرا شد")
+        # print(f"📍 مسیر درخواستی: {current_path}")
+        # print(f"👤 کاربر: {request.user}")
+        # print(f"🔐 لاگین: {request.user.is_authenticated}")
+        # print(f"👑 سوپرادمین: {request.user.is_superuser}")
         # ============================
 
         # مسیرهای عمومی که همیشه آزاد هستند (فقط لاگین و ثابت)
@@ -40,20 +40,20 @@ class RolePermissionMiddleware:
         # بررسی مسیرهای عمومی
         for public_path in public_paths:
             if current_path.startswith(public_path):
-                print(f"✅ مسیر عمومی: {public_path} - دسترسی آزاد")
-                print("=" * 80)
+                # print(f"✅ مسیر عمومی: {public_path} - دسترسی آزاد")
+                # print("=" * 80)
                 return self.get_response(request)
 
         # صفحه اصلی
         if current_path == '/':
-            print("✅ صفحه اصلی - دسترسی آزاد")
-            print("=" * 80)
+            # print("✅ صفحه اصلی - دسترسی آزاد")
+            # print("=" * 80)
             return self.get_response(request)
 
         # کاربر لاگین نکرده
         if not request.user.is_authenticated:
-            print("❌ کاربر لاگین نیست - ریدایرکت به لاگین")
-            print("=" * 80)
+            # print("❌ کاربر لاگین نیست - ریدایرکت به لاگین")
+            # print("=" * 80)
             return redirect('/accounts/login/')
 
         # ========== بررسی جدی دسترسی ==========
@@ -62,18 +62,18 @@ class RolePermissionMiddleware:
 
         # دریافت همه نقش‌های فعال کاربر (برای سوپرادمین این لیست خالیه)
         user_roles = request.user.roles.filter(isActive=True)
-        print(f"📋 نقش‌های کاربر: {list(user_roles.values_list('title', flat=True))}")
+        # print(f"📋 نقش‌های کاربر: {list(user_roles.values_list('title', flat=True))}")
 
         # اگر کاربر سوپرادمین است و نقشی نداره
         if request.user.is_superuser and not user_roles.exists():
-            print("⚠️ سوپرادمین بدون نقش - نیاز به بررسی دسترسی ندارد")
-            print("=" * 80)
+            # print("⚠️ سوپرادمین بدون نقش - نیاز به بررسی دسترسی ندارد")
+            # print("=" * 80)
             return self.get_response(request)
 
         # اگر کاربر هیچ نقشی ندارد (و سوپرادمین هم نیست)
         if not user_roles.exists():
-            print("❌ کاربر بدون نقش - دسترسی به هیچ URL ای مجاز نیست!")
-            print("=" * 80)
+            # print("❌ کاربر بدون نقش - دسترسی به هیچ URL ای مجاز نیست!")
+            # print("=" * 80)
 
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return JsonResponse({
@@ -93,18 +93,18 @@ class RolePermissionMiddleware:
                     'description': ban.description
                 })
 
-        print(f"🚫 لیست سیاه URL ها برای این کاربر:")
+        # print(f"🚫 لیست سیاه URL ها برای این کاربر:")
         for banned in banned_urls:
             print(f"   - نقش: {banned['role']} | الگو: {banned['pattern']}")
 
         # ========== بررسی دسترسی ==========
         for banned in banned_urls:
             if self.match_url(current_path, banned['pattern']):
-                print(f"🚫 دسترسی ممنوع شد!")
-                print(f"   نقش: {banned['role']}")
-                print(f"   الگو: {banned['pattern']}")
-                print(f"   مسیر درخواستی: {current_path}")
-                print("=" * 80)
+                # print(f"🚫 دسترسی ممنوع شد!")
+                # print(f"   نقش: {banned['role']}")
+                # print(f"   الگو: {banned['pattern']}")
+                # print(f"   مسیر درخواستی: {current_path}")
+                # print("=" * 80)
 
                 if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                     return JsonResponse({
@@ -115,8 +115,8 @@ class RolePermissionMiddleware:
 
                 return redirect('/')
 
-        print(f"✅ دسترسی مجاز است - مسیر {current_path} در لیست سیاه نیست")
-        print("=" * 80)
+        # print(f"✅ دسترسی مجاز است - مسیر {current_path} در لیست سیاه نیست")
+        # print("=" * 80)
         return self.get_response(request)
 
     def match_url(self, current_path, pattern):

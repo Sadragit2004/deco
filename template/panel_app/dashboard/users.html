@@ -31,11 +31,13 @@
     .user-value { color: #fff; font-size: 0.8rem; }
     .price-value { color: #fbbf24; font-size: 0.8rem; font-weight: bold; }
     .user-actions { display: flex; gap: 0.625rem; margin-top: 0.75rem; padding-top: 0.625rem; border-top: 1px solid rgba(102,126,234,0.1); flex-wrap: wrap; }
-    .action-btn { flex: 1; padding: 0.5rem; border: none; border-radius: 0.75rem; cursor: pointer; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 0.375rem; }
+    .action-btn { flex: 1; padding: 0.5rem; border: none; border-radius: 0.75rem; cursor: pointer; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; gap: 0.375rem; min-width: 80px; }
     .btn-detail { background: #667eea; color: white; }
     .btn-ban { background: #ef4444; color: white; }
     .btn-verified { background: #8b5cf6; color: white; }
     .btn-payment { background: #f59e0b; color: white; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-danger { background: #ef4444; color: white; }
     .pagination { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
     .pagination button { padding: 0.375rem 0.75rem; background: #1e293b; border: 1px solid #334155; border-radius: 0.5rem; color: #94a3b8; cursor: pointer; }
     .pagination button.active { background: #667eea; color: white; }
@@ -56,21 +58,52 @@
     .text-red-400 { color: #ef4444; }
     .text-gray-400 { color: #94a3b8; }
     .text-yellow-400 { color: #fbbf24; }
+
+    /* راهنمای دکمه‌ها */
+    .actions-guide { background: #0f172a; border-radius: 0.75rem; padding: 0.75rem; margin-bottom: 1rem; border-right: 4px solid #667eea; }
+    .actions-guide-item { display: inline-flex; align-items: center; gap: 0.5rem; margin: 0.25rem 0.75rem 0.25rem 0; font-size: 0.7rem; color: #94a3b8; }
+    .guide-dot { display: inline-block; width: 12px; height: 12px; border-radius: 4px; }
+    .guide-dot.green { background: #10b981; }
+    .guide-dot.red { background: #ef4444; }
+    .guide-dot.blue { background: #667eea; }
+    .guide-dot.purple { background: #8b5cf6; }
+    .guide-dot.yellow { background: #f59e0b; }
+
     @media (min-width: 768px) { .detail-grid { grid-template-columns: repeat(2, 1fr); } .modal-content { max-width: 600px; } }
 </style>
 
 <div class="responsive-container">
+    <!-- آمار -->
     <div class="stats-grid">
         <div class="stat-card"><div class="stat-number" id="mobileStatTotal">-</div><div class="stat-label">کل کاربران</div></div>
-        <div class="stat-card"><div class="stat-number" id="mobileStatActive">-</div><div class="stat-label">فعال</div></div>
+        <div class="stat-card"><div class="stat-number" id="mobileStatActive">-</div><div class="stat-label">تایید شده</div></div>
         <div class="stat-card"><div class="stat-number" id="mobileStatOnline">-</div><div class="stat-label">آنلاین</div></div>
         <div class="stat-card"><div class="stat-number" id="mobileStatBanned">-</div><div class="stat-label">بن شده</div></div>
         <div class="stat-card"><div class="stat-number" id="mobileStatVerified">-</div><div class="stat-label">تایید مدیر</div></div>
         <div class="stat-card"><div class="stat-number" id="mobileStatPayment">-</div><div class="stat-label">حق عضویت</div></div>
     </div>
 
+    <!-- راهنمای دکمه‌ها -->
+    <div class="actions-guide">
+        <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+            <span class="actions-guide-item"><span class="guide-dot green"></span> تایید کاربر (فعال)</span>
+            <span class="actions-guide-item"><span class="guide-dot red"></span> رد کاربر (غیرفعال)</span>
+            <span class="actions-guide-item"><span class="guide-dot red"></span> بن/رفع بن</span>
+            <span class="actions-guide-item"><span class="guide-dot purple"></span> تایید مدیر</span>
+            <span class="actions-guide-item"><span class="guide-dot yellow"></span> حق عضویت</span>
+            <span class="actions-guide-item"><span class="guide-dot blue"></span> جزئیات</span>
+        </div>
+        <div style="color: #64748b; font-size: 0.6rem; margin-top: 0.25rem;">
+            <i class="fas fa-info-circle"></i>
+            <strong>تایید کاربر:</strong> کاربر می‌تواند وارد شود •
+            <strong>رد کاربر:</strong> کاربر نمی‌تواند وارد شود
+        </div>
+    </div>
+
+    <!-- فیلترها -->
     <div class="filter-box">
         <div class="filter-group"><label>جستجو</label><input type="text" id="mobileSearchInput" placeholder="نام / شماره موبایل / ایمیل"></div>
+        <div class="filter-group"><label>وضعیت تایید</label><select id="mobileActiveFilter"><option value="">همه</option><option value="active">تایید شده (فعال)</option><option value="inactive">رد شده (غیرفعال)</option></select></div>
         <div class="filter-group"><label>وضعیت</label><select id="mobileStatusFilter"><option value="">همه</option><option value="active">فعال</option><option value="inactive">غیرفعال</option><option value="banned">بن شده</option><option value="online">آنلاین</option></select></div>
         <div class="filter-group"><label>نقش</label><select id="mobileRoleFilter"><option value="">همه</option><option value="staff">ادمین</option><option value="user">کاربر عادی</option></select></div>
         <div class="filter-group"><label>جنسیت</label><select id="mobileGenderFilter"><option value="">همه</option><option value="M">مرد</option><option value="F">زن</option></select></div>
@@ -79,10 +112,12 @@
         <div class="filter-buttons"><button class="btn-primary" onclick="applyMobileFilters()"><i class="fas fa-search"></i> جستجو</button><button class="btn-reset" onclick="resetMobileFilters()"><i class="fas fa-undo"></i> ریست</button></div>
     </div>
 
+    <!-- لیست کاربران -->
     <div class="users-list" id="mobileUsersList"><div class="loading">در حال بارگذاری...</div></div>
     <div class="pagination" id="mobilePagination"></div>
 </div>
 
+<!-- مودال جزئیات -->
 <div id="mobileUserModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><h3><i class="fas fa-user-circle"></i> جزئیات کامل کاربر</h3><button class="close-modal" onclick="closeMobileModal()">&times;</button></div>
@@ -93,12 +128,13 @@
 <script>
     let mobilePage = 1, mobileFilters = {}, mobileSearchTimeout = null;
     let currentUserRoles = [], allRolesList = [];
-    let mobileSearchValue = ''; // متغیر گلوبال برای جستجو
+    let mobileSearchValue = '';
 
     function getCSRFToken() { return document.querySelector('[name=csrfmiddlewaretoken]')?.value || document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1]; }
     function formatNumber(num) { if (num === undefined || num === null) return '۰'; return new Intl.NumberFormat('fa-IR').format(num); }
     function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
 
+    // ===== توابع عمومی مدیریت وضعیت =====
     async function updateUserStatus(userId, action) {
         let url = '';
         if (action === 'ban') url = `/panel/api/users/${userId}/toggle-ban/`;
@@ -110,17 +146,72 @@
             const response = await fetch(url, { method: 'POST', headers: { 'X-CSRFToken': getCSRFToken() } });
             const data = await response.json();
             if (data.success) { loadMobileUsers(); return true; }
-            else { alert(data.message || 'خطا'); return false; }
-        } catch(e) { alert('خطا'); return false; }
+            else { showToast(data.message || 'خطا', 'danger'); return false; }
+        } catch(e) { showToast('خطا در ارتباط با سرور', 'danger'); return false; }
     }
 
-    // ===== تابع بارگذاری کاربران با جستجو =====
+    // ===== تابع اختصاصی تایید/رد کاربر (is_active) با توضیح کامل =====
+    async function toggleUserActiveStatus(userId, currentStatus) {
+        const action = currentStatus ? 'رد' : 'تایید';
+        const confirmMessage = currentStatus
+            ? '⚠️ آیا از <strong>رد</strong> این کاربر مطمئن هستید؟\n\nکاربر دیگر نمی‌تواند وارد سیستم شود و دسترسی به تمام بخش‌ها را از دست می‌دهد.'
+            : '✅ آیا از <strong>تایید</strong> این کاربر مطمئن هستید؟\n\nکاربر می‌تواند وارد سیستم شود و به تمام بخش‌ها دسترسی پیدا می‌کند.';
+
+        if (!confirm(confirmMessage.replace(/<[^>]*>/g, ''))) return;
+
+        try {
+            const response = await fetch(`/panel/api/users/${userId}/toggle-active/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCSRFToken(),
+                    'Content-Type': 'application/json'
+                }
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                showToast(`✅ کاربر با موفقیت ${data.status_display === 'فعال' ? 'تایید' : 'رد'} شد`, data.status_class || 'success');
+                loadMobileUsers();
+            } else {
+                showToast(data.error || 'خطا در انجام عملیات', 'danger');
+            }
+        } catch(e) {
+            showToast('خطا در ارتباط با سرور', 'danger');
+        }
+    }
+
+    // ===== نمایش پیام (توست) =====
+    function showToast(message, type = 'info') {
+        const existing = document.querySelector('.custom-toast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.className = 'custom-toast';
+        toast.style.cssText = `
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            padding: 14px 28px; border-radius: 12px; color: white; z-index: 9999;
+            background: ${type === 'success' ? '#10b981' : type === 'danger' ? '#ef4444' : '#3b82f6'};
+            font-size: 14px; max-width: 90%; text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            animation: fadeInUp 0.3s ease; font-weight: 500;
+            direction: rtl;
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.4s';
+            setTimeout(() => toast.remove(), 400);
+        }, 3500);
+    }
+
+    // ===== بارگذاری کاربران =====
     async function loadMobileUsers() {
         const params = new URLSearchParams({
             page: mobilePage,
             page_size: 10,
             ...mobileFilters,
-            search: mobileSearchValue // استفاده از متغیر گلوبال برای جستجو
+            search: mobileSearchValue
         });
 
         try {
@@ -153,28 +244,61 @@
         } catch(e) { console.error(e); }
     }
 
+    // ===== رندر کاربران با دکمه تایید/رد =====
     function renderMobileUsers(users) {
         const container = document.getElementById('mobileUsersList');
-        if (!users || users.length === 0) { container.innerHTML = '<div class="loading">هیچ کاربری یافت نشد</div>'; return; }
-        container.innerHTML = users.map(user => `
+        if (!users || users.length === 0) {
+            container.innerHTML = '<div class="loading">هیچ کاربری یافت نشد</div>';
+            return;
+        }
+        container.innerHTML = users.map(user => {
+            const isActive = user.is_active;
+            return `
             <div class="user-card">
-                <div class="user-header"><span class="user-name">${escapeHtml(user.full_name) || 'کاربر بدون نام'}</span><span class="user-status ${user.is_active ? 'status-active' : 'status-inactive'}">${user.is_active ? 'فعال' : 'غیرفعال'}</span></div>
+                <div class="user-header">
+                    <span class="user-name">${escapeHtml(user.full_name) || 'کاربر بدون نام'}</span>
+                    <span class="user-status ${isActive ? 'status-active' : 'status-inactive'}">
+                        ${isActive ? '✅ تایید شده' : '❌ رد شده'}
+                    </span>
+                </div>
                 <div class="user-row"><span class="user-label"><i class="fas fa-phone"></i> موبایل:</span><span class="user-value" dir="ltr">${escapeHtml(user.mobileNumber)}</span></div>
                 <div class="user-row"><span class="user-label"><i class="fas fa-envelope"></i> ایمیل:</span><span class="user-value">${escapeHtml(user.email) || '-'}</span></div>
                 <div class="user-row"><span class="user-label"><i class="fas fa-wifi"></i> آنلاین:</span><span class="user-value ${user.is_online ? 'text-green-400' : 'text-gray-400'}">${user.is_online ? '🟢 آنلاین' : '⚫ آفلاین'}</span></div>
-                <div class="user-row"><span class="user-label"><i class="fas fa-gavel"></i> بن:</span><span class="user-value ${user.is_banned ? 'text-red-400' : 'text-green-400'}">${user.is_banned ? '🔒 بن شده' : '✅ فعال'}</span></div>
+                <div class="user-row"><span class="user-label"><i class="fas fa-gavel"></i> بن:</span><span class="user-value ${user.is_banned ? 'text-red-400' : 'text-green-400'}">${user.is_banned ? '🔒 بن شده' : '✅ آزاد'}</span></div>
                 <div class="user-row"><span class="user-label"><i class="fas fa-user-check"></i> تایید مدیر:</span><span class="user-value ${user.is_verified_by_manager ? 'text-green-400' : 'text-red-400'}">${user.is_verified_by_manager ? '✅ تایید شده' : '❌ تایید نشده'}</span></div>
                 <div class="user-row"><span class="user-label"><i class="fas fa-credit-card"></i> حق عضویت:</span><span class="user-value ${user.is_payment_user ? 'text-green-400' : 'text-red-400'}">${user.is_payment_user ? '✅ فعال' : '❌ غیرفعال'}</span></div>
                 <div class="user-row"><span class="user-label"><i class="fas fa-wallet"></i> کیف پول:</span><span class="price-value">${formatNumber(user.wallet_balance)} تومان</span></div>
                 <div class="user-row"><span class="user-label"><i class="fas fa-star"></i> امتیاز:</span><span class="user-value">${formatNumber(user.total_points)}</span></div>
+
                 <div class="user-actions">
-                    <button class="action-btn btn-detail" onclick="showMobileUserDetail('${user.id}')"><i class="fas fa-eye"></i> جزئیات</button>
-                    <button class="action-btn btn-ban" onclick="updateUserStatus('${user.id}', 'ban')"><i class="fas ${user.is_banned ? 'fa-unlock' : 'fa-lock'}"></i> ${user.is_banned ? 'رفع بن' : 'بن'}</button>
-                    <button class="action-btn btn-verified" onclick="updateUserStatus('${user.id}', 'verified')"><i class="fas ${user.is_verified_by_manager ? 'fa-times' : 'fa-check'}"></i> ${user.is_verified_by_manager ? 'لغو تایید' : 'تایید'}</button>
-                    <button class="action-btn btn-payment" onclick="updateUserStatus('${user.id}', 'payment')"><i class="fas ${user.is_payment_user ? 'fa-times-circle' : 'fa-check-circle'}"></i> ${user.is_payment_user ? 'لغو عضویت' : 'فعال‌سازی عضویت'}</button>
+                    <!-- دکمه تایید/رد با توضیح کامل -->
+                    <button
+                        class="action-btn ${isActive ? 'btn-danger' : 'btn-success'}"
+                        onclick="toggleUserActiveStatus('${user.id}', ${isActive})"
+                        title="${isActive ? 'رد کاربر - کاربر نمی‌تواند وارد شود' : 'تایید کاربر - کاربر می‌تواند وارد شود'}"
+                    >
+                        <i class="fas ${isActive ? 'fa-user-slash' : 'fa-user-check'}"></i>
+                        ${isActive ? '🚫 رد کاربر' : '✅ تایید کاربر'}
+                    </button>
+
+                    <button class="action-btn btn-ban" onclick="updateUserStatus('${user.id}', 'ban')" title="بن یا رفع بن کاربر">
+                        <i class="fas ${user.is_banned ? 'fa-unlock' : 'fa-lock'}"></i>
+                        ${user.is_banned ? 'رفع بن' : 'بن'}
+                    </button>
+                    <button class="action-btn btn-verified" onclick="updateUserStatus('${user.id}', 'verified')" title="تایید یا لغو تایید توسط مدیر">
+                        <i class="fas ${user.is_verified_by_manager ? 'fa-times' : 'fa-check'}"></i>
+                        ${user.is_verified_by_manager ? 'لغو تایید' : 'تایید مدیر'}
+                    </button>
+                    <button class="action-btn btn-payment" onclick="updateUserStatus('${user.id}', 'payment')" title="فعال یا غیرفعال کردن حق عضویت">
+                        <i class="fas ${user.is_payment_user ? 'fa-times-circle' : 'fa-check-circle'}"></i>
+                        ${user.is_payment_user ? 'لغو عضویت' : 'فعال‌سازی عضویت'}
+                    </button>
+                    <button class="action-btn btn-detail" onclick="showMobileUserDetail('${user.id}')" title="مشاهده جزئیات کامل">
+                        <i class="fas fa-eye"></i> جزئیات
+                    </button>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
     }
 
     function renderMobilePagination(pagination) {
@@ -190,19 +314,19 @@
 
     function goToMobilePage(page) { mobilePage = page; loadMobileUsers(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
-    // ===== تابع اعمال فیلترها با جستجو =====
+    // ===== فیلترها =====
     function applyMobileFilters() {
+        let activeFilter = document.getElementById('mobileActiveFilter').value;
         let status = document.getElementById('mobileStatusFilter').value;
         let role = document.getElementById('mobileRoleFilter').value;
         let gender = document.getElementById('mobileGenderFilter').value;
         let verified = document.getElementById('mobileVerifiedFilter').value;
         let payment = document.getElementById('mobilePaymentFilter').value;
 
-        // ذخیره مقدار جستجو در متغیر گلوبال
         mobileSearchValue = document.getElementById('mobileSearchInput').value;
 
         mobileFilters = {
-            is_active: status === 'active' ? 'true' : (status === 'inactive' ? 'false' : ''),
+            is_active: activeFilter === 'active' ? 'true' : (activeFilter === 'inactive' ? 'false' : ''),
             is_banned: status === 'banned' ? 'true' : '',
             is_online: status === 'online' ? 'true' : '',
             is_staff: role === 'staff' ? 'true' : (role === 'user' ? 'false' : ''),
@@ -211,7 +335,6 @@
             is_payment: payment === 'active' ? 'true' : (payment === 'inactive' ? 'false' : '')
         };
 
-        // حذف فیلدهای خالی
         Object.keys(mobileFilters).forEach(k => { if (!mobileFilters[k]) delete mobileFilters[k]; });
 
         mobilePage = 1;
@@ -220,18 +343,19 @@
 
     function resetMobileFilters() {
         document.getElementById('mobileSearchInput').value = '';
+        document.getElementById('mobileActiveFilter').value = '';
         document.getElementById('mobileStatusFilter').value = '';
         document.getElementById('mobileRoleFilter').value = '';
         document.getElementById('mobileGenderFilter').value = '';
         document.getElementById('mobileVerifiedFilter').value = '';
         document.getElementById('mobilePaymentFilter').value = '';
-        mobileSearchValue = ''; // ریست کردن جستجو
+        mobileSearchValue = '';
         mobileFilters = {};
         mobilePage = 1;
         loadMobileUsers();
     }
 
-    // ==================== نقش‌های کاربر ====================
+    // ===== نقش‌های کاربر =====
     async function loadUserRoles(userId) {
         try {
             const response = await fetch(`/panel/api/users/${userId}/get-roles/`);
@@ -310,6 +434,7 @@
         } catch(e) { alert('خطا'); }
     }
 
+    // ===== مودال جزئیات =====
     async function showMobileUserDetail(userId) {
         window.currentUserId = userId;
         try {
@@ -328,10 +453,10 @@
                         <div class="detail-item"><span class="detail-label">فروشگاه:</span><span class="detail-value">${escapeHtml(u.shop_name) || '-'}</span></div>
                     </div></div>
                     <div class="detail-section"><div class="detail-title">وضعیت حساب</div><div class="detail-grid">
-                        <div class="detail-item"><span class="detail-label">وضعیت:</span><span class="detail-value ${u.is_active ? 'text-green-400' : 'text-red-400'}">${u.is_active ? '✅ فعال' : '❌ غیرفعال'}</span></div>
+                        <div class="detail-item"><span class="detail-label">وضعیت تایید:</span><span class="detail-value ${u.is_active ? 'text-green-400' : 'text-red-400'}">${u.is_active ? '✅ تایید شده' : '❌ رد شده'}</span></div>
                         <div class="detail-item"><span class="detail-label">ادمین:</span><span class="detail-value">${u.is_staff ? '✅ بله' : '❌ خیر'}</span></div>
                         <div class="detail-item"><span class="detail-label">آنلاین:</span><span class="detail-value ${u.is_online ? 'text-green-400' : 'text-gray-400'}">${u.is_online ? '🟢 آنلاین' : '⚫ آفلاین'}</span></div>
-                        <div class="detail-item"><span class="detail-label">بن:</span><span class="detail-value ${u.security?.is_banned ? 'text-red-400' : 'text-green-400'}">${u.security?.is_banned ? '🔒 بن شده' : '🔓 فعال'}</span></div>
+                        <div class="detail-item"><span class="detail-label">بن:</span><span class="detail-value ${u.security?.is_banned ? 'text-red-400' : 'text-green-400'}">${u.security?.is_banned ? '🔒 بن شده' : '🔓 آزاد'}</span></div>
                         <div class="detail-item"><span class="detail-label">تایید مدیر:</span><span class="detail-value ${u.security?.is_verified_by_manager ? 'text-green-400' : 'text-red-400'}">${u.security?.is_verified_by_manager ? '✅ تایید' : '❌ عدم تایید'}</span></div>
                         <div class="detail-item"><span class="detail-label">حق عضویت:</span><span class="detail-value ${u.security?.is_payment_user ? 'text-green-400' : 'text-red-400'}">${u.security?.is_payment_user ? '✅ فعال' : '❌ غیرفعال'}</span></div>
                         <div class="detail-item"><span class="detail-label">عضویت:</span><span class="detail-value">${new Date(u.created_at).toLocaleDateString('fa-IR')}</span></div>
@@ -344,25 +469,21 @@
                         <div class="detail-item"><span class="detail-label">سکه:</span><span class="detail-value">${formatNumber(u.loyalty?.total_coins || 0)}</span></div>
                         <div class="detail-item"><span class="detail-label">سطح:</span><span class="detail-value">${u.loyalty?.tier_display || 'برنزی'}</span></div>
                     </div></div>
-                    <div class="detail-section"><div class="detail-title">اقدامات مدیریتی</div><div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-                        <button onclick="updateWalletFromModal('${u.id}')" style="flex:1; background:#10b981; border:none; padding:0.6rem; border-radius:0.75rem; color:white; cursor:pointer;"><i class="fas fa-wallet"></i> کیف پول</button>
-                        <button onclick="updatePointsFromModal('${u.id}')" style="flex:1; background:#8b5cf6; border:none; padding:0.6rem; border-radius:0.75rem; color:white; cursor:pointer;"><i class="fas fa-star"></i> امتیاز</button>
-                        <button onclick="toggleUserStatusFromModal('${u.id}', 'active', ${u.is_active})" style="flex:1; background:#3b82f6; border:none; padding:0.6rem; border-radius:0.75rem; color:white; cursor:pointer;"><i class="fas ${u.is_active ? 'fa-ban' : 'fa-check'}"></i> ${u.is_active ? 'غیرفعال' : 'فعال'}</button>
-                    </div></div>
+                    <div class="detail-section"><div class="detail-title">اقدامات مدیریتی</div>
+                        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                            <button onclick="toggleUserActiveStatus('${u.id}', ${u.is_active})" style="flex:1; ${u.is_active ? 'background:#ef4444;' : 'background:#10b981;'} border:none; padding:0.6rem; border-radius:0.75rem; color:white; cursor:pointer;">
+                                <i class="fas ${u.is_active ? 'fa-user-slash' : 'fa-user-check'}"></i> ${u.is_active ? 'رد کاربر' : 'تایید کاربر'}
+                            </button>
+                            <button onclick="updateWalletFromModal('${u.id}')" style="flex:1; background:#10b981; border:none; padding:0.6rem; border-radius:0.75rem; color:white; cursor:pointer;"><i class="fas fa-wallet"></i> کیف پول</button>
+                            <button onclick="updatePointsFromModal('${u.id}')" style="flex:1; background:#8b5cf6; border:none; padding:0.6rem; border-radius:0.75rem; color:white; cursor:pointer;"><i class="fas fa-star"></i> امتیاز</button>
+                        </div>
+                    </div>
                 `;
                 document.getElementById('mobileUserDetailContent').innerHTML = content;
                 document.getElementById('mobileUserModal').style.display = 'flex';
                 await loadUserRoles(userId);
             } else { alert(data.message); }
         } catch(e) { alert('خطا'); }
-    }
-
-    async function toggleUserStatusFromModal(userId, action, currentStatus) {
-        const statusText = action === 'active' ? (currentStatus ? 'غیرفعال' : 'فعال') : (currentStatus ? 'لغو' : 'فعال');
-        if(!confirm(`آیا میخواهید وضعیت را ${statusText} کنید؟`)) return;
-        await updateUserStatus(userId, action);
-        closeMobileModal();
-        setTimeout(() => showMobileUserDetail(userId), 500);
     }
 
     async function updateWalletFromModal(userId) {
@@ -397,17 +518,19 @@
 
     function closeMobileModal() { document.getElementById('mobileUserModal').style.display = 'none'; }
 
-    // ===== رویدادهای جستجو =====
+    // ===== رویدادها =====
     document.getElementById('mobileSearchInput').addEventListener('input', function() {
         clearTimeout(mobileSearchTimeout);
         mobileSearchTimeout = setTimeout(() => applyMobileFilters(), 500);
     });
+    document.getElementById('mobileActiveFilter').addEventListener('change', applyMobileFilters);
     document.getElementById('mobileStatusFilter').addEventListener('change', applyMobileFilters);
     document.getElementById('mobileRoleFilter').addEventListener('change', applyMobileFilters);
     document.getElementById('mobileGenderFilter').addEventListener('change', applyMobileFilters);
     document.getElementById('mobileVerifiedFilter').addEventListener('change', applyMobileFilters);
     document.getElementById('mobilePaymentFilter').addEventListener('change', applyMobileFilters);
 
+    // ===== استارت =====
     loadMobileUsers();
     setInterval(loadMobileUsers, 30000);
 </script>
@@ -427,16 +550,17 @@
     .btn-desktop-primary { background: linear-gradient(135deg, #667eea, #764ba2); padding: 0.625rem 1rem; border: none; border-radius: 0.75rem; color: white; cursor: pointer; }
     .btn-desktop-reset { background: #ef4444; padding: 0.625rem 1rem; border: none; border-radius: 0.75rem; color: white; cursor: pointer; }
     .users-table-wrapper { background: #1e293b; border-radius: 1.5rem; overflow-x: auto; }
-    .users-table { width: 100%; border-collapse: collapse; min-width: 1300px; }
-    .users-table th { text-align: right; padding: 0.875rem 1rem; color: #94a3b8; border-bottom: 1px solid rgba(102,126,234,0.15); background: rgba(0,0,0,0.2); cursor: pointer; }
-    .users-table td { padding: 0.75rem 1rem; color: #e2e8f0; border-bottom: 1px solid rgba(102,126,234,0.08); }
+    .users-table { width: 100%; border-collapse: collapse; min-width: 1400px; }
+    .users-table th { text-align: right; padding: 0.875rem 1rem; color: #94a3b8; border-bottom: 1px solid rgba(102,126,234,0.15); background: rgba(0,0,0,0.2); cursor: pointer; font-size: 0.75rem; }
+    .users-table td { padding: 0.75rem 1rem; color: #e2e8f0; border-bottom: 1px solid rgba(102,126,234,0.08); font-size: 0.8rem; }
     .users-table tr:hover { background: rgba(102,126,234,0.05); }
     .badge-active, .badge-online, .badge-verified, .badge-payment { background: rgba(16,185,129,0.2); color: #34d399; padding: 0.25rem 0.75rem; border-radius: 1.875rem; font-size: 0.7rem; display: inline-block; }
     .badge-inactive, .badge-offline, .badge-banned, .badge-not-verified, .badge-no-payment { background: rgba(239,68,68,0.2); color: #ef4444; padding: 0.25rem 0.75rem; border-radius: 1.875rem; font-size: 0.7rem; display: inline-block; }
-    .btn-table { padding: 0.375rem 0.75rem; border: none; border-radius: 0.625rem; color: white; cursor: pointer; margin: 0.125rem; }
+    .btn-table { padding: 0.375rem 0.75rem; border: none; border-radius: 0.625rem; color: white; cursor: pointer; margin: 0.125rem; font-size: 0.7rem; }
     .btn-primary-table { background: #667eea; }
     .btn-warning-table { background: #f59e0b; }
     .btn-success-table { background: #10b981; }
+    .btn-danger-table { background: #ef4444; }
     .btn-purple-table { background: #8b5cf6; }
     .role-badge-pc { display: inline-block; background: #8b5cf6; color: white; padding: 0.2rem 0.5rem; border-radius: 1rem; font-size: 0.65rem; margin: 0.1rem; }
     .pagination-desktop { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; }
@@ -455,20 +579,42 @@
     .text-green-400 { color: #34d399; }
     .text-red-400 { color: #ef4444; }
     .text-yellow-400 { color: #fbbf24; }
+
+    .guide-desktop { background: #0f172a; border-radius: 1rem; padding: 0.75rem 1rem; margin-bottom: 1.5rem; border-right: 4px solid #667eea; display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; align-items: center; }
+    .guide-desktop-item { font-size: 0.7rem; color: #94a3b8; display: flex; align-items: center; gap: 0.4rem; }
+    .guide-dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; }
 </style>
 
 <div class="users-container">
+    <!-- آمار -->
     <div class="stats-desktop-grid">
         <div class="stat-desktop-card"><h4>کل کاربران</h4><div class="stat-desktop-number" id="statTotal">-</div></div>
-        <div class="stat-desktop-card"><h4>فعال</h4><div class="stat-desktop-number" id="statActive">-</div></div>
+        <div class="stat-desktop-card"><h4>تایید شده</h4><div class="stat-desktop-number" id="statActive">-</div></div>
         <div class="stat-desktop-card"><h4>آنلاین</h4><div class="stat-desktop-number" id="statOnline">-</div></div>
         <div class="stat-desktop-card"><h4>بن شده</h4><div class="stat-desktop-number" id="statBanned">-</div></div>
         <div class="stat-desktop-card"><h4>تایید مدیر</h4><div class="stat-desktop-number" id="statVerified">-</div></div>
         <div class="stat-desktop-card"><h4>حق عضویت</h4><div class="stat-desktop-number" id="statPayment">-</div></div>
     </div>
 
+    <!-- راهنمای دکمه‌ها -->
+    <div class="guide-desktop">
+        <span class="guide-desktop-item"><span class="guide-dot" style="background:#10b981;"></span> تایید کاربر (فعال)</span>
+        <span class="guide-desktop-item"><span class="guide-dot" style="background:#ef4444;"></span> رد کاربر (غیرفعال)</span>
+        <span class="guide-desktop-item"><span class="guide-dot" style="background:#f59e0b;"></span> بن/رفع بن</span>
+        <span class="guide-desktop-item"><span class="guide-dot" style="background:#8b5cf6;"></span> تایید مدیر</span>
+        <span class="guide-desktop-item"><span class="guide-dot" style="background:#f59e0b;"></span> حق عضویت</span>
+        <span class="guide-desktop-item"><span class="guide-dot" style="background:#667eea;"></span> جزئیات</span>
+        <span style="color:#64748b; font-size:0.65rem; margin-right:auto;">
+            <i class="fas fa-info-circle"></i>
+            <strong>تایید:</strong> کاربر وارد می‌شود •
+            <strong>رد:</strong> کاربر نمی‌تواند وارد شود
+        </span>
+    </div>
+
+    <!-- فیلترها -->
     <div class="filter-desktop-box">
         <div class="filter-desktop-row">
+            <div class="filter-desktop-group"><label>تایید/رد</label><select id="filterActive"><option value="">همه</option><option value="active">تایید شده</option><option value="inactive">رد شده</option></select></div>
             <div class="filter-desktop-group"><label>وضعیت</label><select id="filterStatus"><option value="">همه</option><option value="active">فعال</option><option value="inactive">غیرفعال</option></select></div>
             <div class="filter-desktop-group"><label>بن</label><select id="filterBan"><option value="">همه</option><option value="banned">بن شده</option><option value="not_banned">بدون بن</option></select></div>
             <div class="filter-desktop-group"><label>آنلاین</label><select id="filterOnline"><option value="">همه</option><option value="online">آنلاین</option><option value="offline">آفلاین</option></select></div>
@@ -478,35 +624,80 @@
         </div>
     </div>
 
+    <!-- جدول -->
     <div class="users-table-wrapper">
-        <table class="users-table"><thead><tr><th onclick="sortUsers('full_name')">نام کاربر</th><th>موبایل</th><th>ایمیل</th><th>کیف پول</th><th>امتیاز</th><th>وضعیت</th><th>آنلاین</th><th>بن</th><th>تایید مدیر</th><th>حق عضویت</th><th>نقش</th><th>عملیات</th></tr></thead><tbody id="usersTableBody"><tr><td colspan="12" class="loading">در حال بارگذاری...</td></tr></tbody></table>
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th onclick="sortUsers('full_name')">نام کاربر</th>
+                    <th>موبایل</th>
+                    <th>ایمیل</th>
+                    <th>کیف پول</th>
+                    <th>امتیاز</th>
+                    <th>تایید/رد</th>
+                    <th>آنلاین</th>
+                    <th>بن</th>
+                    <th>تایید مدیر</th>
+                    <th>حق عضویت</th>
+                    <th>نقش</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+            <tbody id="usersTableBody">
+                <tr><td colspan="12" class="loading">در حال بارگذاری...</td></tr>
+            </tbody>
+        </table>
     </div>
     <div class="pagination-desktop" id="paginationDesktop"></div>
 </div>
 
-<div id="userDetailModal" class="modal-desktop"><div class="modal-desktop-content"><div class="modal-desktop-header"><h3>جزئیات کامل کاربر</h3><button class="close-modal-desktop" onclick="closeModal('userDetailModal')">&times;</button></div><div id="userDetailContent"></div></div></div>
+<!-- مودال -->
+<div id="userDetailModal" class="modal-desktop">
+    <div class="modal-desktop-content">
+        <div class="modal-desktop-header"><h3>جزئیات کامل کاربر</h3><button class="close-modal-desktop" onclick="closeModal('userDetailModal')">&times;</button></div>
+        <div id="userDetailContent"></div>
+    </div>
+</div>
 
 <script>
     let currentPage = 1, currentSort = '-createAt', currentFilters = {}, searchTimeoutDesktop = null;
     let pcUserRoles = [], pcAllRoles = [];
-    let desktopSearchValue = ''; // متغیر گلوبال برای جستجو
+    let desktopSearchValue = '';
 
     function getCSRFToken() { return document.querySelector('[name=csrfmiddlewaretoken]')?.value || document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1]; }
     function formatNumber(n) { if (n === undefined || n === null) return '۰'; return new Intl.NumberFormat('fa-IR').format(n); }
     function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
 
+    // ===== وضعیت‌ها =====
     async function updateUserStatus(userId, action) {
         let url = `/panel/api/users/${userId}/toggle-${action}/`;
         try { const res = await fetch(url, { method: 'POST', headers: { 'X-CSRFToken': getCSRFToken() } }); const data = await res.json(); if (data.success) loadUsers(); else alert(data.message); } catch(e) { alert('خطا'); }
     }
 
-    // ===== تابع بارگذاری کاربران با جستجو =====
+    // ===== تایید/رد کاربر =====
+    async function toggleUserActiveStatusDesktop(userId, currentStatus) {
+        const action = currentStatus ? 'رد' : 'تایید';
+        const confirmMessage = currentStatus
+            ? '⚠️ آیا از رد این کاربر مطمئن هستید؟ کاربر دیگر نمی‌تواند وارد شود.'
+            : '✅ آیا از تایید این کاربر مطمئن هستید؟ کاربر می‌تواند وارد شود.';
+        if (!confirm(confirmMessage)) return;
+        try {
+            const res = await fetch(`/panel/api/users/${userId}/toggle-active/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCSRFToken(), 'Content-Type': 'application/json' }
+            });
+            const data = await res.json();
+            if (data.success) { loadUsers(); } else { alert(data.error); }
+        } catch(e) { alert('خطا'); }
+    }
+
+    // ===== بارگذاری =====
     async function loadUsers() {
         const params = new URLSearchParams({
             page: currentPage,
             sort_by: currentSort,
             ...currentFilters,
-            search: desktopSearchValue // استفاده از متغیر گلوبال برای جستجو
+            search: desktopSearchValue
         });
 
         try {
@@ -534,7 +725,35 @@
     function updateTable(users) {
         const tbody = document.getElementById('usersTableBody');
         if (!users || users.length === 0) { tbody.innerHTML = '<tr><td colspan="12" class="loading">هیچ کاربری یافت نشد</td></tr>'; return; }
-        tbody.innerHTML = users.map(u => `<tr><td><strong>${escapeHtml(u.full_name)}</strong><br><small>${u.shop_name ? '🏪 ' + escapeHtml(u.shop_name) : ''}</small></td><td dir="ltr">${escapeHtml(u.mobileNumber)}</td><td>${escapeHtml(u.email) || '-'}</td><td class="text-yellow-400">${formatNumber(u.wallet_balance)} تومان</td><td>${formatNumber(u.total_points)}</td><td><span class="${u.is_active ? 'badge-active' : 'badge-inactive'}">${u.is_active ? 'فعال' : 'غیرفعال'}</span></td><td><span class="${u.is_online ? 'badge-online' : 'badge-offline'}">${u.is_online ? '🟢 آنلاین' : '⚫ آفلاین'}</span></td><td><span class="${u.is_banned ? 'badge-banned' : 'badge-active'}">${u.is_banned ? '🔒 بن' : '✅ آزاد'}</span></td><td><span class="${u.is_verified_by_manager ? 'badge-verified' : 'badge-not-verified'}">${u.is_verified_by_manager ? '✅ تایید' : '❌ عدم تایید'}</span></td><td><span class="${u.is_payment_user ? 'badge-payment' : 'badge-no-payment'}">${u.is_payment_user ? '✅ فعال' : '❌ غیرفعال'}</span></td><td>${(u.roles || []).map(r => `<span class="role-badge-pc">${escapeHtml(r.title)}</span>`).join('') || '-'}</td><td><div style="display:flex; gap:4px;"><button class="btn-table btn-primary-table" onclick="showUserDetail('${u.id}')"><i class="fas fa-eye"></i></button><button class="btn-table btn-warning-table" onclick="updateUserStatus('${u.id}', 'ban')"><i class="fas ${u.is_banned ? 'fa-unlock' : 'fa-lock'}"></i></button><button class="btn-table btn-purple-table" onclick="updateUserStatus('${u.id}', 'verified')"><i class="fas ${u.is_verified_by_manager ? 'fa-times' : 'fa-check'}"></i></button><button class="btn-table btn-warning-table" onclick="updateUserStatus('${u.id}', 'payment')"><i class="fas ${u.is_payment_user ? 'fa-times-circle' : 'fa-check-circle'}"></i></button></div></td></tr>`).join('');
+        tbody.innerHTML = users.map(u => `
+            <tr>
+                <td><strong>${escapeHtml(u.full_name)}</strong><br><small>${u.shop_name ? '🏪 ' + escapeHtml(u.shop_name) : ''}</small></td>
+                <td dir="ltr">${escapeHtml(u.mobileNumber)}</td>
+                <td>${escapeHtml(u.email) || '-'}</td>
+                <td class="text-yellow-400">${formatNumber(u.wallet_balance)} تومان</td>
+                <td>${formatNumber(u.total_points)}</td>
+                <td><span class="${u.is_active ? 'badge-active' : 'badge-inactive'}">${u.is_active ? '✅ تایید' : '❌ رد'}</span></td>
+                <td><span class="${u.is_online ? 'badge-online' : 'badge-offline'}">${u.is_online ? '🟢 آنلاین' : '⚫ آفلاین'}</span></td>
+                <td><span class="${u.is_banned ? 'badge-banned' : 'badge-active'}">${u.is_banned ? '🔒 بن' : '✅ آزاد'}</span></td>
+                <td><span class="${u.is_verified_by_manager ? 'badge-verified' : 'badge-not-verified'}">${u.is_verified_by_manager ? '✅ تایید' : '❌ عدم'}</span></td>
+                <td><span class="${u.is_payment_user ? 'badge-payment' : 'badge-no-payment'}">${u.is_payment_user ? '✅ فعال' : '❌ غیرفعال'}</span></td>
+                <td>${(u.roles || []).map(r => `<span class="role-badge-pc">${escapeHtml(r.title)}</span>`).join('') || '-'}</td>
+                <td>
+                    <div style="display:flex; gap:3px; flex-wrap:wrap;">
+                        <button class="btn-table ${u.is_active ? 'btn-danger-table' : 'btn-success-table'}"
+                            onclick="toggleUserActiveStatusDesktop('${u.id}', ${u.is_active})"
+                            title="${u.is_active ? 'رد کاربر' : 'تایید کاربر'}">
+                            <i class="fas ${u.is_active ? 'fa-user-slash' : 'fa-user-check'}"></i>
+                            ${u.is_active ? 'رد' : 'تایید'}
+                        </button>
+                        <button class="btn-table btn-warning-table" onclick="updateUserStatus('${u.id}', 'ban')" title="بن/رفع بن"><i class="fas ${u.is_banned ? 'fa-unlock' : 'fa-lock'}"></i></button>
+                        <button class="btn-table btn-purple-table" onclick="updateUserStatus('${u.id}', 'verified')" title="تایید مدیر"><i class="fas ${u.is_verified_by_manager ? 'fa-times' : 'fa-check'}"></i></button>
+                        <button class="btn-table btn-warning-table" onclick="updateUserStatus('${u.id}', 'payment')" title="حق عضویت"><i class="fas ${u.is_payment_user ? 'fa-times-circle' : 'fa-check-circle'}"></i></button>
+                        <button class="btn-table btn-primary-table" onclick="showUserDetail('${u.id}')" title="جزئیات"><i class="fas fa-eye"></i></button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
     }
 
     function updatePagination(pagination) {
@@ -548,34 +767,30 @@
         container.innerHTML = html;
     }
 
-    // ===== تابع اعمال فیلترها با جستجو =====
+    // ===== فیلترها =====
     function applyFilters() {
-        // ذخیره مقدار جستجو در متغیر گلوبال
         desktopSearchValue = document.getElementById('searchInput').value;
-
         currentFilters = {
-            is_active: (s=document.getElementById('filterStatus').value) === 'active' ? 'true' : (s === 'inactive' ? 'false' : ''),
+            is_active: (a=document.getElementById('filterActive').value) === 'active' ? 'true' : (a === 'inactive' ? 'false' : ''),
             is_banned: (b=document.getElementById('filterBan').value) === 'banned' ? 'true' : (b === 'not_banned' ? 'false' : ''),
             is_online: (o=document.getElementById('filterOnline').value) === 'online' ? 'true' : (o === 'offline' ? 'false' : ''),
             is_verified: (v=document.getElementById('filterVerified').value) === 'verified' ? 'true' : (v === 'not_verified' ? 'false' : ''),
             is_payment: (p=document.getElementById('filterPayment').value) === 'active' ? 'true' : (p === 'inactive' ? 'false' : '')
         };
-
-        // حذف فیلدهای خالی
         Object.keys(currentFilters).forEach(k => { if (!currentFilters[k]) delete currentFilters[k]; });
-
         currentPage = 1;
         loadUsers();
     }
 
     function resetFilters() {
         document.getElementById('searchInput').value = '';
+        document.getElementById('filterActive').value = '';
         document.getElementById('filterStatus').value = '';
         document.getElementById('filterBan').value = '';
         document.getElementById('filterOnline').value = '';
         document.getElementById('filterVerified').value = '';
         document.getElementById('filterPayment').value = '';
-        desktopSearchValue = ''; // ریست کردن جستجو
+        desktopSearchValue = '';
         currentFilters = {};
         currentPage = 1;
         loadUsers();
@@ -585,6 +800,7 @@
     function goToPage(page) { currentPage = page; loadUsers(); window.scrollTo({ top: 0 }); }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
+    // ===== نقش‌ها =====
     async function loadPCRoles(userId) {
         try { const res = await fetch(`/panel/api/users/${userId}/get-roles/`); const data = await res.json(); if (data.success) { pcUserRoles = data.user_roles; pcAllRoles = data.all_roles; renderPCRoles(); renderPCRoleSelect(); } } catch(e) { console.error(e); }
     }
@@ -619,6 +835,7 @@
         try { const res = await fetch(`/panel/api/users/${window.pcUserId}/update-roles/`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() }, body: JSON.stringify({ role_ids: newIds }) }); const data = await res.json(); if (data.success) { alert('نقش حذف شد'); await loadPCRoles(window.pcUserId); } else { alert(data.error); } } catch(e) { alert('خطا'); }
     }
 
+    // ===== مودال =====
     async function showUserDetail(userId) {
         window.pcUserId = userId;
         try { const res = await fetch(`/panel/api/users/${userId}/`); const data = await res.json(); if (data.success) {
@@ -633,21 +850,29 @@
                     <div class="pc-detail-item"><span class="pc-detail-label">فروشگاه:</span><span class="pc-detail-value">${escapeHtml(u.shop_name) || '-'}</span></div>
                 </div></div>
                 <div class="pc-detail-section"><div class="pc-detail-section-title">وضعیت حساب</div><div class="pc-detail-grid">
-                    <div class="pc-detail-item"><span class="pc-detail-label">فعال:</span><span class="pc-detail-value ${u.is_active ? 'text-green-400' : 'text-red-400'}">${u.is_active ? '✅ فعال' : '❌ غیرفعال'}</span></div>
+                    <div class="pc-detail-item"><span class="pc-detail-label">تایید/رد:</span><span class="pc-detail-value ${u.is_active ? 'text-green-400' : 'text-red-400'}">${u.is_active ? '✅ تایید شده' : '❌ رد شده'}</span></div>
                     <div class="pc-detail-item"><span class="pc-detail-label">آنلاین:</span><span class="pc-detail-value ${u.is_online ? 'text-green-400' : 'text-gray-400'}">${u.is_online ? '🟢 آنلاین' : '⚫ آفلاین'}</span></div>
                     <div class="pc-detail-item"><span class="pc-detail-label">بن:</span><span class="pc-detail-value ${u.security?.is_banned ? 'text-red-400' : 'text-green-400'}">${u.security?.is_banned ? '🔒 بن شده' : '🔓 آزاد'}</span></div>
-                    <div class="pc-detail-item"><span class="pc-detail-label">تایید مدیر:</span><span class="pc-detail-value ${u.security?.is_verified_by_manager ? 'text-green-400' : 'text-red-400'}">${u.security?.is_verified_by_manager ? '✅ تایید' : '❌ عدم تایید'}</span></div>
+                    <div class="pc-detail-item"><span class="pc-detail-label">تایید مدیر:</span><span class="pc-detail-value ${u.security?.is_verified_by_manager ? 'text-green-400' : 'text-red-400'}">${u.security?.is_verified_by_manager ? '✅ تایید' : '❌ عدم'}</span></div>
                     <div class="pc-detail-item"><span class="pc-detail-label">حق عضویت:</span><span class="pc-detail-value ${u.security?.is_payment_user ? 'text-green-400' : 'text-red-400'}">${u.security?.is_payment_user ? '✅ فعال' : '❌ غیرفعال'}</span></div>
                     <div class="pc-detail-item"><span class="pc-detail-label">عضویت:</span><span class="pc-detail-value">${new Date(u.created_at).toLocaleDateString('fa-IR')}</span></div>
                 </div></div>
-                <div class="pc-detail-section"><div class="pc-detail-section-title">نقش‌های کاربر</div><div id="pcRolesContainer" style="margin-bottom:0.75rem;"><div style="text-align:center;">در حال بارگذاری...</div></div><div style="display:flex; gap:0.5rem;"><select id="pcRoleSelect" style="flex:2; padding:0.5rem; background:#0f172a; border:1px solid #667eea; border-radius:0.5rem; color:#fff;"><option value="">انتخاب نقش...</option></select><button onclick="addPCRole()" style="flex:1; background:#10b981; border:none; padding:0.5rem; border-radius:0.5rem; color:white; cursor:pointer;"><i class="fas fa-plus"></i> افزودن</button></div></div>
+                <div class="pc-detail-section"><div class="pc-detail-section-title">نقش‌ها</div><div id="pcRolesContainer" style="margin-bottom:0.75rem;"><div style="text-align:center;">در حال بارگذاری...</div></div><div style="display:flex; gap:0.5rem;"><select id="pcRoleSelect" style="flex:2; padding:0.5rem; background:#0f172a; border:1px solid #667eea; border-radius:0.5rem; color:#fff;"><option value="">انتخاب نقش...</option></select><button onclick="addPCRole()" style="flex:1; background:#10b981; border:none; padding:0.5rem; border-radius:0.5rem; color:white; cursor:pointer;"><i class="fas fa-plus"></i> افزودن</button></div></div>
                 <div class="pc-detail-section"><div class="pc-detail-section-title">کیف پول و امتیازات</div><div class="pc-detail-grid">
                     <div class="pc-detail-item"><span class="pc-detail-label">کیف پول:</span><span class="pc-detail-value text-yellow-400">${formatNumber(u.wallet?.balance || 0)} تومان</span></div>
                     <div class="pc-detail-item"><span class="pc-detail-label">امتیاز:</span><span class="pc-detail-value">${formatNumber(u.loyalty?.total_points || 0)}</span></div>
                     <div class="pc-detail-item"><span class="pc-detail-label">سکه:</span><span class="pc-detail-value">${formatNumber(u.loyalty?.total_coins || 0)}</span></div>
                     <div class="pc-detail-item"><span class="pc-detail-label">سطح:</span><span class="pc-detail-value">${u.loyalty?.tier_display || 'برنزی'}</span></div>
                 </div></div>
-                <div class="pc-detail-section"><div class="pc-detail-section-title">اقدامات</div><div style="display:flex; gap:0.5rem;"><button onclick="updateWalletDesktop('${u.id}')" style="background:#10b981; padding:0.5rem 1rem; border:none; border-radius:0.5rem; color:white; cursor:pointer;"><i class="fas fa-wallet"></i> کیف پول</button><button onclick="updatePointsDesktop('${u.id}')" style="background:#8b5cf6; padding:0.5rem 1rem; border:none; border-radius:0.5rem; color:white; cursor:pointer;"><i class="fas fa-star"></i> امتیاز</button><button onclick="updateUserStatus('${u.id}', 'active')" style="background:#3b82f6; padding:0.5rem 1rem; border:none; border-radius:0.5rem; color:white; cursor:pointer;"><i class="fas ${u.is_active ? 'fa-ban' : 'fa-check'}"></i> ${u.is_active ? 'غیرفعال' : 'فعال'}</button></div></div>
+                <div class="pc-detail-section"><div class="pc-detail-section-title">اقدامات</div>
+                    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                        <button onclick="toggleUserActiveStatusDesktop('${u.id}', ${u.is_active})" style="${u.is_active ? 'background:#ef4444;' : 'background:#10b981;'} padding:0.5rem 1rem; border:none; border-radius:0.5rem; color:white; cursor:pointer;">
+                            <i class="fas ${u.is_active ? 'fa-user-slash' : 'fa-user-check'}"></i> ${u.is_active ? 'رد کاربر' : 'تایید کاربر'}
+                        </button>
+                        <button onclick="updateWalletDesktop('${u.id}')" style="background:#10b981; padding:0.5rem 1rem; border:none; border-radius:0.5rem; color:white; cursor:pointer;"><i class="fas fa-wallet"></i> کیف پول</button>
+                        <button onclick="updatePointsDesktop('${u.id}')" style="background:#8b5cf6; padding:0.5rem 1rem; border:none; border-radius:0.5rem; color:white; cursor:pointer;"><i class="fas fa-star"></i> امتیاز</button>
+                    </div>
+                </div>
             `;
             document.getElementById('userDetailModal').style.display = 'flex';
             await loadPCRoles(userId);
@@ -666,11 +891,12 @@
         try { const res = await fetch(`/panel/api/users/${userId}/update-points/`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() }, body: JSON.stringify({ points: parseInt(points), operation }) }); const data = await res.json(); if (data.success) { alert(data.message); loadUsers(); closeModal('userDetailModal'); } else { alert(data.error); } } catch(e) { alert('خطا'); }
     }
 
-    // ===== رویدادهای جستجو =====
+    // ===== رویدادها =====
     document.getElementById('searchInput').addEventListener('input', function() {
         clearTimeout(searchTimeoutDesktop);
         searchTimeoutDesktop = setTimeout(() => applyFilters(), 500);
     });
+    document.getElementById('filterActive').addEventListener('change', applyFilters);
     document.getElementById('filterStatus').addEventListener('change', applyFilters);
     document.getElementById('filterBan').addEventListener('change', applyFilters);
     document.getElementById('filterOnline').addEventListener('change', applyFilters);
