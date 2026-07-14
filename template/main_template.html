@@ -375,12 +375,78 @@
     }, 30000);
 </script>
 
-<style>
-    /* ============================================
-   گلس مورفی برای کارت محصولات
-   ============================================ */
+<script>
+    // ============================================
+// راه‌اندازی منو همبرگری و نوتیف - مخصوص هدر شما
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    // دکمه همبرگری (با آیدی mobileMenuBtn)
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebarDesktop');
+    const overlay = document.getElementById('megaOverlayBg');
 
+    if (menuBtn && sidebar && overlay) {
+        menuBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            sidebar.classList.toggle('open-mobile');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open-mobile') ? 'hidden' : '';
+        });
 
-</style>
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('open-mobile');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    }
+
+    // دکمه نوتیفیکیشن (با آیدی notifIcon)
+    const notifBtn = document.getElementById('notifIcon');
+    const notifPanel = document.getElementById('notifPanel');
+    const closeNotif = document.getElementById('closeNotif');
+
+    if (notifBtn && notifPanel) {
+        notifBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            notifPanel.classList.toggle('active');
+            if (overlay) overlay.classList.toggle('active');
+            document.body.style.overflow = notifPanel.classList.contains('active') ? 'hidden' : '';
+        });
+
+        if (closeNotif) {
+            closeNotif.addEventListener('click', function() {
+                notifPanel.classList.remove('active');
+                if (overlay) overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        }
+    }
+
+    // دکمه سبد خرید (با آیدی cartIcon)
+    const cartBtn = document.getElementById('cartIcon');
+    const cartPanel = document.getElementById('cartPanel');
+    const closeCart = document.getElementById('closeCart');
+
+    if (cartBtn && cartPanel) {
+        cartBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            cartPanel.classList.toggle('active');
+            if (overlay) overlay.classList.toggle('active');
+            document.body.style.overflow = cartPanel.classList.contains('active') ? 'hidden' : '';
+            if (typeof loadCartFromAPI === 'function') {
+                loadCartFromAPI();
+            }
+        });
+
+        if (closeCart) {
+            closeCart.addEventListener('click', function() {
+                cartPanel.classList.remove('active');
+                if (overlay) overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        }
+    }
+});
+</script>
 </body>
 </html>

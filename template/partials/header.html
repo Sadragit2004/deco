@@ -50,7 +50,7 @@
 
     <div style="padding:6px;" class="header-actions">
         <div class="icon-btn-header" id="cartIcon"><i class="fas fa-shopping-bag"></i><span class="badge-count" id="cartCount">0</span></div>
-        <div class="icon-btn-header" id="notifIcon"><i class="far fa-bell"></i><span class="badge-count">0</span></div>
+        
     </div>
 </header>
 
@@ -1578,4 +1578,56 @@ function setupSearch() {
         }
     });
 }
+</script>
+
+<script>
+    // ============================================
+// رفع مشکل نوتیف در موبایل
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    const notifBtn = document.getElementById('notifIcon');
+    const notifPanel = document.getElementById('notifPanel');
+    const overlay = document.getElementById('megaOverlayBg');
+    const closeNotif = document.getElementById('closeNotif');
+
+    if (notifBtn && notifPanel) {
+        notifBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            // تoggle کلاس active
+            notifPanel.classList.toggle('active');
+            if (overlay) overlay.classList.toggle('active');
+
+            // قفل کردن اسکرول
+            if (notifPanel.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+                // اطمینان از نمایش پنل
+                notifPanel.style.display = 'block';
+                notifPanel.style.left = '0';
+            } else {
+                document.body.style.overflow = '';
+                notifPanel.style.display = '';
+            }
+        });
+
+        if (closeNotif) {
+            closeNotif.addEventListener('click', function() {
+                notifPanel.classList.remove('active');
+                if (overlay) overlay.classList.remove('active');
+                document.body.style.overflow = '';
+                notifPanel.style.display = '';
+            });
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', function() {
+                notifPanel.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+                notifPanel.style.display = '';
+            });
+        }
+    }
+});
 </script>
