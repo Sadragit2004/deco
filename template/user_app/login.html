@@ -357,20 +357,83 @@
             to { transform: rotate(360deg); }
         }
 
+        /* ============================================
+           بخش نماد اعتماد و قوانین
+           ============================================ */
+        .footer-section {
+            margin-top: 1.5rem;
+            border-top: 1px solid rgba(150, 185, 200, 0.25);
+            padding-top: 1rem;
+        }
+
+        .trust-seal-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 0.8rem;
+        }
+
+        .trust-seal-label {
+            color: #526f82;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .trust-seal-label i {
+            color: #2c7da0;
+            font-size: 0.7rem;
+        }
+
+        .trust-seal-link {
+            display: inline-block;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            border-radius: 10px;
+            line-height: 0;
+        }
+
+        .trust-seal-link:hover {
+            transform: scale(1.04);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .trust-seal-img {
+            height: 65px;
+            width: auto;
+            border-radius: 10px;
+            background: white;
+            padding: 4px 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(150, 185, 200, 0.15);
+            transition: all 0.25s ease;
+        }
+
         .terms-note {
             text-align: center;
             font-size: 0.65rem;
             color: #526f82;
-            margin-top: 1.2rem;
-            border-top: 1px solid rgba(150, 185, 200, 0.3);
-            padding-top: 1rem;
         }
+
         .terms-note a {
             color: #1e6f8f;
             text-decoration: none;
             font-weight: 700;
+            transition: color 0.2s ease;
         }
 
+        .terms-note a:hover {
+            color: #0b4b6b;
+            text-decoration: underline;
+        }
+
+        /* ============================================
+           ریسپانسیو
+           ============================================ */
         @media (max-width: 480px) {
             .glass-auth-card {
                 padding: 1.3rem 1rem 1.5rem;
@@ -413,10 +476,27 @@
                 margin: 1rem 0 0.3rem;
                 font-size: 0.7rem;
             }
-            .terms-note {
-                margin-top: 1rem;
+            .footer-section {
+                margin-top: 1.2rem;
                 padding-top: 0.8rem;
+            }
+            .trust-seal-img {
+                height: 55px;
+            }
+            .terms-note {
                 font-size: 0.6rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .glass-auth-card {
+                padding: 1rem 0.8rem 1.2rem;
+            }
+            .trust-seal-img {
+                height: 48px;
+            }
+            .trust-seal-label {
+                font-size: 0.55rem;
             }
         }
     </style>
@@ -481,8 +561,30 @@
             <span>درخواست عضویت</span>
         </a>
 
-        <div class="terms-note">
-            ورود به منزله پذیرش <a href="#">قوانین دکو</a> و <a href="#">حریم خصوصی</a> است.
+        <!-- ==========================================
+        بخش پایینی: نماد اعتماد + قوانین
+        ========================================== -->
+        <div class="footer-section">
+            <div class="trust-seal-wrapper">
+                <span class="trust-seal-label">
+                    <i class="fa-regular fa-shield-check"></i>
+                    نماد اعتماد الکترونیکی
+                </span>
+                <a href="https://trustseal.enamad.ir/?id=6899091&Code=hDK7e5u0UTvYE5yeCYIwWg3XGaTJDSi0"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="trust-seal-link"
+                   title="مشاهده نماد اعتماد الکترونیکی">
+                    <img src="https://trustseal.enamad.ir/logo.aspx?id=6899091&Code=hDK7e5u0UTvYE5yeCYIwWg3XGaTJDSi0"
+                         alt="نماد اعتماد الکترونیکی"
+                         class="trust-seal-img"
+                         loading="lazy">
+                </a>
+            </div>
+
+            <div class="terms-note">
+                ورود به منزله پذیرش <a href="#">قوانین دکو</a> و <a href="#">حریم خصوصی</a> است.
+            </div>
         </div>
     </form>
 </div>
