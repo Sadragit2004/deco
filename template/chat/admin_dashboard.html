@@ -1374,45 +1374,162 @@
         var typingTimeout = null;
 
         // ======================== WebSocket ========================
-        function connectWebSocket() {
-            var wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            var wsHost = window.location.hostname;
-            var wsPort = '5000';
-            var wsUrl = wsProtocol + '//' + wsHost + ':' + wsPort + '/ws/chat/';
+      // ======================== WebSocket ========================
+            function connectWebSocket() {
+                // استفاده از مسیر نسبی و بدون پورت
+                var wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                var wsUrl = wsProtocol + '//' + window.location.host + '/ws/chat/';
 
-            console.log('🔌 Connecting to:', wsUrl);
-            ws = new WebSocket(wsUrl);
+                console.log('🔌 Connecting to:', wsUrl);
+                ws = new WebSocket(wsUrl);
 
-            ws.onopen = function() {
-                isConnected = true;
-                reconnectAttempts = 0;
-                console.log('✅ WebSocket ادمین متصل شد!');
-                statusText.textContent = 'متصل';
-                statusDot.className = 'status-dot online';
-                statusBar.className = 'status-bar online';
-            };
+                ws.onopen = function() {
+                    isConnected = true;
+                    reconnectAttempts = 0;
+                    console.log('✅ WebSocket ادمین متصل شد!');
+                    statusText.textContent = 'متصل';
+                    statusDot.className = 'status-dot online';
+                    statusBar.className = 'status-bar online';
+                };
 
-            ws.onerror = function(error) {
-                console.log('❌ خطا:', error);
-                statusText.textContent = 'خطا در اتصال';
-                statusDot.className = 'status-dot offline';
-                statusBar.className = 'status-bar offline';
-            };
+                ws.onerror = function(error) {
+                    console.log('❌ خطا:', error);
+                    statusText.textContent = 'خطا در اتصال';
+                    statusDot.className = 'status-dot offline';
+                    statusBar.className = 'status-bar offline';
+                };
 
-            ws.onclose = function() {
-                isConnected = false;
-                console.log('🔴 اتصال قطع شد');
-                statusText.textContent = 'قطع شده - تلاش مجدد...';
-                statusDot.className = 'status-dot offline';
-                statusBar.className = 'status-bar offline';
+                ws.onclose = function() {
+                    isConnected = false;
+                    console.log('🔴 اتصال قطع شد');
+                    statusText.textContent = 'قطع شده - تلاش مجدد...';
+                    statusDot.className = 'status-dot offline';
+                    statusBar.className = 'status-bar offline';
 
-                if (reconnectAttempts < 10) {
-                    reconnectAttempts++;
-                    setTimeout(connectWebSocket, 3000);
-                } else {
-                    statusText.textContent = 'قطع شده - رفرش کنید';
+                    if (reconnectAttempts < 10) {
+                        reconnectAttempts++;
+                        setTimeout(connectWebSocket, 3000);
+                    } else {
+                        statusText.textContent = 'قطع شده - رفرش کنید';
+                    }
+                };
+
+    ws.onmessage = function(e) {
+        try {
+            var data = JSON.parse(e.data);
+            console.log('📩 پیام جدید از WebSocket:', data);
+
+            if (data.type === 'message_seen_update') {
+                console.log('👁️ پیام دیده شد:', data.message_id);
+                if (currentChatId && data.chat_id == currentChatId) {
+                    updateSingleMessageSeenUI(data.message_id);
                 }
-            };
+                return;
+            }
+
+            if (data.type === 'messages_seen_update') {
+                console.log('👁️ تمام پیام‌های چت دیده شدند:', data.count);
+                if (currentChatId && data.chat_id == currentChatId) {
+                    updateAllMessagesSeenUI();
+                }
+                loadChats();
+                return;
+            }
+
+            if (data.type === 'typing') {
+                if (data.is_typing && data.chat_id == currentChatId) {
+                    typingIndicator.classList.add('show');
+                    clearTimeout(typingTimeout);
+                    typingTimeout = setTimeout(function() {
+                        typingIndicator.classList.remove('show');
+                    }, 3000);
+                } else {
+                    typingIndicator.classList.remove('show');
+                }
+                return;
+            }
+
+            if (data.type === 'admin_message' || data.type === 'chat_message' || data.type === 'message') {
+                var chatId = data.chat_id;
+                var isCurrentChat = currentChatId && chatId == currentChatId;
+
+                if (data.is_admin === true) {
+                    console.log('⏭️ پیام از ادمین، نادیده گرفته شد');
+                    if (chatId) {
+                        if (!chatMessagesCache[chatId]) {
+                            chatMessagesCache[chatId] = [];
+                        }
+                        chatMessagesCache[chatId].push({
+                            message_id: data.message_id,
+                            content: data.message || data.content || '',
+                            sender_name: data.sender_name,
+                            timestamp: data.timestamp,
+                            is_admin: true,
+                            message_type: data.message_type || 'text',
+                            file_url: data.file_url,
+                            file_name: data.file_name,
+                            file_size: data.file_size,
+                            file_thumbnail: data.file_thumbnail,
+                            is_seen: data.is_seen || false,
+                        });
+                    }
+                    return;
+                }
+
+                var messageContent = data.message || data.content || '';
+
+                if (chatId) {
+                    if (!chatMessagesCache[chatId]) {
+                        chatMessagesCache[chatId] = [];
+                    }
+                    chatMessagesCache[chatId].push({
+                        message_id: data.message_id,
+                        content: messageContent,
+                        sender_name: data.sender_name,
+                        timestamp: data.timestamp,
+                        is_admin: false,
+                        message_type: data.message_type || 'text',
+                        file_url: data.file_url,
+                        file_name: data.file_name,
+                        file_size: data.file_size,
+                        file_thumbnail: data.file_thumbnail,
+                        is_seen: data.is_seen || false,
+                    });
+
+                    if (isCurrentChat) {
+                        addMessageToUI({
+                            content: messageContent,
+                            sender_name: data.sender_name,
+                            timestamp: data.timestamp,
+                            is_admin: false,
+                            message_type: data.message_type || 'text',
+                            file_url: data.file_url,
+                            file_name: data.file_name,
+                            file_size: data.file_size,
+                            file_thumbnail: data.file_thumbnail,
+                            is_seen: data.is_seen || false,
+                            message_id: data.message_id,
+                        }, false);
+
+                        if (data.message_id) {
+                            markSingleMessageAsSeen(data.message_id);
+                        }
+                        markChatAsSeen(chatId);
+                    }
+
+                    loadChats();
+
+                    if (!isCurrentChat) {
+                        showNotification('📩 پیام جدید از ' + data.sender_name);
+                        playNotificationSound();
+                    }
+                }
+            }
+        } catch (err) {
+            console.log('❌ خطا در parse:', err);
+        }
+    };
+}
 
             ws.onmessage = function(e) {
                 try {
