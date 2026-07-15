@@ -1319,7 +1319,7 @@
         </div>
     </div>
 
-    <script>
+   <script>
         // ============================================================
         //  داشبورد ادمین - کامل با دکمه اطلاعات مشتری
         // ============================================================
@@ -1374,162 +1374,52 @@
         var typingTimeout = null;
 
         // ======================== WebSocket ========================
-      // ======================== WebSocket ========================
-            function connectWebSocket() {
-                // استفاده از مسیر نسبی و بدون پورت
-                var wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                var wsUrl = wsProtocol + '//' + window.location.host + '/ws/chat/';
+        function connectWebSocket() {
+            var wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            var wsUrl = wsProtocol + '//' + window.location.host + '/ws/chat/';
 
-                console.log('🔌 Connecting to:', wsUrl);
+            console.log('🔌 Connecting to:', wsUrl);
+
+            try {
                 ws = new WebSocket(wsUrl);
-
-                ws.onopen = function() {
-                    isConnected = true;
-                    reconnectAttempts = 0;
-                    console.log('✅ WebSocket ادمین متصل شد!');
-                    statusText.textContent = 'متصل';
-                    statusDot.className = 'status-dot online';
-                    statusBar.className = 'status-bar online';
-                };
-
-                ws.onerror = function(error) {
-                    console.log('❌ خطا:', error);
-                    statusText.textContent = 'خطا در اتصال';
-                    statusDot.className = 'status-dot offline';
-                    statusBar.className = 'status-bar offline';
-                };
-
-                ws.onclose = function() {
-                    isConnected = false;
-                    console.log('🔴 اتصال قطع شد');
-                    statusText.textContent = 'قطع شده - تلاش مجدد...';
-                    statusDot.className = 'status-dot offline';
-                    statusBar.className = 'status-bar offline';
-
-                    if (reconnectAttempts < 10) {
-                        reconnectAttempts++;
-                        setTimeout(connectWebSocket, 3000);
-                    } else {
-                        statusText.textContent = 'قطع شده - رفرش کنید';
-                    }
-                };
-
-    ws.onmessage = function(e) {
-        try {
-            var data = JSON.parse(e.data);
-            console.log('📩 پیام جدید از WebSocket:', data);
-
-            if (data.type === 'message_seen_update') {
-                console.log('👁️ پیام دیده شد:', data.message_id);
-                if (currentChatId && data.chat_id == currentChatId) {
-                    updateSingleMessageSeenUI(data.message_id);
-                }
+            } catch (e) {
+                console.error('❌ خطا در ایجاد WebSocket:', e);
+                statusText.textContent = 'خطا در اتصال';
+                statusDot.className = 'status-dot offline';
+                statusBar.className = 'status-bar offline';
                 return;
             }
 
-            if (data.type === 'messages_seen_update') {
-                console.log('👁️ تمام پیام‌های چت دیده شدند:', data.count);
-                if (currentChatId && data.chat_id == currentChatId) {
-                    updateAllMessagesSeenUI();
-                }
-                loadChats();
-                return;
-            }
+            ws.onopen = function() {
+                isConnected = true;
+                reconnectAttempts = 0;
+                console.log('✅ WebSocket ادمین متصل شد!');
+                statusText.textContent = 'متصل';
+                statusDot.className = 'status-dot online';
+                statusBar.className = 'status-bar online';
+            };
 
-            if (data.type === 'typing') {
-                if (data.is_typing && data.chat_id == currentChatId) {
-                    typingIndicator.classList.add('show');
-                    clearTimeout(typingTimeout);
-                    typingTimeout = setTimeout(function() {
-                        typingIndicator.classList.remove('show');
-                    }, 3000);
+            ws.onerror = function(error) {
+                console.log('❌ خطا:', error);
+                statusText.textContent = 'خطا در اتصال';
+                statusDot.className = 'status-dot offline';
+                statusBar.className = 'status-bar offline';
+            };
+
+            ws.onclose = function() {
+                isConnected = false;
+                console.log('🔴 اتصال قطع شد');
+                statusText.textContent = 'قطع شده - تلاش مجدد...';
+                statusDot.className = 'status-dot offline';
+                statusBar.className = 'status-bar offline';
+
+                if (reconnectAttempts < 10) {
+                    reconnectAttempts++;
+                    setTimeout(connectWebSocket, 3000);
                 } else {
-                    typingIndicator.classList.remove('show');
+                    statusText.textContent = 'قطع شده - رفرش کنید';
                 }
-                return;
-            }
-
-            if (data.type === 'admin_message' || data.type === 'chat_message' || data.type === 'message') {
-                var chatId = data.chat_id;
-                var isCurrentChat = currentChatId && chatId == currentChatId;
-
-                if (data.is_admin === true) {
-                    console.log('⏭️ پیام از ادمین، نادیده گرفته شد');
-                    if (chatId) {
-                        if (!chatMessagesCache[chatId]) {
-                            chatMessagesCache[chatId] = [];
-                        }
-                        chatMessagesCache[chatId].push({
-                            message_id: data.message_id,
-                            content: data.message || data.content || '',
-                            sender_name: data.sender_name,
-                            timestamp: data.timestamp,
-                            is_admin: true,
-                            message_type: data.message_type || 'text',
-                            file_url: data.file_url,
-                            file_name: data.file_name,
-                            file_size: data.file_size,
-                            file_thumbnail: data.file_thumbnail,
-                            is_seen: data.is_seen || false,
-                        });
-                    }
-                    return;
-                }
-
-                var messageContent = data.message || data.content || '';
-
-                if (chatId) {
-                    if (!chatMessagesCache[chatId]) {
-                        chatMessagesCache[chatId] = [];
-                    }
-                    chatMessagesCache[chatId].push({
-                        message_id: data.message_id,
-                        content: messageContent,
-                        sender_name: data.sender_name,
-                        timestamp: data.timestamp,
-                        is_admin: false,
-                        message_type: data.message_type || 'text',
-                        file_url: data.file_url,
-                        file_name: data.file_name,
-                        file_size: data.file_size,
-                        file_thumbnail: data.file_thumbnail,
-                        is_seen: data.is_seen || false,
-                    });
-
-                    if (isCurrentChat) {
-                        addMessageToUI({
-                            content: messageContent,
-                            sender_name: data.sender_name,
-                            timestamp: data.timestamp,
-                            is_admin: false,
-                            message_type: data.message_type || 'text',
-                            file_url: data.file_url,
-                            file_name: data.file_name,
-                            file_size: data.file_size,
-                            file_thumbnail: data.file_thumbnail,
-                            is_seen: data.is_seen || false,
-                            message_id: data.message_id,
-                        }, false);
-
-                        if (data.message_id) {
-                            markSingleMessageAsSeen(data.message_id);
-                        }
-                        markChatAsSeen(chatId);
-                    }
-
-                    loadChats();
-
-                    if (!isCurrentChat) {
-                        showNotification('📩 پیام جدید از ' + data.sender_name);
-                        playNotificationSound();
-                    }
-                }
-            }
-        } catch (err) {
-            console.log('❌ خطا در parse:', err);
-        }
-    };
-}
+            };
 
             ws.onmessage = function(e) {
                 try {
@@ -1646,7 +1536,7 @@
                     console.log('❌ خطا در parse:', err);
                 }
             };
-        
+        }
 
         // ============================================================
         // 🔥 نشانه‌گذاری دیده شده
@@ -1659,10 +1549,14 @@
             console.log('👁️ نشانه‌گذاری چت', chatId, 'به عنوان دیده شده');
 
             if (ws && isConnected) {
-                ws.send(JSON.stringify({
-                    action: 'mark_chat_seen',
-                    chat_id: chatId
-                }));
+                try {
+                    ws.send(JSON.stringify({
+                        action: 'mark_chat_seen',
+                        chat_id: chatId
+                    }));
+                } catch (e) {
+                    console.error('❌ خطا در ارسال:', e);
+                }
             }
 
             fetch('/chat/api/admin/chat/' + chatId + '/seen/', {
@@ -1849,7 +1743,6 @@
             if (selectedItem) {
                 selectedItem.classList.add('active');
 
-                // دریافت نام و موبایل
                 var nameElement = selectedItem.querySelector('.chat-name');
                 var name = nameElement ? nameElement.textContent.trim() : 'کاربر';
                 var mobile = selectedItem.querySelector('.user-mobile');
@@ -1858,7 +1751,6 @@
                 chatUserName.textContent = name;
                 chatUserMobile.textContent = mobileText;
 
-                // آواتار هدر
                 var avatarImg = selectedItem.querySelector('.avatar-small img');
                 if (avatarImg) {
                     chatAvatar.innerHTML = '<img src="' + avatarImg.src + '" alt="avatar" />';
@@ -1867,7 +1759,6 @@
                     chatAvatar.innerHTML = '<span style="font-size:20px;font-weight:700;">' + initial + '</span>';
                 }
 
-                // نمایش دکمه اطلاعات مشتری
                 customerInfoBtn.style.display = 'inline-flex';
             } else {
                 console.log('❌ آیتم انتخاب شده پیدا نشد');
@@ -2049,7 +1940,6 @@
                 }) : '';
                 var preview = chat.last_message && chat.last_message.length > 35 ? chat.last_message.substring(0, 35) + '...' : (chat.last_message || 'بدون پیام');
 
-                // آواتار کوچک
                 var avatarHTML = '';
                 if (chat.user_avatar) {
                     avatarHTML = `<img src="${chat.user_avatar}" alt="${escapeHtml(chat.user_name)}" />`;
@@ -2058,7 +1948,6 @@
                     avatarHTML = `<span style="font-weight:700;">${initial}</span>`;
                 }
 
-                // وضعیت آنلاین
                 var onlineStatus = chat.is_online ? 'online' : 'offline';
 
                 html += `
@@ -2130,7 +2019,7 @@
         }
 
         // ============================================================
-        // 🔥 نمایش اطلاعات مشتری - طراحی جدید
+        // 🔥 نمایش اطلاعات مشتری
         // ============================================================
         async function showCustomerInfo() {
             if (!currentUserId) {
@@ -2181,7 +2070,6 @@
             var loyalty = data.loyalty || {};
             var chat = data.chat || {};
 
-            // آواتار مودال
             if (user.avatar) {
                 modalAvatar.innerHTML = `<img src="${user.avatar}" alt="${user.full_name}" />`;
             } else {
@@ -2191,7 +2079,6 @@
             modalUserName.textContent = user.full_name || user.mobile;
             modalUserMobile.textContent = '📱 ' + user.mobile;
 
-            // اطلاعات پایه
             var genderBadge = '';
             if (user.gender === 'مرد') {
                 genderBadge = `<span class="badge-status male">👨 ${user.gender}</span>`;
@@ -2203,7 +2090,6 @@
                 ? `<span class="badge-status online">🟢 آنلاین</span>`
                 : `<span class="badge-status offline">⚪ آفلاین</span>`;
 
-            // آدرس‌ها
             var addressHTML = '';
             if (addresses.length > 0) {
                 addressHTML = addresses.map(function(addr) {
@@ -2223,7 +2109,6 @@
             }
 
             modalBody.innerHTML = `
-                <!-- اطلاعات پایه -->
                 <div class="modal-section">
                     <div class="modal-section-title"><i class="fas fa-user-circle"></i> اطلاعات شخصی</div>
                     <div class="info-grid">
@@ -2266,7 +2151,6 @@
                     </div>
                 </div>
 
-                <!-- اطلاعات مالی -->
                 <div class="modal-section">
                     <div class="modal-section-title"><i class="fas fa-wallet"></i> اطلاعات مالی</div>
                     <div class="finance-grid">
@@ -2301,13 +2185,11 @@
                     </div>
                 </div>
 
-                <!-- آدرس‌ها -->
                 <div class="modal-section">
                     <div class="modal-section-title"><i class="fas fa-map-marked-alt"></i> آدرس‌های ثبت شده</div>
                     <div class="address-grid">${addressHTML}</div>
                 </div>
 
-                <!-- آمار چت -->
                 <div class="modal-section">
                     <div class="modal-section-title"><i class="fas fa-comments"></i> آمار مکالمات</div>
                     <div class="finance-grid">
@@ -2472,7 +2354,12 @@
                 is_seen: true,
             });
 
-            ws.send(JSON.stringify(payload));
+            if (ws && isConnected) {
+                ws.send(JSON.stringify(payload));
+            } else {
+                console.error('❌ WebSocket وصل نیست!');
+                showNotification('❌ اتصال برقرار نیست!');
+            }
 
             msgInput.value = '';
             clearFilePreview();
@@ -2625,18 +2512,26 @@
         msgInput.addEventListener('input', function() {
             if (isConnected && ws && currentChatId) {
                 clearTimeout(typingTimeout);
-                ws.send(JSON.stringify({
-                    type: 'typing',
-                    is_typing: true,
-                    chat_id: currentChatId
-                }));
+                try {
+                    ws.send(JSON.stringify({
+                        type: 'typing',
+                        is_typing: true,
+                        chat_id: currentChatId
+                    }));
+                } catch (e) {
+                    console.error('❌ خطا در ارسال تایپینگ:', e);
+                }
                 typingTimeout = setTimeout(function() {
                     if (ws && isConnected) {
-                        ws.send(JSON.stringify({
-                            type: 'typing',
-                            is_typing: false,
-                            chat_id: currentChatId
-                        }));
+                        try {
+                            ws.send(JSON.stringify({
+                                type: 'typing',
+                                is_typing: false,
+                                chat_id: currentChatId
+                            }));
+                        } catch (e) {
+                            console.error('❌ خطا در ارسال تایپینگ:', e);
+                        }
                     }
                 }, 2000);
             }
@@ -2647,7 +2542,10 @@
         // ============================================================
         console.log('🚀 داشبورد ادمین بارگذاری شد');
 
-        connectWebSocket();
+        // اطمینان از اینکه ws تعریف شده است
+        if (typeof ws === 'undefined' || ws === null) {
+            connectWebSocket();
+        }
         loadChats();
 
         setInterval(function() {
