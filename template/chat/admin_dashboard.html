@@ -1374,20 +1374,23 @@
         var typingTimeout = null;
 
         // ======================== WebSocket ========================
-       function connectWebSocket() {
-            const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-            const wsUrl = `${protocol}//${window.location.host}/ws/chat/`;
+        function connectWebSocket() {
+            var wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            var wsHost = window.location.hostname;
+            var wsPort = '5000';
+            var wsUrl = wsProtocol + '//' + wsHost + ':' + wsPort + '/ws/chat/';
 
-            console.log("🔌 Connecting to:", wsUrl);
-
+            console.log('🔌 Connecting to:', wsUrl);
             ws = new WebSocket(wsUrl);
 
-            ws.onopen = function () {
+            ws.onopen = function() {
                 isConnected = true;
                 reconnectAttempts = 0;
-                console.log("✅ WebSocket ادمین متصل شد!");
+                console.log('✅ WebSocket ادمین متصل شد!');
+                statusText.textContent = 'متصل';
+                statusDot.className = 'status-dot online';
+                statusBar.className = 'status-bar online';
             };
-        }
 
             ws.onerror = function(error) {
                 console.log('❌ خطا:', error);
