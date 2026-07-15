@@ -1,5 +1,14 @@
 <!-- templates/chat/chat.html -->
 <style>
+    /* ===== متغیرهای داینامیک ارتفاع ===== */
+    .chat-fab-wrapper {
+        --chat-vh: 100vh;
+    }
+    .chat-fab-wrapper .chat-container {
+        height: var(--chat-vh);
+        max-height: var(--chat-vh);
+    }
+
     /* ===== همه استایل‌ها با پیشوند chat- برای ایزوله کردن ===== */
     .chat-fab-wrapper * {
         margin: 0;
@@ -70,16 +79,13 @@
         50% { transform: scale(1.18); }
     }
 
-    /* ===== کانتینر اصلی چت - مودال ===== */
+    /* ===== کانتینر اصلی چت - مودال با GRID ===== */
     .chat-fab-wrapper .chat-container {
         position: fixed;
-        bottom: 0;
-        right: 0;
+        inset: 0;
         z-index: 999998;
         width: 100vw;
         max-width: 100vw;
-        height: 100vh;
-        max-height: 100vh;
         background-image: url('/media/chat-background.jpg');
         background-size: cover;
         background-position: center;
@@ -96,9 +102,18 @@
         overscroll-behavior: contain;
         -webkit-overflow-scrolling: touch;
         padding-bottom: 0;
+        /* استفاده از grid برای کنترل دقیق ارتفاع */
+        display: none !important;
+        grid-template-rows: auto auto 1fr auto;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "header"
+            "status"
+            "messages"
+            "input";
     }
     .chat-fab-wrapper .chat-container.open {
-        display: flex !important;
+        display: grid !important;
         animation: chat-slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     @keyframes chat-slideUp {
@@ -114,6 +129,7 @@
 
     /* ===== هدر چت ===== */
     .chat-fab-wrapper .chat-header {
+        grid-area: header;
         background: linear-gradient(145deg, #0a7e6e, #065a4e);
         color: white;
         padding: 16px 22px;
@@ -220,6 +236,7 @@
 
     /* ===== استاتوس بار ===== */
     .chat-fab-wrapper .status-bar {
+        grid-area: status;
         padding: 8px 18px;
         background: rgba(248, 249, 250, 0.9);
         backdrop-filter: blur(4px);
@@ -236,6 +253,40 @@
     }
     .chat-fab-wrapper .status-bar.online { color: #059669; background: rgba(236, 253, 245, 0.9); }
     .chat-fab-wrapper .status-bar.offline { color: #dc2626; background: rgba(254, 242, 242, 0.9); }
+
+    /* ===== پیام‌ها ===== */
+    .chat-fab-wrapper .chat-messages {
+        grid-area: messages;
+        padding: 18px 18px;
+        overflow-y: auto;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-family: 'Tahoma', sans-serif;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        min-height: 0;
+        height: 100%;
+        /* مهم: این باعث میشه فقط پیام‌ها اسکرول بشن */
+        flex: 1 1 auto;
+    }
+    .chat-fab-wrapper .chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+    .chat-fab-wrapper .chat-messages::-webkit-scrollbar-track {
+        background: rgba(209, 199, 193, 0.3);
+        border-radius: 10px;
+    }
+    .chat-fab-wrapper .chat-messages::-webkit-scrollbar-thumb {
+        background: linear-gradient(145deg, #a89a92, #8a7a72);
+        border-radius: 10px;
+    }
+    .chat-fab-wrapper .chat-messages::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(145deg, #8a7a72, #6a5a52);
+    }
 
     /* ===== اسکلتون لودینگ ===== */
     .chat-fab-wrapper .skeleton-loader {
@@ -286,38 +337,6 @@
         0% { opacity: 0.6; }
         50% { opacity: 1; }
         100% { opacity: 0.6; }
-    }
-
-    /* ===== پیام‌ها ===== */
-    .chat-fab-wrapper .chat-messages {
-        flex: 1;
-        padding: 18px 18px;
-        overflow-y: auto;
-        background: rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        font-family: 'Tahoma', sans-serif;
-        overscroll-behavior: contain;
-        -webkit-overflow-scrolling: touch;
-        min-height: 0;
-        height: 100%;
-    }
-    .chat-fab-wrapper .chat-messages::-webkit-scrollbar {
-        width: 6px;
-    }
-    .chat-fab-wrapper .chat-messages::-webkit-scrollbar-track {
-        background: rgba(209, 199, 193, 0.3);
-        border-radius: 10px;
-    }
-    .chat-fab-wrapper .chat-messages::-webkit-scrollbar-thumb {
-        background: linear-gradient(145deg, #a89a92, #8a7a72);
-        border-radius: 10px;
-    }
-    .chat-fab-wrapper .chat-messages::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(145deg, #8a7a72, #6a5a52);
     }
 
     /* ===== پیام‌ها ===== */
@@ -512,8 +531,9 @@
         100% { transform: rotate(360deg); }
     }
 
-    /* ===== ورودی - اصلاح شده برای همیشه قابل مشاهده بودن ===== */
+    /* ===== ورودی - کاملاً اصلاح شده ===== */
     .chat-fab-wrapper .chat-input {
+        grid-area: input;
         padding: 12px 16px;
         padding-bottom: max(12px, calc(env(safe-area-inset-bottom, 12px) + 15px));
         background: rgba(255, 255, 255, 0.95);
@@ -527,12 +547,13 @@
         width: 100%;
         z-index: 5;
         /* مهم: همیشه در پایین صفحه */
-        position: relative;
+        position: sticky;
         bottom: 0;
         left: 0;
         right: 0;
         min-height: 65px;
         box-shadow: 0 -4px 20px rgba(0,0,0,0.03);
+        background-color: rgba(255, 255, 255, 0.97);
     }
     .chat-fab-wrapper .chat-input .input-wrapper {
         flex: 1;
@@ -676,6 +697,7 @@
         background: rgba(255, 255, 255, 0.6);
         backdrop-filter: blur(4px);
         flex-shrink: 0;
+        grid-area: filepreview;
     }
 
     /* ===== نوتیفیکیشن ===== */
@@ -742,18 +764,18 @@
     /* ===== Responsive - موبایل ===== */
     @media (max-width: 768px) {
         .chat-fab-wrapper .chat-container {
-            bottom: 0;
-            right: 0;
+            inset: 0;
             width: 100vw;
             max-width: 100vw;
-            height: 100vh;
-            max-height: 100vh;
             border-radius: 0;
             backdrop-filter: blur(8px);
             position: fixed;
             top: 0;
             left: 0;
             padding-bottom: 0;
+            /* استفاده از داینامیک vh */
+            height: var(--chat-vh, 100vh);
+            max-height: var(--chat-vh, 100vh);
         }
 
         .chat-fab-wrapper .chat-fab {
@@ -782,9 +804,7 @@
 
         .chat-fab-wrapper .chat-messages {
             padding: 14px 14px;
-            height: 100%;
             min-height: 0;
-            /* مهم: فضای خالی رو پر کنه */
             flex: 1 1 auto;
         }
 
@@ -792,7 +812,6 @@
             padding: 10px 12px;
             padding-bottom: max(10px, calc(env(safe-area-inset-bottom, 10px) + 15px));
             min-height: 60px;
-            /* مهم: ورودی همیشه قابل مشاهده */
             flex-shrink: 0;
         }
         .chat-fab-wrapper .chat-input .input-wrapper { padding: 2px 4px 2px 12px; }
@@ -913,7 +932,7 @@
 
         <!-- پیام‌ها -->
         <div class="chat-messages" id="chat-messages">
-            <!-- اسکلتون لودینگ - به صورت پیش‌فرض مخفی -->
+            <!-- اسکلتون لودینگ -->
             <div class="skeleton-loader" id="skeleton-loader" style="display:none;">
                 <div class="skeleton-item left">
                     <div class="skeleton-avatar"></div>
@@ -983,12 +1002,67 @@
 
 <script>
     // ============================================================
-    //  اسکریپت چت - فوق‌حرفه‌ای
+    //  اسکریپت چت - فوق‌حرفه‌ای با حل مشکل موبایل
     // ============================================================
     (function() {
         'use strict';
 
         console.log('🚀 چت شناور بارگذاری شد...');
+
+        // ============================================================
+        //  مدیریت ارتفاع واقعی صفحه در موبایل
+        // ============================================================
+        function updateViewportHeight() {
+            const vh = window.innerHeight || document.documentElement.clientHeight;
+            const vw = window.innerWidth || document.documentElement.clientWidth;
+
+            // تنظیم متغیر CSS برای کل wrapper
+            const wrapper = document.querySelector('.chat-fab-wrapper');
+            if (wrapper) {
+                wrapper.style.setProperty('--chat-vh', vh + 'px');
+                wrapper.style.setProperty('--chat-vw', vw + 'px');
+            }
+
+            // تنظیم مستقیم روی container
+            const container = document.getElementById('chat-container');
+            if (container) {
+                container.style.height = vh + 'px';
+                container.style.maxHeight = vh + 'px';
+                container.style.width = vw + 'px';
+                container.style.maxWidth = vw + 'px';
+            }
+
+            console.log('📱 ارتفاع واقعی صفحه:', vh, 'px');
+        }
+
+        // اجرا در بارگذاری اولیه
+        updateViewportHeight();
+
+        // اجرا در هر تغییر اندازه
+        let resizeTimeout = null;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(updateViewportHeight, 200);
+        });
+
+        // استفاده از visualViewport برای دقت بیشتر در موبایل
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', function() {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(updateViewportHeight, 150);
+            });
+
+            window.visualViewport.addEventListener('scroll', function() {
+                // در موبایل وقتی کیبورد باز میشه، visualViewport تغییر میکنه
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(updateViewportHeight, 150);
+            });
+        }
+
+        // همچنین وقتی orientation تغییر میکنه
+        window.addEventListener('orientationchange', function() {
+            setTimeout(updateViewportHeight, 300);
+        });
 
         // ============================================================
         //  عناصر
@@ -1031,7 +1105,6 @@
             if (skeletonLoader) {
                 skeletonLoader.style.display = 'none';
             }
-            // empty state رو بعداً مدیریت میکنیم
         }
 
         // ============================================================
@@ -1078,17 +1151,25 @@
         //  مدیریت باز/بسته شدن چت
         // ============================================================
         function openChat() {
+            // اول ارتفاع رو بروز کن
+            updateViewportHeight();
+
             chatContainer.classList.add('open');
-            chatContainer.style.display = 'flex !important';
+            chatContainer.style.display = 'grid !important';
             chatFab.style.display = 'none';
             unreadCount = 0;
             updateBadge();
             preventBodyScroll(true);
 
-            // نمایش اسکلتون تا وقتی تاریخچه بیاد
+            // نمایش اسکلتون
             showSkeleton();
 
-            setTimeout(function() { msgInput.focus(); }, 400);
+            setTimeout(function() {
+                msgInput.focus();
+                // بعد از باز شدن دوباره ارتفاع رو چک کن
+                setTimeout(updateViewportHeight, 300);
+            }, 400);
+
             if (ws && isConnected) {
                 loadChatHistory();
             }
@@ -1233,14 +1314,12 @@
         // ============================================================
         async function loadChatHistory() {
             try {
-                // اسکلتون رو نمایش بده
                 showSkeleton();
-
                 statusBar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> بارگذاری...';
+
                 const response = await fetch('/chat/api/history/');
                 const data = await response.json();
 
-                // اسکلتون رو مخفی کن
                 hideSkeleton();
 
                 const emptyStateEl = document.getElementById('empty-state');
@@ -1811,6 +1890,20 @@
         };
 
         console.log('✅ سیستم خوش‌آمدگویی فعال شد');
+
+        // ============================================================
+        //  بروزرسانی ارتفاع هنگام باز شدن کیبورد
+        // ============================================================
+        // وقتی input فوکوس می‌شه، کیبورد باز میشه و ارتفاع تغییر میکنه
+        msgInput.addEventListener('focus', function() {
+            setTimeout(updateViewportHeight, 300);
+        });
+
+        msgInput.addEventListener('blur', function() {
+            setTimeout(updateViewportHeight, 300);
+        });
+
+        console.log('✅ سیستم مدیریت ارتفاع فعال شد');
 
     })();
 </script>
