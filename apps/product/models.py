@@ -70,6 +70,8 @@ class PackageUnit(BaseModel):
 class Brand(BaseModel):
     description = models.TextField(null=True, blank=True, verbose_name=_("توضیحات برند"))
     isCatalog = models.BooleanField(default=True,verbose_name='ایا کاتالوگ هست ؟')
+    pdf_file = models.FileField(upload_to='brands/pdfs/', null=True, blank=True, verbose_name=_("فایل PDF کاتالوگ"))
+
 
     class Meta:
         verbose_name = _("برند")
@@ -82,6 +84,10 @@ class Brand(BaseModel):
 class Category(BaseModel):
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='children', verbose_name=_("دسته بندی والد"))
     brands = models.ManyToManyField(Brand, blank=True, related_name="categories", verbose_name=_("برندهای این دسته"))
+    files = models.FileField(
+        upload_to=utils.FileUpload('uploads/catalogs', 'pdf').upload_to,
+        null=True, blank=True, verbose_name=_("فایل کاتالوگ (PDF)")
+    )
 
     class Meta:
         verbose_name = _("دسته بندی")

@@ -1,47 +1,13 @@
-# views.py
+# views.py - نسخه کامل و اصلاح شده
+
 from django.http import JsonResponse
 from django.views import View
 from django.core.serializers import serialize
-from ..models import Category
-import json
-
-class CategoryListView(View):
-    """نمایش دسته بندی‌های اصلی (parent=None) به صورت JSON"""
-
-    def get(self, request):
-        # گرفتن دسته بندی‌هایی که parent ندارند
-        main_categories = Category.objects.filter(parent__isnull=True, status=True)
-
-        # ساخت آرایه دیتا
-        categories_data = []
-        for category in main_categories:
-            # گرفتن آدرس کامل تصویر
-            image_url = category.image.url if category.image else '/media/images/default-category.jpg'
-
-            categories_data.append({
-                'id': category.id,
-                'name': category.title,  # اسم دسته بندی
-                'slug': category.slug,   # اسلاگ برای لینک‌ها
-                'img': image_url,        # آدرس تصویر
-
-                'sort_order': category.sort_order,  # ترتیب نمایش
-                'child_count': category.children.count()  # تعداد زیرمجموعه‌ها
-            })
-
-        # مرتب‌سازی بر اساس sort_order
-        categories_data.sort(key=lambda x: x['sort_order'])
-
-        return JsonResponse({
-            'status': 'success',
-            'data': categories_data,
-            'total': len(categories_data)
-        }, status=200)
-
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views import View
-from django.db.models import Count, Q
-from django.http import JsonResponse
+from django.db.models import Count, Q, Sum
 from ..models import Category, Brand, Catalog, Product
+from apps.order.models import OrderItem, OrderStatus
+import json
 
 
 class CategoryListView(View):
@@ -59,7 +25,9 @@ class CategoryListView(View):
                 'slug': category.slug,
                 'img': image_url,
                 'sort_order': category.sort_order,
-                'child_count': category.children.count()
+                'child_count': category.children.count(),
+                'pdf_file': category.files.url if category.files else None,  # اضافه کردن PDF دسته
+                'has_pdf': bool(category.files),  # آیا PDF دارد
             })
 
         categories_data.sort(key=lambda x: x['sort_order'])
@@ -112,14 +80,35 @@ class CategoryBrandsView(View):
         subcategories = category.children.filter(status=True)
         popular_brands = brands.order_by('-total_content', '-product_count')
 
+        # اضافه کردن PDF برندها به context
+        brands_with_pdf = []
+        for brand in brands:
+            brand_data = {
+                'id': brand.id,
+                'title': brand.title,
+                'slug': brand.slug,
+                'image': brand.image,
+                'description': brand.description,
+                'isCatalog': brand.isCatalog,
+                'product_count': brand.product_count,
+                'catalog_count': brand.catalog_count,
+                'total_content': brand.total_content,
+                'pdf_file': brand.pdf_file.url if brand.pdf_file else None,
+                'has_pdf': bool(brand.pdf_file),
+            }
+            brands_with_pdf.append(brand_data)
+
         context = {
             'category': category,
-            'brands': brands,
+            'brands': brands_with_pdf,
+            'brands_queryset': brands,
             'subcategories': subcategories,
             'popular_brands': popular_brands,
             'total_brands': brands.count(),
             'sort_by': sort_by,
             'search_query': search_query,
+            'category_pdf': category.files.url if category.files else None,  # PDF دسته بندی
+            'category_has_pdf': bool(category.files),  # آیا دسته بندی PDF دارد
         }
 
         return render(request, self.template_name, context)
@@ -162,14 +151,33 @@ class BrandCatalogsView(View):
         categories = brand.categories.filter(status=True)
         products = brand.products.filter(status=True)
 
+        # آماده سازی کاتالوگ‌ها با اطلاعات PDF
+        catalogs_with_pdf = []
+        for catalog in catalogs:
+            catalog_data = {
+                'id': catalog.id,
+                'title': catalog.title,
+                'slug': catalog.slug,
+                'description': catalog.description,
+                'image': catalog.image,
+                'pdf_file': catalog.files.url if catalog.files else None,
+                'has_pdf': bool(catalog.files),
+                'created_at': catalog.created_at,
+                'brand': catalog.brand,
+            }
+            catalogs_with_pdf.append(catalog_data)
+
         context = {
             'brand': brand,
-            'catalogs': catalogs,
+            'catalogs': catalogs_with_pdf,  # کاتالوگ‌ها با اطلاعات PDF
+            'catalogs_queryset': catalogs,
             'categories': categories,
             'products': products,
             'total_catalogs': catalogs.count(),
             'sort_by': sort_by,
             'search_query': search_query,
+            'brand_pdf': brand.pdf_file.url if brand.pdf_file else None,  # PDF برند
+            'brand_has_pdf': bool(brand.pdf_file),  # آیا برند PDF دارد
         }
 
         return render(request, self.template_name, context)
@@ -189,22 +197,33 @@ def brand_catalogs_view(request, slug):
     categories = brand.categories.filter(status=True)
     products = brand.products.filter(status=True)
 
+    # آماده سازی کاتالوگ‌ها با اطلاعات PDF
+    catalogs_with_pdf = []
+    for catalog in catalogs:
+        catalog_data = {
+            'id': catalog.id,
+            'title': catalog.title,
+            'slug': catalog.slug,
+            'description': catalog.description,
+            'image': catalog.image,
+            'pdf_file': catalog.files.url if catalog.files else None,
+            'has_pdf': bool(catalog.files),
+            'created_at': catalog.created_at,
+        }
+        catalogs_with_pdf.append(catalog_data)
+
     context = {
         'brand': brand,
-        'catalogs': catalogs,
+        'catalogs': catalogs_with_pdf,
+        'catalogs_queryset': catalogs,
         'categories': categories,
         'products': products,
         'total_catalogs': catalogs.count(),
+        'brand_pdf': brand.pdf_file.url if brand.pdf_file else None,
+        'brand_has_pdf': bool(brand.pdf_file),
     }
 
     return render(request, 'product_app/category/category_catalog.html', context)
-
-from django.db.models import Count, Sum, Q
-from django.views import View
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
-from apps.product.models import Category, Brand, Catalog, Product
-from apps.order.models import OrderItem, OrderStatus
 
 
 class CategoryMegaMenuView(View):
@@ -232,7 +251,9 @@ class CategoryMegaMenuView(View):
                 'slug': b.slug,
                 'image': b.image.url if b.image else None,
                 'product_count': b.product_count,
-                'is_catalog': b.isCatalog
+                'is_catalog': b.isCatalog,
+                'pdf_file': b.pdf_file.url if b.pdf_file else None,  # PDF برند
+                'has_pdf': bool(b.pdf_file),
             }
             for b in brands
         ]
@@ -249,13 +270,14 @@ class CategoryMegaMenuView(View):
                 'title': c.title,
                 'slug': c.slug,
                 'file_url': c.files.url if c.files else '#',
-                'date': c.created_at.strftime('%Y/%m/%d') if c.created_at else ''
+                'has_pdf': bool(c.files),
+                'date': c.created_at.strftime('%Y/%m/%d') if c.created_at else '',
+                'image': c.image.url if c.image else None,
             }
             for c in catalogs
         ]
 
         # ========== پرفروش‌ترین محصولات (از OrderItem) ==========
-        # محاسبه مجموع تعداد فروش برای هر محصول در سفارش‌های پرداخت شده
         bestsellers = Product.objects.filter(
             categories__id__in=sub_ids,
             status=True
@@ -266,7 +288,6 @@ class CategoryMegaMenuView(View):
             ))
         ).filter(total_sold__gt=0).order_by('-total_sold')
 
-        # اگر محصول پرفروشی نبود، محصولات تصادفی یا جدید نشون بده
         if not bestsellers:
             bestsellers = Product.objects.filter(
                 categories__id__in=sub_ids,
@@ -275,7 +296,6 @@ class CategoryMegaMenuView(View):
 
         bestsellers_data = []
         for p in bestsellers:
-            # قیمت رو safe handling کن
             price_value = 0
             if p.price is not None:
                 try:
@@ -290,14 +310,22 @@ class CategoryMegaMenuView(View):
                 'image': p.image.url if p.image else None,
                 'price': price_value,
                 'price_display': f"{price_value:,}" if price_value > 0 else 'تماس بگیرید',
-                'total_sold': p.total_sold if hasattr(p, 'total_sold') and p.total_sold else 0
+                'total_sold': p.total_sold if hasattr(p, 'total_sold') and p.total_sold else 0,
+                'product_pdf': p.product_pdf.url if p.product_pdf else None,  # PDF محصول
+                'has_pdf': bool(p.product_pdf),
             })
+
+        # ========== PDF دسته‌بندی ==========
+        category_pdf = category.files.url if category.files else None
+        category_has_pdf = bool(category.files)
 
         return JsonResponse({
             'status': 'success',
             'data': {
                 'category_id': category.id,
                 'category_name': category.title,
+                'category_pdf': category_pdf,
+                'category_has_pdf': category_has_pdf,
                 'brands': brands_data,
                 'catalogs': catalogs_data,
                 'bestsellers': bestsellers_data

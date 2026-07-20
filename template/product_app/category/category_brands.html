@@ -8,530 +8,511 @@
 {% block content %}
 
 <style>
+    /* ============================================
+       استایل‌های جدید - نسخه مدرن و مینیمال
+       ============================================ */
 
-      @media (max-width: 768px) {
-  .content-container {
-    padding: 1px 1px 10px;
-  }
-}
-    /* استایل اختصاصی این صفحه - بدون بک‌گراند اضافی */
-    .brands-page-custom {
+    * {
+        font-family: 'Vazir', 'IRANSans', 'Tahoma', sans-serif;
+    }
+
+    .brands-page-modern {
         min-height: 100vh;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+        padding: 20px;
     }
 
-    .brands-content-custom {
-        max-width: 100%;
-        padding: 16px;
+    .brands-content-modern {
+        max-width: 1400px;
+        margin: 0 auto;
     }
 
-    /* ========== هدر ========== */
-    .brands-head-custom {
-        background: #1e293b;
-        border-radius: 20px;
-        padding: 20px 16px;
-        text-align: center;
-        margin-bottom: 16px;
-    }
-
-    .brands-head-custom h1 {
-        color: white;
-        font-size: 1.4rem;
-        font-weight: 700;
-        margin: 0 0 8px 0;
-    }
-
-    .brands-head-custom .badge-custom {
-        background: #334155;
-        color: #94a3b8;
-        font-size: 0.7rem;
-        padding: 4px 12px;
-        border-radius: 50px;
-        display: inline-block;
-    }
-
-    /* ========== جستجو ========== */
-    .search-wrap-custom {
-        background: white;
-        border-radius: 16px;
-        padding: 12px;
-        margin-bottom: 12px;
-    }
-
-    .search-box-custom {
+    /* ============================================
+       هدر - مینیمال و شیک
+       ============================================ */
+    .brands-header-modern {
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        border-radius: 24px;
+        padding: 30px 40px;
+        margin-bottom: 30px;
         position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
     }
 
-    .search-box-custom input {
-        width: 100%;
-        padding: 12px 45px 12px 16px;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        font-size: 0.85rem;
-        background: #f8fafc;
-        outline: none;
-    }
-
-    .search-box-custom input:focus {
-        border-color: #d25f00;
-    }
-
-    .search-box-custom .search-icon-custom {
+    .brands-header-modern::before {
+        content: '';
         position: absolute;
-        right: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #94a3b8;
+        top: -50%;
+        right: -20%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(210, 95, 0, 0.15), transparent 70%);
+        border-radius: 50%;
     }
 
-    .result-count-custom {
-        font-size: 0.7rem;
-        color: #64748b;
-        text-align: center;
-        margin-top: 8px;
+    .brands-header-modern .header-left {
+        position: relative;
+        z-index: 1;
     }
 
-    /* ========== فیلترها ========== */
-    .filter-wrap-custom {
-        background: white;
-        border-radius: 16px;
-        padding: 12px;
-        margin-bottom: 12px;
-        overflow-x: auto;
-    }
-
-    .filter-list-custom {
-        display: flex;
-        gap: 8px;
-        white-space: nowrap;
-    }
-
-    .filter-btn-custom {
-        padding: 6px 14px;
-        background: #f1f5f9;
-        border: none;
-        border-radius: 30px;
-        font-size: 0.7rem;
-        font-weight: 500;
-        color: #475569;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .filter-btn-custom.active {
-        background: #d25f00;
+    .brands-header-modern h1 {
         color: white;
-    }
-
-    /* ========== زیردسته‌ها ========== */
-    .subcat-wrap-custom {
-        background: white;
-        border-radius: 16px;
-        padding: 12px;
-        margin-bottom: 16px;
-        overflow-x: auto;
-    }
-
-    .subcat-title-custom {
-        font-size: 0.7rem;
-        font-weight: 600;
-        color: #64748b;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .subcat-list-custom {
-        display: flex;
-        gap: 16px;
-        white-space: nowrap;
-    }
-
-    .subcat-item-custom {
-        display: inline-flex;
-        flex-direction: column;
-        align-items: center;
-        text-decoration: none;
-        width: 65px;
-    }
-
-    .subcat-icon-custom {
-        width: 50px;
-        height: 50px;
-        background: #f1f5f9;
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 6px;
-    }
-
-    .subcat-icon-custom i {
-        font-size: 24px;
-        color: #d25f00;
-    }
-
-    .subcat-icon-custom img {
-        width: 35px;
-        height: 35px;
-        object-fit: contain;
-    }
-
-    .subcat-name-custom {
-        font-size: 0.65rem;
-        font-weight: 500;
-        color: #334155;
-    }
-
-    /* ========== لیست برندها (موبایل - عمودی) ========== */
-    .brands-list-custom {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .brand-item-custom {
-        background: white;
-        border-radius: 14px;
-        padding: 10px 14px;
+        font-size: 2rem;
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: -0.5px;
         display: flex;
         align-items: center;
         gap: 12px;
-        text-decoration: none;
-        border: 1px solid #eef2f7;
+        flex-wrap: wrap;
     }
 
-    .brand-avatar-custom {
-        width: 45px;
-        height: 45px;
-        background: #f8fafc;
+    .brands-header-modern h1 small {
+        font-size: 1rem;
+        font-weight: 400;
+        color: rgba(255,255,255,0.6);
+    }
+
+    .brands-header-modern .header-right {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .brands-header-modern .badge-modern {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .brands-header-modern .badge-modern i {
+        color: #ff6b35;
+    }
+
+    /* ============================================
+       دکمه دانلود PDF هدر
+       ============================================ */
+    .header-pdf-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 20px;
+        background: linear-gradient(135deg, #ff6b35, #e5532c);
+        color: white !important;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid rgba(255,255,255,0.15);
+        position: relative;
+        z-index: 1;
+    }
+
+    .header-pdf-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
+        color: white !important;
+    }
+
+    .header-pdf-btn i {
+        font-size: 1rem;
+    }
+
+    /* ============================================
+       بخش جستجو و فیلتر - یکپارچه
+       ============================================ */
+    .search-filter-wrapper {
+        background: white;
+        border-radius: 20px;
+        padding: 20px 24px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+    }
+
+    .search-box-modern {
+        flex: 1;
+        min-width: 200px;
+        position: relative;
+    }
+
+    .search-box-modern input {
+        width: 100%;
+        padding: 14px 50px 14px 20px;
+        border: 2px solid #e8ecf1;
+        border-radius: 14px;
+        font-size: 0.95rem;
+        background: #f8f9fb;
+        transition: all 0.3s ease;
+        outline: none;
+    }
+
+    .search-box-modern input:focus {
+        border-color: #ff6b35;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+    }
+
+    .search-box-modern .search-icon {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 1.1rem;
+    }
+
+    .filter-buttons-modern {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn-modern {
+        padding: 8px 16px;
+        background: #f1f3f5;
+        border: none;
         border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+    .filter-btn-modern:hover {
+        background: #e8ecf1;
+        transform: translateY(-1px);
+    }
+
+    .filter-btn-modern.active {
+        background: #ff6b35;
+        color: white;
+        box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+    }
+
+    .filter-btn-modern i {
+        font-size: 0.8rem;
+    }
+
+    .results-count-modern {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        margin-right: auto;
+        font-weight: 500;
+    }
+
+    /* ============================================
+       زیردسته‌ها - اسکرول افقی شیک
+       ============================================ */
+    .subcategories-modern {
+        background: white;
+        border-radius: 20px;
+        padding: 20px 24px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+
+    .subcategories-modern .subcat-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .subcategories-modern .subcat-title i {
+        color: #ff6b35;
+    }
+
+    .subcat-scroll {
+        display: flex;
+        gap: 16px;
+        overflow-x: auto;
+        padding: 4px 0 12px 0;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .subcat-scroll::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .subcat-scroll::-webkit-scrollbar-track {
+        background: #f1f3f5;
+        border-radius: 4px;
+    }
+
+    .subcat-scroll::-webkit-scrollbar-thumb {
+        background: #ff6b35;
+        border-radius: 4px;
+    }
+
+    .subcat-item-modern {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        gap: 8px;
+        min-width: 70px;
+        transition: all 0.3s ease;
+    }
+
+    .subcat-item-modern:hover {
+        transform: translateY(-4px);
+    }
+
+    .subcat-icon-modern {
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #f8f9fb, #f1f3f5);
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
     }
 
-    .brand-avatar-custom img {
-        width: 35px;
-        height: 35px;
+    .subcat-item-modern:hover .subcat-icon-modern {
+        border-color: #ff6b35;
+        background: linear-gradient(135deg, #fff5f0, #fff);
+        box-shadow: 0 4px 16px rgba(255, 107, 53, 0.15);
+    }
+
+    .subcat-icon-modern i {
+        font-size: 24px;
+        color: #ff6b35;
+    }
+
+    .subcat-icon-modern img {
+        width: 32px;
+        height: 32px;
         object-fit: contain;
     }
 
-    .brand-avatar-custom .no-img-custom {
-        font-size: 28px;
+    .subcat-name-modern {
+        font-size: 0.7rem;
+        font-weight: 500;
+        color: #475569;
+        text-align: center;
+        max-width: 70px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* ============================================
+       گرید برندها - کارت‌های شیشه‌ای
+       ============================================ */
+    .brands-grid-modern {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .brand-card-modern {
+        background: white;
+        border-radius: 20px;
+        padding: 24px 20px;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+        animation: fadeUp 0.5s ease forwards;
+        opacity: 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+
+    .brand-card-modern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 107, 53, 0.03), rgba(255, 107, 53, 0.01));
+        opacity: 0;
+        transition: all 0.4s ease;
+    }
+
+    .brand-card-modern:hover {
+        transform: translateY(-8px);
+        border-color: #ff6b35;
+        box-shadow: 0 12px 40px rgba(255, 107, 53, 0.15);
+    }
+
+    .brand-card-modern:hover::before {
+        opacity: 1;
+    }
+
+    .brand-card-modern .brand-logo-wrap {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 16px;
+        background: #f8f9fb;
+        border-radius: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.4s ease;
+        position: relative;
+        z-index: 1;
+    }
+
+    .brand-card-modern:hover .brand-logo-wrap {
+        background: linear-gradient(135deg, #fff5f0, #fff);
+        box-shadow: 0 8px 24px rgba(255, 107, 53, 0.1);
+        transform: scale(1.05);
+    }
+
+    .brand-card-modern .brand-logo-wrap img {
+        width: 70px;
+        height: 70px;
+        object-fit: contain;
+        transition: all 0.4s ease;
+    }
+
+    .brand-card-modern:hover .brand-logo-wrap img {
+        transform: scale(1.1);
+    }
+
+    .brand-card-modern .brand-logo-wrap .no-img {
+        font-size: 48px;
         color: #cbd5e1;
     }
 
-    .brand-details-custom {
-        flex: 1;
-    }
-
-    .brand-details-custom h3 {
-        font-size: 0.85rem;
+    .brand-card-modern .brand-name {
+        font-size: 1.05rem;
         font-weight: 700;
         color: #0f172a;
-        margin: 0 0 3px 0;
+        margin: 0 0 8px 0;
+        position: relative;
+        z-index: 1;
+        transition: all 0.3s ease;
     }
 
-    .brand-meta-custom {
+    .brand-card-modern:hover .brand-name {
+        color: #ff6b35;
+    }
+
+    .brand-card-modern .brand-stats {
         display: flex;
-        gap: 10px;
-        font-size: 0.6rem;
-        color: #64748b;
+        justify-content: center;
+        gap: 16px;
+        font-size: 0.75rem;
+        color: #94a3b8;
+        position: relative;
+        z-index: 1;
     }
 
-    .brand-meta-custom span {
+    .brand-card-modern .brand-stats span {
         display: flex;
         align-items: center;
         gap: 4px;
     }
 
-    .brand-arrow-custom {
-        color: #cbd5e1;
-        font-size: 12px;
+    .brand-card-modern .brand-stats i {
+        font-size: 0.7rem;
     }
 
-    /* ========== پیشنهادات جستجو ========== */
-    .suggestions-custom {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        z-index: 1000;
-        max-height: 280px;
-        overflow-y: auto;
-        display: none;
-        margin-top: 8px;
-        border: 1px solid #e2e8f0;
-    }
-
-    .suggestions-custom.show {
-        display: block;
-    }
-
-    .suggestion-custom {
-        display: flex;
+    /* ============================================
+       دکمه دانلود PDF روی کارت برند - ساده با تگ a
+       ============================================ */
+    .brand-pdf-link {
+        display: inline-flex;
         align-items: center;
-        gap: 12px;
-        padding: 10px 14px;
-        cursor: pointer;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    .suggestion-custom:active {
-        background: #f1f5f9;
-    }
-
-    .suggestion-img-custom {
-        width: 40px;
-        height: 40px;
-        background: #f1f5f9;
+        gap: 6px;
+        margin-top: 12px;
+        padding: 6px 14px;
+        background: #fee9e4;
+        color: #ff6b35;
         border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        position: relative;
+        z-index: 1;
+        border: none;
     }
 
-    .suggestion-img-custom img {
-        width: 30px;
-        height: 30px;
-        object-fit: contain;
+    .brand-pdf-link:hover {
+        background: #ff6b35;
+        color: white !important;
+        transform: scale(1.05);
+        box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
     }
 
-    .suggestion-info-custom h4 {
-        font-size: 0.85rem;
-        font-weight: 700;
-        margin: 0 0 3px 0;
-        color: #0f172a;
-    }
-
-    .suggestion-info-custom p {
-        font-size: 0.65rem;
-        margin: 0;
-        color: #64748b;
-    }
-
-    .highlight-custom {
-        background: #dbeafe;
-        color: #d25f00;
-        border-radius: 3px;
-        padding: 0 2px;
-    }
-
-    /* ========== حالت خالی ========== */
-    .empty-custom {
-        text-align: center;
-        padding: 60px 20px;
-        background: white;
-        border-radius: 20px;
-    }
-
-    .empty-custom i {
-        font-size: 50px;
-        color: #cbd5e1;
-        margin-bottom: 12px;
-    }
-
-    .empty-custom h3 {
-        font-size: 1rem;
-        font-weight: 700;
-        margin: 0 0 6px 0;
-        color: #0f172a;
-    }
-
-    .empty-custom p {
+    .brand-pdf-link i {
         font-size: 0.8rem;
+    }
+
+    /* ============================================
+       حالت خالی
+       ============================================ */
+    .empty-modern {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 80px 20px;
+        background: white;
+        border-radius: 24px;
+    }
+
+    .empty-modern i {
+        font-size: 60px;
+        color: #cbd5e1;
+        margin-bottom: 16px;
+    }
+
+    .empty-modern h3 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 8px 0;
+    }
+
+    .empty-modern p {
+        color: #94a3b8;
         margin: 0;
-        color: #64748b;
     }
 
-    /* ========== دسکتاپ (گرید چند ستونه) ========== */
-    @media (min-width: 768px) {
-        .brands-content-custom {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 24px;
-        }
-
-        .brands-head-custom {
-            border-radius: 24px;
-            padding: 40px 32px;
-            margin-bottom: 32px;
-        }
-
-        .brands-head-custom h1 {
-            font-size: 2.2rem;
-        }
-
-        .brands-head-custom .badge-custom {
-            font-size: 0.85rem;
-            padding: 8px 20px;
-        }
-
-        .search-wrap-custom {
-            border-radius: 20px;
-            padding: 20px 24px;
-            margin-bottom: 24px;
-        }
-
-        .search-box-custom input {
-            padding: 16px 55px 16px 24px;
-            font-size: 1rem;
-            border-radius: 60px;
-        }
-
-        .result-count-custom {
-            font-size: 0.85rem;
-            margin-top: 12px;
-        }
-
-        .filter-wrap-custom {
-            border-radius: 20px;
-            padding: 16px 20px;
-            margin-bottom: 24px;
-            overflow-x: visible;
-        }
-
-        .filter-list-custom {
-            justify-content: center;
-            flex-wrap: wrap;
-            white-space: normal;
-            gap: 12px;
-        }
-
-        .filter-btn-custom {
-            padding: 10px 24px;
-            font-size: 0.9rem;
-        }
-
-        .subcat-wrap-custom {
-            border-radius: 20px;
-            padding: 20px 24px;
-            margin-bottom: 32px;
-        }
-
-        .subcat-title-custom {
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
-
-        .subcat-list-custom {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 24px;
-            white-space: normal;
-        }
-
-        .subcat-item-custom {
-            width: auto;
-            min-width: 80px;
-        }
-
-        .subcat-icon-custom {
-            width: 70px;
-            height: 70px;
-            border-radius: 20px;
-        }
-
-        .subcat-icon-custom i {
-            font-size: 32px;
-        }
-
-        .subcat-icon-custom img {
-            width: 45px;
-            height: 45px;
-        }
-
-        .subcat-name-custom {
-            font-size: 0.8rem;
-        }
-
-        /* گرید چند ستونه برای برندها */
-        .brands-list-custom {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-        }
-
-        .brand-item-custom {
-            flex-direction: column;
-            text-align: center;
-            padding: 28px 20px;
-            gap: 16px;
-            border-radius: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .brand-item-custom:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border-color: #d25f00;
-        }
-
-        .brand-avatar-custom {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto;
-            border-radius: 24px;
-        }
-
-        .brand-avatar-custom img {
-            width: 70px;
-            height: 70px;
-        }
-
-        .brand-avatar-custom .no-img-custom {
-            font-size: 55px;
-        }
-
-        .brand-details-custom h3 {
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-        }
-
-        .brand-meta-custom {
-            justify-content: center;
-            font-size: 0.75rem;
-            gap: 16px;
-        }
-
-        .brand-arrow-custom {
-            display: none;
-        }
-    }
-
-    @media (min-width: 1024px) {
-        .brands-list-custom {
-            grid-template-columns: repeat(4, 1fr);
-            gap: 28px;
-        }
-        .brand-avatar-custom {
-            width: 120px;
-            height: 120px;
-        }
-        .brand-avatar-custom img {
-            width: 85px;
-            height: 85px;
-        }
-    }
-
-    @media (min-width: 1400px) {
-        .brands-list-custom {
-            grid-template-columns: repeat(5, 1fr);
-            gap: 32px;
-        }
-    }
-
-    @keyframes fadeInCustom {
+    /* ============================================
+       انیمیشن‌ها
+       ============================================ */
+    @keyframes fadeUp {
         from {
             opacity: 0;
-            transform: translateY(15px);
+            transform: translateY(30px);
         }
         to {
             opacity: 1;
@@ -539,105 +520,316 @@
         }
     }
 
-    .brand-item-custom {
-        animation: fadeInCustom 0.3s ease forwards;
-        opacity: 0;
+    .brand-card-modern:nth-child(1) { animation-delay: 0.05s; }
+    .brand-card-modern:nth-child(2) { animation-delay: 0.1s; }
+    .brand-card-modern:nth-child(3) { animation-delay: 0.15s; }
+    .brand-card-modern:nth-child(4) { animation-delay: 0.2s; }
+    .brand-card-modern:nth-child(5) { animation-delay: 0.25s; }
+    .brand-card-modern:nth-child(6) { animation-delay: 0.3s; }
+    .brand-card-modern:nth-child(7) { animation-delay: 0.35s; }
+    .brand-card-modern:nth-child(8) { animation-delay: 0.4s; }
+    .brand-card-modern:nth-child(9) { animation-delay: 0.45s; }
+    .brand-card-modern:nth-child(10) { animation-delay: 0.5s; }
+
+    /* ============================================
+       ریسپانسیو
+       ============================================ */
+    @media (max-width: 1024px) {
+        .brands-grid-modern {
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .brands-page-modern {
+            padding: 12px;
+        }
+
+        .brands-header-modern {
+            padding: 20px 24px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .brands-header-modern h1 {
+            font-size: 1.5rem;
+        }
+
+        .brands-header-modern h1 small {
+            font-size: 0.8rem;
+            display: block;
+            margin-right: 0;
+            margin-top: 4px;
+        }
+
+        .brands-header-modern .header-right {
+            width: 100%;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .brands-header-modern .badge-modern {
+            font-size: 0.75rem;
+            padding: 6px 14px;
+        }
+
+        .header-pdf-btn {
+            font-size: 0.75rem;
+            padding: 6px 16px;
+        }
+
+        .search-filter-wrapper {
+            padding: 16px;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .search-box-modern input {
+            padding: 12px 45px 12px 16px;
+            font-size: 0.9rem;
+        }
+
+        .filter-buttons-modern {
+            width: 100%;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            padding: 4px 0 8px 0;
+            gap: 6px;
+        }
+
+        .filter-btn-modern {
+            padding: 6px 14px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+        }
+
+        .results-count-modern {
+            margin-right: 0;
+            width: 100%;
+            text-align: center;
+        }
+
+        .subcategories-modern {
+            padding: 16px;
+        }
+
+        .subcat-icon-modern {
+            width: 48px;
+            height: 48px;
+        }
+
+        .subcat-icon-modern i {
+            font-size: 20px;
+        }
+
+        .brands-grid-modern {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .brand-card-modern {
+            padding: 16px 12px;
+        }
+
+        .brand-card-modern .brand-logo-wrap {
+            width: 72px;
+            height: 72px;
+        }
+
+        .brand-card-modern .brand-logo-wrap img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .brand-card-modern .brand-name {
+            font-size: 0.9rem;
+        }
+
+        .brand-card-modern .brand-stats {
+            font-size: 0.65rem;
+            gap: 10px;
+        }
+
+        .brand-pdf-link {
+            font-size: 0.6rem;
+            padding: 4px 12px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .brands-grid-modern {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .brand-card-modern .brand-logo-wrap {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+        }
+
+        .brand-card-modern .brand-logo-wrap img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .brand-card-modern .brand-name {
+            font-size: 0.8rem;
+        }
+
+        .brand-card-modern .brand-stats {
+            font-size: 0.55rem;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+    }
+
+    @media (min-width: 1400px) {
+        .brands-grid-modern {
+            grid-template-columns: repeat(5, 1fr);
+        }
     }
 </style>
 
-<div class="brands-page-custom">
-    <div class="brands-content-custom">
+<div class="brands-page-modern">
+    <div class="brands-content-modern">
 
-        <!-- هدر -->
-        <div class="brands-head-custom">
-            <h1>{{ category.title }}</h1>
-            <div class="badge-custom">
-                <i class="fas fa-building"></i> {{ total_brands }} برند
+        <!-- ==========================================
+        هدر مدرن با دکمه دانلود PDF دسته‌بندی
+        ========================================== -->
+        <div class="brands-header-modern">
+            <div class="header-left">
+                <h1>
+                    {{ category.title }}
+                    <small>دسته‌بندی برندها</small>
+                </h1>
+            </div>
+            <div class="header-right">
+                <div class="badge-modern">
+                    <i class="fas fa-building"></i>
+                    {{ total_brands }} برند
+                </div>
+
+                <!-- ====== دانلود PDF دسته‌بندی ====== -->
+                {% if category_has_pdf %}
+                <a href="{{ category_pdf }}" download="{{ category.title }}.pdf" class="header-pdf-btn">
+                    <i class="fas fa-file-pdf"></i>
+                    دانلود PDF
+                    <i class="fas fa-download"></i>
+                </a>
+                {% endif %}
+
+                {% if category.image %}
+                <div class="badge-modern" style="background: rgba(255,107,53,0.15); border-color: rgba(255,107,53,0.2);">
+                    <img src="{{ category.image.url }}" alt="{{ category.title }}" style="width: 24px; height: 24px; object-fit: contain; border-radius: 8px;">
+                </div>
+                {% endif %}
             </div>
         </div>
 
-        <!-- جستجو -->
-        <div class="search-wrap-custom">
-            <div class="search-box-custom">
-                <input type="text" id="searchInputCustom" placeholder="جستجوی برند..." value="{{ search_query }}">
-                <i class="fas fa-search search-icon-custom"></i>
-                <div id="suggestionsListCustom" class="suggestions-custom"></div>
+        <!-- ==========================================
+        جستجو و فیلتر - یکپارچه
+        ========================================== -->
+        <div class="search-filter-wrapper">
+            <div class="search-box-modern">
+                <input type="text" id="searchInputModern" placeholder="جستجوی برند..." value="{{ search_query }}">
+                <i class="fas fa-search search-icon"></i>
+                <div id="suggestionsModern" class="suggestions-modern" style="display:none; position:absolute; top:calc(100% + 8px); left:0; right:0; background:white; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.12); z-index:1000; max-height:300px; overflow-y:auto; border:1px solid #e8ecf1;"></div>
             </div>
-            <div class="result-count-custom" id="resultsCountCustom">{{ total_brands }} برند</div>
-        </div>
 
-        <!-- فیلترها -->
-        <div class="filter-wrap-custom">
-            <div class="filter-list-custom">
-                <button class="filter-btn-custom {% if sort_by == 'default' %}active{% endif %}" data-sort="default">
+            <div class="results-count-modern" id="resultsCountModern">
+                <i class="fas fa-list-ul"></i> {{ total_brands }} برند
+            </div>
+
+            <div class="filter-buttons-modern">
+                <button class="filter-btn-modern {% if sort_by == 'default' %}active{% endif %}" data-sort="default">
                     <i class="fas fa-star"></i> پیش‌فرض
                 </button>
-                <button class="filter-btn-custom {% if sort_by == 'newest' %}active{% endif %}" data-sort="newest">
-                    <i class="fas fa-clock"></i> جدیدترین
+                <button class="filter-btn-modern {% if sort_by == 'newest' %}active{% endif %}" data-sort="newest">
+                    <i class="fas fa-clock"></i> جدید
                 </button>
-                <button class="filter-btn-custom {% if sort_by == 'most_content' %}active{% endif %}" data-sort="most_content">
-                    <i class="fas fa-fire"></i> پرمحتوا
+                <button class="filter-btn-modern {% if sort_by == 'most_content' %}active{% endif %}" data-sort="most_content">
+                    <i class="fas fa-fire"></i> محتوا
                 </button>
-                <button class="filter-btn-custom {% if sort_by == 'most_products' %}active{% endif %}" data-sort="most_products">
-                    <i class="fas fa-box"></i> بیشترین محصول
+                <button class="filter-btn-modern {% if sort_by == 'most_products' %}active{% endif %}" data-sort="most_products">
+                    <i class="fas fa-box"></i> محصول
                 </button>
-                <button class="filter-btn-custom {% if sort_by == 'most_catalogs' %}active{% endif %}" data-sort="most_catalogs">
-                    <i class="fas fa-book"></i> بیشترین کاتالوگ
+                <button class="filter-btn-modern {% if sort_by == 'most_catalogs' %}active{% endif %}" data-sort="most_catalogs">
+                    <i class="fas fa-book"></i> کاتالوگ
                 </button>
-                <button class="filter-btn-custom {% if sort_by == 'alphabetical' %}active{% endif %}" data-sort="alphabetical">
+                <button class="filter-btn-modern {% if sort_by == 'alphabetical' %}active{% endif %}" data-sort="alphabetical">
                     <i class="fas fa-sort-alpha-down"></i> الفبا
                 </button>
             </div>
         </div>
 
-        <!-- زیردسته‌ها -->
+        <!-- ==========================================
+        زیردسته‌ها - اسکرول افقی
+        ========================================== -->
         {% if subcategories %}
-        <div class="subcat-wrap-custom">
-            <div class="subcat-title-custom">
+        <div class="subcategories-modern">
+            <div class="subcat-title">
                 <i class="fas fa-layer-group"></i>
                 <span>دسته‌های مرتبط</span>
             </div>
-            <div class="subcat-list-custom">
+            <div class="subcat-scroll">
                 {% for subcat in subcategories %}
-                <a href="{% url 'product:category_brands' subcat.slug %}" class="subcat-item-custom">
-                    <div class="subcat-icon-custom">
+                <a href="{% url 'product:category_brands' subcat.slug %}" class="subcat-item-modern">
+                    <div class="subcat-icon-modern">
                         {% if subcat.image %}
                             <img src="{{ subcat.image.url }}" alt="{{ subcat.title }}">
                         {% else %}
                             <i class="fas fa-folder-open"></i>
                         {% endif %}
                     </div>
-                    <span class="subcat-name-custom">{{ subcat.title|truncatechars:12 }}</span>
+                    <span class="subcat-name-modern">{{ subcat.title|truncatechars:10 }}</span>
                 </a>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
 
-        <!-- لیست برندها -->
-        <div class="brands-list-custom" id="brandsListCustom">
+        <!-- ==========================================
+        گرید برندها
+        ========================================== -->
+        <div class="brands-grid-modern" id="brandsGridModern">
             {% if brands %}
                 {% for brand in brands %}
-                <a href="{% url 'product:brand_catalogs' brand.slug %}" class="brand-item-custom" data-name="{{ brand.title|lower }}">
-                    <div class="brand-avatar-custom">
-                        {% if brand.image %}
-                            <img src="{{ brand.image.url }}" alt="{{ brand.title }}" loading="lazy">
-                        {% else %}
-                            <i class="fas fa-building no-img-custom"></i>
-                        {% endif %}
-                    </div>
-                    <div class="brand-details-custom">
-                        <h3>{{ brand.title }}</h3>
-                        <div class="brand-meta-custom">
+                <div class="brand-card-modern"
+                     data-name="{{ brand.title|lower }}"
+                     data-products="{{ brand.product_count|default:0 }}"
+                     data-catalogs="{{ brand.catalog_count|default:0 }}">
+
+                    <a href="{% url 'product:brand_catalogs' brand.slug %}" style="text-decoration:none; display:block;">
+                        <div class="brand-logo-wrap">
+                            {% if brand.image %}
+                                <img src="{{ brand.image.url }}" alt="{{ brand.title }}" loading="lazy">
+                            {% else %}
+                                <i class="fas fa-building no-img"></i>
+                            {% endif %}
+                        </div>
+
+                        <h3 class="brand-name">{{ brand.title }}</h3>
+
+                        <div class="brand-stats">
                             <span><i class="fas fa-box"></i> {{ brand.product_count|default:0 }}</span>
                             <span><i class="fas fa-book"></i> {{ brand.catalog_count|default:0 }}</span>
                         </div>
-                    </div>
-                    <i class="fas fa-chevron-left brand-arrow-custom"></i>
-                </a>
+                    </a>
+
+                    <!-- ====== دانلود PDF برند ====== -->
+                    {% if brand.has_pdf %}
+                    <a href="{{ brand.pdf_file }}" download="{{ brand.title }}.pdf" class="brand-pdf-link">
+                        <i class="fas fa-file-pdf"></i>
+                        دانلود PDF
+                    </a>
+                    {% endif %}
+                </div>
                 {% endfor %}
             {% else %}
-                <div class="empty-custom">
+                <div class="empty-modern">
                     <i class="fas fa-box-open"></i>
                     <h3>برندی یافت نشد!</h3>
                     <p>متاسفانه هیچ برندی برای {{ category.title }} وجود ندارد.</p>
@@ -649,125 +841,129 @@
 </div>
 
 <script>
-    const allBrandsCustom = [
-        {% for brand in brands %}
-        {
-            id: {{ brand.id }},
-            title: "{{ brand.title|escapejs }}",
-            slug: "{{ brand.slug|escapejs }}",
-            image: "{% if brand.image %}{{ brand.image.url }}{% endif %}",
-            products: {{ brand.product_count|default:0 }},
-            catalogs: {{ brand.catalog_count|default:0 }}
-        },
-        {% endfor %}
-    ];
+// ============================================
+// داده‌های برندها برای جستجو
+// ============================================
+const allBrands = [
+    {% for brand in brands %}
+    {
+        id: {{ brand.id }},
+        title: "{{ brand.title|escapejs }}",
+        slug: "{{ brand.slug|escapejs }}",
+        image: "{% if brand.image %}{{ brand.image.url }}{% endif %}",
+        products: {{ brand.product_count|default:0 }},
+        catalogs: {{ brand.catalog_count|default:0 }},
+        has_pdf: {% if brand.has_pdf %}true{% else %}false{% endif %},
+        pdf_file: "{% if brand.pdf_file %}{{ brand.pdf_file }}{% else %}null{% endif %}"
+    },
+    {% endfor %}
+];
 
-    const searchInputCustom = document.getElementById('searchInputCustom');
-    const suggestionsListCustom = document.getElementById('suggestionsListCustom');
-    const resultsCountCustom = document.getElementById('resultsCountCustom');
+// ============================================
+// جستجو با پیشنهادات
+// ============================================
+const searchInput = document.getElementById('searchInputModern');
+const suggestionsBox = document.getElementById('suggestionsModern');
+const resultsCount = document.getElementById('resultsCountModern');
 
-    function highlightMatchCustom(text, query) {
-        if (!query) return text;
-        const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-        return text.replace(regex, '<span class="highlight-custom">$1</span>');
+function highlightMatch(text, query) {
+    if (!query) return text;
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return text.replace(regex, '<span style="background:#ff6b35; color:white; border-radius:4px; padding:0 4px;">$1</span>');
+}
+
+function showSuggestions(query) {
+    if (!query.trim()) {
+        suggestionsBox.style.display = 'none';
+        return;
     }
 
-    function showSuggestionsCustom(query) {
-        if (!query.trim()) {
-            suggestionsListCustom.classList.remove('show');
-            return;
-        }
+    const filtered = allBrands.filter(b =>
+        b.title.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 6);
 
-        const filtered = allBrandsCustom.filter(b =>
-            b.title.toLowerCase().includes(query.toLowerCase())
-        ).slice(0, 5);
+    if (filtered.length === 0) {
+        suggestionsBox.style.display = 'none';
+        return;
+    }
 
-        if (filtered.length === 0) {
-            suggestionsListCustom.classList.remove('show');
-            return;
-        }
-
-        suggestionsListCustom.innerHTML = filtered.map(b => `
-            <div class="suggestion-custom" data-slug="${b.slug}">
-                <div class="suggestion-img-custom">
-                    ${b.image ?
-                        `<img src="${b.image}" alt="${b.title}">` :
-                        `<i class="fas fa-building" style="font-size: 24px; color: #d25f00;"></i>`
-                    }
-                </div>
-                <div class="suggestion-info-custom">
-                    <h4>${highlightMatchCustom(b.title, query)}</h4>
-                    <p><i class="fas fa-box"></i> ${b.products} محصول | <i class="fas fa-book"></i> ${b.catalogs} کاتالوگ</p>
+    suggestionsBox.innerHTML = filtered.map(b => `
+        <div onclick="window.location.href='/product/brand/${b.slug}/catalogs/'"
+             style="padding:12px 16px; border-bottom:1px solid #f1f3f5; cursor:pointer; display:flex; align-items:center; gap:12px; transition:all 0.2s;">
+            <div style="width:40px; height:40px; background:#f8f9fb; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                ${b.image ?
+                    `<img src="${b.image}" style="width:28px; height:28px; object-fit:contain;">` :
+                    `<i class="fas fa-building" style="color:#ff6b35; font-size:20px;"></i>`
+                }
+            </div>
+            <div style="flex:1;">
+                <div style="font-weight:700; color:#0f172a; font-size:0.9rem;">${highlightMatch(b.title, query)}</div>
+                <div style="font-size:0.7rem; color:#94a3b8;">
+                    <i class="fas fa-box"></i> ${b.products} | <i class="fas fa-book"></i> ${b.catalogs}
                 </div>
             </div>
-        `).join('');
+            <i class="fas fa-chevron-left" style="color:#cbd5e1; font-size:12px;"></i>
+        </div>
+    `).join('');
 
-        suggestionsListCustom.classList.add('show');
+    suggestionsBox.style.display = 'block';
+}
 
-        document.querySelectorAll('.suggestion-custom').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const slug = item.dataset.slug;
-                window.location.href = `/product/brand/${slug}/catalogs/`;
-            });
-        });
-    }
+function filterBrands(query) {
+    const cards = document.querySelectorAll('.brand-card-modern');
+    let visible = 0;
 
-    function filterBrandsListCustom(query) {
-        const cards = document.querySelectorAll('.brand-item-custom');
-
-        if (!query.trim()) {
-            cards.forEach(card => card.style.display = 'flex');
-            if (window.innerWidth >= 768) {
-                cards.forEach(card => card.style.display = 'flex');
-            }
-            resultsCountCustom.innerHTML = `${cards.length} برند`;
-            return;
-        }
-
-        let visible = 0;
-        cards.forEach(card => {
-            const name = card.dataset.name;
-            if (name && name.includes(query.toLowerCase())) {
-                card.style.display = 'flex';
-                visible++;
-            } else {
-                card.style.display = 'none';
-            }
-        });
-        resultsCountCustom.innerHTML = `${visible} برند`;
-    }
-
-    let typingTimerCustom;
-    searchInputCustom.addEventListener('input', (e) => {
-        const val = e.target.value;
-        clearTimeout(typingTimerCustom);
-        typingTimerCustom = setTimeout(() => {
-            showSuggestionsCustom(val);
-            filterBrandsListCustom(val);
-        }, 200);
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!searchInputCustom.contains(e.target) && !suggestionsListCustom.contains(e.target)) {
-            suggestionsListCustom.classList.remove('show');
+    cards.forEach(card => {
+        const name = card.dataset.name;
+        if (!query.trim() || (name && name.includes(query.toLowerCase()))) {
+            card.style.display = 'block';
+            visible++;
+        } else {
+            card.style.display = 'none';
         }
     });
 
-    document.querySelectorAll('.filter-btn-custom').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const sort = btn.dataset.sort;
-            const url = new URL(window.location.href);
-            url.searchParams.set('sort', sort);
-            url.searchParams.set('search', searchInputCustom.value);
-            window.location.href = url.toString();
-        });
-    });
+    resultsCount.innerHTML = `<i class="fas fa-list-ul"></i> ${visible} برند`;
+}
 
-    document.querySelectorAll('.brand-item-custom').forEach(item => {
-        const name = item.querySelector('.brand-details-custom h3')?.textContent;
-        if (name) item.dataset.name = name.toLowerCase();
+let typingTimer;
+searchInput.addEventListener('input', (e) => {
+    const val = e.target.value;
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => {
+        showSuggestions(val);
+        filterBrands(val);
+    }, 200);
+});
+
+document.addEventListener('click', (e) => {
+    if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+        suggestionsBox.style.display = 'none';
+    }
+});
+
+// ============================================
+// فیلترها
+// ============================================
+document.querySelectorAll('.filter-btn-modern').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const sort = btn.dataset.sort;
+        const url = new URL(window.location.href);
+        url.searchParams.set('sort', sort);
+        url.searchParams.set('search', searchInput.value);
+        window.location.href = url.toString();
     });
+});
+
+// ============================================
+// مقداردهی اولیه - نمایش تعداد برندها
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    const total = document.querySelectorAll('.brand-card-modern:not([style*="display: none"])').length;
+    if (total > 0) {
+        resultsCount.innerHTML = `<i class="fas fa-list-ul"></i> ${total} برند`;
+    }
+});
 </script>
 
 {% endblock %}

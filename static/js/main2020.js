@@ -53,6 +53,17 @@ setInterval(updateClock, 1000);
 updateClock();
 
 // ============================================
+// تابع redirectToCategory - برای کلیک روی دسته‌بندی‌ها
+// ============================================
+function redirectToCategory(slug) {
+    if (!slug) {
+        console.error('slug category is undefined');
+        return;
+    }
+    window.location.href = `/product/category/${slug}/brands/`;
+}
+
+// ============================================
 // استایل‌های اسکرول افقی - اضافه شدن به هدر
 // ============================================
 function addHorizontalScrollStyles() {
@@ -770,12 +781,42 @@ function renderProductCard(product, showDiscount = true) {
                 <span class="product-code"><i class="fas fa-barcode"></i> ${product.code || '---'}</span>
             </div>
             <div class="price-row">
-             
+
             </div>
         </div>
     `;
 }
 
+// ============================================
+// رندر دسته‌بندی‌ها با کلیک - اصلاح شده
+// ============================================
+async function fetchAndRenderCategories() {
+    const container = document.getElementById('categoriesGrid');
+    if (!container) return;
+    try {
+        const response = await fetch('/product/noneParentCategory/');
+        const result = await response.json();
+        if (result.status === 'success' && result.data.length > 0) {
+            container.innerHTML = result.data.map(c => `
+                <div class="category-square" data-slug="${c.slug}" onclick="redirectToCategory('${c.slug}')">
+                    <div onclick="redirectToCategory('${c.slug}')">
+                        <img src="${getValidImage(c.img)}" onerror="this.src='${DEFAULT_IMAGE}'" alt="${escapeHtml(c.name)}">
+                        <span>${escapeHtml(c.name)}</span>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = '<p>دسته‌بندی یافت نشد.</p>';
+        }
+    } catch (error) {
+        console.error("خطا:", error);
+        container.innerHTML = '<p>خطا در برقراری ارتباط با سرور.</p>';
+    }
+}
+
+// ============================================
+// رندر محصولات جدید
+// ============================================
 async function fetchAndRenderLatestProducts() {
     const container = document.getElementById('newProductsList');
     if (!container) return;
@@ -813,6 +854,9 @@ async function fetchAndRenderLatestProducts() {
     }
 }
 
+// ============================================
+// رندر پرفروش‌ترین‌ها
+// ============================================
 async function fetchAndRenderBestsellers() {
     const container = document.getElementById('bestsellersList');
     if (!container) return;
@@ -849,30 +893,9 @@ async function fetchAndRenderBestsellers() {
     }
 }
 
-async function fetchAndRenderCategories() {
-    const container = document.getElementById('categoriesGrid');
-    if (!container) return;
-    try {
-        const response = await fetch('/product/noneParentCategory/');
-        const result = await response.json();
-        if (result.status === 'success' && result.data.length > 0) {
-            container.innerHTML = result.data.map(c => `
-                <div class="category-square" data-slug="${c.slug}">
-                    <div onclick="redirectToCategory('${c.slug}')">
-                        <img src="${getValidImage(c.img)}" onerror="this.src='${DEFAULT_IMAGE}'" alt="${escapeHtml(c.name)}">
-                        <span>${escapeHtml(c.name)}</span>
-                    </div>
-                </div>
-            `).join('');
-        } else {
-            container.innerHTML = '<p>دسته‌بندی یافت نشد.</p>';
-        }
-    } catch (error) {
-        console.error("خطا:", error);
-        container.innerHTML = '<p>خطا در برقراری ارتباط با سرور.</p>';
-    }
-}
-
+// ============================================
+// رندر برندهای محبوب
+// ============================================
 async function fetchAndRenderPopularBrands() {
     const container = document.getElementById('brandsList');
     if (!container) return;
@@ -901,6 +924,9 @@ async function fetchAndRenderPopularBrands() {
     }
 }
 
+// ============================================
+// رندر آخرین کاتالوگ‌ها
+// ============================================
 async function fetchAndRenderLatestCatalogs() {
     const container = document.getElementById('catalogVertical');
     if (!container) return;
@@ -930,6 +956,9 @@ async function fetchAndRenderLatestCatalogs() {
     }
 }
 
+// ============================================
+// رندر نمونه کارها
+// ============================================
 async function fetchAndRenderPortfolios() {
     const container = document.getElementById('portfolioList');
     if (!container) return;
@@ -966,12 +995,6 @@ async function fetchAndRenderPortfolios() {
 }
 
 // ============================================
-// ادامه کدهای قبلی (ساعت، سبد خرید، اعلان‌ها و...)
-// ============================================
-// [ادامه کدهای قبلی شما از اینجا میاد...]
-// ولی برای رعایت اختصار، فقط بخش‌های مهم رو مینویسم
-
-// ============================================
 // اجرای اولیه
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
@@ -979,16 +1002,15 @@ document.addEventListener('DOMContentLoaded', function() {
     addHorizontalScrollStyles();
 
     // بارگذاری داده‌ها
+    fetchAndRenderCategories();
     fetchAndRenderLatestProducts();
     fetchAndRenderBestsellers();
-    fetchAndRenderCategories();
     fetchAndRenderPopularBrands();
     fetchAndRenderLatestCatalogs();
     fetchAndRenderPortfolios();
 
-    // بقیه توابع...
     console.log('✅ تمام سیستم‌ها با موفقیت بارگذاری شدند');
-    console.log('✨ اسکرول افقی حرفه‌ای فعال شد');
+    console.log('✨ اسکرول افقی حرفه‌ای و کلیک دسته‌بندی‌ها فعال شد');
 });
 
 // ============================================

@@ -96,7 +96,7 @@ class PackageUnitAdmin(admin.ModelAdmin):
 # ==========================================
 @admin.register(models.Brand)
 class BrandAdmin(admin.ModelAdmin):
-    list_display = ['title', 'slug', 'image_preview', 'status', 'sort_order', 'created_at']
+    list_display = ['title', 'slug', 'image_preview', 'status', 'sort_order', 'created_at',]
     list_display_links = ['title']
     list_editable = ['status', 'sort_order']
     list_filter = ['status', 'created_at']
@@ -106,7 +106,7 @@ class BrandAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('اطلاعات اصلی', {
-            'fields': ('title','isCatalog','slug', 'image', 'description')
+            'fields': ('title','isCatalog','slug', 'image', 'description','pdf_file')
         }),
         ('تنظیمات نمایش', {
             'fields': ('status', 'sort_order')
@@ -145,7 +145,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('اطلاعات اصلی', {
-            'fields': ('title', 'slug', 'parent', 'image')
+            'fields': ('title', 'slug', 'parent', 'image','files')
         }),
         ('برندهای مرتبط', {
             'fields': ('brands',),
