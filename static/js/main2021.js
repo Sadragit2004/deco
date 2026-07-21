@@ -1,5 +1,5 @@
 // ============================================
-// فایل کامل main.js - نسخه نهایی
+// فایل کامل main.js - نسخه نهایی با اسکلتون
 // ============================================
 
 // ============================================
@@ -128,6 +128,143 @@ function addHorizontalScrollStyles() {
         .brands-horizontal::-webkit-scrollbar-thumb:hover,
         .portfolio-grid::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(135deg, #f57c00, #e96500) !important;
+        }
+
+        /* ============================================
+           استایل‌های اسکلتون (Skeleton Loading)
+           ============================================ */
+        .skeleton-wrapper {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            gap: 16px !important;
+            padding: 16px 8px !important;
+            overflow-x: auto !important;
+            min-height: 200px !important;
+        }
+
+        .skeleton-item {
+            flex: 0 0 auto !important;
+            width: 200px !important;
+            min-width: 180px !important;
+            background: #e2e8f0 !important;
+            border-radius: 16px !important;
+            overflow: hidden !important;
+            animation: skeleton-pulse 1.5s ease-in-out infinite !important;
+        }
+
+        .skeleton-item .skeleton-img {
+            width: 100% !important;
+            height: 160px !important;
+            background: #cbd5e1 !important;
+        }
+
+        .skeleton-item .skeleton-text {
+            height: 16px !important;
+            margin: 12px 16px 8px !important;
+            background: #cbd5e1 !important;
+            border-radius: 8px !important;
+        }
+
+        .skeleton-item .skeleton-text-sm {
+            height: 12px !important;
+            margin: 0 16px 12px !important;
+            background: #cbd5e1 !important;
+            border-radius: 8px !important;
+            width: 60% !important;
+        }
+
+        /* اسکلتون برای دسته‌بندی‌ها */
+        .skeleton-category {
+            flex: 0 0 auto !important;
+            width: 140px !important;
+            min-width: 120px !important;
+            background: #e2e8f0 !important;
+            border-radius: 16px !important;
+            padding: 16px !important;
+            text-align: center !important;
+            animation: skeleton-pulse 1.5s ease-in-out infinite !important;
+        }
+
+        .skeleton-category .skeleton-circle {
+            width: 80px !important;
+            height: 80px !important;
+            border-radius: 50% !important;
+            background: #cbd5e1 !important;
+            margin: 0 auto 12px !important;
+        }
+
+        .skeleton-category .skeleton-text {
+            height: 14px !important;
+            background: #cbd5e1 !important;
+            border-radius: 8px !important;
+            margin: 0 auto !important;
+            width: 70% !important;
+        }
+
+        /* اسکلتون برای برندها */
+        .skeleton-brand {
+            flex: 0 0 auto !important;
+            width: 140px !important;
+            min-width: 120px !important;
+            background: #e2e8f0 !important;
+            border-radius: 16px !important;
+            padding: 16px !important;
+            text-align: center !important;
+            animation: skeleton-pulse 1.5s ease-in-out infinite !important;
+        }
+
+        .skeleton-brand .skeleton-circle {
+            width: 80px !important;
+            height: 80px !important;
+            border-radius: 50% !important;
+            background: #cbd5e1 !important;
+            margin: 0 auto 12px !important;
+        }
+
+        .skeleton-brand .skeleton-text {
+            height: 14px !important;
+            background: #cbd5e1 !important;
+            border-radius: 8px !important;
+            margin: 0 auto !important;
+            width: 70% !important;
+        }
+
+        /* اسکلتون برای کاتالوگ */
+        .skeleton-catalog {
+            flex: 0 0 auto !important;
+            width: 200px !important;
+            min-width: 180px !important;
+            background: #e2e8f0 !important;
+            border-radius: 16px !important;
+            overflow: hidden !important;
+            animation: skeleton-pulse 1.5s ease-in-out infinite !important;
+        }
+
+        .skeleton-catalog .skeleton-img {
+            width: 100% !important;
+            height: 160px !important;
+            background: #cbd5e1 !important;
+        }
+
+        .skeleton-catalog .skeleton-text {
+            height: 16px !important;
+            margin: 12px 16px 8px !important;
+            background: #cbd5e1 !important;
+            border-radius: 8px !important;
+        }
+
+        .skeleton-catalog .skeleton-text-sm {
+            height: 12px !important;
+            margin: 0 16px 12px !important;
+            background: #cbd5e1 !important;
+            border-radius: 8px !important;
+            width: 50% !important;
+        }
+
+        @keyframes skeleton-pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
 
         /* ============================================
@@ -736,6 +873,66 @@ function escapeHtml(text) {
 }
 
 // ============================================
+// نمایش اسکلتون (Skeleton) برای بخش‌ها
+// ============================================
+function showSkeleton(containerId, type = 'product', count = 6) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    let skeletonHTML = '';
+
+    if (type === 'category') {
+        skeletonHTML = '<div class="skeleton-wrapper">';
+        for (let i = 0; i < count; i++) {
+            skeletonHTML += `
+                <div class="skeleton-category">
+                    <div class="skeleton-circle"></div>
+                    <div class="skeleton-text"></div>
+                </div>
+            `;
+        }
+        skeletonHTML += '</div>';
+    } else if (type === 'brand') {
+        skeletonHTML = '<div class="skeleton-wrapper">';
+        for (let i = 0; i < count; i++) {
+            skeletonHTML += `
+                <div class="skeleton-brand">
+                    <div class="skeleton-circle"></div>
+                    <div class="skeleton-text"></div>
+                </div>
+            `;
+        }
+        skeletonHTML += '</div>';
+    } else if (type === 'catalog') {
+        skeletonHTML = '<div class="skeleton-wrapper">';
+        for (let i = 0; i < count; i++) {
+            skeletonHTML += `
+                <div class="skeleton-catalog">
+                    <div class="skeleton-img"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-text-sm"></div>
+                </div>
+            `;
+        }
+        skeletonHTML += '</div>';
+    } else { // product
+        skeletonHTML = '<div class="skeleton-wrapper">';
+        for (let i = 0; i < count; i++) {
+            skeletonHTML += `
+                <div class="skeleton-item">
+                    <div class="skeleton-img"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-text-sm"></div>
+                </div>
+            `;
+        }
+        skeletonHTML += '</div>';
+    }
+
+    container.innerHTML = skeletonHTML;
+}
+
+// ============================================
 // رندر محصولات با گلس مورفی - اصلاح شده
 // ============================================
 function renderProductCard(product, showDiscount = true) {
@@ -793,6 +990,10 @@ function renderProductCard(product, showDiscount = true) {
 async function fetchAndRenderCategories() {
     const container = document.getElementById('categoriesGrid');
     if (!container) return;
+
+    // نمایش اسکلتون
+    showSkeleton('categoriesGrid', 'category', 8);
+
     try {
         const response = await fetch('/product/noneParentCategory/');
         const result = await response.json();
@@ -820,6 +1021,10 @@ async function fetchAndRenderCategories() {
 async function fetchAndRenderLatestProducts() {
     const container = document.getElementById('newProductsList');
     if (!container) return;
+
+    // نمایش اسکلتون
+    showSkeleton('newProductsList', 'product', 6);
+
     try {
         const response = await fetch('/product/lastedProduct/');
         const result = await response.json();
@@ -860,6 +1065,10 @@ async function fetchAndRenderLatestProducts() {
 async function fetchAndRenderBestsellers() {
     const container = document.getElementById('bestsellersList');
     if (!container) return;
+
+    // نمایش اسکلتون
+    showSkeleton('bestsellersList', 'product', 6);
+
     try {
         const response = await fetch('/product/api/bestsellers/?limit=12');
         const result = await response.json();
@@ -899,6 +1108,10 @@ async function fetchAndRenderBestsellers() {
 async function fetchAndRenderPopularBrands() {
     const container = document.getElementById('brandsList');
     if (!container) return;
+
+    // نمایش اسکلتون
+    showSkeleton('brandsList', 'brand', 8);
+
     try {
         const response = await fetch('/product/popularBrands/');
         const result = await response.json();
@@ -930,6 +1143,10 @@ async function fetchAndRenderPopularBrands() {
 async function fetchAndRenderLatestCatalogs() {
     const container = document.getElementById('catalogVertical');
     if (!container) return;
+
+    // نمایش اسکلتون
+    showSkeleton('catalogVertical', 'catalog', 6);
+
     try {
         const response = await fetch('/product/latest-catalogs/');
         const result = await response.json();
@@ -962,6 +1179,9 @@ async function fetchAndRenderLatestCatalogs() {
 async function fetchAndRenderPortfolios() {
     const container = document.getElementById('portfolioList');
     if (!container) return;
+
+    // نمایش اسکلتون
+    showSkeleton('portfolioList', 'product', 6);
 
     try {
         const response = await fetch('/api/portfolios/');
