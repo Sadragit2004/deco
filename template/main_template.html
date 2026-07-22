@@ -251,6 +251,250 @@
             display: none;
         }
     }
+
+
+    /* ========== سایدبار شیشه‌ای فقط برای موبایل ========== */
+@media (max-width: 768px) {
+    .sidebar {
+        background: transparent !important;
+        backdrop-filter: blur(30px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+        border-left: 1px solid rgba(255, 255, 255, 0.25) !important;
+        border-right: none !important;
+        box-shadow:
+            -8px 0 40px rgba(0, 0, 0, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    }
+
+    /* لوگو و نوشته‌ها - همیشه سفید با سایه */
+    .sidebar .logo-text-side h2 {
+        color: #ffffff !important;
+        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .sidebar .logo-text-side span {
+        color: rgba(255, 255, 255, 0.8) !important;
+        text-shadow: 0 1px 10px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    /* آیتم‌های منو - شیشه‌ای روی بک‌گراند شفاف */
+    .sidebar .nav-item-side {
+        color: rgba(255, 255, 255, 0.95) !important;
+        background: rgba(255, 255, 255, 0.06) !important;
+        backdrop-filter: blur(4px) !important;
+        -webkit-backdrop-filter: blur(4px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.10) !important;
+        border-radius: 14px !important;
+        margin-bottom: 6px !important;
+        transition: all 0.3s ease !important;
+        text-shadow: 0 1px 8px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .sidebar .nav-item-side:hover {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-color: rgba(255, 255, 255, 0.25) !important;
+        transform: translateX(-4px) !important;
+        box-shadow: 0 4px 25px rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .sidebar .nav-item-side i {
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+
+    /* ساعت دیجیتال پایین - کاملاً شیشه‌ای بدون بک‌گراند */
+    .sidebar .sidebar-footer-clock {
+        background: rgba(255, 255, 255, 0.05) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 16px 16px 0 0 !important;
+        margin: 8px !important;
+        padding: 16px 12px !important;
+        box-shadow: none !important;
+    }
+
+    .sidebar .clock-time {
+        color: #ffffff !important;
+        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .sidebar .clock-date {
+        color: rgba(255, 255, 255, 0.75) !important;
+    }
+
+    .sidebar .clock-date #dayName {
+        background: rgba(255, 255, 255, 0.08) !important;
+        color: #ffffff !important;
+        backdrop-filter: blur(4px) !important;
+        -webkit-backdrop-filter: blur(4px) !important;
+    }
+
+    .sidebar .clock-date #persianDate {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    /* اسکرول‌بار - شفاف */
+    .sidebar::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+    }
+}
+
+/* ============================================ */
+/* منوی پایین موبایل - گلس مورفیسم با کنتراست بالا */
+/* ============================================ */
+
+@media (max-width: 768px) {
+    .mobile-bottom-nav {
+        position: fixed !important;
+        bottom: 16px !important;
+        left: 16px !important;
+        right: 16px !important;
+        width: auto !important;
+        max-width: none !important;
+        transform: none !important;
+        background: rgba(20, 20, 30, 0.45) !important;
+        backdrop-filter: blur(32px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(32px) saturate(180%) !important;
+        border-radius: 30px !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        box-shadow:
+            0 8px 40px rgba(0, 0, 0, 0.25),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+        display: flex !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        padding: 6px 6px !important;
+        z-index: 9999 !important;
+        transition: all 0.3s ease !important;
+        margin: 0 !important;
+    }
+
+    .bottom-item {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 2px !important;
+        cursor: pointer !important;
+        padding: 6px 10px !important;
+        border-radius: 20px !important;
+        background: transparent !important;
+        transition: all 0.3s ease !important;
+        flex: 1 !important;
+        border: none !important;
+        position: relative !important;
+        min-height: 44px !important;
+    }
+
+    .bottom-item i {
+        font-size: 1.2rem !important;
+        color: rgba(255, 255, 255, 0.85) !important;
+        transition: all 0.3s ease !important;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .bottom-item span {
+        font-size: 0.55rem !important;
+        font-weight: 500 !important;
+        color: rgba(255, 255, 255, 0.75) !important;
+        transition: all 0.3s ease !important;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    /* حالت فعال */
+    .bottom-item.active-bottom {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.2),
+            0 4px 20px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .bottom-item.active-bottom i {
+        color: #000000 !important;
+        transform: scale(1.1) !important;
+        text-shadow: 0 0 30px rgba(255, 255, 255, 0.4) !important;
+    }
+
+    .bottom-item.active-bottom span {
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.2) !important;
+    }
+
+    /* خط نورانی زیر آیتم فعال */
+    .bottom-item.active-bottom::after {
+        content: '' !important;
+        position: absolute !important;
+        bottom: 2px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 16px !important;
+        height: 2.5px !important;
+        background: #ffffff !important;
+        border-radius: 10px !important;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.6) !important;
+    }
+
+    /* هوور */
+    .bottom-item:hover {
+        background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .bottom-item:hover i {
+        color: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    /* صفحه‌های خیلی کوچک */
+    @media (max-width: 400px) {
+        .mobile-bottom-nav {
+            padding: 4px 2px !important;
+            bottom: 12px !important;
+            left: 12px !important;
+            right: 12px !important;
+            border-radius: 24px !important;
+        }
+
+        .bottom-item {
+            padding: 4px 6px !important;
+            min-height: 38px !important;
+        }
+
+        .bottom-item i {
+            font-size: 1rem !important;
+        }
+
+        .bottom-item span {
+            font-size: 0.45rem !important;
+        }
+
+        .bottom-item.active-bottom::after {
+            width: 12px !important;
+            height: 2px !important;
+        }
+    }
+
+    /* جا به جایی بدنه */
+    body {
+        padding-bottom: 80px !important;
+    }
+}
+
+/* مخفی کردن در دسکتاپ */
+@media (min-width: 769px) {
+    .mobile-bottom-nav {
+        display: none !important;
+    }
+}
 </style>
 
 <script>
