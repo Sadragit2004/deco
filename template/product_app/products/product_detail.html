@@ -1023,7 +1023,7 @@
                         <div class="gallery-main" id="galleryMain">
                             {% with first_image=gallery_images.0 %}
                                 {% if first_image and first_image != '/media/images/nophoto.png' %}
-                                    <img id="mainProductImage" class="gallery-main-img" src="{{ first_image }}" alt="{{ product.title }}" onerror="this.src='/media/images/nophoto.png'">
+                                    <img loading="lazy" id="mainProductImage" class="gallery-main-img" src="{{ first_image }}" alt="{{ product.title }}" onerror="this.src='/media/images/nophoto.png'">
                                 {% else %}
                                     <div class="no-photo-img gallery-main-img" style="display: flex; align-items: center; justify-content: center; background: #f8fafc;">
                                         <i class="fas fa-image" style="font-size: 3rem; color: #cbd5e1;"></i>
@@ -1038,7 +1038,7 @@
                         <div class="thumbnail-strip" id="thumbnailStrip">
                             {% for img in gallery_images %}
                                 {% if img and img != '/media/images/nophoto.png' %}
-                                    <img src="{{ img }}" class="thumbnail-item {% if forloop.first %}active{% endif %}" data-img="{{ img }}" alt="thumb" onerror="this.src='/media/images/nophoto.png'">
+                                    <img loading="lazy" src="{{ img }}" class="thumbnail-item {% if forloop.first %}active{% endif %}" data-img="{{ img }}" alt="thumb" onerror="this.src='/media/images/nophoto.png'">
                                 {% else %}
                                     <div class="thumbnail-item no-photo-img" style="display: flex; align-items: center; justify-content: center; background: #f8fafc; width: 65px; height: 65px;" data-img="/media/images/nophoto.png">
                                         <i class="fas fa-image" style="font-size: 1.5rem; color: #cbd5e1;"></i>
@@ -1055,7 +1055,7 @@
                                 {% if product.brand %}
                                     <div class="brand-circle">
                                         {% if product.brand.image %}
-                                            <img src="{{ product.brand.image.url }}" class="brand-circle-img" onerror="this.src='/media/images/nophoto.png'">
+                                            <img loading="lazy" src="{{ product.brand.image.url }}" class="brand-circle-img" onerror="this.src='/media/images/nophoto.png'">
                                         {% else %}
                                             <div class="brand-circle-img" style="display: flex; align-items: center; justify-content: center; background: #f1f5f9;"><i class="fas fa-building" style="font-size: 14px; color: #94a3b8;"></i></div>
                                         {% endif %}
@@ -1065,7 +1065,7 @@
                                 {% if product.categories.first %}
                                     <div class="category-circle">
                                         {% if product.categories.first.image %}
-                                            <img src="{{ product.categories.first.image.url }}" class="category-circle-img" onerror="this.src='/media/images/nophoto.png'">
+                                            <img loading="lazy" src="{{ product.categories.first.image.url }}" class="category-circle-img" onerror="this.src='/media/images/nophoto.png'">
                                         {% else %}
                                             <div class="category-circle-img" style="display: flex; align-items: center; justify-content: center; background: #f1f5f9;"><i class="fas fa-folder" style="font-size: 14px; color: #94a3b8;"></i></div>
                                         {% endif %}
@@ -1129,7 +1129,7 @@
                                 {% if rel.has_discount %}
                                     <div class="related-discount-badge">🔥 {{ rel.discount_percent }}%</div>
                                 {% endif %}
-                                <img src="{{ rel.image }}" onerror="this.src='/media/images/nophoto.png'" alt="{{ rel.title }}">
+                                <img loading="lazy" src="{{ rel.image }}" onerror="this.src='/media/images/nophoto.png'" alt="{{ rel.title }}">
                                 <div class="related-item-info">
                                     <div class="related-item-title">{{ rel.title|truncatechars:22 }}</div>
                                     <div class="related-price-wrapper">
@@ -2055,7 +2055,7 @@ function renderCart() {
     container.innerHTML = `
         ${cart.map(item => `
             <div class="cart-item" data-id="${item.id}">
-                <img src="${item.img}" class="cart-item-image" onerror="this.src='/media/images/placeholder.jpg'">
+                <img loading="lazy" src="${item.img}" class="cart-item-image" onerror="this.src='/media/images/placeholder.jpg'">
                 <div class="cart-item-details">
                     <div class="cart-item-title">${escapeHtml(item.name)}</div>
                     <div class="cart-item-specs">

@@ -761,7 +761,7 @@
         if (e.target.files && e.target.files[0]) {
             const reader = new FileReader();
             reader.onload = function(ev) {
-                preview.innerHTML = `<img src="${ev.target.result}" alt="آواتار">`;
+                preview.innerHTML = `<img loading="lazy" src="${ev.target.result}" alt="آواتار">`;
             }
             reader.readAsDataURL(e.target.files[0]);
         }

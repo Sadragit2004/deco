@@ -723,7 +723,7 @@
 
                 {% if category.image %}
                 <div class="badge-modern" style="background: rgba(255,107,53,0.15); border-color: rgba(255,107,53,0.2);">
-                    <img src="{{ category.image.url }}" alt="{{ category.title }}" style="width: 24px; height: 24px; object-fit: contain; border-radius: 8px;">
+                    <img loading="lazy" src="{{ category.image.url }}" alt="{{ category.title }}" style="width: 24px; height: 24px; object-fit: contain; border-radius: 8px;">
                 </div>
                 {% endif %}
             </div>
@@ -779,7 +779,7 @@
                 <a href="{% url 'product:category_brands' subcat.slug %}" class="subcat-item-modern">
                     <div class="subcat-icon-modern">
                         {% if subcat.image %}
-                            <img src="{{ subcat.image.url }}" alt="{{ subcat.title }}">
+                            <img loading="lazy" src="{{ subcat.image.url }}" alt="{{ subcat.title }}">
                         {% else %}
                             <i class="fas fa-folder-open"></i>
                         {% endif %}
@@ -805,7 +805,7 @@
                     <a href="{% url 'product:brand_catalogs' brand.slug %}" style="text-decoration:none; display:block;">
                         <div class="brand-logo-wrap">
                             {% if brand.image %}
-                                <img src="{{ brand.image.url }}" alt="{{ brand.title }}" loading="lazy">
+                                <img loading="lazy" src="{{ brand.image.url }}" alt="{{ brand.title }}" loading="lazy">
                             {% else %}
                                 <i class="fas fa-building no-img"></i>
                             {% endif %}
@@ -892,7 +892,7 @@ function showSuggestions(query) {
              style="padding:12px 16px; border-bottom:1px solid #f1f3f5; cursor:pointer; display:flex; align-items:center; gap:12px; transition:all 0.2s;">
             <div style="width:40px; height:40px; background:#f8f9fb; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
                 ${b.image ?
-                    `<img src="${b.image}" style="width:28px; height:28px; object-fit:contain;">` :
+                    `<img loading="lazy" src="${b.image}" style="width:28px; height:28px; object-fit:contain;">` :
                     `<i class="fas fa-building" style="color:#ff6b35; font-size:20px;"></i>`
                 }
             </div>

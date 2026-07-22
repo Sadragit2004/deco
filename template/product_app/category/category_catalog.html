@@ -633,7 +633,7 @@
             <div class="brand-info">
                 <div class="brand-logo-wrap">
                     {% if brand.image %}
-                        <img src="{{ brand.image.url }}" alt="{{ brand.title }}">
+                        <img loading="lazy" src="{{ brand.image.url }}" alt="{{ brand.title }}">
                     {% else %}
                         <i class="fas fa-building"></i>
                     {% endif %}
@@ -701,7 +701,7 @@
 
                     <div class="catalog-image">
                         {% if catalog.image %}
-                            <img src="{{ catalog.image.url }}" alt="{{ catalog.title }}" loading="lazy">
+                            <img loading="lazy" src="{{ catalog.image.url }}" alt="{{ catalog.title }}" loading="lazy">
                         {% else %}
                             <i class="fas fa-file-pdf no-image"></i>
                         {% endif %}

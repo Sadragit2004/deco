@@ -13,7 +13,7 @@
                     <div class="product-card">
                         <div class="product-image">
                             {% if product.image %}
-                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                <img loading="lazy" src="{{ product.image.url }}" alt="{{ product.name }}">
                             {% else %}
                                 <div class="no-image">بدون تصویر</div>
                             {% endif %}

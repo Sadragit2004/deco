@@ -963,7 +963,7 @@ function renderProductCard(product, showDiscount = true) {
         <div class="product-card-item" data-product-id="${product.id || product.product_id}">
             ${discountText ? `<div class="discount-badge">${discountText}</div>` : ''}
             <a href="/product/${product.slug || '#'}" class="product-img-link">
-                <img src="${productImage}" onerror="this.src='${DEFAULT_IMAGE}'" alt="${escapeHtml(productTitle)}">
+                <img loading="lazy" src="${productImage}" onerror="this.src='${DEFAULT_IMAGE}'" alt="${escapeHtml(productTitle)}">
             </a>
             <a href="/product/${product.slug || '#'}" class="product-title-link">
                 <h4 class="product-title-text">${escapeHtml(truncatedTitle)}</h4>
@@ -1001,7 +1001,7 @@ async function fetchAndRenderCategories() {
             container.innerHTML = result.data.map(c => `
                 <div class="category-square" data-slug="${c.slug}" onclick="redirectToCategory('${c.slug}')">
                     <div onclick="redirectToCategory('${c.slug}')">
-                        <img src="${getValidImage(c.img)}" onerror="this.src='${DEFAULT_IMAGE}'" alt="${escapeHtml(c.name)}">
+                        <img loading="lazy" src="${getValidImage(c.img)}" onerror="this.src='${DEFAULT_IMAGE}'" alt="${escapeHtml(c.name)}">
                         <span>${escapeHtml(c.name)}</span>
                     </div>
                 </div>
@@ -1119,7 +1119,7 @@ async function fetchAndRenderPopularBrands() {
             container.innerHTML = result.data.map(b => `
                 <div class="brand-logo">
                     <a href="/product/shop/?brand=${b.slug}">
-                        <img src="${getValidImage(b.img)}" onerror="this.src='${DEFAULT_IMAGE}'" alt="${escapeHtml(b.name)}">
+                        <img loading="lazy" src="${getValidImage(b.img)}" onerror="this.src='${DEFAULT_IMAGE}'" alt="${escapeHtml(b.name)}">
                         <span>${escapeHtml(b.name)}</span>
                     </a>
                 </div>
@@ -1153,7 +1153,7 @@ async function fetchAndRenderLatestCatalogs() {
         if (result.status === 'success' && result.data.length > 0) {
             container.innerHTML = result.data.map(catalog => `
                 <div class="catalog-vertical-card">
-                    <img src="${getValidImage(catalog.image_url)}" onerror="this.src='${DEFAULT_IMAGE}'" alt="${escapeHtml(catalog.title)}">
+                    <img loading="lazy" src="${getValidImage(catalog.image_url)}" onerror="this.src='${DEFAULT_IMAGE}'" alt="${escapeHtml(catalog.title)}">
                     <div class="info">
                         <h5>${escapeHtml(catalog.title)}</h5>
                         <span>${escapeHtml(catalog.brand_name || 'کاتالوگ')}</span>
@@ -1190,7 +1190,7 @@ async function fetchAndRenderPortfolios() {
         if (result.status === 'success' && result.data.length > 0) {
             container.innerHTML = result.data.map(portfolio => `
                 <div class="portfolio-card" onclick="showPortfolioDetail(${portfolio.id})">
-                    <img src="${getValidImage(portfolio.image)}" onerror="this.src='${DEFAULT_IMAGE}'" alt="${escapeHtml(portfolio.title)}">
+                    <img loading="lazy" src="${getValidImage(portfolio.image)}" onerror="this.src='${DEFAULT_IMAGE}'" alt="${escapeHtml(portfolio.title)}">
                     <div class="portfolio-title-overlay">
                         <h4>${escapeHtml(portfolio.title)}</h4>
                         <small>${escapeHtml(portfolio.user_name)}</small>

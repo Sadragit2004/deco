@@ -3,7 +3,7 @@
 <a href="{% url 'product:product_detail' product.slug %}" class="product-card">
     <div class="product-image">
         {% if product.image %}
-            <img src="{{ product.image.url }}" alt="{{ product.title }}" loading="lazy">
+            <img loading="lazy" src="{{ product.image.url }}" alt="{{ product.title }}" loading="lazy">
         {% else %}
             <i class="fas fa-box" style="font-size: 50px; color: #cbd5e1;"></i>
         {% endif %}

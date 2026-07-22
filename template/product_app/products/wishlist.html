@@ -502,7 +502,7 @@
         <!-- Product Image -->
         <div class="card-image">
             <a href="/product/{{ item.product_slug }}/">
-                <img src="{{ item.product_image|default:'/static/images/placeholder.jpg' }}"
+                <img loading="lazy" src="{{ item.product_image|default:'/static/images/placeholder.jpg' }}"
                      alt="{{ item.product_title }}"
                      onerror="this.src='/static/images/placeholder.jpg'">
             </a>

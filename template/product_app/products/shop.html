@@ -996,7 +996,7 @@
                 <div class="shp_product_card" data-product-id="{{ product.id }}" data-price="{{ product.final_price }}" data-product-slug="{{ product.slug }}" data-product-name="{{ product.title|escapejs }}">
                     <div class="shp_product_img">
                         {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.title }}" loading="lazy">
+                            <img loading="lazy" src="{{ product.image.url }}" alt="{{ product.title }}" loading="lazy">
                         {% else %}
                             <i class="fas fa-box" style="font-size: 50px; color: #cbd5e1;"></i>
                         {% endif %}
@@ -1387,7 +1387,7 @@
                                 shp_suggestions.innerHTML = result.data.map(item => `
                                     <div class="shp_suggestion_item" onclick="location.href='${item.url}'">
                                         <div class="shp_suggestion_img">
-                                            ${item.image ? `<img src="${item.image}" alt="${item.title}">` : '<i class="fas fa-box"></i>'}
+                                            ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : '<i class="fas fa-box"></i>'}
                                         </div>
                                         <div class="shp_suggestion_info">
                                             <div class="shp_suggestion_title">${item.title}</div>
@@ -1497,7 +1497,7 @@
                             const html = `
                                 <div class="shp_product_card" data-product-id="${p.id}" data-price="${priceNum}" data-product-slug="${p.slug}" data-product-name="${p.title.replace(/'/g, "\\'")}">
                                     <div class="shp_product_img">
-                                        ${p.image ? `<img src="${p.image}" loading="lazy">` : '<i class="fas fa-box" style="font-size:50px;color:#cbd5e1;"></i>'}
+                                        ${p.image ? `<img loading="lazy" src="${p.image}" loading="lazy">` : '<i class="fas fa-box" style="font-size:50px;color:#cbd5e1;"></i>'}
                                         ${p.has_discount ? `<div class="shp_discount_badge">-${p.discount_percent}%</div>` : ''}
                                         ${p.code ? `<div class="shp_product_code">${p.code}</div>` : ''}
                                     </div>
