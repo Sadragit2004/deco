@@ -123,8 +123,8 @@
 
         .logo-icon-side {
 
-            width: 48px;
-            height: 48px;
+            width: 130px;
+            height: 119px;
             border-radius: 16px;
             display: flex;
             align-items: center;
@@ -135,9 +135,10 @@
             overflow: hidden;
             transition: all 0.3s ease;
         }
+        
         .logo-icon-side img {
             width: 100%;
-            height: 100%;
+            height: 166%;
             object-fit: cover;
         }
         .logo-text-side h2 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px;}

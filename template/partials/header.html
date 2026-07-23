@@ -1,16 +1,22 @@
 <header class="main-header">
     <div class="header-right-side">
-        <div style="background: none; box-shadow: none; border: none;" class="menu-toggle-mobile"  id="mobileMenuBtn"><i style="font-size:20px;" class="fas fa-bars"></i></div>
+        <div style="background: none; box-shadow: none; border: none;" class="menu-toggle-mobile" id="mobileMenuBtn">
+            <i style="font-size:20px;" class="fas fa-bars"></i>
+        </div>
+
+        <!-- ========== لوگوی جدید: متن | لوگو ========== -->
         <div class="header-logo">
-            <div class="logo-icon-side">
-                <img src="/media/images/deco.png" alt="Logo">
-                
-            </div>
-            <div class="header-logo-text"><strong>Deco B2B</strong><span>تخصصی B2B</span></div>
+            <a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+                <!-- متن برند -->
+                <span class="logo-text">Deco B2B</span>
+                <!-- خط جداکننده -->
+                <span class="logo-separator">|</span>
+                <!-- تصویر لوگو -->
+                <img src="/media/images/deco.png" alt="Logo" class="logo-image">
+            </a>
         </div>
 
         <div class="desktop-nav-accordion" id="desktopNavAccordion">
-
             <div class="accordion-item">
                 <div class="accordion-header">
                     <i class="fas fa-cube"></i> محصولات
@@ -25,17 +31,15 @@
                     <a style="color: #333; text-decoration: none;" href="/"><i class="fas fa-home"></i> خانه</a>
                 </div>
             </div>
-
-
-             <div class="accordion-item">
+            <div class="accordion-item">
                 <div class="accordion-header">
-                    <a style="color: #333; text-decoration: none;" href="/pro"><i class="fas fa-chalkboard-user"> </i> سفارش چاپی</a>
+                    <a style="color: #333; text-decoration: none;" href="/pro"><i class="fas fa-chalkboard-user"></i> سفارش چاپی</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <div style=" height: 45px;" class="search-wrapper">
+    <div style="height: 45px;" class="search-wrapper">
         <div style="height: 45px;" class="search-box-header">
             <div class="search-icon-wrapper">
                 <i class="fas fa-search search-icon-header"></i>
@@ -50,8 +54,10 @@
     </div>
 
     <div style="padding:6px;" class="header-actions">
-        <div class="icon-btn-header" id="cartIcon"><i class="fas fa-shopping-bag"></i><span class="badge-count" id="cartCount">0</span></div>
-
+        <div class="icon-btn-header" id="cartIcon">
+            <i class="fas fa-shopping-bag"></i>
+            <span class="badge-count" id="cartCount">0</span>
+        </div>
     </div>
 </header>
 
@@ -64,8 +70,11 @@
 }
 
 .main-header {
-    background: white;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
     padding: 12px 24px;
     display: flex;
     justify-content: space-between;
@@ -84,31 +93,39 @@
     flex: 0 0 auto;
 }
 
+/* ========== لوگوی جدید ========== */
 .header-logo {
     display: flex;
     align-items: center;
-
 }
 
-.logo-icon-side img {
-    height: 45px;
+.header-logo a {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    text-decoration: none !important;
+}
+
+.logo-text {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #d25f00;
+    letter-spacing: -0.5px;
+    line-height: 1;
+}
+
+.logo-separator {
+    color: #cbd5e1;
+    font-size: 2rem;
+    font-weight: 300;
+    line-height: 1;
+}
+
+.logo-image {
+    height: 55px;
     width: auto;
     border-radius: 8px;
-}
-
-.header-logo-text {
-    display: flex;
-    flex-direction: column;
-}
-
-.header-logo-text strong {
-    font-size: 1.2rem;
-    color: #1e293b;
-}
-
-.header-logo-text span {
-    font-size: 0.7rem;
-    color: #64748b;
+    display: block;
 }
 
 /* ========== جستجو ========== */
@@ -122,8 +139,10 @@
 .search-box-header {
     display: flex;
     align-items: center;
-    background: #f8fafc;
-    border: 2px solid #e2e8f0;
+    background: rgba(248, 250, 252, 0.7) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 2px solid rgba(226, 232, 240, 0.6) !important;
     border-radius: 60px;
     padding: 3px 3px 3px 6px;
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -157,9 +176,9 @@
 }
 
 .search-box-header:focus-within {
-    border-color: #d25f00;
-    box-shadow: 0 4px 20px rgba(210,95,0,0.12), 0 0 0 4px rgba(210,95,0,0.06);
-    background: white;
+    border-color: #d25f00 !important;
+    box-shadow: 0 4px 20px rgba(210, 95, 0, 0.12), 0 0 0 4px rgba(210, 95, 0, 0.05) !important;
+    background: rgba(255, 255, 255, 0.9) !important;
     transform: scale(1.01);
 }
 
@@ -275,7 +294,10 @@
     top: calc(100% + 10px);
     right: 0;
     left: 0;
-    background: white;
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.06);
     display: none;
@@ -283,8 +305,6 @@
     overflow-y: auto;
     z-index: 1001;
     padding: 6px 0;
-    border: 1px solid rgba(226,232,240,0.5);
-    backdrop-filter: blur(12px);
 }
 
 .search-suggestions.show {
@@ -449,7 +469,9 @@
 
 .accordion-header {
     padding: 8px 16px;
-    background: #f1f5f9;
+    background: rgba(241, 245, 249, 0.6) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
     border-radius: 40px;
     cursor: pointer;
     font-size: 0.85rem;
@@ -463,7 +485,7 @@
 }
 
 .accordion-header:hover {
-    background: #e2e8f0;
+    background: rgba(226, 232, 240, 0.8) !important;
 }
 
 .accordion-header i:first-child {
@@ -475,7 +497,9 @@
     top: 100%;
     right: 0;
     min-width: 260px;
-    background: white;
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
     border-radius: 16px;
     box-shadow: 0 15px 35px rgba(0,0,0,0.12);
     padding: 8px 0;
@@ -528,7 +552,9 @@
     top: 0;
     right: 100%;
     width: 750px;
-    background: white;
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
     border-radius: 20px;
     box-shadow: 0 20px 45px rgba(0,0,0,0.15);
     display: none;
@@ -599,7 +625,7 @@
     display: inline-block;
     position: sticky;
     top: 0;
-    background: white;
+    background: transparent !important;
     z-index: 5;
     width: 100%;
 }
@@ -790,14 +816,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f1f5f9;
+    background: rgba(241, 245, 249, 0.6) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .icon-btn-header:hover {
-    background: #e2e8f0;
+    background: rgba(226, 232, 240, 0.8) !important;
 }
 
 .badge-count {
@@ -842,7 +870,9 @@
         justify-content: center;
         width: 42px;
         height: 42px;
-        background: #f1f5f9;
+        background: rgba(241, 245, 249, 0.6);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
         border-radius: 12px;
         font-size: 1.2rem;
     }
@@ -899,14 +929,10 @@
         border-radius: 40px;
         padding: 4px 4px 4px 10px;
         border-width: 1.5px;
-        background: #f1f5f9;
     }
 
     .search-box-header:focus-within {
         transform: scale(1);
-        background: white;
-        border-color: #d25f00;
-        box-shadow: 0 4px 16px rgba(210,95,0,0.1);
     }
 
     .search-box-header::after {
@@ -996,10 +1022,15 @@
         right: -4px;
     }
 
-
-
-    .logo-icon-side img {
-        height: 67px;
+    /* ===== لوگو ریسپانسیو ===== */
+    .logo-text {
+        font-size: 1.3rem !important;
+    }
+    .logo-separator {
+        font-size: 1.5rem !important;
+    }
+    .logo-image {
+        height: 45px !important;
     }
 }
 
@@ -1019,14 +1050,17 @@
         font-size: 1.1rem;
     }
 
-    .logo-icon-side img {
-        height: 67px;
+    .header-logo a {
+        gap: 8px !important;
     }
-
-
-
-    .header-logo-text span {
-        font-size: 0.5rem;
+    .logo-text {
+        font-size: 1.1rem !important;
+    }
+    .logo-separator {
+        font-size: 1.2rem !important;
+    }
+    .logo-image {
+        height: 38px !important;
     }
 
     .search-wrapper {
@@ -1116,6 +1150,9 @@
     .main-header {
         padding: 8px 10px;
         gap: 6px;
+        background: rgba(255, 255, 255, 0.7) !important;
+        backdrop-filter: blur(24px) !important;
+        -webkit-backdrop-filter: blur(24px) !important;
     }
 
     .header-right-side {
@@ -1129,21 +1166,22 @@
         border-radius: 10px;
     }
 
-    .logo-icon-side img {
-        height: 67px;
+    .header-logo a {
+        gap: 6px !important;
     }
-
-    .header-logo-text strong {
-        font-size: 15px;
+    .logo-text {
+        font-size: 0.9rem !important;
+        font-weight: 800 !important;
     }
-
-    .header-logo-text span {
-        font-size: 10px;
+    .logo-separator {
+        font-size: 1rem !important;
+    }
+    .logo-image {
+        height: 30px !important;
     }
 
     .search-wrapper {
         margin-top: 4px;
-
     }
 
     .search-box-header {
@@ -1263,117 +1301,7 @@
         transform: translateX(0);
     }
 }
-
-/* ===== تغییرات گلس مورفی برای هدر ===== */
-.main-header {
-    background: rgba(255, 255, 255, 0.5) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
-}
-
-/* افکت شیشه‌ای روی باکس جستجو */
-.search-box-header {
-    background: rgba(248, 250, 252, 0.7) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    border-color: rgba(226, 232, 240, 0.6) !important;
-}
-
-.search-box-header:focus-within {
-    background: rgba(255, 255, 255, 0.9) !important;
-    border-color: #d25f00 !important;
-    box-shadow: 0 4px 20px rgba(210, 95, 0, 0.12), 0 0 0 4px rgba(210, 95, 0, 0.05) !important;
-}
-
-/* دکمه‌های منو با افکت شیشه‌ای */
-.accordion-header {
-    background: rgba(241, 245, 249, 0.6) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-}
-
-.accordion-header:hover {
-    background: rgba(226, 232, 240, 0.8) !important;
-}
-
-/* آیکون‌های اکشن با افکت شیشه‌ای */
-.icon-btn-header {
-    background: rgba(241, 245, 249, 0.6) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-}
-
-.icon-btn-header:hover {
-    background: rgba(226, 232, 240, 0.8) !important;
-}
-
-/* دکمه منوی موبایل با افکت شیشه‌ای */
-.menu-toggle-mobile {
-
-    -webkit-backdrop-filter: blur(8px) !important;
-}
-
-/* باکس پیشنهادات با افکت شیشه‌ای */
-.search-suggestions {
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-}
-
-/* منوی دسکتاپ با افکت شیشه‌ای */
-.accordion-content {
-    background: rgba(255, 255, 255, 0.9) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-}
-
-.mega-3col-menu {
-    background: rgba(255, 255, 255, 0.92) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-}
-
-.mega-col-title {
-    background: transparent !important;
-}
-
-/* ریسپانسیو - در موبایل شفافیت بیشتر */
-@media (max-width: 992px) {
-    .main-header {
-        background: rgba(255, 255, 255, 0.6) !important;
-        backdrop-filter: blur(24px) !important;
-        -webkit-backdrop-filter: blur(24px) !important;
-    }
-
-    .search-box-header {
-        background: rgba(248, 250, 252, 0.8) !important;
-    }
-
-    .search-box-header:focus-within {
-        background: rgba(255, 255, 255, 0.95) !important;
-    }
-}
-
-@media (max-width: 768px) {
-    .main-header {
-        background: rgba(255, 255, 255, 0.65) !important;
-        backdrop-filter: blur(24px) !important;
-        -webkit-backdrop-filter: blur(24px) !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .main-header {
-        background: rgba(255, 255, 255, 0.7) !important;
-        backdrop-filter: blur(24px) !important;
-        -webkit-backdrop-filter: blur(24px) !important;
-    }
-}
 </style>
-
 
 
 
