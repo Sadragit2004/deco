@@ -210,7 +210,7 @@ web/settings/*.py
 **/user_uploads/
 
 # Image files (extra safety)
-*.jpg
+
 *.jpeg
 *.png
 *.gif
