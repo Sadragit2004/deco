@@ -3,11 +3,14 @@
 <html lang="fa">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
     <title>ورود رسمی | Deco B2B</title>
     <link rel="stylesheet" href="https://lib.arvancloud.ir/font-awesome/6.3.0/css/all.css">
     <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
     <style>
+        /* ============================================
+           RESET & BASE
+           ============================================ */
         * {
             margin: 0;
             padding: 0;
@@ -16,178 +19,497 @@
         }
 
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.96);
-            --glass-border: rgba(99, 102, 241, 0.2);
-            --glass-shadow: 0 30px 45px -20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
-            --blur-amount: 18px;
-            --primary-gradient: linear-gradient(105deg, #1e3a5f 0%, #2a5f8a 100%);
+            --orange: #e07c3c;
+            --orange-light: #f0a06a;
+            --orange-dark: #c96a2e;
+            --orange-glow: rgba(224, 124, 60, 0.3);
+            --black: #0a0a0a;
+            --black-light: #1a1a1a;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.12);
             --radius-card: 2rem;
+            --blur-amount: 24px;
+        }
+
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            font-family: 'IRANYekan', system-ui, -apple-system, 'Vazirmatn', sans-serif;
+            direction: rtl;
+            background: #0a1628;
         }
 
         body {
-            font-family: 'IRANYekan', system-ui, -apple-system, 'Vazirmatn', sans-serif;
-            direction: rtl;
-            min-height: 100vh;
-            background: radial-gradient(ellipse at 30% 20%, #d9e6f2 0%, #bdd4e7 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
+            padding: 0;
             position: relative;
-            overflow: hidden;
         }
 
+        /* ============================================
+           BACKGROUND - FULL SCREEN NO CROP
+           ============================================ */
+        .bg-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            z-index: 0;
+            overflow: hidden;
+            background: url('/media/images/bglogin.jpg') no-repeat center center;
+            background-size: cover;
+            transform: scale(1.02);
+        }
+
+        .bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 30% 40%, rgba(10, 40, 80, 0.75) 0%, transparent 65%),
+                radial-gradient(ellipse at 70% 60%, rgba(30, 80, 140, 0.5) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(0, 20, 50, 0.85) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 0%, rgba(224, 124, 60, 0.08) 0%, transparent 40%);
+            z-index: 1;
+        }
+
+        /* Floating particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: floatParticle linear infinite;
+            box-shadow: 0 0 12px rgba(224, 124, 60, 0.15);
+        }
+
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(100dvh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            15% {
+                opacity: 1;
+                transform: translateY(90dvh) translateX(20px) scale(1);
+            }
+            85% {
+                opacity: 1;
+                transform: translateY(10dvh) translateX(-20px) scale(1);
+            }
+            100% {
+                transform: translateY(0) translateX(0) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Light lines */
+        .light-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .light-line {
+            position: absolute;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(224, 124, 60, 0.06), rgba(224, 124, 60, 0.03), transparent);
+            animation: moveLine 14s ease-in-out infinite;
+        }
+
+        .light-line:nth-child(1) { left: 8%; animation-delay: 0s; }
+        .light-line:nth-child(2) { left: 22%; animation-delay: -3.5s; }
+        .light-line:nth-child(3) { left: 36%; animation-delay: -7s; }
+        .light-line:nth-child(4) { left: 50%; animation-delay: -10.5s; }
+        .light-line:nth-child(5) { left: 64%; animation-delay: -2s; }
+        .light-line:nth-child(6) { left: 78%; animation-delay: -5.5s; }
+        .light-line:nth-child(7) { left: 92%; animation-delay: -9s; }
+
+        @keyframes moveLine {
+            0%, 100% {
+                transform: scaleY(0.2) translateY(0);
+                opacity: 0.2;
+            }
+            50% {
+                transform: scaleY(1) translateY(-25%);
+                opacity: 0.8;
+            }
+        }
+
+        /* ============================================
+           GLASS AUTH CARD - MOBILE FIRST
+           ============================================ */
         .glass-auth-card {
             width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
+            max-width: 460px;
+            margin: 0 16px;
+            padding: 28px 24px 32px;
             background: var(--glass-bg);
             backdrop-filter: blur(var(--blur-amount));
             -webkit-backdrop-filter: blur(var(--blur-amount));
             border-radius: var(--radius-card);
-            box-shadow: var(--glass-shadow);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            padding: 2rem 1.8rem 2.2rem;
+            border: 1px solid var(--glass-border);
+            box-shadow:
+                0 40px 80px -30px rgba(0, 0, 0, 0.7),
+                0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+                0 0 60px rgba(224, 124, 60, 0.04);
             position: relative;
-            z-index: 4;
+            z-index: 10;
             transform: translateZ(0);
-            will-change: transform;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-auth-card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: var(--radius-card);
+            background: linear-gradient(135deg,
+                    rgba(255, 255, 255, 0.15) 0%,
+                    transparent 40%,
+                    rgba(255, 255, 255, 0.03) 100%);
+            pointer-events: none;
+            z-index: -1;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            -webkit-mask-composite: xor;
+            padding: 1px;
+        }
+
+        /* Glow ring - mobile only */
+        .glass-auth-card::after {
+            content: '';
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(224, 124, 60, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+            display: none;
         }
 
         @media (max-width: 560px) {
             .glass-auth-card {
-                padding: 1.6rem 1.3rem 1.8rem;
-                border-radius: 1.8rem;
+                padding: 20px 18px 24px;
+                border-radius: 28px;
+                margin: 0 12px;
+                background: rgba(255, 255, 255, 0.06);
+                backdrop-filter: blur(28px);
+                -webkit-backdrop-filter: blur(28px);
+                box-shadow:
+                    0 30px 60px -25px rgba(0, 0, 0, 0.8),
+                    0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+                    0 0 80px rgba(224, 124, 60, 0.03);
+            }
+
+            .glass-auth-card::after {
+                display: block;
             }
         }
 
-        .brand {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 0.8rem;
+        @media (max-width: 400px) {
+            .glass-auth-card {
+                padding: 16px 14px 20px;
+                border-radius: 24px;
+                margin: 0 8px;
+            }
         }
-        .logo-circle {
-            background: var(--primary-gradient);
-            width: 70px;
-            height: 70px;
-            border-radius: 28px;
+
+        /* ============================================
+           LOGO - با لوگوی واقعی
+           ============================================ */
+        .logo-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .logo-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 12px 18px -8px rgba(0, 32, 64, 0.25);
+        }
+
+        /* Glow ring around logo */
+        .logo-container::before {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(224, 124, 60, 0.15) 0%, transparent 70%);
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.12); opacity: 1; }
+        }
+
+        .logo-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 100%);
+            border: 2.5px solid var(--orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                0 12px 30px -8px rgba(0, 0, 0, 0.6),
+                0 0 40px rgba(224, 124, 60, 0.06);
             flex-shrink: 0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .logo-circle svg {
-            width: 38px;
-            height: 38px;
-            stroke: white;
-            stroke-width: 1.5;
-            fill: none;
+
+        /* ===== لوگوی واقعی ===== */
+        .logo-circle img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+            display: block;
+            filter: drop-shadow(0 2px 8px rgba(224, 124, 60, 0.1));
         }
+
+        @media (max-width: 560px) {
+            .logo-container {
+                width: 96px;
+                height: 96px;
+            }
+            .logo-circle {
+                width: 88px;
+                height: 88px;
+                border-width: 3px;
+                box-shadow:
+                    0 16px 40px -10px rgba(0, 0, 0, 0.7),
+                    0 0 60px rgba(224, 124, 60, 0.08);
+            }
+            .logo-circle img {
+                width: 75%;
+                height: 75%;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .logo-container {
+                width: 80px;
+                height: 80px;
+            }
+            .logo-circle {
+                width: 72px;
+                height: 72px;
+                border-width: 2.5px;
+            }
+            .logo-circle img {
+                width: 72%;
+                height: 72%;
+            }
+        }
+
+        /* ============================================
+           AUTH HEADER
+           ============================================ */
         .auth-header {
             text-align: center;
-            margin-bottom: 1.8rem;
+            margin-top: 4px;
+            margin-bottom: 20px;
         }
+
         .auth-header h1 {
-            font-size: 1.9rem;
+            font-size: 1.6rem;
             font-weight: 800;
-            background: linear-gradient(130deg, #0b3b4f, #1a5878);
+            background: linear-gradient(135deg, var(--orange), var(--orange-light));
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
-            margin-bottom: 0.3rem;
-        }
-        .auth-header p {
-            color: #2c6e8f;
-            font-size: 0.85rem;
-            font-weight: 500;
-            background: rgba(235, 245, 255, 0.7);
-            display: inline-block;
-            padding: 0.3rem 1.4rem;
-            border-radius: 60px;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
         }
 
+        .auth-header .subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 60px;
+            border: 1px solid rgba(224, 124, 60, 0.12);
+            margin-top: 2px;
+        }
+
+        @media (max-width: 560px) {
+            .auth-header h1 {
+                font-size: 1.8rem;
+            }
+            .auth-header .subtitle {
+                font-size: 0.7rem;
+                padding: 3px 14px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .auth-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* ============================================
+           FORM - MOBILE OPTIMIZED
+           ============================================ */
         .form-group {
-            margin-bottom: 1.6rem;
+            margin-bottom: -28px;
             position: relative;
         }
 
         .input-label {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 0.65rem;
-            font-weight: 700;
-            font-size: 0.85rem;
-            color: #144e6b;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
         }
+
         .input-label svg {
-            width: 18px;
-            height: 18px;
-            stroke: #2c7da0;
-            stroke-width: 1.8;
+            width: 16px;
+            height: 16px;
+            stroke: var(--orange);
+            stroke-width: 2;
             flex-shrink: 0;
+            opacity: 0.7;
         }
+
         .input-wrapper {
             position: relative;
             display: flex;
             align-items: center;
             direction: ltr;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 14px;
+            border: 1.5px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 4px rgba(224, 124, 60, 0.06), 0 0 30px rgba(224, 124, 60, 0.03);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .input-wrapper .input-icon {
+            padding: 0 12px 0 4px;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            transition: color 0.3s ease;
+            direction: rtl;
+        }
+
+        .input-wrapper:focus-within .input-icon {
+            color: var(--orange);
         }
 
         .auth-input {
             width: 100%;
-            padding: 0.85rem 1.2rem 0.85rem 1.2rem;
+            padding: 14px 8px 14px 14px;
             font-size: 1.1rem;
             font-family: 'Vazirmatn', monospace;
             border: none;
-            border-bottom: 2.5px solid #d0dce6;
-            border-radius: 0;
             background: transparent;
-            transition: border-color 0.3s ease, background 0.3s ease;
-            text-align: center;
+            text-align: left;
             direction: ltr;
             font-weight: 600;
-            color: #0c2c3b;
+            color: #ffffff;
             letter-spacing: 2px;
             outline: none;
             box-sizing: border-box;
+            min-height: 52px;
         }
-        .auth-input:focus {
-            border-bottom-color: #2c7da0;
-            border-bottom-width: 3px;
-        }
+
         .auth-input::placeholder {
-            color: #a0b8c8;
-            font-weight: 500;
-            font-size: 1.1rem;
-            text-align: center;
+            color: rgba(255, 255, 255, 0.2);
+            font-weight: 400;
+            font-size: 0.95rem;
             letter-spacing: 1px;
-            opacity: 0.9;
+            opacity: 1;
+        }
+
+        .auth-input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.4) inset !important;
+            -webkit-text-fill-color: #fff !important;
+            border-radius: 14px;
         }
 
         .auth-input.error-input {
-            border-bottom-color: #dc3545 !important;
-            border-bottom-width: 3px !important;
-            background: rgba(220, 53, 69, 0.03) !important;
+            border-color: #dc3545 !important;
         }
 
         .auth-input.valid-input {
-            border-bottom-color: #28a745 !important;
-            border-bottom-width: 3px !important;
-            background: rgba(40, 167, 69, 0.02) !important;
+            border-color: var(--orange) !important;
         }
 
+        @media (max-width: 400px) {
+            .auth-input {
+                font-size: 1rem;
+                padding: 12px 6px 12px 12px;
+                min-height: 46px;
+                letter-spacing: 1.5px;
+            }
+            .auth-input::placeholder {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* ============================================
+           LIVE FEEDBACK - CLEAN & MINIMAL
+           ============================================ */
         .live-feedback {
-            margin-top: 6px;
-            font-weight: 600;
-            font-size: 0.75rem;
-            text-align: center;
-            height: 28px;
+            margin-top: 4px;
+            min-height: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
-            line-height: 1.2;
             position: relative;
         }
 
@@ -195,175 +517,216 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 0.2rem 1rem;
-            border-radius: 60px;
-            font-weight: 600;
-            font-size: 0.75rem;
-            transition: opacity 0.25s ease, transform 0.25s ease;
-            transform: translateZ(0);
-            will-change: transform;
+            padding: 2px 12px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.7rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0;
-            transform: scale(0.95);
+            transform: translateY(-4px) scale(0.95);
             pointer-events: none;
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) scale(0.95);
+            transform: translate(-50%, -50%) translateY(-4px) scale(0.95);
             white-space: nowrap;
         }
 
         .feedback-content.show {
             opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
+            transform: translate(-50%, -50%) translateY(0) scale(1);
             pointer-events: auto;
         }
 
         .valid-feedback {
-            color: #1c6e43;
-            background: #e8f5ee;
-            border: 1.5px solid #28a745;
-            box-shadow: 0 1px 6px rgba(40, 167, 69, 0.08);
+            color: var(--orange-light);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(224, 124, 60, 0.2);
         }
 
         .invalid-feedback {
-            color: #dc3545;
-            background: #fff5f5;
-            border: 1.5px solid #dc3545;
-            box-shadow: 0 1px 6px rgba(220, 53, 69, 0.08);
+            color: #f87171;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(220, 53, 69, 0.2);
         }
 
         .error-list {
-            list-style: none;
-            margin-top: 6px;
-            text-align: center;
-            height: 28px;
+            min-height: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
+            margin-top: 2px;
         }
+
         .error-list li {
-            background: #fff5f5;
-            color: #dc3545;
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.2rem 1.2rem;
-            border-radius: 50px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: #f87171;
+            font-size: 0.7rem;
+            font-weight: 500;
+            padding: 2px 14px;
+            border-radius: 40px;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            border: 1.5px solid #dc3545;
-            box-shadow: 0 1px 6px rgba(220, 53, 69, 0.08);
+            gap: 6px;
+            border: 1px solid rgba(220, 53, 69, 0.2);
             opacity: 0;
-            transform: scale(0.95);
-            transition: opacity 0.25s ease, transform 0.25s ease;
+            transform: translateY(-4px) scale(0.95);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) scale(0.95);
+            transform: translate(-50%, -50%) translateY(-4px) scale(0.95);
             white-space: nowrap;
         }
+
         .error-list li.show {
             opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
+            transform: translate(-50%, -50%) translateY(0) scale(1);
         }
 
+        /* ============================================
+           BUTTONS - TOUCH FRIENDLY
+           ============================================ */
         .btn-submit {
             width: 100%;
-            background: var(--primary-gradient);
-            border: none;
-            padding: 0.9rem 1rem;
-            border-radius: 80px;
+            padding: 16px 20px;
+            margin-top: 8px;
+            background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 100%);
+            border: 2px solid var(--orange);
+            border-radius: 16px;
             font-size: 1rem;
-            font-weight: 800;
-            color: white;
+            font-weight: 700;
+            color: var(--orange);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
             cursor: pointer;
-            transition: all 0.25s;
-            box-shadow: 0 8px 20px -8px rgba(28, 75, 100, 0.5);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow:
+                0 8px 30px -10px rgba(0, 0, 0, 0.8),
+                0 0 40px rgba(224, 124, 60, 0.02);
             font-family: 'IRANYekan', 'Vazirmatn', sans-serif;
-            margin-top: 0.3rem;
-            transform: translateZ(0);
-            will-change: transform;
+            position: relative;
+            overflow: hidden;
+            min-height: 54px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
         }
+
         .btn-submit:active {
-            transform: scale(0.97);
+            transform: scale(0.96);
+            box-shadow: 0 4px 15px -8px rgba(0, 0, 0, 0.9);
         }
+
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            background: linear-gradient(145deg, rgba(224, 124, 60, 0.05), transparent 60%);
+            pointer-events: none;
+        }
+
         .btn-submit:disabled {
-            opacity: 0.75;
-            cursor: wait;
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-submit .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2.5px solid rgba(224, 124, 60, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--orange);
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .btn-register {
             width: 100%;
-            background: transparent;
-            border: 2px solid #2a5f8a;
-            padding: 0.8rem 1rem;
-            border-radius: 80px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: #1e3a5f;
+            padding: 14px 20px;
+            margin-top: 10px;
+            background: rgba(10, 10, 10, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(224, 124, 60, 0.15);
+            border-radius: 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
             cursor: pointer;
-            transition: all 0.25s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: 'IRANYekan', 'Vazirmatn', sans-serif;
-            margin-top: 0.8rem;
-            background: rgba(255, 255, 255, 0.5);
             text-decoration: none;
+            min-height: 48px;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
         }
-        .btn-register:hover {
-            background: #2a5f8a;
-            color: white;
-            border-color: #2a5f8a;
-            box-shadow: 0 8px 20px -8px rgba(28, 75, 100, 0.3);
-        }
+
         .btn-register:active {
-            transform: scale(0.97);
+            transform: scale(0.96);
+            background: rgba(10, 10, 10, 0.5);
+        }
+
+        .btn-register i {
+            color: var(--orange) !important;
+            opacity: 0.6;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-register:hover i {
+            opacity: 1;
+        }
+
+        .btn-register span {
+            color: rgba(255, 255, 255, 0.6) !important;
         }
 
         .divider {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            margin: 1.2rem 0 0.5rem;
-            color: #7a9bb0;
-            font-size: 0.8rem;
+            gap: 12px;
+            margin: 14px 0 6px;
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 0.7rem;
             font-weight: 500;
         }
+
         .divider::before,
         .divider::after {
             content: '';
             flex: 1;
             height: 1px;
-            background: linear-gradient(90deg, transparent, #b8d0de, transparent);
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.6s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+            background: linear-gradient(90deg, transparent, rgba(224, 124, 60, 0.12), transparent);
         }
 
         /* ============================================
-           بخش نماد اعتماد و قوانین
+           FOOTER - TRUST SEAL
            ============================================ */
         .footer-section {
-            margin-top: 1.5rem;
-            border-top: 1px solid rgba(150, 185, 200, 0.25);
-            padding-top: 1rem;
+            margin-top: 16px;
+            border-top: 1px solid rgba(224, 124, 60, 0.06);
+            padding-top: 14px;
         }
 
         .trust-seal-wrapper {
@@ -372,389 +735,567 @@
             align-items: center;
             justify-content: center;
             gap: 4px;
-            margin-bottom: 0.8rem;
+            margin-bottom: 8px;
         }
 
         .trust-seal-label {
-            color: #526f82;
-            font-size: 0.65rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.6rem;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 6px;
+            letter-spacing: 0.3px;
         }
 
         .trust-seal-label i {
-            color: #2c7da0;
-            font-size: 0.7rem;
+            color: var(--orange);
+            font-size: 0.6rem;
+            opacity: 0.5;
         }
 
         .trust-seal-link {
             display: inline-block;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-            border-radius: 10px;
+            transition: transform 0.2s ease;
+            border-radius: 8px;
             line-height: 0;
         }
 
-        .trust-seal-link:hover {
-            transform: scale(1.04);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        .trust-seal-link:active {
+            transform: scale(0.94);
         }
 
         .trust-seal-img {
-            height: 65px;
+            height: 48px;
             width: auto;
-            border-radius: 10px;
-            background: white;
-            padding: 4px 6px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            border: 1px solid rgba(150, 185, 200, 0.15);
-            transition: all 0.25s ease;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 3px 5px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(150, 185, 200, 0.08);
+        }
+
+        @media (max-width: 560px) {
+            .trust-seal-img {
+                height: 40px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .trust-seal-img {
+                height: 34px;
+            }
         }
 
         .terms-note {
             text-align: center;
-            font-size: 0.65rem;
-            color: #526f82;
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.25);
+            line-height: 1.6;
         }
 
         .terms-note a {
-            color: #1e6f8f;
+            color: var(--orange);
             text-decoration: none;
-            font-weight: 700;
+            font-weight: 600;
             transition: color 0.2s ease;
+            opacity: 0.7;
         }
 
-        .terms-note a:hover {
-            color: #0b4b6b;
-            text-decoration: underline;
+        .terms-note a:active {
+            opacity: 1;
+        }
+
+        @media (max-width: 400px) {
+            .terms-note {
+                font-size: 0.55rem;
+            }
         }
 
         /* ============================================
-           ریسپانسیو
+           DESKTOP OVERRIDES (keep original feel)
            ============================================ */
-        @media (max-width: 480px) {
+        @media (min-width: 768px) {
             .glass-auth-card {
-                padding: 1.3rem 1rem 1.5rem;
+                padding: 32px 36px 36px;
+                border-radius: 32px;
+                background: rgba(255, 255, 255, 0.12);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                box-shadow:
+                    0 40px 80px -30px rgba(0, 0, 0, 0.6),
+                    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+                /* ===== حرکت کارت به سمت راست ===== */
+                margin-right: 5%;
+                margin-left: auto;
             }
+
+            .glass-auth-card::after {
+                display: none;
+            }
+
+            .logo-container {
+                width: 72px;
+                height: 72px;
+            }
+
+            .logo-container::before {
+                display: none;
+            }
+
+            .logo-circle {
+                width: 64px;
+                height: 64px;
+            }
+
+            .logo-circle img {
+                width: 75%;
+                height: 75%;
+            }
+
+            .auth-header h1 {
+                font-size: 1.5rem;
+            }
+
             .auth-input {
+                padding: 12px 8px 12px 16px;
+                min-height: 48px;
                 font-size: 1rem;
-                padding: 0.75rem 1rem 0.75rem 1rem;
-                letter-spacing: 1.5px;
             }
-            .auth-input::placeholder {
-                font-size: 0.95rem;
-            }
-            .live-feedback {
-                height: 24px;
-                font-size: 0.7rem;
-                margin-top: 4px;
-            }
-            .feedback-content {
-                font-size: 0.7rem;
-                padding: 0.15rem 0.8rem;
-            }
-            .error-list {
-                height: 24px;
-            }
-            .error-list li {
-                font-size: 0.7rem;
-                padding: 0.15rem 1rem;
-            }
+
             .btn-submit {
-                padding: 0.8rem 1rem;
-                font-size: 0.9rem;
-                margin-top: 0.2rem;
+                min-height: 48px;
+                padding: 14px 20px;
+                border-radius: 14px;
             }
+
+            .btn-submit:hover {
+                background: linear-gradient(145deg, #1a1a1a 0%, #0a0a0a 100%);
+                box-shadow: 0 8px 40px -12px rgba(0, 0, 0, 0.9);
+                transform: translateY(-1px);
+                border-color: var(--orange-light);
+                color: var(--orange-light);
+            }
+
             .btn-register {
-                padding: 0.7rem 1rem;
-                font-size: 0.85rem;
-                margin-top: 0.6rem;
+                min-height: 44px;
+                border-radius: 14px;
             }
-            .divider {
-                margin: 1rem 0 0.3rem;
-                font-size: 0.7rem;
+
+            .btn-register:hover {
+                background: rgba(10, 10, 10, 0.5);
+                border-color: rgba(224, 124, 60, 0.3);
             }
-            .footer-section {
-                margin-top: 1.2rem;
-                padding-top: 0.8rem;
-            }
+
             .trust-seal-img {
                 height: 55px;
             }
-            .terms-note {
-                font-size: 0.6rem;
+        }
+
+        @media (min-width: 1024px) {
+            .glass-auth-card {
+                padding: 40px 44px 44px;
+                max-width: 480px;
+                border-radius: 36px;
+                margin-right: 8%;
+            }
+
+            .auth-header h1 {
+                font-size: 1.7rem;
             }
         }
 
-        @media (max-width: 380px) {
+        /* ============================================
+           KEYBOARD SAFE AREA (iOS)
+           ============================================ */
+        @supports (padding: max(0px)) {
             .glass-auth-card {
-                padding: 1rem 0.8rem 1.2rem;
+                padding-left: max(24px, env(safe-area-inset-left));
+                padding-right: max(24px, env(safe-area-inset-right));
+                padding-bottom: max(24px, env(safe-area-inset-bottom));
             }
-            .trust-seal-img {
-                height: 48px;
-            }
-            .trust-seal-label {
-                font-size: 0.55rem;
+        }
+
+        @media (max-width: 560px) {
+            @supports (padding: max(0px)) {
+                .glass-auth-card {
+                    padding-left: max(16px, env(safe-area-inset-left));
+                    padding-right: max(16px, env(safe-area-inset-right));
+                    padding-bottom: max(16px, env(safe-area-inset-bottom));
+                }
             }
         }
     </style>
 </head>
 <body>
 
-<div class="glass-auth-card">
-    <div class="brand">
-        <div class="logo-circle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-                <path d="M3 9.5L12 4L21 9.5L12 15L3 9.5Z" />
-                <path d="M5 11.5V16.5L12 20.5L19 16.5V11.5" />
-                <path d="M12 15V20" />
-                <circle cx="12" cy="8" r="1.5" fill="white" stroke="white"/>
-            </svg>
+    <!-- ============================================
+    BACKGROUND
+    ============================================ -->
+    <div class="bg-wrapper">
+        <div class="bg-overlay"></div>
+        <div class="light-lines">
+            <div class="light-line"></div>
+            <div class="light-line"></div>
+            <div class="light-line"></div>
+            <div class="light-line"></div>
+            <div class="light-line"></div>
+            <div class="light-line"></div>
+            <div class="light-line"></div>
         </div>
+        <div class="particles" id="particlesContainer"></div>
     </div>
-    <div class="auth-header">
-        <h1>Deco B2B</h1>
-        <p>پلتفرم هوشمند B2B</p>
+
+    <!-- ============================================
+    AUTH CARD
+    ============================================ -->
+    <div class="glass-auth-card">
+
+        <!-- LOGO -->
+        <div class="logo-wrapper">
+            <div class="logo-container">
+                <div class="logo-circle">
+                    <img src="/media/images/deco.png" alt="Deco B2B" loading="lazy">
+                </div>
+            </div>
+        </div>
+
+        <!-- HEADER -->
+        <div class="auth-header">
+            <h1>Deco B2B</h1>
+            <span class="subtitle">پلتفرم هوشمند B2B</span>
+        </div>
+
+        <!-- FORM -->
+        <form method="post" action="{% url 'account:send_mobile' %}" id="authForm" novalidate>
+            {% csrf_token %}
+
+            <div class="form-group" id="mobileGroup">
+                <div class="input-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2" stroke="currentColor" fill="none"/>
+                        <line x1="12" y1="18" x2="12" y2="18" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <span>شماره همراه</span>
+                </div>
+                <div class="input-wrapper">
+                    <span class="input-icon">🇮🇷</span>
+                    <input type="tel"
+                           name="mobileNumber"
+                           id="id_mobileNumber"
+                           class="auth-input"
+                           maxlength="11"
+                           minlength="11"
+                           placeholder="0912 345 6789"
+                           inputmode="numeric"
+                           autocomplete="tel"
+                           value=""
+                           aria-describedby="mobileHelp">
+                </div>
+                <div id="liveValidation" class="live-feedback"></div>
+                <div id="errorContainer" class="error-list"></div>
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn-submit">
+                <span>دریافت کد تایید</span>
+                <i class="fa-regular fa-paper-plane"></i>
+            </button>
+
+            <div class="divider">
+                <span>یا</span>
+            </div>
+
+            <a href="{% url 'account:registration_form' %}" class="btn-register">
+                <i class="fa-regular fa-user-plus"></i>
+                <span>درخواست عضویت</span>
+            </a>
+
+            <div class="footer-section">
+                <div class="trust-seal-wrapper">
+                    <span class="trust-seal-label">
+                        <i class="fa-regular fa-shield-check"></i>
+                        نماد اعتماد الکترونیکی
+                    </span>
+                    <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=6899091&Code=hDK7e5u0UTvYE5yeCYIwWg3XGaTJDSi0'>
+                        <img loading="lazy" referrerpolicy='origin'
+                             src='https://trustseal.enamad.ir/logo.aspx?id=6899091&Code=hDK7e5u0UTvYE5yeCYIwWg3XGaTJDSi0'
+                             alt='نماد اعتماد'
+                             class="trust-seal-img"
+                             code='hDK7e5u0UTvYE5yeCYIwWg3XGaTJDSi0'>
+                    </a>
+                </div>
+
+                <div class="terms-note">
+                    ورود به منزله پذیرش <a href="#">قوانین دکو</a> و <a href="#">حریم خصوصی</a> است.
+                </div>
+            </div>
+        </form>
     </div>
 
-    <form method="post" action="{% url 'account:send_mobile' %}" id="authForm" novalidate>
-        {% csrf_token %}
+    <!-- ============================================
+    JAVASCRIPT
+    ============================================ -->
+    <script>
+        (function() {
+            'use strict';
 
-        <div class="form-group" id="mobileGroup">
-            <div class="input-label">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2" stroke="currentColor" fill="none"/>
-                    <line x1="12" y1="18" x2="12" y2="18" stroke="currentColor" stroke-width="2"/>
-                </svg>
-                <span>شماره همراه مدیر</span>
-            </div>
-            <div class="input-wrapper">
-                <input type="tel"
-                       name="mobileNumber"
-                       id="id_mobileNumber"
-                       class="auth-input"
-                       maxlength="11"
-                       minlength="11"
-                       placeholder="0912 345 6789"
-                       inputmode="numeric"
-                       autocomplete="tel"
-                       value=""
-                       aria-describedby="mobileHelp">
-            </div>
-            <div id="liveValidation" class="live-feedback"></div>
-            <div id="errorContainer" class="error-list"></div>
-        </div>
-
-        <button type="submit" id="submitBtn" class="btn-submit">
-            <span>دریافت کد تایید</span>
-            <i class="fa-regular fa-paper-plane"></i>
-        </button>
-
-        <div class="divider">
-            <span>یا</span>
-        </div>
-
-        <a href="{% url 'account:registration_form' %}" class="btn-register">
-            <i class="fa-regular fa-user-plus"></i>
-            <span>درخواست عضویت</span>
-        </a>
-
-        <!-- ==========================================
-        بخش پایینی: نماد اعتماد + قوانین
-        ========================================== -->
-        <div class="footer-section">
-            <div class="trust-seal-wrapper">
-                <span class="trust-seal-label">
-                    <i class="fa-regular fa-shield-check"></i>
-                    نماد اعتماد الکترونیکی
-                </span>
-               <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=6899091&Code=hDK7e5u0UTvYE5yeCYIwWg3XGaTJDSi0'><img loading="lazy" referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=6899091&Code=hDK7e5u0UTvYE5yeCYIwWg3XGaTJDSi0' alt='' style='cursor:pointer' code='hDK7e5u0UTvYE5yeCYIwWg3XGaTJDSi0'></a>
-            </div>
-
-            <div class="terms-note">
-                ورود به منزله پذیرش <a href="#">قوانین دکو</a> و <a href="#">حریم خصوصی</a> است.
-            </div>
-        </div>
-    </form>
-</div>
-
-<script>
-    (function() {
-        const mobileInput = document.getElementById('id_mobileNumber');
-        const submitBtn = document.getElementById('submitBtn');
-        const form = document.getElementById('authForm');
-        const liveFeedback = document.getElementById('liveValidation');
-        const errorContainer = document.getElementById('errorContainer');
-
-        function normalizeMobileDigits(value) {
-            return value.replace(/\D/g, '').slice(0, 11);
-        }
-
-        function isValidIranMobile(digits) {
-            if (digits.length === 11 && digits.startsWith('09')) {
-                return /^09[0-9]{9}$/.test(digits);
+            // ===== PARTICLES =====
+            const particlesContainer = document.getElementById('particlesContainer');
+            if (particlesContainer) {
+                const count = window.innerWidth < 560 ? 25 : 40;
+                for (let i = 0; i < count; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    p.style.left = Math.random() * 100 + '%';
+                    const size = Math.random() * 3 + 2;
+                    p.style.width = size + 'px';
+                    p.style.height = size + 'px';
+                    p.style.animationDuration = (Math.random() * 22 + 14) + 's';
+                    p.style.animationDelay = (Math.random() * 22) + 's';
+                    p.style.opacity = Math.random() * 0.35 + 0.05;
+                    particlesContainer.appendChild(p);
+                }
             }
-            if (digits.length === 10 && digits.startsWith('9')) {
-                return /^9[0-9]{9}$/.test(digits);
-            }
-            return false;
-        }
 
-        function getFinalMobile(digits) {
-            if (digits.length === 10 && digits.startsWith('9')) {
-                return '0' + digits;
+            // ===== DOM REFS =====
+            const mobileInput = document.getElementById('id_mobileNumber');
+            const submitBtn = document.getElementById('submitBtn');
+            const form = document.getElementById('authForm');
+            const liveFeedback = document.getElementById('liveValidation');
+            const errorContainer = document.getElementById('errorContainer');
+
+            // ===== FORMATTING HELPERS =====
+            function normalizeMobileDigits(value) {
+                return value.replace(/\D/g, '').slice(0, 11);
             }
-            if (digits.length === 11 && digits.startsWith('09')) {
+
+            function isValidIranMobile(digits) {
+                if (digits.length === 11 && digits.startsWith('09')) {
+                    return /^09[0-9]{9}$/.test(digits);
+                }
+                if (digits.length === 10 && digits.startsWith('9')) {
+                    return /^9[0-9]{9}$/.test(digits);
+                }
+                return false;
+            }
+
+            function getFinalMobile(digits) {
+                if (digits.length === 10 && digits.startsWith('9')) {
+                    return '0' + digits;
+                }
+                if (digits.length === 11 && digits.startsWith('09')) {
+                    return digits;
+                }
                 return digits;
             }
-            return digits;
-        }
 
-        function updateLiveValidationUI() {
-            let raw = mobileInput.value;
-            let digits = normalizeMobileDigits(raw);
-
-            if (raw !== digits) {
-                mobileInput.value = digits;
+            // ===== DISPLAY FORMATTING =====
+            function formatDisplayNumber(digits) {
+                if (digits.length >= 4) {
+                    let parts = [];
+                    if (digits.startsWith('0')) {
+                        parts.push(digits.slice(0, 4));
+                        if (digits.length > 4) parts.push(digits.slice(4, 7));
+                        if (digits.length > 7) parts.push(digits.slice(7, 11));
+                    } else if (digits.startsWith('9')) {
+                        parts.push('0' + digits.slice(0, 3));
+                        if (digits.length > 3) parts.push(digits.slice(3, 6));
+                        if (digits.length > 6) parts.push(digits.slice(6, 10));
+                    } else {
+                        if (digits.length >= 4) parts.push(digits.slice(0, 4));
+                        if (digits.length > 4) parts.push(digits.slice(4, 7));
+                        if (digits.length > 7) parts.push(digits.slice(7, 11));
+                    }
+                    return parts.filter(p => p.length > 0).join(' ');
+                }
+                return digits;
             }
 
-            const isValid = isValidIranMobile(digits);
-            mobileInput.classList.remove('error-input', 'valid-input');
+            // ===== UI UPDATE =====
+            function updateLiveValidationUI() {
+                let raw = mobileInput.value;
+                let digits = normalizeMobileDigits(raw);
 
-            liveFeedback.innerHTML = '';
-            errorContainer.innerHTML = '';
+                if (raw !== digits) {
+                    mobileInput.value = digits;
+                }
 
-            if (digits.length === 0) {
-                mobileInput.style.borderBottomColor = '#d0dce6';
-                return;
-            }
+                const isValid = isValidIranMobile(digits);
+                const wrapper = mobileInput.closest('.input-wrapper');
+                mobileInput.classList.remove('error-input', 'valid-input');
 
-            if (!isValid) {
-                let message = '';
-                if (digits.length > 0 && digits.length < 10) {
-                    message = '⚠️ شماره ناقص است';
-                } else if (digits.length === 10 && !digits.startsWith('9')) {
-                    message = '⚠️ باید با 9 شروع شود';
-                } else if (digits.length === 11 && !digits.startsWith('09')) {
-                    message = '⚠️ باید با 09 شروع شود';
+                liveFeedback.innerHTML = '';
+                errorContainer.innerHTML = '';
+
+                if (wrapper) {
+                    wrapper.style.borderColor = 'rgba(255, 255, 255, 0.06)';
+                }
+
+                if (digits.length === 0) {
+                    return;
+                }
+
+                if (!isValid) {
+                    let message = '';
+                    if (digits.length > 0 && digits.length < 10) {
+                        message = 'شماره ناقص است';
+                    } else if (digits.length === 10 && !digits.startsWith('9')) {
+                        message = 'باید با 9 شروع شود';
+                    } else if (digits.length === 11 && !digits.startsWith('09')) {
+                        message = 'باید با 09 شروع شود';
+                    } else {
+                        message = 'شماره نامعتبر';
+                    }
+
+                    const span = document.createElement('span');
+                    span.className = 'feedback-content invalid-feedback show';
+                    span.innerHTML = `<i class="fa-regular fa-circle-xmark"></i> ${message}`;
+                    liveFeedback.appendChild(span);
+
+                    mobileInput.classList.add('error-input');
+                    if (wrapper) {
+                        wrapper.style.borderColor = '#dc3545';
+                    }
+
                 } else {
-                    message = '📱 شماره نامعتبر';
+                    let displayMsg = '✓ شماره معتبر';
+                    const displayVal = formatDisplayNumber(digits);
+                    displayMsg = `✓ ${displayVal}`;
+
+                    const span = document.createElement('span');
+                    span.className = 'feedback-content valid-feedback show';
+                    span.innerHTML = `<i class="fa-regular fa-circle-check"></i> ${displayMsg}`;
+                    liveFeedback.appendChild(span);
+
+                    mobileInput.classList.add('valid-input');
+                    if (wrapper) {
+                        wrapper.style.borderColor = 'var(--orange)';
+                    }
                 }
+            }
 
-                const span = document.createElement('span');
-                span.className = 'feedback-content invalid-feedback show';
-                span.innerHTML = `<i class="fa-regular fa-circle-xmark" style="font-size:0.8rem;"></i> ${message}`;
-                liveFeedback.appendChild(span);
+            function showError(message) {
+                errorContainer.innerHTML = '';
+                const li = document.createElement('li');
+                li.className = 'show';
+                li.innerHTML = `<i class="fa-regular fa-circle-xmark"></i> ${message}`;
+                errorContainer.appendChild(li);
 
+                const wrapper = mobileInput.closest('.input-wrapper');
+                if (wrapper) {
+                    wrapper.style.borderColor = '#dc3545';
+                }
                 mobileInput.classList.add('error-input');
-                mobileInput.style.borderBottomColor = '#dc3545';
+            }
 
-            } else {
-                let displayMsg = '✓ شماره همراه معتبر';
+            function clearErrors() {
+                errorContainer.innerHTML = '';
+                const wrapper = mobileInput.closest('.input-wrapper');
+                if (wrapper && !mobileInput.classList.contains('valid-input')) {
+                    wrapper.style.borderColor = 'rgba(255, 255, 255, 0.06)';
+                }
+            }
+
+            // ===== BLUR AUTO-CORRECT =====
+            function autoCorrectOnBlur() {
+                let digits = normalizeMobileDigits(mobileInput.value);
                 if (digits.length === 10 && digits.startsWith('9')) {
-                    displayMsg = '✓ معتبر (0' + digits + ')';
+                    mobileInput.value = '0' + digits;
+                } else {
+                    mobileInput.value = digits;
+                }
+                updateLiveValidationUI();
+            }
+
+            // ===== SUBMIT =====
+            async function handleFormSubmit(e) {
+                e.preventDefault();
+
+                errorContainer.innerHTML = '';
+
+                let rawDigits = normalizeMobileDigits(mobileInput.value);
+
+                if (!isValidIranMobile(rawDigits)) {
+                    showError('شماره موبایل صحیح نیست. مثال: 09123456789');
+                    mobileInput.focus();
+                    return;
                 }
 
-                const span = document.createElement('span');
-                span.className = 'feedback-content valid-feedback show';
-                span.innerHTML = `<i class="fa-regular fa-circle-check" style="font-size:0.8rem;"></i> ${displayMsg}`;
-                liveFeedback.appendChild(span);
+                let finalMobileNumber = getFinalMobile(rawDigits);
 
-                mobileInput.classList.add('valid-input');
-                mobileInput.style.borderBottomColor = '#28a745';
+                const originalContent = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<span class="spinner"></span> <span>ارسال کد ...</span>`;
+
+                let mobileField = document.querySelector('input[name="mobileNumber"]');
+                if (!mobileField || mobileField === mobileInput) {
+                    let hiddenMobile = document.createElement('input');
+                    hiddenMobile.type = 'hidden';
+                    hiddenMobile.name = 'mobileNumber';
+                    hiddenMobile.value = finalMobileNumber;
+                    form.appendChild(hiddenMobile);
+                    mobileInput.setAttribute('name', 'mobile_display');
+                } else {
+                    mobileField.value = finalMobileNumber;
+                }
+
+                try {
+                    form.submit();
+                } catch (err) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalContent;
+                    showError('خطا در ارتباط، دوباره تلاش کنید');
+                }
             }
-        }
 
-        function showError(message) {
-            errorContainer.innerHTML = '';
-            const li = document.createElement('li');
-            li.className = 'show';
-            li.innerHTML = `<i class="fa-regular fa-circle-xmark"></i> ${message}`;
-            errorContainer.appendChild(li);
-        }
+            // ===== EVENT LISTENERS =====
+            mobileInput.addEventListener('input', function() {
+                let val = mobileInput.value;
+                let cleaned = val.replace(/\D/g, '').slice(0, 11);
 
-        function autoCorrectOnBlur() {
-            let digits = normalizeMobileDigits(mobileInput.value);
-            if (digits.length === 10 && digits.startsWith('9')) {
-                mobileInput.value = '0' + digits;
+                if (cleaned !== val) {
+                    const cursorPos = mobileInput.selectionStart;
+                    mobileInput.value = cleaned;
+                    if (cursorPos !== null) {
+                        let newPos = cursorPos - (val.length - cleaned.length);
+                        if (newPos < 0) newPos = 0;
+                        if (newPos > cleaned.length) newPos = cleaned.length;
+                        try {
+                            mobileInput.setSelectionRange(newPos, newPos);
+                        } catch (e) {}
+                    }
+                }
+
+                clearErrors();
                 updateLiveValidationUI();
-            } else {
-                mobileInput.value = digits;
-                updateLiveValidationUI();
-            }
-        }
+            });
 
-        async function handleFormSubmit(e) {
-            e.preventDefault();
+            mobileInput.addEventListener('blur', autoCorrectOnBlur);
 
-            errorContainer.innerHTML = '';
+            mobileInput.addEventListener('focus', function() {
+                this.style.fontSize = '16px';
+            });
 
-            let rawDigits = normalizeMobileDigits(mobileInput.value);
+            form.addEventListener('submit', handleFormSubmit);
 
-            if (!isValidIranMobile(rawDigits)) {
-                showError('شماره موبایل صحیح نیست. مثال: 09123456789');
-                mobileInput.classList.add('error-input');
-                mobileInput.style.borderBottomColor = '#dc3545';
-                return;
-            }
-
-            let finalMobileNumber = getFinalMobile(rawDigits);
-
-            const originalContent = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `<span class="spinner"></span> <span>ارسال کد ...</span>`;
-
-            let mobileField = document.querySelector('input[name="mobileNumber"]');
-            if (!mobileField || mobileField === mobileInput) {
-                let hiddenMobile = document.createElement('input');
-                hiddenMobile.type = 'hidden';
-                hiddenMobile.name = 'mobileNumber';
-                hiddenMobile.value = finalMobileNumber;
-                form.appendChild(hiddenMobile);
-                mobileInput.setAttribute('name', 'mobile_display');
-            } else {
-                mobileField.value = finalMobileNumber;
-            }
-
-            try {
-                form.submit();
-            } catch (err) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalContent;
-                showError('خطا در ارتباط، دوباره تلاش کنید');
-            }
-        }
-
-        mobileInput.addEventListener('input', function() {
-            let val = mobileInput.value;
-            let cleaned = val.replace(/\D/g, '').slice(0, 11);
-
-            if (cleaned !== val) {
-                const cursorPos = mobileInput.selectionStart;
+            // ===== INITIAL STATE =====
+            if (mobileInput.value) {
+                let cleaned = mobileInput.value.replace(/\D/g, '').slice(0, 11);
                 mobileInput.value = cleaned;
-                if (cursorPos) {
-                    let newPos = cursorPos - (val.length - cleaned.length);
-                    if (newPos < 0) newPos = 0;
-                    if (newPos > cleaned.length) newPos = cleaned.length;
-                    mobileInput.setSelectionRange(newPos, newPos);
-                }
+                updateLiveValidationUI();
             }
 
-            updateLiveValidationUI();
-        });
+            // ===== KEYBOARD SAFE AREA =====
+            if ('visualViewport' in window) {
+                let vp = window.visualViewport;
+                vp.addEventListener('scroll', function() {
+                    if (document.activeElement === mobileInput) {
+                        window.scrollTo(0, 0);
+                    }
+                });
+            }
 
-        mobileInput.addEventListener('blur', autoCorrectOnBlur);
-
-        form.addEventListener('submit', handleFormSubmit);
-
-        if (mobileInput.value) {
-            let cleaned = mobileInput.value.replace(/\D/g, '').slice(0, 11);
-            mobileInput.value = cleaned;
-            updateLiveValidationUI();
-        }
-    })();
-</script>
+        })();
+    </script>
 </body>
 </html>

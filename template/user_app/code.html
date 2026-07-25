@@ -85,21 +85,29 @@
         }
 
         .logo-circle {
-            background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
-            width: 64px;
-            height: 64px;
+            width: 70px;
+            height: 70px;
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
             box-shadow: 0 10px 20px -5px rgba(30, 58, 138, 0.3);
+            background: white;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
         }
 
-        .logo-circle svg {
-            width: 34px;
-            height: 34px;
-            stroke: white;
-            stroke-width: 1.6;
+        .logo-circle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px -8px rgba(30, 58, 138, 0.4);
+        }
+
+        .logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .auth-header {
@@ -134,7 +142,7 @@
             font-size: 0.9rem;
         }
 
-        /* ===== مهم: کانتینر باکس‌های کد ===== */
+        /* ===== کانتینر باکس‌های کد ===== */
         .code-inputs {
             display: flex;
             justify-content: center;
@@ -142,14 +150,12 @@
             gap: 10px;
             direction: ltr;
             margin: 1.5rem 0 0.8rem;
-            /* جلوگیری از شکستن */
             flex-wrap: nowrap;
             width: 100%;
         }
 
         /* ===== هر باکس کد ===== */
         .code-input {
-            /* سایز منعطف ولی با محدودیت */
             width: clamp(48px, 14vw, 68px);
             height: clamp(54px, 14vw, 74px);
             font-size: clamp(1.4rem, 4vw, 1.8rem);
@@ -161,10 +167,8 @@
             font-weight: 700;
             color: var(--text-dark);
             transition: all 0.2s;
-            /* جلوگیری از کوچک شدن بیش از حد */
             flex-shrink: 0;
             flex-grow: 0;
-            /* مهم: برای اینکه باکس‌ها دقیقاً هم اندازه باشن */
             min-width: 44px;
             min-height: 50px;
         }
@@ -246,7 +250,7 @@
 
         .btn {
             width: 100%;
-            background: linear-gradient(95deg, var(--primary-start), var(--primary-end));
+            background: linear-gradient(95deg, #ff8300, #000);
             border: none;
             padding: 0.9rem 1rem;
             border-radius: 60px;
@@ -351,7 +355,6 @@
             padding-top: 1rem;
         }
 
-        /* ===== فرم گروه ===== */
         .form-group {
             width: 100%;
         }
@@ -362,12 +365,7 @@
 <div class="glass-auth-card">
     <div class="brand">
         <div class="logo-circle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-                <path d="M3 9.5L12 4L21 9.5L12 15L3 9.5Z" />
-                <path d="M5 11.5V16.5L12 20.5L19 16.5V11.5" />
-                <path d="M12 15V20" />
-                <circle cx="12" cy="8" r="1.5" fill="white" stroke="white"/>
-            </svg>
+            <img src="/media/images/deco.png" alt="Deco B2B" loading="lazy">
         </div>
     </div>
     <div class="auth-header">
