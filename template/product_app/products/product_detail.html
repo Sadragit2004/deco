@@ -2055,7 +2055,7 @@ function renderCart() {
     container.innerHTML = `
         ${cart.map(item => `
             <div class="cart-item" data-id="${item.id}">
-                <img loading="lazy" src="${item.img}" class="cart-item-image" onerror="this.src='/media/images/placeholder.jpg'">
+                <img loading="lazy" src="${item.img}" class="cart-item-image" onerror="this.src='/media/images/nophoto.png'">
                 <div class="cart-item-details">
                     <div class="cart-item-title">${escapeHtml(item.name)}</div>
                     <div class="cart-item-specs">
