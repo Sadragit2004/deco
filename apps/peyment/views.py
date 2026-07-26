@@ -727,14 +727,42 @@ class Zarin_pal_view_verfiy(LoginRequiredMixin, View):
 
 
 # =============================== ویوهای نمایش پیام ===============================
+# peyment/views.py - جایگزین ویوهای قبلی
 
 def show_verfiy_message(request, message):
-    return render(request, "peyment_app/peyment.html", {"message": message})
+    """نمایش صفحه پرداخت موفق با کد رهگیری"""
+    try:
+        # دریافت آخرین پرداخت موفق کاربر
+        latest_payment = Peyment.objects.filter(
+            customer=request.user,
+            isFinaly=True
+        ).order_by('-createAt').first()
+
+        # دریافت اطلاعات سفارش در صورت وجود
+        order = None
+        if latest_payment and latest_payment.order:
+            order = latest_payment.order
+
+        context = {
+            'message': message,
+            'payment': latest_payment,
+            'order': order,
+            'ref_id': latest_payment.refId if latest_payment else None,
+            'amount': latest_payment.amount if latest_payment else 0,
+            'amount_toman': (latest_payment.amount // 10) if latest_payment else 0,
+            'payment_date': latest_payment.createAt if latest_payment else None,
+        }
+
+        return render(request, "peyment_app/peyment.html", context)
+
+    except Exception as e:
+        print(f"❌ خطا در show_verfiy_message: {str(e)}")
+        return render(request, "peyment_app/peyment.html", {"message": message})
 
 
 def show_verfiy_unmessage(request, message):
+    """نمایش صفحه پرداخت ناموفق"""
     return render(request, "peyment_app/unpeyment.html", {"message": message})
-
 
 
 
