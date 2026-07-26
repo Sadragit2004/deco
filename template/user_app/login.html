@@ -657,22 +657,24 @@
             to { transform: rotate(360deg); }
         }
 
-        .btn-register {
-            width: 100%;
-            padding: 14px 20px;
+        /* ===== BUTTON ROW (عضویت + راهنمایی) ===== */
+        .btn-row {
+            display: flex;
+            gap: 10px;
             margin-top: 10px;
-            background: rgba(10, 10, 10, 0.3);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1.5px solid rgba(224, 124, 60, 0.15);
+        }
+
+        .btn-row .btn-register,
+        .btn-row .btn-guide {
+            flex: 1;
+            padding: 14px 10px;
             border-radius: 16px;
             font-size: 0.9rem;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.7);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: 'IRANYekan', 'Vazirmatn', sans-serif;
@@ -681,25 +683,52 @@
             touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
+            background: rgba(10, 10, 10, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(224, 124, 60, 0.15);
+            color: rgba(255, 255, 255, 0.7);
         }
 
-        .btn-register:active {
-            transform: scale(0.96);
-            background: rgba(10, 10, 10, 0.5);
-        }
-
-        .btn-register i {
+        .btn-row .btn-register i,
+        .btn-row .btn-guide i {
             color: var(--orange) !important;
             opacity: 0.6;
             transition: opacity 0.2s ease;
         }
 
-        .btn-register:hover i {
+        .btn-row .btn-register:hover i,
+        .btn-row .btn-guide:hover i {
             opacity: 1;
         }
 
-        .btn-register span {
-            color: rgba(255, 255, 255, 0.6) !important;
+        .btn-row .btn-register:active,
+        .btn-row .btn-guide:active {
+            transform: scale(0.96);
+            background: rgba(10, 10, 10, 0.5);
+        }
+
+        .btn-row .btn-guide {
+            border-color: rgba(224, 124, 60, 0.25);
+            background: rgba(224, 124, 60, 0.05);
+        }
+
+        .btn-row .btn-guide:hover {
+            background: rgba(224, 124, 60, 0.12);
+            border-color: rgba(224, 124, 60, 0.4);
+        }
+
+        @media (max-width: 400px) {
+            .btn-row .btn-register,
+            .btn-row .btn-guide {
+                font-size: 0.75rem;
+                padding: 12px 6px;
+                min-height: 42px;
+                gap: 4px;
+            }
+            .btn-row {
+                gap: 6px;
+            }
         }
 
         .divider {
@@ -813,6 +842,204 @@
         }
 
         /* ============================================
+           MODAL - GLASS MORPHISM
+           ============================================ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-glass {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+            padding: 32px 28px 28px;
+            max-width: 420px;
+            width: 100%;
+            transform: scale(0.92) translateY(20px);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+            opacity: 0;
+            position: relative;
+        }
+
+        .modal-overlay.active .modal-glass {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        .modal-glass::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 32px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, transparent 50%, rgba(224, 124, 60, 0.05) 100%);
+            pointer-events: none;
+            z-index: -1;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            -webkit-mask-composite: xor;
+            padding: 1px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 40px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+        }
+
+        .modal-close:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-glass h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--orange), var(--orange-light));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .modal-sub {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.7rem;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .modal-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 14px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.9rem;
+            transition: background 0.2s ease;
+        }
+
+        .modal-contact-item:active {
+            background: rgba(0, 0, 0, 0.35);
+        }
+
+        .modal-contact-item i {
+            color: var(--orange);
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        .modal-contact-item .label {
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 0.65rem;
+            font-weight: 500;
+            display: block;
+            line-height: 1.2;
+        }
+
+        .modal-contact-item .value {
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            direction: ltr;
+            display: block;
+        }
+
+        .modal-contact-item .value-rtl {
+            font-weight: 600;
+            display: block;
+        }
+
+        .modal-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(224, 124, 60, 0.08), transparent);
+            margin: 14px 0 8px;
+        }
+
+        .modal-hours {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+            padding: 8px 0 2px;
+        }
+
+        .modal-hours i {
+            color: var(--orange);
+            opacity: 0.5;
+            font-size: 0.8rem;
+        }
+
+        .modal-hours span {
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        @media (max-width: 400px) {
+            .modal-glass {
+                padding: 24px 18px 20px;
+                border-radius: 28px;
+            }
+            .modal-contact-item {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+            }
+            .modal-glass h2 {
+                font-size: 1.1rem;
+            }
+            .modal-close {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+                top: 10px;
+                left: 10px;
+            }
+        }
+
+        /* ============================================
            DESKTOP OVERRIDES (keep original feel)
            ============================================ */
         @media (min-width: 768px) {
@@ -825,7 +1052,6 @@
                 box-shadow:
                     0 40px 80px -30px rgba(0, 0, 0, 0.6),
                     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-                /* ===== حرکت کارت به سمت راست ===== */
                 margin-right: 5%;
                 margin-left: auto;
             }
@@ -877,18 +1103,37 @@
                 color: var(--orange-light);
             }
 
-            .btn-register {
+            .btn-row .btn-register,
+            .btn-row .btn-guide {
                 min-height: 44px;
                 border-radius: 14px;
+                padding: 12px 14px;
             }
 
-            .btn-register:hover {
+            .btn-row .btn-register:hover,
+            .btn-row .btn-guide:hover {
                 background: rgba(10, 10, 10, 0.5);
                 border-color: rgba(224, 124, 60, 0.3);
             }
 
+            .btn-row .btn-guide:hover {
+                background: rgba(224, 124, 60, 0.15);
+                border-color: rgba(224, 124, 60, 0.4);
+            }
+
             .trust-seal-img {
                 height: 55px;
+            }
+
+            .modal-glass {
+                padding: 36px 32px 32px;
+            }
+            .modal-contact-item:hover {
+                background: rgba(0, 0, 0, 0.35);
+            }
+            .modal-close:hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: rgba(255, 255, 255, 0.7);
             }
         }
 
@@ -1005,10 +1250,17 @@
                 <span>یا</span>
             </div>
 
-            <a href="{% url 'account:registration_form' %}" class="btn-register">
-                <i class="fa-regular fa-user-plus"></i>
-                <span>درخواست عضویت</span>
-            </a>
+            <!-- ===== BUTTON ROW: عضویت + راهنمایی عضویت ===== -->
+            <div class="btn-row">
+                <a href="{% url 'account:registration_form' %}" class="btn-register">
+                    <i class="fa-regular fa-user-plus"></i>
+                    <span>عضویت</span>
+                </a>
+                <button type="button" class="btn-guide" id="guideBtn">
+                    <i class="fa-regular fa-circle-question"></i>
+                    <span>راهنمایی عضویت</span>
+                </button>
+            </div>
 
             <div class="footer-section">
                 <div class="trust-seal-wrapper">
@@ -1030,6 +1282,44 @@
                 </div>
             </div>
         </form>
+    </div>
+
+    <!-- ============================================
+    MODAL - GLASS MORPHISM
+    ============================================ -->
+    <div class="modal-overlay" id="guideModal">
+        <div class="modal-glass">
+            <button class="modal-close" id="modalCloseBtn" aria-label="بستن">
+                <i class="fa-regular fa-xmark"></i>
+            </button>
+
+            <h2>راهنمای عضویت</h2>
+            <p class="modal-sub">برای ثبت‌نام با ما در ارتباط باشید</p>
+
+            <div class="modal-contact-item">
+                <i class="fa-regular fa-phone"></i>
+                <div>
+                    <span class="label">شماره تماس</span>
+                    <span class="value">۰۲۱-۱۲۳۴۵۶۷۸</span>
+                </div>
+            </div>
+
+            <div class="modal-contact-item">
+                <i class="fa-regular fa-location-dot"></i>
+                <div>
+                    <span class="label">آدرس</span>
+                    <span class="value-rtl">تهران، خیابان آزادی، برج دکو، طبقه ۵</span>
+                </div>
+            </div>
+
+            <div class="modal-divider"></div>
+
+            <div class="modal-hours">
+                <i class="fa-regular fa-clock"></i>
+                <span>ساعت کاری:</span>
+                <span>شنبه تا چهارشنبه ۹ الی ۱۷</span>
+            </div>
+        </div>
     </div>
 
     <!-- ============================================
@@ -1063,6 +1353,37 @@
             const form = document.getElementById('authForm');
             const liveFeedback = document.getElementById('liveValidation');
             const errorContainer = document.getElementById('errorContainer');
+
+            // ===== MODAL =====
+            const modalOverlay = document.getElementById('guideModal');
+            const guideBtn = document.getElementById('guideBtn');
+            const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+            function openModal() {
+                modalOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                modalOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            guideBtn.addEventListener('click', openModal);
+
+            modalCloseBtn.addEventListener('click', closeModal);
+
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+                    closeModal();
+                }
+            });
 
             // ===== FORMATTING HELPERS =====
             function normalizeMobileDigits(value) {
