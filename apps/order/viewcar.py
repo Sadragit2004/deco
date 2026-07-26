@@ -141,3 +141,14 @@ def cart_data_api(request):
         'total_quantity': cart.get_total_quantity(),
         'items_count': len(cart.cart)
     })
+
+
+    # در فایل order/views.py
+from django.http import JsonResponse
+
+def test_view(request):
+    """مسیر تست برای بررسی ارتباط"""
+    return JsonResponse({
+        'success': True,
+        'message': 'Test view is working!'
+    })

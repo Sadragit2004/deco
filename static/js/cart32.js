@@ -71,9 +71,9 @@ async function createOrderAndRedirect() {
         checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال ایجاد سفارش...';
         checkoutBtn.disabled = true;
 
-        // اول تست کن ببین ویو تست کار می‌کند یا نه
-        console.log("Sending request to test endpoint...");
-        const testResponse = await fetch('/order/test/', {
+        // حذف قسمت تست و مستقیماً رفتن به ایجاد سفارش
+        console.log("Sending request to create order...");
+        const response = await fetch('/order/create/', {
             method: 'GET',
             headers: {
                 'X-CSRFToken': getCsrfToken(),
@@ -81,24 +81,11 @@ async function createOrderAndRedirect() {
             }
         });
 
-        const testResult = await testResponse.json();
-        console.log("Test response:", testResult);
+        console.log("Response status:", response.status);
 
-        if (testResult.success) {
-            console.log("Test view works! Now trying real order creation...");
-
-            // حالا درخواست واقعی
-            const response = await fetch('/order/create/', {
-                method: 'GET',
-                headers: {
-                    'X-CSRFToken': getCsrfToken(),
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-
-            console.log("Response status:", response.status);
-            console.log("Response headers:", response.headers);
-
+        // بررسی اینکه پاسخ JSON است یا HTML
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
             const result = await response.json();
             console.log("Order creation response:", result);
 
@@ -112,7 +99,9 @@ async function createOrderAndRedirect() {
                 checkoutBtn.disabled = false;
             }
         } else {
-            console.error("Test view failed:", testResult);
+            // اگر پاسخ HTML بود، خطا نمایش بده
+            const text = await response.text();
+            console.error("Received HTML instead of JSON:", text.substring(0, 200));
             showNotification('خطا در ارتباط با سرور', 'error');
             checkoutBtn.innerHTML = originalText;
             checkoutBtn.disabled = false;

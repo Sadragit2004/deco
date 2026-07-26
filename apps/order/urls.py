@@ -11,6 +11,7 @@ urlpatterns = [
     path('cart/update/', viewcar.cart_update_api, name='cart_update_api'),
     path('cart/clear/', viewcar.cart_clear_api, name='cart_clear_api'),
     path('cart/data/', viewcar.cart_data_api, name='cart_data_api'),
+    path('test/', viewcar.test_view, name='test_view'),  # <-- این خط را اضافه کنید
 
     # صفحات اصلی سفارش
     path('create/', views.CreateOrderView.as_view(), name='create_order'),

@@ -22,11 +22,11 @@ import utils
 
 
 # تنظیمات ZarinPal
-MERCHANT_ID = "6fe93958-6832-4fbc-be2f-aa85e63233bd"
+MERCHANT_ID = "9f39aedf-f67b-487a-9911-ea3832f99eb8"
 ZP_API_REQUEST = "https://api.zarinpal.com/pg/v4/payment/request.json"
 ZP_API_VERIFY = "https://api.zarinpal.com/pg/v4/payment/verify.json"
 ZP_API_STARTPAY = "https://www.zarinpal.com/pg/StartPay/{authority}"
-CALLBACK_URL = "https://sayamedical.com/peyment/verify/"
+CALLBACK_URL = "https://decob2b.net/peyment/verify/"
 
 
 def send_request(request, order_id):
@@ -103,7 +103,7 @@ def send_request(request, order_id):
             "merchant_id": MERCHANT_ID,
             "amount": amount,
             "callback_url": CALLBACK_URL,
-            "description": f"پرداخت سفارش شماره {order.order_number} - سایت سایا مدیکال",
+            "description": f"پرداخت سفارش شماره {order.order_number} - سایت دکو بی تو بی",
             "metadata": {
                 "email": request.user.email if request.user.email else "",
                 "mobile": request.user.mobileNumber
@@ -215,7 +215,7 @@ class MembershipPaymentAPIView(LoginRequiredMixin, View):
                 "merchant_id": MERCHANT_ID,
                 "amount": amount,
                 "callback_url": CALLBACK_URL,
-                "description": f"پرداخت حق عضویت سایت سایا مدیکال - کاربر {request.user.mobileNumber}",
+                "description": f"پرداخت حق عضویت سایت دکو بی تو بی - کاربر {request.user.mobileNumber}",
                 "metadata": {
                     "email": request.user.email if request.user.email else "",
                     "mobile": request.user.mobileNumber
@@ -455,7 +455,7 @@ def membership_payment_redirect(request):
             "merchant_id": MERCHANT_ID,
             "amount": amount,
             "callback_url": CALLBACK_URL,
-            "description": f"پرداخت حق عضویت سایت سایا مدیکال - کاربر {request.user.mobileNumber}",
+            "description": f"پرداخت حق عضویت سایت دکو بی تو بی - کاربر {request.user.mobileNumber}",
             "metadata": {
                 "email": request.user.email if request.user.email else "",
                 "mobile": request.user.mobileNumber
