@@ -94,17 +94,14 @@ class ProvinceAdmin(admin.ModelAdmin):
 
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin):
-    list_display = ['name', 'province_link', 'is_active']
+    list_display = ['name', 'is_active']
     list_editable = ['is_active']
     list_filter = ['is_active', 'province']
     search_fields = ['name', 'province__name']
     autocomplete_fields = ['province']
     ordering = ['province__name', 'name']
 
-    def province_link(self, obj):
-        url = reverse('admin:app_province_change', args=[obj.province.id])
-        return format_html('<a href="{}" style="font-weight: bold;">{}</a>', url, obj.province.name)
-    province_link.short_description = "استان"
+
 
 
 # =========================
