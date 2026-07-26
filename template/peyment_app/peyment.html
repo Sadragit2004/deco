@@ -1,1 +1,341 @@
-<h1>پرداخت شد</h1>
+<!DOCTYPE html>
+{% load static %}
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پرداخت موفق</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            max-width: 440px;
+            width: 100%;
+            padding: 48px 40px 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            text-align: center;
+        }
+
+        .icon {
+            width: 72px;
+            height: 72px;
+            background: #22c55e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .icon i {
+            font-size: 32px;
+            color: white;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+
+        .desc {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 28px;
+            line-height: 1.6;
+        }
+
+        .amount {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .amount-label {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .amount-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-top: 2px;
+        }
+
+        .amount-value span {
+            font-size: 16px;
+            font-weight: 400;
+            color: #6b7280;
+        }
+
+        .ref {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ref-label {
+            font-size: 13px;
+            color: #15803d;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ref-label i {
+            font-size: 14px;
+        }
+
+        .ref-code {
+            font-size: 16px;
+            font-weight: 600;
+            color: #15803d;
+            direction: ltr;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        .ref-copy {
+            background: none;
+            border: none;
+            color: #15803d;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .ref-copy:hover {
+            background: #dcfce7;
+        }
+
+        .info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+
+        .info-item {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 10px 8px;
+        }
+
+        .info-item .label {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .info-item .value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-top: 2px;
+        }
+
+        .info-item .badge {
+            display: inline-block;
+            background: #22c55e;
+            color: white;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 2px 14px;
+            border-radius: 20px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #333;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #1a1a1a;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1a1a1a;
+            color: white;
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-size: 14px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 32px 20px 28px;
+            }
+            .amount-value {
+                font-size: 24px;
+            }
+            .ref-code {
+                font-size: 14px;
+            }
+            .info {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+
+    <div class="icon">
+        <i class="fas fa-check"></i>
+    </div>
+
+    <div class="title">پرداخت موفق</div>
+    <div class="desc">{{ message|default:"پرداخت شما با موفقیت انجام شد" }}</div>
+
+    <div class="amount">
+        <div class="amount-label">مبلغ پرداخت شده</div>
+        <div class="amount-value">
+            {{ amount|default:"0"|floatformat:0 }} <span>تومان</span>
+        </div>
+    </div>
+
+    <div class="ref">
+        <span class="ref-label">
+            <i class="fas fa-hashtag"></i> کد رهگیری
+        </span>
+        <div style="display:flex;align-items:center;gap:6px;">
+            <span class="ref-code" id="refCode">{{ ref_id|default:"---" }}</span>
+            <button class="ref-copy" onclick="copyRef()" title="کپی">
+                <i class="fas fa-copy"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="info">
+        <div class="info-item">
+            <div class="label">تاریخ</div>
+            <div class="value">{{ payment_date|date:"Y/m/d"|default:"---" }}</div>
+        </div>
+        <div class="info-item">
+            <div class="label">وضعیت</div>
+            <div class="value"><span class="badge">موفق</span></div>
+        </div>
+        {% if order %}
+        <div class="info-item" style="grid-column: 1/-1;">
+            <div class="label">شماره سفارش</div>
+            <div class="value">#{{ order.order_number|default:order.id }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="actions">
+        <a href="{% url 'main:index' %}" class="btn btn-primary">
+            <i class="fas fa-home"></i> صفحه اصلی
+        </a>
+        {% if order %}
+        <a href="{% url 'order:order_detail' order_id=order.id %}" class="btn btn-secondary">
+            <i class="fas fa-receipt"></i> سفارش
+        </a>
+        {% else %}
+        <a href="{% url 'user:dashboard' %}" class="btn btn-secondary">
+            <i class="fas fa-user"></i> پنل
+        </a>
+        {% endif %}
+    </div>
+
+</div>
+
+<div class="toast" id="toast">کد رهگیری کپی شد</div>
+
+<script>
+    function copyRef() {
+        const code = document.getElementById('refCode').innerText;
+        if (code && code !== '---') {
+            navigator.clipboard.writeText(code).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = code;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            });
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+    }
+</script>
+
+</body>
+</html>
