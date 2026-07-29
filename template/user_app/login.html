@@ -122,7 +122,7 @@
             width: 110px;
             height: 110px;
             border-radius: 50%;
-            background: #0a0a0a;
+            background: #f9f9f9;
             border: 3.5px solid var(--orange);
             display: flex;
             align-items: center;
@@ -914,6 +914,66 @@
                 }
             }
         }
+
+    @media (max-width: 768px) {
+    .logo-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    /* ===== اینجا اندازه‌ها رو بزرگ‌تر کن ===== */
+    .logo-container {
+        width: 160px;      /* قبلاً 120px */
+        height: 160px;
+    }
+
+    .logo-circle {
+        width: 150px;      /* قبلاً 110px */
+        height: 150px;
+        border-width: 4px; /* ضخیم‌تر برای چشم‌زدن */
+    }
+
+    .logo-circle img {
+        width: 88%;        /* قبلاً 85% */
+        height: 88%;
+        object-fit: contain;
+        display: block;
+    }
+}
+
+@media (max-width: 560px) {
+    .logo-container {
+        width: 180px;      /* قبلاً 130px */
+        height: 180px;
+    }
+    .logo-circle {
+        width: 170px;      /* قبلاً 120px */
+        height: 170px;
+        border-width: 5px; /* ضخیم‌تر */
+    }
+    .logo-circle img {
+        width: 85%;
+        height: 85%;
+    }
+}
+
+@media (max-width: 400px) {
+    .logo-container {
+        width: 150px;      /* قبلاً 110px */
+        height: 150px;
+    }
+    .logo-circle {
+        width: 140px;      /* قبلاً 100px */
+        height: 140px;
+        border-width: 4px;
+    }
+    .logo-circle img {
+        width: 123%;
+        height: 82%;
+    }
+}
     </style>
 </head>
 <body>
@@ -975,12 +1035,12 @@
                 <span>یا</span>
             </div>
 
-            <div class="btn-row">
-                <a href="{% url 'account:registration_form' %}" class="btn-register">
+            <div  class="btn-row">
+                <a style="border:1px solid orange;" href="{% url 'account:registration_form' %}" class="btn-register">
                     <i class="fa-regular fa-user-plus"></i>
                     <span>عضویت</span>
                 </a>
-                <button type="button" class="btn-guide" id="guideBtn">
+                <button style="border:1px solid orange;" type="button" class="btn-guide" id="guideBtn">
                     <i class="fa-regular fa-circle-question"></i>
                     <span>راهنمایی عضویت</span>
                 </button>
@@ -1001,8 +1061,8 @@
                     </a>
                 </div>
 
-                <div class="terms-note">
-                    ورود به منزله پذیرش <a href="#">قوانین دکو</a> و <a href="#">حریم خصوصی</a> است.
+                <div style="color:#ffff; font-size:12px;" class="terms-note">
+                 ورود به منزله پذیرش قوانین decob2b
                 </div>
             </div>
         </form>
