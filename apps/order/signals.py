@@ -1,5 +1,3 @@
-# apps/order/signals.py
-
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -12,6 +10,7 @@ from apps.peyment.models import Peyment, PaymentMethod
 from apps.product.models import Product
 from apps.user.models.profile import Wallet, WalletTransaction
 from apps.check.models import CheckPayment, CheckPaymentStatus
+import utils
 
 logger = logging.getLogger(__name__)
 
@@ -149,7 +148,6 @@ def assign_coins_and_wallet_bonus(order, paid_amount=None):
     if not order.user:
         return None, None
 
-    # محاسبه مبلغ واقعی پرداختی
     if paid_amount is None:
         paid_amount = order.total
         if paid_amount <= 0:
@@ -160,17 +158,14 @@ def assign_coins_and_wallet_bonus(order, paid_amount=None):
     if paid_amount <= 0:
         return 0, 0
 
-    # دریافت یا ایجاد لایفتایم کاربر
     loyalty, created = CustomerLoyalty.objects.get_or_create(user=order.user)
     old_lifetime = loyalty.lifetime_purchase
     old_tier = loyalty.current_tier
 
-    # اضافه کردن مبلغ واقعی پرداختی به لایفتایم
     new_lifetime = old_lifetime + paid_amount
     loyalty.lifetime_purchase = new_lifetime
     loyalty.save(update_fields=['lifetime_purchase'])
 
-    # محاسبه سطح جدید
     new_tier = calculate_tier_by_lifetime(new_lifetime)
 
     if old_tier != new_tier:
@@ -183,10 +178,8 @@ def assign_coins_and_wallet_bonus(order, paid_amount=None):
             note=f"🎖️ تبریک! سطح عضویت شما از {old_tier} به {new_tier} ارتقا یافت"
         )
 
-    # محاسبه سکه‌های جدید
     new_coins, wallet_amount = calculate_new_coins_and_wallet_amount(old_lifetime, new_lifetime)
 
-    # محاسبه سکه‌های B2B
     old_b2b_coins = get_tier_b2b_coins(old_tier)
     new_b2b_coins = get_tier_b2b_coins(new_tier)
     b2b_coins_earned = new_b2b_coins - old_b2b_coins
@@ -196,11 +189,9 @@ def assign_coins_and_wallet_bonus(order, paid_amount=None):
     if total_new_coins == 0:
         return 0, 0
 
-    # اضافه کردن سکه‌ها
     loyalty.total_coins += total_new_coins
     loyalty.save(update_fields=['total_coins'])
 
-    # ثبت تراکنش‌ها
     if new_coins > 0:
         LoyaltyTransaction.objects.create(
             loyalty=loyalty,
@@ -239,18 +230,15 @@ def finalize_order_payment(order):
     if order.status == 'paid':
         return True
 
-    # محاسبه مبلغ واقعی پرداختی
     paid_amount = order.total
     if paid_amount <= 0:
         paid_amount = order.subtotal - order.discount_amount - order.coupon_discount + order.shipping_cost - order.used_from_wallet
     if paid_amount < 0:
         paid_amount = 0
 
-    # کسر مبلغ کیف پول
     if order.used_from_wallet > 0:
         deduct_wallet_after_confirmation(order)
 
-    # ایجاد یا بروزرسانی پرداخت
     payment, created = Peyment.objects.get_or_create(
         order=order,
         customer=order.user,
@@ -265,22 +253,18 @@ def finalize_order_payment(order):
         }
     )
 
-    # بروزرسانی وضعیت سفارش
     order.status = 'paid'
     order.paid_at = timezone.now()
     order.save(update_fields=['status', 'paid_at'])
 
-    # ثبت تاریخچه
     OrderStatusHistory.objects.create(
         order=order,
         status='paid',
         note=f"✅ پرداخت سفارش نهایی شد - مبلغ: {order.total:,.0f} تومان"
     )
 
-    # کسر موجودی محصولات
     deduct_product_stock(order)
 
-    # تخصیص سکه و شارژ کیف پول
     if paid_amount > 0:
         assign_coins_and_wallet_bonus(order, paid_amount)
 
@@ -316,7 +300,7 @@ def store_old_status(sender, instance, **kwargs):
 
 @receiver(post_save, sender=CheckPayment)
 def check_payment_verified_signal(sender, instance, created, **kwargs):
-    """وقتی چک تایید شد، سفارش رو نهایی کن"""
+    """وقتی چک تایید شد، سفارش رو نهایی کن و پیامک بفرست"""
     if created:
         return
 
@@ -347,6 +331,22 @@ def check_payment_verified_signal(sender, instance, created, **kwargs):
             note=f"📝 چک {instance.tracking_number} تأیید شد"
         )
 
+        # ارسال پیامک
+        if order.user and order.user.mobileNumber:
+            # پیامک تایید چک
+            utils.send_receipt_check_status_sms(
+                number=order.user.mobileNumber,
+                order_number=order.order_number,
+                title="چک",
+                status="تایید"
+            )
+            # پیامک تایید سفارش
+            utils.send_order_confirmation_sms(
+                number=order.user.mobileNumber,
+                order_number=order.order_number,
+                name=order.user.name or order.user.mobileNumber
+            )
+
     except Exception as e:
         logger.error(f"Error in check_payment_verified_signal: {str(e)}")
         raise
@@ -355,30 +355,25 @@ def check_payment_verified_signal(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Order)
 def receipt_verified_signal(sender, instance, created, **kwargs):
     """
-    وقتی رسید تایید شد، سفارش رو نهایی کن
+    وقتی رسید تایید شد، سفارش رو نهایی کن و پیامک بفرست
     """
     if created:
         return
 
-    # اگر سفارش قبلاً پرداخت شده، خارج شو
     if instance.status == 'paid':
         return
 
-    # فقط اگر رسید تایید شده باشد
     if not instance.receipt_verified:
         return
 
-    # بررسی اینکه آیا این یک تغییر وضعیت از false به true است
     old_receipt_verified = getattr(instance, '_old_receipt_verified', False)
     if old_receipt_verified == instance.receipt_verified:
         return
 
-    # بررسی اینکه آیا قبلاً پرداخت نهایی شده
     old_paid_at = getattr(instance, '_old_paid_at', None)
     if old_paid_at is not None:
         return
 
-    # بررسی وجود چک در انتظار
     pending_checks = CheckPayment.objects.filter(
         order=instance,
         status=CheckPaymentStatus.PENDING.value
@@ -389,6 +384,23 @@ def receipt_verified_signal(sender, instance, created, **kwargs):
 
     try:
         finalize_order_payment(instance)
+
+        # ارسال پیامک
+        if instance.user and instance.user.mobileNumber:
+            # پیامک تایید رسید
+            utils.send_receipt_check_status_sms(
+                number=instance.user.mobileNumber,
+                order_number=instance.order_number,
+                title="رسید پرداخت",
+                status="تایید"
+            )
+            # پیامک تایید سفارش
+            utils.send_order_confirmation_sms(
+                number=instance.user.mobileNumber,
+                order_number=instance.order_number,
+                name=instance.user.name or instance.user.mobileNumber
+            )
+
     except Exception as e:
         logger.error(f"Error in receipt_verified_signal: {str(e)}")
         raise
@@ -396,7 +408,7 @@ def receipt_verified_signal(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Peyment)
 def online_payment_signal(sender, instance, created, **kwargs):
-    """وقتی پرداخت آنلاین موفق شد، سفارش رو نهایی کن"""
+    """وقتی پرداخت آنلاین موفق شد، سفارش رو نهایی کن و پیامک بفرست"""
     if not instance.isFinaly:
         return
 
@@ -410,7 +422,6 @@ def online_payment_signal(sender, instance, created, **kwargs):
     if order.status == 'paid':
         return
 
-    # بررسی اینکه آیا قبلاً پرداخت نهایی شده
     if order.paid_at is not None:
         return
 
@@ -424,6 +435,15 @@ def online_payment_signal(sender, instance, created, **kwargs):
 
     try:
         finalize_order_payment(order)
+
+        # ارسال پیامک تایید سفارش
+        if order.user and order.user.mobileNumber:
+            utils.send_order_confirmation_sms(
+                number=order.user.mobileNumber,
+                order_number=order.order_number,
+                name=order.user.name or order.user.mobileNumber
+            )
+
     except Exception as e:
         logger.error(f"Error in online_payment_signal: {str(e)}")
         raise
@@ -510,18 +530,14 @@ def order_status_notification(sender, instance, created, **kwargs):
         logger.error(f"Error in order_status_notification: {str(e)}")
 
 
-# ==================== سیگنال برای بروزرسانی موجودی بعد از لغو سفارش ====================
-
 @receiver(post_save, sender=Order)
 def restore_stock_on_cancel(sender, instance, created, **kwargs):
     """برگرداندن موجودی محصولات در صورت لغو سفارش"""
     if created:
         return
 
-    # فقط اگر وضعیت به cancelled تغییر کرده باشد
     old_status = getattr(instance, '_old_status', None)
     if old_status != instance.status and instance.status == 'cancelled':
-        # برگرداندن موجودی
         for item in instance.items.all():
             if item.product:
                 product = item.product
@@ -536,8 +552,6 @@ def restore_stock_on_cancel(sender, instance, created, **kwargs):
         )
 
 
-# ==================== سیگنال برای بروزرسانی آمار کاربر ====================
-
 @receiver(post_save, sender=Order)
 def update_user_stats(sender, instance, created, **kwargs):
     """بروزرسانی آمار کاربر بعد از پرداخت سفارش"""
@@ -550,19 +564,12 @@ def update_user_stats(sender, instance, created, **kwargs):
     if not instance.user:
         return
 
-    # بررسی اینکه آیا قبلاً آمار بروزرسانی شده
     if instance.earned_points <= 0:
         return
 
     try:
-        # بروزرسانی تعداد سفارش‌های پرداخت شده کاربر
         from apps.user.models.user import CustomUser
         user = instance.user
-
-        # اینجا می‌توانید آمارهای دلخواه را بروزرسانی کنید
-        # مثلاً تعداد سفارش‌ها، مجموع مبلغ خرید و ...
-
         logger.info(f"User {user.mobileNumber} stats updated for order {instance.order_number}")
-
     except Exception as e:
         logger.error(f"Error in update_user_stats: {str(e)}")

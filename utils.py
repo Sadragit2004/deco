@@ -179,6 +179,101 @@ def send_sms(number,code):
         ],
     )
 
+from sms_ir import SmsIr
+def send_confirmation_sms(number,name):
+
+    pass
+    sms_ir = SmsIr('6AyzUqH1zjA46MHHafu3ArtOE4YdsgOfX7Z3ThOJOfrLnfVz')
+
+    result = sms_ir.send_verify_code(
+        number=str(number),
+        template_id=420755,
+        parameters=[
+            {
+
+                "name" : "NAME",
+                "value": str(name)
+
+            }
+        ],
+    )
+
+
+
+# utils/sms_utils.py
+from sms_ir import SmsIr
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def send_order_confirmation_sms(number, order_number,name):
+    """
+    پیامک تایید سفارش
+    قالبی که خودت دادی:
+    "همکار محترم #TITLE# سفارش شما با کد #ORDER_NUMBER# ثبت شد"
+    """
+    try:
+        sms_ir = SmsIr('6AyzUqH1zjA46MHHafu3ArtOE4YdsgOfX7Z3ThOJOfrLnfVz')
+
+        result = sms_ir.send_verify_code(
+            number=str(number),
+            template_id=509917,  # تمپلیت مخصوص تایید سفارش
+            parameters=[
+                {
+                    "name": "NAME",
+                    "value":name
+                },
+                {
+                    "name": "ORDER_NUMBER",
+                    "value": str(order_number)
+                }
+            ],
+        )
+
+        logger.info(f"Order confirmation SMS sent to {number}")
+        return result
+
+    except Exception as e:
+        logger.error(f"Failed to send order confirmation SMS to {number}: {str(e)}")
+        return None
+
+
+def send_receipt_check_status_sms(number, order_number, title, status):
+    """
+    پیامک وضعیت تایید رسید یا چک
+    قالبی که خودت دادی:
+    "وضعیت #TITLE# شما با کد #CODE# در وضعیت #STATUS# قرار گرفت."
+    """
+    try:
+        sms_ir = SmsIr('6AyzUqH1zjA46MHHafu3ArtOE4YdsgOfX7Z3ThOJOfrLnfVz')
+
+        result = sms_ir.send_verify_code(
+            number=str(number),
+            template_id=599895,  # تمپلیت مخصوص وضعیت رسید/چک
+            parameters=[
+                {
+                    "name": "TITLE",
+                    "value": str(title)  # "رسید پرداخت" یا "چک"
+                },
+                {
+                    "name": "CODE",
+                    "value": str(order_number)
+                },
+                {
+                    "name": "STATUS",
+                    "value": str(status)  # "تایید" یا "رد"
+                }
+            ],
+        )
+
+        logger.info(f"Receipt/Check status SMS sent to {number}")
+        return result
+
+    except Exception as e:
+        logger.error(f"Failed to send receipt/check status SMS to {number}: {str(e)}")
+        return None
+
 
 
 # apps/discount/utils.py

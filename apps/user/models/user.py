@@ -46,6 +46,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     createAt = models.DateTimeField(default=timezone.now,verbose_name='تاریخ ثبت')
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name="آواتار")
+    
 
     # آنلاین/آفلاین
     last_activity = models.DateTimeField(default=timezone.now, verbose_name="آخرین فعالیت")
