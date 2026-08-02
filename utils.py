@@ -164,7 +164,7 @@ from sms_ir import SmsIr
 def send_sms(number,code):
 
     pass
-    sms_ir = SmsIr('PN1TVeBeaAehFLJAKU4XdfpsFXsQguYfleO0bV4ceh6diTZid2hRXza3uSkBbDef')
+    sms_ir = SmsIr('6AyzUqH1zjA46MHHafu3ArtOE4YdsgOfX7Z3ThOJOfrLnfVz')
 
     result = sms_ir.send_verify_code(
         number=str(number),
