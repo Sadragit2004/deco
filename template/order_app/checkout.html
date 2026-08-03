@@ -116,6 +116,7 @@
             .desktop-pay-btn, .secure-payment-badge { display: none; }
             .checkout-wrapper { display: flex; flex-direction: column; gap: 20px; }
             .container { padding: 16px; }
+
             .mobile-accordion-section {
                 background: var(--surface);
                 border-radius: var(--radius-lg);
@@ -123,6 +124,7 @@
                 overflow: hidden;
                 box-shadow: var(--shadow-md);
             }
+
             .accordion-toggle {
                 width: 100%;
                 padding: 18px 20px;
@@ -137,28 +139,35 @@
                 font-size: 15px;
                 color: var(--text-main);
                 font-family: inherit;
-                transition: var(--transition);
+                position: relative;
+                z-index: 5;
             }
+
             .accordion-toggle i:first-child {
                 color: var(--primary);
                 margin-left: 10px;
             }
+
             .accordion-toggle .toggle-icon {
                 transition: transform 0.3s ease;
                 color: var(--text-muted);
             }
+
             .accordion-toggle.active .toggle-icon {
                 transform: rotate(180deg);
             }
+
             .accordion-content {
                 display: none;
                 padding: 0 20px 20px 20px;
                 border-top: 1px solid var(--border-color);
                 background: var(--surface);
             }
+
             .accordion-content.active {
                 display: block;
             }
+
             .checkout-form {
                 background: transparent;
                 padding: 0;
@@ -169,13 +178,13 @@
             }
         }
 
+        /* بقیه استایل‌ها به همان شکل قبل */
         .checkout-form, .order-summary {
             background: var(--surface);
             border-radius: var(--radius-lg);
             padding: 24px;
             box-shadow: var(--shadow-md);
         }
-
         .section-title {
             font-size: 16px;
             font-weight: 800;
@@ -186,7 +195,6 @@
             align-items: center;
             gap: 10px;
         }
-
         .section-title i {
             color: var(--primary);
             background: var(--primary-light);
@@ -194,7 +202,6 @@
             border-radius: 10px;
             font-size: 16px;
         }
-
         .form-group { margin-bottom: 18px; }
         .form-group label {
             display: flex;
@@ -222,7 +229,6 @@
             background: var(--surface);
             box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
         }
-        /* استایل فیلدهای فقط خواندنی (نام و نام خانوادگی) */
         .form-group input[readonly] {
             background: #f1f5f9 !important;
             color: #475569 !important;
@@ -234,7 +240,6 @@
             box-shadow: none !important;
             border-color: #e2e8f0 !important;
         }
-
         .check-section-gold {
             background: linear-gradient(135deg, var(--gold-light), #fff8e7);
             border: 2px solid var(--gold);
@@ -291,7 +296,6 @@
             gap: 8px;
         }
         .check-info-note i { color: var(--gold); }
-
         .check-owner-info {
             background: white;
             border-radius: 12px;
@@ -322,7 +326,6 @@
             direction: ltr;
             text-align: left;
         }
-
         .check-upload-area {
             border: 2px dashed var(--gold);
             border-radius: 12px;
@@ -378,7 +381,6 @@
             cursor: pointer;
             margin: 0;
         }
-
         .check-fixed-percent {
             background: #fff3cd;
             border-radius: 12px;
@@ -397,7 +399,6 @@
             color: #856404;
             margin-top: 8px;
         }
-
         .check-enable-box {
             background: linear-gradient(135deg, #fef9e6, #fff8e7);
             border: 2px solid var(--gold);
@@ -461,7 +462,6 @@
             display: flex;
         }
         .check-status-msg i { font-size: 14px; }
-
         .wallet-section {
             background: linear-gradient(135deg, #f0fdf4, #dcfce7);
             border-radius: var(--radius-md);
@@ -597,7 +597,6 @@
             color: var(--primary-dark);
         }
         .payment-option input:checked + label i { color: var(--primary); }
-
         .address-item {
             position: relative;
             padding: 12px 16px;
@@ -632,7 +631,6 @@
         .address-meta { font-size: 11px; color: #64748b; display: inline-flex; align-items: center; gap: 5px; background: white; padding: 3px 8px; border-radius: 6px; border: 1px solid #e2e8f0; }
         .check-icon { color: var(--primary); font-size: 20px; display: none; }
         .check-icon.show { display: block; }
-
         .btn-add-address {
             width: 100%;
             margin-top: 12px;
@@ -650,7 +648,6 @@
             gap: 8px;
         }
         .btn-add-address:hover { background: var(--primary-light); border-color: var(--primary); }
-
         .shipping-select {
             width: 100%;
             padding: 12px 14px;
@@ -661,7 +658,6 @@
             background: #f8fafc;
             cursor: pointer;
         }
-
         .shipping-option-preview {
             display: flex;
             align-items: center;
@@ -674,7 +670,6 @@
             color: var(--text-muted);
             border: 1px dashed var(--border-color);
         }
-
         .order-items { margin-bottom: 20px; max-height: 350px; overflow-y: auto; }
         .order-item {
             display: flex;
@@ -691,7 +686,6 @@
         .final-price { font-weight: 800; font-size: 14px; }
         .original-price { text-decoration: line-through; color: #94a3b8; font-size: 11px; }
         .discount-badge { background: #fef2f2; color: #ef4444; font-size: 10px; padding: 2px 6px; border-radius: 6px; display: inline-block; margin-top: 4px; }
-
         .summary-totals { background: #f8fafc; border-radius: var(--radius-md); padding: 18px; }
         .total-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 13px; font-weight: 600; color: var(--text-muted); }
         .total-row span:last-child { color: var(--text-main); font-weight: 700; }
@@ -701,22 +695,18 @@
         .total-row.wallet-row span:last-child { color: #059669; }
         .total-row.grand-total { font-size: 16px; font-weight: 800; border-top: 2px dashed #cbd5e1; margin-top: 12px; padding-top: 14px; }
         .total-row.grand-total span:last-child { color: var(--primary-dark); font-size: 20px; }
-
         .alert { padding: 14px; border-radius: var(--radius-sm); margin-bottom: 20px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
         .alert-error { background: #fef2f2; color: #b91c1c; border-right: 4px solid #ef4444; }
         .alert-success { background: #f0fdf4; color: #15803d; border-right: 4px solid #10b981; }
         .alert-info { background: #e0f2fe; color: #0369a1; border-right: 4px solid #0ea5e9; }
-
         .empty-state { text-align: center; padding: 24px; color: var(--text-muted); background: #f8fafc; border-radius: var(--radius-sm); border: 2px dashed #cbd5e1; }
         .empty-state i { font-size: 40px; color: #cbd5e1; margin-bottom: 12px; display: block; }
         .row-2cols { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
         @media (max-width: 560px) {
             .row-2cols { grid-template-columns: 1fr; gap: 10px; }
             .payment-methods { flex-direction: column; }
             .payment-option { min-width: auto; }
         }
-
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -782,7 +772,6 @@
         .btn-primary:hover { background: var(--primary-dark); }
         .btn-secondary { background: #f1f5f9; color: var(--text-main); }
         .btn-secondary:hover { background: #e2e8f0; }
-
         .spinner {
             width: 20px;
             height: 20px;
@@ -793,7 +782,6 @@
             display: inline-block;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-
         #toast {
             position: fixed;
             bottom: 30px;
@@ -812,14 +800,12 @@
             gap: 8px;
             white-space: nowrap;
         }
-
         .receipt-preview-large {
             max-width: 100%;
             max-height: 300px;
             border-radius: 12px;
             margin: 10px 0;
         }
-
         .success-message-modal {
             position: fixed;
             top: 0;
@@ -891,7 +877,6 @@
             transition: all 0.3s;
         }
         .success-btn:hover { transform: scale(1.05); }
-
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -1030,13 +1015,11 @@
                                         <i class="fas fa-info-circle"></i>
                                         <span>طبق سطح {{ user_tier_display|default:user_tier }} شما، {% if user_tier == 'premium' %}۱۵٪{% elif user_tier == 'elite' %}۲۵٪{% else %}۵۰٪{% endif %} از مبلغ سفارش را با چک پرداخت می‌کنید.</span>
                                     </div>
-
                                     <div class="check-fixed-percent">
                                         <div>درصد پرداخت با چک (ثابت)</div>
                                         <div class="percent-value" id="fixedPercentDisplay">{% if user_tier == 'premium' %}۱۵{% elif user_tier == 'elite' %}۲۵{% else %}۵۰{% endif %}%</div>
                                         <div class="amount-value" id="fixedCheckAmountDisplay">مبلغ چک: ۰ تومان</div>
                                     </div>
-
                                     <div class="check-owner-info">
                                         <div class="info-row">
                                             <span class="info-label">کد ملی گیرنده چک:</span>
@@ -1047,7 +1030,6 @@
                                             <span class="info-value">CHK-{{ order.order_number|slice:":8" }}</span>
                                         </div>
                                     </div>
-
                                     <div class="check-form-group">
                                         <label><i class="fas fa-image"></i> عکس چک (الزامی)</label>
                                         <div class="check-upload-area" id="checkUploadArea">
@@ -1067,9 +1049,7 @@
                                             </button>
                                         </div>
                                     </div>
-
                                     <div id="checkStatusMsg" class="check-status-msg"></div>
-
                                     <div class="check-confirm-box" id="checkConfirmBox">
                                         <input type="checkbox" id="checkConfirmCheckbox">
                                         <label for="checkConfirmCheckbox">
@@ -1349,7 +1329,7 @@
     <div id="toast"><i class="fas fa-check-circle" style="color: #10b981;"></i><span>کپی شد!</span></div>
 
     <script>
-        // ========== متغیرهای اصلی ==========
+        // ========== تمام کدهای قبلی ==========
         let selectedAddressId = null;
         let selectedShippingId = null;
         let currentShippingCost = {{ order.shipping_cost|default:0 }};
@@ -1402,15 +1382,19 @@
 
         function updateCheckDisplay() {
             const totalBeforeCheck = getTotalBeforeCheck();
+            const fixedCheckAmountDisplay = document.getElementById('fixedCheckAmountDisplay');
+            const checkDeductAmount = document.getElementById('checkDeductAmount');
+            const checkRow = document.getElementById('checkRow');
+
             if (checkEnabled && checkPercent > 0) {
                 checkAmountValue = Math.floor(totalBeforeCheck * checkPercent / 100);
-                document.getElementById('fixedCheckAmountDisplay').innerHTML = `مبلغ چک: ${checkAmountValue.toLocaleString()} تومان`;
-                document.getElementById('checkDeductAmount').innerHTML = `- ${checkAmountValue.toLocaleString()} تومان`;
-                document.getElementById('checkRow').style.display = 'flex';
+                if (fixedCheckAmountDisplay) fixedCheckAmountDisplay.innerHTML = `مبلغ چک: ${checkAmountValue.toLocaleString()} تومان`;
+                if (checkDeductAmount) checkDeductAmount.innerHTML = `- ${checkAmountValue.toLocaleString()} تومان`;
+                if (checkRow) checkRow.style.display = 'flex';
             } else {
                 checkAmountValue = 0;
-                document.getElementById('fixedCheckAmountDisplay').innerHTML = `مبلغ چک: ۰ تومان`;
-                document.getElementById('checkRow').style.display = 'none';
+                if (fixedCheckAmountDisplay) fixedCheckAmountDisplay.innerHTML = `مبلغ چک: ۰ تومان`;
+                if (checkRow) checkRow.style.display = 'none';
             }
             updateTotal();
         }
@@ -1998,9 +1982,71 @@
         });
         loadProvinces();
         updateCheckDisplay();
+    </script>
 
-        if (window.innerWidth <= 991) initMobileAccordion();
-        window.addEventListener('resize', function() { if (window.innerWidth <= 991) initMobileAccordion(); });
+    <script>
+        // ========== راه‌حل ساده و نهایی برای باز شدن تب‌ها در موبایل ==========
+        // این اسکریپت عمداً در تگ <script> جداگانه قرار گرفته تا مستقل از بقیه کدها
+        // اجرا شود؛ اگر خطایی در اسکریپت‌های دیگر رخ دهد، باز/بسته شدن تب‌ها
+        // همچنان کار می‌کند.
+        (function() {
+            // فقط در موبایل اجرا شود
+            if (window.innerWidth > 991) return;
+
+            // پیدا کردن همه تب‌ها
+            var sections = document.querySelectorAll('.mobile-accordion-section');
+            if (!sections.length) return;
+
+            // اولین تب (اطلاعات شخصی) را باز کن
+            var firstToggle = sections[0].querySelector('.accordion-toggle');
+            var firstContent = sections[0].querySelector('.accordion-content');
+            if (firstToggle) firstToggle.classList.add('active');
+            if (firstContent) firstContent.classList.add('active');
+
+            // برای هر تب، رویداد کلیک را تنظیم کن
+            for (var i = 0; i < sections.length; i++) {
+                var toggle = sections[i].querySelector('.accordion-toggle');
+                var content = sections[i].querySelector('.accordion-content');
+
+                if (!toggle || !content) continue;
+
+                // جلوگیری از ثبت چندباره
+                if (toggle._listenerAdded) continue;
+                toggle._listenerAdded = true;
+
+                toggle.addEventListener('click', function(e) {
+                    // پیدا کردن تب مربوطه
+                    var parentSection = this.closest('.mobile-accordion-section');
+                    if (!parentSection) return;
+
+                    var targetContent = parentSection.querySelector('.accordion-content');
+                    var targetToggle = parentSection.querySelector('.accordion-toggle');
+
+                    if (!targetContent || !targetToggle) return;
+
+                    // اگر این تب باز است، آن را ببند
+                    if (targetContent.classList.contains('active')) {
+                        targetContent.classList.remove('active');
+                        targetToggle.classList.remove('active');
+                    } else {
+                        // بستن همه تب‌ها
+                        var allContents = document.querySelectorAll('.mobile-accordion-section .accordion-content');
+                        var allToggles = document.querySelectorAll('.mobile-accordion-section .accordion-toggle');
+
+                        for (var j = 0; j < allContents.length; j++) {
+                            allContents[j].classList.remove('active');
+                        }
+                        for (var j = 0; j < allToggles.length; j++) {
+                            allToggles[j].classList.remove('active');
+                        }
+
+                        // باز کردن تب فعلی
+                        targetContent.classList.add('active');
+                        targetToggle.classList.add('active');
+                    }
+                });
+            }
+        })();
     </script>
 </body>
 </html>
