@@ -16,6 +16,7 @@
         <h3 id="panelName">محسن کیوانی</h3>
         <p id="panelBio">دکو اس دکوراسیون | عضو طلایی</p>
     </div>
+
     <!-- کارت سکه‌ها (جایگزین امتیاز) -->
     <div class="points-card">
         <div class="points-amount" id="panelCoins">۰</div>
@@ -134,10 +135,11 @@ async function loadUserDashboard() {
     }
 }
 
+
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
+    // فقط یک بار در ابتدا
     loadUserDashboard();
-    setInterval(loadUserDashboard, 60000);
 
     // آپلود عکس
     const avatarInput = document.getElementById('avatarUploadInput');
@@ -147,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await uploadAvatar(e.target.files[0]);
                 if (result.success) {
                     alert('عکس با موفقیت آپلود شد');
-                    loadUserDashboard();
+                    loadUserDashboard();  // فقط وقتی عکس آپلود می‌شود
                 } else {
                     alert('خطا: ' + result.error);
                 }
