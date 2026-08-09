@@ -176,7 +176,7 @@ class BrandCatalogsView(View):
         if search_query:
             catalogs = catalogs.filter(
                 Q(title__icontains=search_query) |
-                Q(description__icontains=search_query)
+                Q(title__icontains=search_query)  # Catalog فیلد description ندارد، فقط title
             )
 
         if sort_by == 'newest':
@@ -198,7 +198,7 @@ class BrandCatalogsView(View):
                 'id': catalog.id,
                 'title': catalog.title,
                 'slug': catalog.slug,
-                'description': catalog.description,
+                'description': catalog.title,  # استفاده از title به جای description
                 'image': catalog.image,
                 'pdf_file': catalog.files.url if catalog.files and hasattr(catalog.files, 'url') else None,
                 'has_pdf': bool(catalog.files and catalog.files.name),
@@ -225,7 +225,6 @@ class BrandCatalogsView(View):
         cache.set(cache_key, context, timeout=cache_timeout)
 
         return render(request, self.template_name, context)
-
 
 def brand_catalogs_view(request, slug):
     """
@@ -255,7 +254,7 @@ def brand_catalogs_view(request, slug):
             'id': catalog.id,
             'title': catalog.title,
             'slug': catalog.slug,
-            'description': catalog.description,
+            'description': catalog.title,  # استفاده از title به جای description
             'image': catalog.image,
             'pdf_file': catalog.files.url if catalog.files and hasattr(catalog.files, 'url') else None,
             'has_pdf': bool(catalog.files and catalog.files.name),
