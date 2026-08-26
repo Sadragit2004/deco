@@ -52,6 +52,9 @@
         {% block content %}
         {% endblock %}
     </div>
+
+    <!-- فضای خالی مینیمال پایین برای PC و لپ‌تاپ -->
+    <div class="minimal-bottom-space"></div>
 </div>
 
 <div class="mega-overlay-bg" id="megaOverlayBg"></div>
@@ -98,92 +101,34 @@
 </div>
 
 <style>
-    /* منوی موبایل */
-    .mobile-bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(255, 255, 255, 0.96);
-        backdrop-filter: blur(20px);
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        padding: 8px 12px 18px;
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
-        border-top: 1px solid rgba(0, 0, 0, 0.05);
-        z-index: 1000;
+    /* ============================================================
+       BASE - مینیمال و تنفس‌دار
+    ============================================================ */
+    * {
+        -webkit-tap-highlight-color: transparent;
     }
 
-    @media (min-width: 769px) {
-        .mobile-bottom-nav {
-            display: none !important;
-        }
+    html, body {
+        overflow-x: hidden;
+    }
+
+    /* فضای خالی مینیمال پایین در PC و لپ‌تاپ */
+    .minimal-bottom-space {
+        height: 90px;
+        width: 100%;
+        display: block;
+        pointer-events: none;
     }
 
     @media (max-width: 768px) {
-        body {
-            padding-bottom: 70px !important;
+        .minimal-bottom-space {
+            display: none;
         }
     }
 
-    .bottom-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        padding: 6px 8px;
-        border-radius: 40px;
-        background: transparent;
-        flex: 1;
-        text-align: center;
-    }
-
-    .bottom-item i {
-        font-size: 1.3rem;
-        color: #8a9bb0;
-        transition: all 0.2s;
-    }
-
-    .bottom-item span {
-        font-size: 0.65rem;
-        font-weight: 500;
-        color: #8a9bb0;
-        transition: all 0.2s;
-    }
-
-    .bottom-item.active-bottom {
-        background: rgba(230, 126, 34, 0.12);
-    }
-
-    .bottom-item.active-bottom i {
-        color: #e67e22;
-        transform: translateY(-2px);
-    }
-
-    .bottom-item.active-bottom span {
-        color: #e67e22;
-        font-weight: 600;
-    }
-
-    @media (max-width: 480px) {
-        .mobile-bottom-nav {
-            padding: 6px 8px 14px;
-        }
-        .bottom-item i {
-            font-size: 1.2rem;
-        }
-        .bottom-item span {
-            font-size: 0.6rem;
-        }
-        body {
-            padding-bottom: 65px !important;
-        }
-    }
-
-    /* ==================== ساعت دیجیتال - چسبیده به انتهای سایدبار با متن مشکی ==================== */
+    /* ============================================================
+       SIDEBAR
+    ============================================================ */
     .sidebar {
         display: flex;
         flex-direction: column;
@@ -193,10 +138,12 @@
         right: 0;
         bottom: 0;
         overflow-y: auto;
+        overflow-x: hidden;
     }
 
     .nav-menu-side {
         flex: 1;
+        padding-bottom: 10px;
     }
 
     .sidebar-footer-clock {
@@ -253,221 +200,216 @@
         }
     }
 
-
-    /* ========== سایدبار شیشه‌ای فقط برای موبایل ========== */
-@media (max-width: 768px) {
-    .sidebar {
-        background: transparent !important;
-        backdrop-filter: blur(30px) saturate(180%) !important;
-        -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
-        border-left: 1px solid rgba(255, 255, 255, 0.25) !important;
-        border-right: none !important;
-        box-shadow:
-            -8px 0 40px rgba(0, 0, 0, 0.08),
-            inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
-    }
-
-    /* لوگو و نوشته‌ها - همیشه سفید با سایه */
-    .sidebar .logo-text-side h2 {
-        color: #ffffff !important;
-        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3) !important;
-    }
-
-    .sidebar .logo-text-side span {
-        color: rgba(255, 255, 255, 0.8) !important;
-        text-shadow: 0 1px 10px rgba(0, 0, 0, 0.2) !important;
-    }
-
-    /* آیتم‌های منو - شیشه‌ای روی بک‌گراند شفاف */
-    .sidebar .nav-item-side {
-        color: rgba(255, 255, 255, 0.95) !important;
-        background: rgba(255, 255, 255, 0.06) !important;
-        backdrop-filter: blur(4px) !important;
-        -webkit-backdrop-filter: blur(4px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.10) !important;
-        border-radius: 14px !important;
-        margin-bottom: 6px !important;
-        transition: all 0.3s ease !important;
-        text-shadow: 0 1px 8px rgba(0, 0, 0, 0.15) !important;
-    }
-
-    .sidebar .nav-item-side:hover {
-        background: rgba(255, 255, 255, 0.15) !important;
-        border-color: rgba(255, 255, 255, 0.25) !important;
-        transform: translateX(-4px) !important;
-        box-shadow: 0 4px 25px rgba(255, 255, 255, 0.05) !important;
-    }
-
-    .sidebar .nav-item-side i {
-        color: rgba(255, 255, 255, 0.9) !important;
-    }
-
-    /* ساعت دیجیتال پایین - کاملاً شیشه‌ای بدون بک‌گراند */
-    .sidebar .sidebar-footer-clock {
-        background: rgba(255, 255, 255, 0.05) !important;
-        backdrop-filter: blur(16px) !important;
-        -webkit-backdrop-filter: blur(16px) !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
-        border-radius: 16px 16px 0 0 !important;
-        margin: 8px !important;
-        padding: 16px 12px !important;
-        box-shadow: none !important;
-    }
-
-    .sidebar .clock-time {
-        color: #ffffff !important;
-        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3) !important;
-    }
-
-    .sidebar .clock-date {
-        color: rgba(255, 255, 255, 0.75) !important;
-    }
-
-    .sidebar .clock-date #dayName {
-        background: rgba(255, 255, 255, 0.08) !important;
-        color: #ffffff !important;
-        backdrop-filter: blur(4px) !important;
-        -webkit-backdrop-filter: blur(4px) !important;
-    }
-
-    .sidebar .clock-date #persianDate {
-        color: rgba(255, 255, 255, 0.8) !important;
-    }
-
-    /* اسکرول‌بار - شفاف */
+    /* اسکرول‌بار نرم */
     .sidebar::-webkit-scrollbar {
-        width: 3px;
+        width: 4px;
     }
-
     .sidebar::-webkit-scrollbar-track {
-        background: transparent !important;
+        background: transparent;
     }
-
     .sidebar::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.1);
         border-radius: 10px;
     }
-}
-
-/* ============================================ */
-/* منوی پایین موبایل - گلس مورفیسم با کنتراست بالا */
-/* ============================================ */
-
-@media (max-width: 768px) {
-    .mobile-bottom-nav {
-        position: fixed !important;
-        bottom: 16px !important;
-        left: 16px !important;
-        right: 16px !important;
-        width: auto !important;
-        max-width: none !important;
-        transform: none !important;
-        background: rgba(20, 20, 30, 0.45) !important;
-        backdrop-filter: blur(32px) saturate(180%) !important;
-        -webkit-backdrop-filter: blur(32px) saturate(180%) !important;
-        border-radius: 30px !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        box-shadow:
-            0 8px 40px rgba(0, 0, 0, 0.25),
-            inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
-        display: flex !important;
-        justify-content: space-around !important;
-        align-items: center !important;
-        padding: 6px 6px !important;
-
-        transition: all 0.3s ease !important;
-        margin: 0 !important;
+    .sidebar::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.2);
     }
 
-    .bottom-item {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 2px !important;
-        cursor: pointer !important;
-        padding: 6px 10px !important;
-        border-radius: 20px !important;
-        background: transparent !important;
-        transition: all 0.3s ease !important;
-        flex: 1 !important;
-        border: none !important;
-        position: relative !important;
-        min-height: 44px !important;
+
+    /* ============================================================
+       MOBILE SIDEBAR
+    ============================================================ */
+    @media (max-width: 768px) {
+        .sidebar {
+            background: rgba(20, 20, 30, 0.55) !important;
+            backdrop-filter: blur(30px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+            border-left: 1px solid rgba(255, 255, 255, 0.12) !important;
+            border-right: none !important;
+            box-shadow: -8px 0 40px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .sidebar.open-mobile {
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .sidebar .logo-text-side h2 {
+            color: #ffffff !important;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        .sidebar .logo-text-side span {
+            color: rgba(255, 255, 255, 0.8) !important;
+            text-shadow: 0 1px 10px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .sidebar .nav-menu-side {
+            padding: 8px 10px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sidebar .nav-item-side {
+            color: rgba(255, 255, 255, 0.95) !important;
+            background: rgba(255, 255, 255, 0.06) !important;
+            backdrop-filter: blur(4px) !important;
+            -webkit-backdrop-filter: blur(4px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 14px !important;
+            padding: 13px 16px !important;
+            font-size: 0.95rem !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            transition: all 0.25s ease !important;
+            margin: 0 !important;
+            min-height: 48px;
+        }
+
+        .sidebar .nav-item-side i {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-size: 1.05rem;
+            width: 22px;
+            text-align: center;
+        }
+
+        .sidebar .nav-item-side:hover,
+        .sidebar .nav-item-side:active {
+            background: rgba(255, 255, 255, 0.14) !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            transform: translateX(-3px) !important;
+        }
+
+        .sidebar .sidebar-footer-clock {
+            display: none !important;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 3px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent !important;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+        }
     }
 
-    .bottom-item i {
-        font-size: 1.2rem !important;
-        color: rgba(255, 255, 255, 0.85) !important;
-        transition: all 0.3s ease !important;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-    }
 
-    .bottom-item span {
-        font-size: 0.55rem !important;
-        font-weight: 500 !important;
-        color: rgba(255, 255, 255, 0.75) !important;
-        transition: all 0.3s ease !important;
-        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
-    }
-
-    /* حالت فعال */
-    .bottom-item.active-bottom {
-        background: rgba(255, 255, 255, 0.15) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.2),
-            0 4px 20px rgba(0, 0, 0, 0.15) !important;
-    }
-
-    .bottom-item.active-bottom i {
-        color: #000000 !important;
-        transform: scale(1.1) !important;
-        text-shadow: 0 0 30px rgba(255, 255, 255, 0.4) !important;
-    }
-
-    .bottom-item.active-bottom span {
-        color: #ffffff !important;
-        font-weight: 600 !important;
-        text-shadow: 0 0 20px rgba(255, 255, 255, 0.2) !important;
-    }
-
-    /* خط نورانی زیر آیتم فعال */
-    .bottom-item.active-bottom::after {
-        content: '' !important;
-        position: absolute !important;
-        bottom: 2px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        width: 16px !important;
-        height: 2.5px !important;
-        background: #ffffff !important;
-        border-radius: 10px !important;
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.6) !important;
-    }
-
-    /* هوور */
-    .bottom-item:hover {
-        background: rgba(255, 255, 255, 0.05) !important;
-    }
-
-    .bottom-item:hover i {
-        color: rgba(255, 255, 255, 0.95) !important;
-    }
-
-    /* صفحه‌های خیلی کوچک */
-    @media (max-width: 400px) {
+    /* ============================================================
+       MOBILE BOTTOM NAV - مینیمال و بهینه
+    ============================================================ */
+    @media (max-width: 768px) {
         .mobile-bottom-nav {
-            padding: 4px 2px !important;
-            bottom: 12px !important;
-            left: 12px !important;
-            right: 12px !important;
-            border-radius: 24px !important;
+            position: fixed !important;
+            bottom: 14px !important;
+            left: 14px !important;
+            right: 14px !important;
+            width: auto !important;
+            max-width: none !important;
+            transform: none !important;
+            background: rgba(18, 18, 28, 0.55) !important;
+            backdrop-filter: blur(28px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+            border-radius: 26px !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            box-shadow:
+                0 6px 30px rgba(0, 0, 0, 0.22),
+                inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+            display: flex !important;
+            justify-content: space-around !important;
+            align-items: center !important;
+            padding: 6px 4px !important;
+            gap: 2px !important;
+            transition: all 0.3s ease !important;
+            margin: 0 !important;
+            z-index: 1000 !important;
         }
 
         .bottom-item {
-            padding: 4px 6px !important;
-            min-height: 38px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 2px !important;
+            cursor: pointer !important;
+            padding: 7px 4px !important;
+            border-radius: 18px !important;
+            background: transparent !important;
+            transition: all 0.25s ease !important;
+            flex: 1 1 0 !important;
+            min-width: 0 !important;
+            border: none !important;
+            position: relative !important;
+            min-height: 46px !important;
+        }
+
+        .bottom-item i {
+            font-size: 1.15rem !important;
+            color: rgba(255, 255, 255, 0.85) !important;
+            transition: all 0.25s ease !important;
+        }
+
+        .bottom-item span {
+            font-size: 0.6rem !important;
+            font-weight: 500 !important;
+            color: rgba(255, 255, 255, 0.7) !important;
+            transition: all 0.25s ease !important;
+            white-space: nowrap !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .bottom-item.active-bottom {
+            background: rgba(255, 255, 255, 0.12) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        }
+
+        .bottom-item.active-bottom i {
+            color: #ffffff !important;
+            transform: scale(1.08) !important;
+        }
+
+        .bottom-item.active-bottom span {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+
+        .bottom-item.active-bottom::after {
+            content: '' !important;
+            position: absolute !important;
+            bottom: 3px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 14px !important;
+            height: 2px !important;
+            background: #ffffff !important;
+            border-radius: 10px !important;
+        }
+
+        body {
+            padding-bottom: 80px !important;
+        }
+    }
+
+    /* موبایل کوچک */
+    @media (max-width: 420px) {
+        .mobile-bottom-nav {
+            bottom: 10px !important;
+            left: 10px !important;
+            right: 10px !important;
+            padding: 5px 3px !important;
+            border-radius: 22px !important;
+        }
+
+        .bottom-item {
+            padding: 5px 2px !important;
+            min-height: 42px !important;
+            gap: 1px !important;
         }
 
         .bottom-item i {
@@ -475,27 +417,48 @@
         }
 
         .bottom-item span {
-            font-size: 0.45rem !important;
+            font-size: 0.52rem !important;
         }
 
         .bottom-item.active-bottom::after {
-            width: 12px !important;
+            width: 10px !important;
             height: 2px !important;
+        }
+
+        body {
+            padding-bottom: 72px !important;
         }
     }
 
-    /* جا به جایی بدنه */
-    body {
-        padding-bottom: 80px !important;
-    }
-}
+    /* موبایل خیلی کوچک */
+    @media (max-width: 360px) {
+        .mobile-bottom-nav {
+            bottom: 8px !important;
+            left: 8px !important;
+            right: 8px !important;
+            padding: 4px 2px !important;
+        }
 
-/* مخفی کردن در دسکتاپ */
-@media (min-width: 769px) {
-    .mobile-bottom-nav {
-        display: none !important;
+        .bottom-item {
+            padding: 4px 1px !important;
+            min-height: 40px !important;
+        }
+
+        .bottom-item i {
+            font-size: 0.95rem !important;
+        }
+
+        .bottom-item span {
+            font-size: 0.48rem !important;
+        }
     }
-}
+
+    /* مخفی در دسکتاپ */
+    @media (min-width: 769px) {
+        .mobile-bottom-nav {
+            display: none !important;
+        }
+    }
 </style>
 
 <script>
@@ -589,76 +552,76 @@
 
 <script>
     // ============================================
-// راه‌اندازی منو همبرگری و نوتیف - مخصوص هدر شما
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    // دکمه همبرگری (با آیدی mobileMenuBtn)
-    const menuBtn = document.getElementById('mobileMenuBtn');
-    const sidebar = document.getElementById('sidebarDesktop');
-    const overlay = document.getElementById('megaOverlayBg');
+    // راه‌اندازی منو همبرگری، نوتیف و سبد خرید
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        // دکمه همبرگری
+        const menuBtn = document.getElementById('mobileMenuBtn');
+        const sidebar = document.getElementById('sidebarDesktop');
+        const overlay = document.getElementById('megaOverlayBg');
 
-    if (menuBtn && sidebar && overlay) {
-        menuBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            sidebar.classList.toggle('open-mobile');
-            overlay.classList.toggle('active');
-            document.body.style.overflow = sidebar.classList.contains('open-mobile') ? 'hidden' : '';
-        });
+        if (menuBtn && sidebar && overlay) {
+            menuBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                sidebar.classList.toggle('open-mobile');
+                overlay.classList.toggle('active');
+                document.body.style.overflow = sidebar.classList.contains('open-mobile') ? 'hidden' : '';
+            });
 
-        overlay.addEventListener('click', function() {
-            sidebar.classList.remove('open-mobile');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-    }
-
-    // دکمه نوتیفیکیشن (با آیدی notifIcon)
-    const notifBtn = document.getElementById('notifIcon');
-    const notifPanel = document.getElementById('notifPanel');
-    const closeNotif = document.getElementById('closeNotif');
-
-    if (notifBtn && notifPanel) {
-        notifBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            notifPanel.classList.toggle('active');
-            if (overlay) overlay.classList.toggle('active');
-            document.body.style.overflow = notifPanel.classList.contains('active') ? 'hidden' : '';
-        });
-
-        if (closeNotif) {
-            closeNotif.addEventListener('click', function() {
-                notifPanel.classList.remove('active');
-                if (overlay) overlay.classList.remove('active');
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('open-mobile');
+                overlay.classList.remove('active');
                 document.body.style.overflow = '';
             });
         }
-    }
 
-    // دکمه سبد خرید (با آیدی cartIcon)
-    const cartBtn = document.getElementById('cartIcon');
-    const cartPanel = document.getElementById('cartPanel');
-    const closeCart = document.getElementById('closeCart');
+        // دکمه نوتیفیکیشن
+        const notifBtn = document.getElementById('notifIcon');
+        const notifPanel = document.getElementById('notifPanel');
+        const closeNotif = document.getElementById('closeNotif');
 
-    if (cartBtn && cartPanel) {
-        cartBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            cartPanel.classList.toggle('active');
-            if (overlay) overlay.classList.toggle('active');
-            document.body.style.overflow = cartPanel.classList.contains('active') ? 'hidden' : '';
-            if (typeof loadCartFromAPI === 'function') {
-                loadCartFromAPI();
+        if (notifBtn && notifPanel) {
+            notifBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notifPanel.classList.toggle('active');
+                if (overlay) overlay.classList.toggle('active');
+                document.body.style.overflow = notifPanel.classList.contains('active') ? 'hidden' : '';
+            });
+
+            if (closeNotif) {
+                closeNotif.addEventListener('click', function() {
+                    notifPanel.classList.remove('active');
+                    if (overlay) overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
             }
-        });
-
-        if (closeCart) {
-            closeCart.addEventListener('click', function() {
-                cartPanel.classList.remove('active');
-                if (overlay) overlay.classList.remove('active');
-                document.body.style.overflow = '';
-            });
         }
-    }
-});
+
+        // دکمه سبد خرید
+        const cartBtn = document.getElementById('cartIcon');
+        const cartPanel = document.getElementById('cartPanel');
+        const closeCart = document.getElementById('closeCart');
+
+        if (cartBtn && cartPanel) {
+            cartBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                cartPanel.classList.toggle('active');
+                if (overlay) overlay.classList.toggle('active');
+                document.body.style.overflow = cartPanel.classList.contains('active') ? 'hidden' : '';
+                if (typeof loadCartFromAPI === 'function') {
+                    loadCartFromAPI();
+                }
+            });
+
+            if (closeCart) {
+                closeCart.addEventListener('click', function() {
+                    cartPanel.classList.remove('active');
+                    if (overlay) overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+        }
+    });
 </script>
 </body>
 </html>

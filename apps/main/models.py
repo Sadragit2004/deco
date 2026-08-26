@@ -1,14 +1,18 @@
 # models.py
 
 from django.db import models
+from django.conf import settings
 from django.utils import timezone
 from django.core.validators import FileExtensionValidator
 from django.core.exceptions import ValidationError
 
+
+# =========================================================
+# مدل اسلایدر
+# =========================================================
 class Slider(models.Model):
     """مدل اسلایدر اصلی"""
 
-    # فیلدهای اصلی
     title = models.CharField(
         max_length=200,
         verbose_name="عنوان",
@@ -22,7 +26,10 @@ class Slider(models.Model):
         help_text="توضیحات کوتاه برای اسلایدر"
     )
 
-    isdiscount = models.BooleanField(default=False,verbose_name='حراجی ها')
+    isdiscount = models.BooleanField(
+        default=False,
+        verbose_name="حراجی ها"
+    )
 
     is_active = models.BooleanField(
         default=True,
@@ -30,7 +37,6 @@ class Slider(models.Model):
         help_text="آیا این اسلایدر نمایش داده شود؟"
     )
 
-    # فیلدهای عکس
     image_pc = models.ImageField(
         upload_to='slider/pc/%Y/%m/',
         verbose_name="عکس برای پی‌سی",
@@ -49,7 +55,6 @@ class Slider(models.Model):
         ]
     )
 
-    # فیلدهای تاریخ
     start_date = models.DateTimeField(
         default=timezone.now,
         verbose_name="تاریخ شروع",
@@ -63,7 +68,6 @@ class Slider(models.Model):
         help_text="تا چه تاریخی نمایش داده شود؟ (اختیاری)"
     )
 
-    # فیلد لینک
     link = models.URLField(
         max_length=500,
         verbose_name="لینک مورد نظر",
@@ -72,7 +76,6 @@ class Slider(models.Model):
         help_text="لینک هدایت کاربر پس از کلیک روی اسلایدر"
     )
 
-    # فیلدهای اضافی برای مدیریت بهتر
     order = models.PositiveIntegerField(
         default=0,
         verbose_name="ترتیب نمایش",
@@ -102,12 +105,10 @@ class Slider(models.Model):
         return self.title
 
     def clean(self):
-        """اعتبارسنجی تاریخ‌ها"""
         if self.end_date and self.start_date > self.end_date:
             raise ValidationError({'end_date': 'تاریخ پایان باید بزرگتر از تاریخ شروع باشد.'})
 
     def is_available(self):
-        """بررسی آیا اسلایدر در تاریخ فعلی فعال است"""
         now = timezone.now()
         is_date_valid = self.start_date <= now
         if self.end_date:
@@ -115,36 +116,26 @@ class Slider(models.Model):
         return self.is_active and is_date_valid
 
     def save(self, *args, **kwargs):
-        """ذخیره خودکار با اعتبارسنجی"""
         self.clean()
         super().save(*args, **kwargs)
 
     def get_image_pc_url(self):
-        """دریافت لینک عکس پی‌سی"""
         if self.image_pc:
             return self.image_pc.url
         return '/static/images/default-slider-pc.jpg'
 
     def get_image_mobile_url(self):
-        """دریافت لینک عکس موبایل"""
         if self.image_mobile:
             return self.image_mobile.url
         return '/static/images/default-slider-mobile.jpg'
 
 
-
-# models.py
-
-# apps/portfolio/models.py
-
-from django.db import models
-from django.conf import settings
-
-
+# =========================================================
+# مدل نمونه کار
+# =========================================================
 class Portfolio(models.Model):
-    """
-    مدل نمونه کار با وضعیت تایید
-    """
+    """مدل نمونه کار با وضعیت تایید"""
+
     title = models.CharField(max_length=200, verbose_name="عنوان")
     description = models.TextField(verbose_name="توضیحات")
     user = models.ForeignKey(
@@ -153,7 +144,7 @@ class Portfolio(models.Model):
         related_name="portfolios",
         verbose_name="کاربر مربوطه"
     )
-    
+
     is_active = models.BooleanField(
         default=False,
         verbose_name="تایید شده",
@@ -172,18 +163,28 @@ class Portfolio(models.Model):
         return f"{self.title} - {'تایید شده' if self.is_active else 'در انتظار تایید'}"
 
 
+# =========================================================
+# مدل گالری نمونه کار
+# =========================================================
 class PortfolioGallery(models.Model):
-    """
-    گالری عکس‌های نمونه کار
-    """
+    """گالری عکس‌های نمونه کار"""
+
     portfolio = models.ForeignKey(
         Portfolio,
         on_delete=models.CASCADE,
         related_name="gallery",
         verbose_name="نمونه کار"
     )
-    image = models.ImageField(upload_to='portfolio/gallery/%Y/%m/', verbose_name="عکس")
-    sort_order = models.IntegerField(default=0, verbose_name="ترتیب نمایش")
+
+    image = models.ImageField(
+        upload_to='portfolio/gallery/%Y/%m/',
+        verbose_name="عکس"
+    )
+
+    sort_order = models.IntegerField(
+        default=0,
+        verbose_name="ترتیب نمایش"
+    )
 
     class Meta:
         verbose_name = "عکس گالری"
@@ -192,3 +193,51 @@ class PortfolioGallery(models.Model):
 
     def __str__(self):
         return f"عکس برای {self.portfolio.title}"
+
+
+# =========================================================
+# مدل آهنگ (Music)
+# =========================================================
+class Music(models.Model):
+    """مدل ساده برای ذخیره آهنگ"""
+
+    title = models.CharField(
+        max_length=200,
+        verbose_name="عنوان آهنگ"
+    )
+
+    artist = models.CharField(
+        max_length=200,
+        verbose_name="خواننده"
+    )
+
+    audio_file = models.FileField(
+        upload_to='music/%Y/%m/',
+        verbose_name="فایل صوتی",
+        validators=[
+            FileExtensionValidator(allowed_extensions=['mp3', 'wav', 'ogg', 'm4a'])
+        ]
+    )
+
+    cover = models.ImageField(
+        upload_to='music/covers/%Y/%m/',
+        verbose_name="کاور",
+        blank=True,
+        null=True,
+        validators=[
+            FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])
+        ]
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="تاریخ ایجاد"
+    )
+
+    class Meta:
+        verbose_name = "آهنگ"
+        verbose_name_plural = "آهنگ‌ها"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.title} - {self.artist}"

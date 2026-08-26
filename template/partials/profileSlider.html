@@ -1,4 +1,52 @@
 <div class="slide-panel" id="profilePanel">
+
+    <!-- ============================================================
+         🎵 موزیک پلیر - بالای پنل
+    ============================================================ -->
+    <div class="mini-music-player" id="miniMusicPlayer">
+        <div class="mini-music-header">
+            <span><i class="fas fa-music"></i> پخش موسیقی</span>
+            <button type="button" class="mini-music-toggle" id="miniMusicToggle" title="باز/بسته">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+
+        <div class="mini-music-body" id="miniMusicBody">
+            <!-- کاور و اطلاعات -->
+            <div class="mini-music-info">
+                <img id="miniCover" src="/media/images/nophoto.png" alt="cover">
+                <div class="mini-music-text">
+                    <div id="miniTitle" class="mini-music-title">آهنگی انتخاب نشده</div>
+                    <div id="miniArtist" class="mini-music-artist">—</div>
+                </div>
+            </div>
+
+            <!-- نوار پیشرفت -->
+            <div class="mini-progress" id="miniProgress">
+                <div class="mini-progress-fill" id="miniProgressFill"></div>
+            </div>
+
+            <!-- کنترل‌ها -->
+            <div class="mini-controls">
+                <button type="button" id="miniPrev"><i class="fas fa-backward"></i></button>
+                <button type="button" id="miniPlay" class="mini-play-btn"><i class="fas fa-play"></i></button>
+                <button type="button" id="miniNext"><i class="fas fa-forward"></i></button>
+            </div>
+
+            <!-- لیست آهنگ‌ها -->
+            <div class="mini-music-list" id="miniMusicList">
+                <div class="mini-music-loading">در حال بارگذاری...</div>
+            </div>
+        </div>
+
+        <!-- المنت صوتی مخفی -->
+        <audio id="miniAudio" preload="none"></audio>
+    </div>
+    <!-- ============================================================
+         پایان موزیک پلیر
+    ============================================================ -->
+
+
     <div style="display:flex; justify-content:space-between; margin-bottom:24px; align-items:center;">
         <h3 style="font-size:1.6rem; font-weight:800; background:linear-gradient(135deg, var(--primary), var(--primary-dark)); -webkit-background-clip:text; background-clip:text; color:transparent;">پنل کاربری</h3>
         <div id="closeProfile" style="cursor:pointer; width:40px; height:40px; background:rgba(255,255,255,0.8); border-radius:14px; display:flex; align-items:center; justify-content:center; box-shadow:var(--glass-shadow); transition:0.2s;"><i class="fas fa-times" style="font-size:1.2rem; color:var(--text-medium);"></i></div>
@@ -17,7 +65,7 @@
         <p id="panelBio">دکو اس دکوراسیون | عضو طلایی</p>
     </div>
 
-    <!-- کارت سکه‌ها (جایگزین امتیاز) -->
+    <!-- کارت سکه‌ها -->
     <div class="points-card">
         <div class="points-amount" id="panelCoins">۰</div>
         <div class="points-label">سکه‌های B2B</div>
@@ -27,7 +75,7 @@
         </div>
     </div>
 
-    <!-- کارت کیف پول (اضافه شد) -->
+    <!-- کارت کیف پول -->
     <div class="points-card" style="background: linear-gradient(135deg, #e8f4fd, #d6eeff); margin-top: 12px;">
         <div class="points-amount" id="panelWalletBalance" style="color: #2980b9;">۰</div>
         <div class="points-label" style="color: #2980b9;">موجودی کیف پول (تومان)</div>
@@ -55,118 +103,439 @@
     </div>
 </div>
 
+<!-- ============================================================
+     استایل موزیک پلیر
+============================================================ -->
+<style>
+    .mini-music-player {
+        background: #f8f9fa;
+        border: 1px solid #e8e8ee;
+        border-radius: 14px;
+        padding: 10px 12px;
+        margin-bottom: 16px;
+    }
+
+    .mini-music-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .mini-music-header i {
+        color: #7f5af0;
+        margin-left: 4px;
+    }
+
+    .mini-music-toggle {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: #666;
+        font-size: 0.9rem;
+        padding: 4px 8px;
+        border-radius: 8px;
+        transition: background 0.2s;
+    }
+
+    .mini-music-toggle:hover {
+        background: #ececf2;
+    }
+
+    .mini-music-body {
+        max-height: 500px;
+        overflow: hidden;
+        transition: max-height 0.3s ease, opacity 0.2s ease;
+        opacity: 1;
+    }
+
+    .mini-music-body.collapsed {
+        max-height: 0;
+        opacity: 0;
+    }
+
+    .mini-music-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .mini-music-info img {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        object-fit: cover;
+        flex-shrink: 0;
+        background: #e8e8ee;
+    }
+
+    .mini-music-text {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .mini-music-title {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #222;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mini-music-artist {
+        font-size: 0.7rem;
+        color: #888;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mini-progress {
+        width: 100%;
+        height: 4px;
+        background: #e4e4ee;
+        border-radius: 10px;
+        cursor: pointer;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+
+    .mini-progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #7f5af0, #2cb67d);
+        border-radius: 10px;
+    }
+
+    .mini-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .mini-controls button {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        color: #555;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .mini-controls button:hover {
+        background: #ececf2;
+        color: #7f5af0;
+    }
+
+    .mini-controls .mini-play-btn {
+        background: linear-gradient(135deg, #7f5af0, #2cb67d);
+        color: #fff;
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .mini-controls .mini-play-btn:hover {
+        color: #fff;
+        transform: scale(1.05);
+    }
+
+    .mini-music-list {
+        max-height: 130px;
+        overflow-y: auto;
+        border-top: 1px solid #ececf2;
+        padding-top: 6px;
+    }
+
+    .mini-music-list::-webkit-scrollbar {
+        width: 4px;
+    }
+    .mini-music-list::-webkit-scrollbar-thumb {
+        background: #d0d0da;
+        border-radius: 10px;
+    }
+
+    .mini-music-loading,
+    .mini-music-empty {
+        text-align: center;
+        font-size: 0.72rem;
+        color: #999;
+        padding: 10px 0;
+    }
+
+    .mini-music-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+    .mini-music-item:hover {
+        background: #f0f0f7;
+    }
+
+    .mini-music-item.active {
+        background: #ede8ff;
+    }
+
+    .mini-music-item img {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .mini-music-item-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .mini-music-item-title {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mini-music-item-artist {
+        font-size: 0.62rem;
+        color: #999;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mini-music-item i {
+        font-size: 0.7rem;
+        color: #bbb;
+    }
+
+    .mini-music-item.active i {
+        color: #7f5af0;
+    }
+</style>
+
+
+<!-- ============================================================
+     اسکریپت موزیک پلیر
+============================================================ -->
 <script>
-// آپلود عکس
-async function uploadAvatar(file) {
-    const formData = new FormData();
-    formData.append('avatar', file);
-    const res = await fetch('/accounts/api/user/upload-avatar/', {
-        method: 'POST',
-        body: formData
-    });
-    return res.json();
-}
+(function () {
+    'use strict';
 
-// تابع اصلی بارگذاری
-async function loadUserDashboard() {
-    try {
-        const response = await fetch('/accounts/api/user/dashboard/');
-        const result = await response.json();
+    // المنت‌ها
+    const audio        = document.getElementById('miniAudio');
+    const cover        = document.getElementById('miniCover');
+    const titleEl      = document.getElementById('miniTitle');
+    const artistEl     = document.getElementById('miniArtist');
+    const playBtn      = document.getElementById('miniPlay');
+    const prevBtn      = document.getElementById('miniPrev');
+    const nextBtn      = document.getElementById('miniNext');
+    const listEl       = document.getElementById('miniMusicList');
+    const progressEl   = document.getElementById('miniProgress');
+    const progressFill = document.getElementById('miniProgressFill');
+    const toggleBtn    = document.getElementById('miniMusicToggle');
+    const bodyEl       = document.getElementById('miniMusicBody');
 
-        if (result.success) {
-            const data = result.data;
+    // حالت
+    let musics = [];
+    let currentIndex = -1;
+    let isLoaded = false;
 
-            // ========== به‌روزرسانی هدر (points-info) ==========
-            const pointsInfo = document.querySelector('.points-info');
-            if (pointsInfo) {
-                pointsInfo.innerHTML = `
-                    <div class="coins-section">
-                        <i class="fas fa-coins"></i>
-                        <span>B2B</span>
-                        <span id="coinsValue">${data.loyalty?.total_coins_display || '۰'}</span>
-                        <span>سکه</span>
-                    </div>
-                    <div class="wallet-section">
-                        <i class="fas fa-wallet"></i>
-                        <span id="walletValue">${data.wallet?.balance_display || '۰'}</span>
-                        <span>تومان</span>
-                    </div>
-                `;
+    // ========== بارگذاری لیست فقط یک بار ==========
+    async function loadMusics() {
+        if (isLoaded) return;
+        try {
+            const res = await fetch('/api/musics/');
+            const data = await res.json();
+
+            if (!data.success || !data.musics || !data.musics.length) {
+                listEl.innerHTML = '<div class="mini-music-empty">هیچ آهنگی موجود نیست</div>';
+                isLoaded = true;
+                return;
             }
 
-            // ========== به‌روزرسانی پنل کاربری ==========
-            // نام و بیو
-            document.getElementById('panelName').textContent = data.user.full_name;
-            document.getElementById('panelBio').innerHTML = `${data.user.mobile} | عضو ${data.loyalty.current_tier_display}`;
-
-            // سکه‌ها (به جای امتیاز)
-            document.getElementById('panelCoins').textContent = data.loyalty.total_coins_display || '۰';
-
-            // موجودی کیف پول
-            document.getElementById('panelWalletBalance').textContent = data.wallet.balance_display || '۰';
-
-            // آمار دیگر
-            document.getElementById('activeOrders').innerHTML = `${data.stats.active_orders_count} سفارش`;
-            document.getElementById('totalPurchase').innerHTML = `${data.stats.total_purchase_display} تومان`;
-            document.getElementById('membershipLevel').innerHTML = `<i class="fas fa-crown" style="color:var(--primary);"></i> ${data.stats.membership_level}`;
-            document.getElementById('discountPercent').innerHTML = data.stats.special_discount;
-
-            // آپدیت عکس
-            if (data.user.avatar_url) {
-                document.getElementById('panelAvatarImg').src = data.user.avatar_url + '?t=' + new Date().getTime();
-                const headerImg = document.querySelector('.user-info img');
-                if (headerImg) headerImg.src = data.user.avatar_url + '?t=' + new Date().getTime();
-            }
-
-            // آپدیت نام کاربر در هدر
-            const userNameSpan = document.getElementById('userName');
-            if (userNameSpan) {
-                userNameSpan.textContent = data.user.full_name;
-            }
-
-            // آپدیت سطح کاربر در هدر
-            const tierValue = document.getElementById('tierValue');
-            if (tierValue) {
-                tierValue.textContent = data.loyalty.current_tier_display;
-            }
+            musics = data.musics;
+            renderList();
+            isLoaded = true;
+        } catch (err) {
+            console.error('Music load error:', err);
+            listEl.innerHTML = '<div class="mini-music-empty">خطا در بارگذاری</div>';
         }
-    } catch (error) {
-        console.error('خطا:', error);
-    }
-}
-
-
-// Event Listeners
-document.addEventListener('DOMContentLoaded', function() {
-    // فقط یک بار در ابتدا
-    loadUserDashboard();
-
-    // آپلود عکس
-    const avatarInput = document.getElementById('avatarUploadInput');
-    if (avatarInput) {
-        avatarInput.onchange = async (e) => {
-            if (e.target.files[0]) {
-                const result = await uploadAvatar(e.target.files[0]);
-                if (result.success) {
-                    alert('عکس با موفقیت آپلود شد');
-                    loadUserDashboard();  // فقط وقتی عکس آپلود می‌شود
-                } else {
-                    alert('خطا: ' + result.error);
-                }
-            }
-        };
     }
 
-    // پنل پروفایل
-    const panel = document.getElementById('profilePanel');
-    const trigger = document.getElementById('profileTriggerTop');
-    const closePanel = document.getElementById('closeProfile');
+    // ========== رندر لیست ==========
+    function renderList() {
+        const frag = document.createDocumentFragment();
 
-    if (trigger) {
-        trigger.onclick = () => panel.classList.add('open');
+        musics.forEach((m, i) => {
+            const item = document.createElement('div');
+            item.className = 'mini-music-item';
+            item.dataset.index = i;
+
+            const img = document.createElement('img');
+            img.loading = 'lazy';
+            img.src = m.cover || '/media/images/nophoto.png';
+            img.alt = m.title;
+
+            const info = document.createElement('div');
+            info.className = 'mini-music-item-info';
+
+            const t = document.createElement('div');
+            t.className = 'mini-music-item-title';
+            t.textContent = m.title;
+
+            const a = document.createElement('div');
+            a.className = 'mini-music-item-artist';
+            a.textContent = m.artist;
+
+            info.appendChild(t);
+            info.appendChild(a);
+
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-play';
+
+            item.appendChild(img);
+            item.appendChild(info);
+            item.appendChild(icon);
+
+            item.addEventListener('click', () => playIndex(i));
+
+            frag.appendChild(item);
+        });
+
+        listEl.innerHTML = '';
+        listEl.appendChild(frag);
     }
-    if (closePanel) {
-        closePanel.onclick = () => panel.classList.remove('open');
+
+    // ========== پخش بر اساس ایندکس ==========
+    function playIndex(index) {
+        if (index < 0 || index >= musics.length) return;
+
+        // ذخیره‌ی قبلی متوقف بشه
+        if (currentIndex === index && !audio.paused) {
+            audio.pause();
+            return;
+        }
+
+        currentIndex = index;
+        const m = musics[index];
+
+        audio.src = m.audio_file;
+        audio.load();
+
+        cover.src = m.cover || '/media/images/nophoto.png';
+        titleEl.textContent = m.title;
+        artistEl.textContent = m.artist;
+
+        audio.play().catch(err => console.warn('Play error:', err));
+
+        // آپدیت UI لیست
+        document.querySelectorAll('.mini-music-item').forEach((el, i) => {
+            el.classList.toggle('active', i === index);
+            const ic = el.querySelector('i');
+            if (ic) ic.className = (i === index) ? 'fas fa-volume-up' : 'fas fa-play';
+        });
     }
-});
+
+    // ========== دکمه پخش ==========
+    playBtn.addEventListener('click', () => {
+        if (currentIndex === -1) {
+            if (musics.length) playIndex(0);
+            return;
+        }
+        if (audio.paused) {
+            audio.play().catch(err => console.warn(err));
+        } else {
+            audio.pause();
+        }
+    });
+
+    // ========== بعدی/قبلی ==========
+    nextBtn.addEventListener('click', () => {
+        if (!musics.length) return;
+        playIndex((currentIndex + 1) % musics.length);
+    });
+
+    prevBtn.addEventListener('click', () => {
+        if (!musics.length) return;
+        playIndex((currentIndex - 1 + musics.length) % musics.length);
+    });
+
+    // ========== آپدیت آیکن پخش ==========
+    audio.addEventListener('play', () => {
+        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    });
+
+    audio.addEventListener('pause', () => {
+        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+    });
+
+    // ========== پیشرفت ==========
+    audio.addEventListener('timeupdate', () => {
+        if (!audio.duration) return;
+        const p = (audio.currentTime / audio.duration) * 100;
+        progressFill.style.width = p + '%';
+    });
+
+    // ========== پایان آهنگ → بعدی ==========
+    audio.addEventListener('ended', () => {
+        if (musics.length > 1) {
+            playIndex((currentIndex + 1) % musics.length);
+        } else {
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            progressFill.style.width = '0%';
+        }
+    });
+
+    // ========== کلیک روی نوار پیشرفت ==========
+    progressEl.addEventListener('click', (e) => {
+        if (!audio.duration) return;
+        const rect = progressEl.getBoundingClientRect();
+        const ratio = (e.clientX - rect.left) / rect.width;
+        audio.currentTime = ratio * audio.duration;
+    });
+
+    // ========== باز/بسته کردن ==========
+    toggleBtn.addEventListener('click', () => {
+        bodyEl.classList.toggle('collapsed');
+        const icon = toggleBtn.querySelector('i');
+        icon.className = bodyEl.classList.contains('collapsed')
+            ? 'fas fa-chevron-up'
+            : 'fas fa-chevron-down';
+    });
+
+    // ========== اولین بار که پنل باز می‌شه، لود کن ==========
+    const profileTrigger = document.getElementById('profileTriggerTop');
+    if (profileTrigger) {
+        profileTrigger.addEventListener('click', () => {
+            loadMusics();
+        }, { once: true });
+    }
+
+    // اگه پنل از قبل بازه، هم لود کن (احتیاط)
+    if (document.getElementById('profilePanel')?.classList.contains('open')) {
+        loadMusics();
+    }
+
+})();
 </script>
