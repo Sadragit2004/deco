@@ -6,81 +6,70 @@ from django.conf import settings
 from ..models import Catalog
 
 
+
 @csrf_exempt
 def latest_catalogs(request):
-    """
-    دریافت آخرین کاتالوگ‌های فعال با کش
-    """
-    # کلید کش
-    cache_key = 'latest_catalogs'
+    cache_key = "latest_catalogs"
+    cache_timeout = getattr(settings, "CATALOGS_CACHE_TIMEOUT", 3600)
 
-    # دریافت داده از کش
     cached_data = cache.get(cache_key)
 
     if cached_data is not None:
         return JsonResponse({
-            'status': 'success',
-            'data': cached_data['data'],
-            'total': cached_data['total'],
-            'cached': True,
-            'cache_timeout': getattr(settings, 'CATALOGS_CACHE_TIMEOUT', 3600)
+            "status": "success",
+            "data": cached_data["data"],
+            "total": cached_data["total"],
+            "cached": True,
+            "cache_timeout": cache_timeout,
         }, status=200)
 
-    # اگر در کش نبود، از دیتابیس می‌خوانیم
-    catalogs = Catalog.objects.filter(status=True).order_by('-created_at')
+    catalogs = (
+        Catalog.objects
+        .filter(status=True)
+        .select_related("brand")
+        .prefetch_related("categories")
+        .order_by("-created_at")[:20]
+    )
 
     data = []
+
     for catalog in catalogs:
-        # مدیریت تصویر با بررسی وجود فایل
-        image_url = None
-        if catalog.image and hasattr(catalog.image, 'url') and catalog.image:
-            image_url = catalog.image.url
-
-        # مدیریت فایل PDF
-        file_url = None
-        if catalog.files and hasattr(catalog.files, 'url') and catalog.files:
-            file_url = catalog.files.url
-
-        # دریافت نام برند (با بهینه‌سازی برای جلوگیری از کوئری اضافی)
-        brand_name = catalog.brand.title if catalog.brand else None
-
-        # دریافت نام دسته‌بندی‌ها
-        category_names = [cat.title for cat in catalog.categories.all()]
+        image_url = catalog.image.url if catalog.image else None
+        file_url = catalog.files.url if catalog.files else None
+        categories = list(catalog.categories.all())
 
         data.append({
-            'id': catalog.id,
-            'title': catalog.title,
-            'slug': catalog.slug,
-            'brand_name': brand_name,
-            'brand_id': catalog.brand.id if catalog.brand else None,
-            'category_names': category_names,
-            'category_ids': [cat.id for cat in catalog.categories.all()],
-            'image_url': image_url,
-            'file_url': file_url,
-            'has_file': bool(file_url),
-            'created_at': catalog.created_at.strftime('%Y/%m/%d %H:%M') if catalog.created_at else None,
-            'sort_order': catalog.sort_order,
-            'status': catalog.status,
+            "id": catalog.id,
+            "title": catalog.title,
+            "slug": catalog.slug,
+            "brand_name": catalog.brand.title if catalog.brand else None,
+            "brand_id": catalog.brand.id if catalog.brand else None,
+            "category_names": [category.title for category in categories],
+            "category_ids": [category.id for category in categories],
+            "image_url": image_url,
+            "file_url": file_url,
+            "has_file": bool(file_url),
+            "created_at": (
+                catalog.created_at.strftime("%Y/%m/%d %H:%M")
+                if catalog.created_at else None
+            ),
+            "sort_order": catalog.sort_order,
+            "status": catalog.status,
         })
 
-    # ساخت داده برای ذخیره در کش
     cache_data = {
-        'data': data,
-        'total': len(data),
-        'timestamp': cache.get('catalogs_timestamp') or 0
+        "data": data,
+        "total": len(data),
     }
 
-    # ذخیره در کش
-    cache_timeout = getattr(settings, 'CATALOGS_CACHE_TIMEOUT', 3600)  # پیش‌فرض ۱ ساعت
     cache.set(cache_key, cache_data, timeout=cache_timeout)
-    cache.set('catalogs_timestamp', cache_data['timestamp'] + 1, timeout=86400)  # ۲۴ ساعت
 
     return JsonResponse({
-        'status': 'success',
-        'data': data,
-        'total': len(data),
-        'cached': False,
-        'cache_timeout': cache_timeout
+        "status": "success",
+        "data": data,
+        "total": len(data),
+        "cached": False,
+        "cache_timeout": cache_timeout,
     }, status=200)
 
 

@@ -1,66 +1,246 @@
 <style>
-    .scroll-reveal { opacity: 0; transform: translateY(35px); transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1); }
-    .scroll-reveal.revealed { opacity: 1; transform: translateY(0); }
-    .reveal-delay-1 { transition-delay: 0.05s; }
-    .reveal-delay-2 { transition-delay: 0.1s; }
-    .reveal-delay-3 { transition-delay: 0.15s; }
-    .reveal-delay-4 { transition-delay: 0.2s; }
-    .reveal-delay-5 { transition-delay: 0.25s; }
-    .reveal-delay-6 { transition-delay: 0.3s; }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    html {
+        scroll-behavior: smooth;
+        overflow-x: clip;
+    }
+
+    body {
+        max-width: 100%;
+        overflow-x: clip;
+    }
+
+    .scroll-reveal {
+        opacity: 0;
+        transform: translate3d(0, 24px, 0);
+        transition:
+            opacity 0.55s ease,
+            transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: opacity, transform;
+    }
+
+    .scroll-reveal.revealed {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        will-change: auto;
+    }
+
+    .reveal-delay-1 { transition-delay: 50ms; }
+    .reveal-delay-2 { transition-delay: 100ms; }
+    .reveal-delay-3 { transition-delay: 150ms; }
+    .reveal-delay-4 { transition-delay: 200ms; }
+    .reveal-delay-5 { transition-delay: 250ms; }
+    .reveal-delay-6 { transition-delay: 300ms; }
+
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+
+        .scroll-reveal,
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: none;
+            transition: none;
+            animation: none;
+            will-change: auto;
+        }
+    }
 </style>
 
 <script>
-    (function() {
-        document.documentElement.style.scrollBehavior = "smooth";
-        const elementsToReveal = document.querySelectorAll(`.section-header, .category-square, .product-card-item, .catalog-vertical-card, .brand-logo, .portfolio-card, .banner-item, .order-card-expanded, .payment-card-expanded, .wishlist-card, .portfolio-user-card, .reward-card, .points-card, .stat-row, .digital-clock-box, .contact-bar`);
-        elementsToReveal.forEach((el, index) => {
-            if (!el.classList.contains('scroll-reveal')) el.classList.add('scroll-reveal');
-            if (!el.classList.contains('reveal-delay-1') && !el.classList.contains('reveal-delay-2') && !el.classList.contains('reveal-delay-3') && !el.classList.contains('reveal-delay-4') && !el.classList.contains('reveal-delay-5') && !el.classList.contains('reveal-delay-6')) {
-                const delayClass = `reveal-delay-${(index % 6) + 1}`;
-                el.classList.add(delayClass);
-            }
+(function () {
+    "use strict";
+
+    if (window.__scrollRevealInitialized) return;
+    window.__scrollRevealInitialized = true;
+
+    const selector = [
+        ".section-header",
+        ".category-square",
+        ".product-card-item",
+        ".catalog-vertical-card",
+        ".brand-logo",
+        ".portfolio-card",
+        ".banner-item",
+        ".order-card-expanded",
+        ".payment-card-expanded",
+        ".wishlist-card",
+        ".portfolio-user-card",
+        ".reward-card",
+        ".points-card",
+        ".stat-row",
+        ".digital-clock-box",
+        ".contact-bar",
+        ".cart-item",
+        ".notif-item"
+    ].join(",");
+
+    const delayClasses = [
+        "reveal-delay-1",
+        "reveal-delay-2",
+        "reveal-delay-3",
+        "reveal-delay-4",
+        "reveal-delay-5",
+        "reveal-delay-6"
+    ];
+
+    const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+    );
+
+    let observer = null;
+    let mutationObserver = null;
+    let sequence = 0;
+    let refreshTimer = null;
+
+    function revealImmediately(element) {
+        element.classList.add("scroll-reveal", "revealed");
+        delayClasses.forEach(function (className) {
+            element.classList.remove(className);
         });
-        const observerForDynamic = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                    mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === 1) {
-                            if (node.matches && node.matches('.product-card-item, .catalog-vertical-card, .order-card-expanded, .payment-card-expanded, .cart-item, .notif-item, .reward-card, .wishlist-card, .portfolio-user-card, .digital-clock-box, .contact-bar')) {
-                                if (!node.classList.contains('scroll-reveal')) { node.classList.add('scroll-reveal'); const randomDelay = `reveal-delay-${(Math.floor(Math.random() * 6) + 1)}`; node.classList.add(randomDelay); }
-                            }
-                            if (node.querySelectorAll) {
-                                const childrenToReveal = node.querySelectorAll('.product-card-item, .catalog-vertical-card, .order-card-expanded, .payment-card-expanded, .cart-item, .notif-item, .reward-card, .wishlist-card, .portfolio-user-card, .digital-clock-box, .contact-bar');
-                                childrenToReveal.forEach(child => { if (!child.classList.contains('scroll-reveal')) { child.classList.add('scroll-reveal'); const randomDelay = `reveal-delay-${(Math.floor(Math.random() * 6) + 1)}`; child.classList.add(randomDelay); } });
-                            }
+    }
+
+    function prepareElement(element) {
+        if (!(element instanceof Element)) return;
+        if (element.dataset.scrollRevealPrepared === "true") return;
+
+        element.dataset.scrollRevealPrepared = "true";
+        element.classList.add("scroll-reveal");
+
+        const hasDelay = delayClasses.some(function (className) {
+            return element.classList.contains(className);
+        });
+
+        if (!hasDelay) {
+            element.classList.add(
+                delayClasses[sequence % delayClasses.length]
+            );
+        }
+
+        sequence++;
+
+        if (reducedMotion.matches) {
+            revealImmediately(element);
+            return;
+        }
+
+        if (observer) {
+            observer.observe(element);
+        } else {
+            element.classList.add("revealed");
+        }
+    }
+
+    function prepareTree(root) {
+        if (!(root instanceof Element)) return;
+
+        if (root.matches(selector)) {
+            prepareElement(root);
+        }
+
+        root.querySelectorAll(selector).forEach(prepareElement);
+    }
+
+    function refresh() {
+        if (refreshTimer !== null) return;
+
+        refreshTimer = window.setTimeout(function () {
+            refreshTimer = null;
+            prepareTree(document.body);
+        }, 50);
+    }
+
+    function init() {
+        if (!document.body) return;
+
+        if (!reducedMotion.matches && "IntersectionObserver" in window) {
+            observer = new IntersectionObserver(
+                function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add("revealed");
+                            observer.unobserve(entry.target);
                         }
                     });
+                },
+                {
+                    root: null,
+                    rootMargin: "0px 0px -40px 0px",
+                    threshold: 0.01
                 }
+            );
+        }
+
+        prepareTree(document.body);
+
+        mutationObserver = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                mutation.addedNodes.forEach(function (node) {
+                    if (node instanceof Element) {
+                        prepareTree(node);
+                    }
+                });
             });
         });
-        observerForDynamic.observe(document.body, { childList: true, subtree: true });
-        function checkReveal() {
-            const revealElements = document.querySelectorAll('.scroll-reveal');
-            const windowHeight = window.innerHeight;
-            const revealThreshold = 80;
-            revealElements.forEach(el => { const rect = el.getBoundingClientRect(); const isRevealed = rect.top < windowHeight - revealThreshold && rect.bottom > 0; if (isRevealed) el.classList.add('revealed'); });
-        }
-        window.addEventListener('load', function() { checkReveal(); setTimeout(checkReveal, 300); });
-        window.addEventListener('scroll', checkReveal);
-        window.addEventListener('resize', checkReveal);
-        const panels = ['profilePanel', 'cartPanel', 'notifPanel'];
-        panels.forEach(panelId => {
+
+        mutationObserver.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        [
+            "profilePanel",
+            "cartPanel",
+            "notifPanel"
+        ].forEach(function (panelId) {
             const panel = document.getElementById(panelId);
-            if (panel) {
-                const observerPanel = new MutationObserver(function(mutations) {
-                    mutations.forEach(function(mutation) { if (mutation.type === 'attributes' && mutation.attributeName === 'class') { if (panel.classList.contains('open')) { setTimeout(checkReveal, 200); } } });
-                });
-                observerPanel.observe(panel, { attributes: true });
+            if (!panel) return;
+
+            const panelObserver = new MutationObserver(function () {
+                if (panel.classList.contains("open")) {
+                    refresh();
+                }
+            });
+
+            panelObserver.observe(panel, {
+                attributes: true,
+                attributeFilter: ["class"]
+            });
+        });
+
+        document.addEventListener("click", function (event) {
+            const target = event.target;
+
+            if (
+                target instanceof Element &&
+                target.closest(
+                    ".nav-item-side, .bottom-item[data-mobile-tab]"
+                )
+            ) {
+                refresh();
             }
         });
-        const originalSwitchTab = window.switchTab;
-        if (typeof originalSwitchTab === 'function') { window.switchTab = function(tabId) { originalSwitchTab(tabId); setTimeout(checkReveal, 150); }; }
-        else { document.querySelectorAll('.nav-item-side, .bottom-item[data-mobile-tab]').forEach(btn => { btn.addEventListener('click', function() { setTimeout(checkReveal, 150); }); }); }
-    })();
+
+        window.addEventListener("switchtab:updated", refresh);
+
+        if (typeof window.switchTab === "function") {
+            const originalSwitchTab = window.switchTab;
+
+            window.switchTab = function () {
+                const result = originalSwitchTab.apply(this, arguments);
+                refresh();
+                return result;
+            };
+        }
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init, { once: true });
+    } else {
+        init();
+    }
+})();
+</script>
 
 
+{% include './scroll.html' %}

@@ -8,3 +8,4 @@ class ProductConfig(AppConfig):
 
     def ready(self):
         import apps.product.signals
+        import apps.product.signals_shop
