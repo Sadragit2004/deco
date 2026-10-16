@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>سقف کشسان | طراح حرفه‌ای خط‌روند و متن | پس‌زمینه متحرک</title>
+    <title>سفارش چاپی DECO B2B | طراحی حرفه‌ای</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
     <style>
@@ -39,6 +39,32 @@
         .installation-item.selected, .material-item.selected, .pdf-item.selected, .template-item.selected { border-color: #e67e22; box-shadow: 0 4px 12px rgba(230,126,34,0.2); background: rgba(230,126,34,0.15); }
         .installation-img { width: 70px; height: 70px; object-fit: cover; border-radius: 14px; margin-bottom: 6px; }
         .installation-title, .material-title { font-weight: bold; font-size: 0.85rem; margin-top: 6px; color: #ffffff; }
+
+        /* ==================== بخش PDFهای هر نصبیات در مرحله ۱ ==================== */
+        .installation-block { margin-bottom: 20px; }
+        .installation-block-title { color: #fff; font-size: 0.95rem; font-weight: bold; margin-bottom: 8px; padding-right: 8px; border-right: 3px solid #e67e22; display: flex; align-items: center; gap: 6px; }
+        .installation-main { display: flex; gap: 12px; align-items: center; background: rgba(255,255,255,0.08); border-radius: 16px; padding: 12px; border: 2px solid transparent; cursor: pointer; transition: all 0.2s; }
+        .installation-main.selected { border-color: #e67e22; background: rgba(230,126,34,0.15); }
+        .installation-main img { width: 70px; height: 70px; object-fit: cover; border-radius: 14px; flex-shrink: 0; }
+        .installation-info { flex: 1; text-align: right; }
+        .installation-info .name { font-weight: bold; font-size: 0.9rem; color: #fff; }
+        .installation-info .desc { font-size: 0.7rem; color: rgba(255,255,255,0.7); margin-top: 4px; }
+        .pdfs-section { margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 14px; }
+        .pdfs-section-title { font-size: 0.75rem; color: #e67e22; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; font-weight: bold; }
+        .pdf-row { display: flex; align-items: center; gap: 8px; padding: 8px; background: rgba(255,255,255,0.08); border-radius: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+        .pdf-row .pdf-name { flex: 1; min-width: 100px; color: #fff; font-size: 0.78rem; display: flex; align-items: center; gap: 6px; }
+        .pdf-row .pdf-name .material-tag { font-size: 0.62rem; background: rgba(230,126,34,0.3); padding: 2px 6px; border-radius: 8px; color: #e67e22; }
+        .pdf-row .pdf-download { background: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 20px; font-size: 0.7rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+        .pdf-row .pdf-download:hover { background: #c82333; }
+        .pdf-row .pdf-code-input { flex: 1; min-width: 120px; padding: 7px 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.95); font-size: 0.75rem; }
+        .pdf-row .pdf-verify-btn { background: #e67e22; color: white; border: none; padding: 7px 12px; border-radius: 10px; font-size: 0.72rem; font-weight: bold; cursor: pointer; }
+        .pdf-row .pdf-verify-btn:hover { background: #d35400; }
+        .pdf-row .pdf-status { font-size: 0.7rem; width: 100%; margin-top: 4px; }
+        .pdf-status.ok { color: #27ae60; }
+        .pdf-status.err { color: #e74c3c; }
+        .verify-all-btn { width: 100%; background: linear-gradient(135deg, #e67e22, #d35400); color: white; border: none; padding: 12px; border-radius: 14px; font-weight: bold; font-size: 0.85rem; cursor: pointer; margin-top: 12px; }
+        .verify-all-btn:hover { transform: scale(1.01); }
+
         .form-group { margin-bottom: 14px; }
         label { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.8rem; margin-bottom: 6px; color: #1e293b; }
         input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; font-size: 0.85rem; background: rgba(255,255,255,0.9); }
@@ -50,6 +76,7 @@
         .design-options { display: flex; gap: 12px; margin: 16px 0; }
         .design-opt { flex: 1; background: rgba(248,249,250,0.8); border-radius: 16px; padding: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; }
         .design-opt i { font-size: 28px; color: #e67e22; }
+        .design-opt h3 { font-size: 0.8rem; margin-top: 6px; color: #1e293b; }
         .design-opt.selected { border-color: #e67e22; background: rgba(255,248,240,0.9); }
         .design-area { position: relative; flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.03); border-radius: 20px; overflow: hidden; border: 1px solid rgba(0,0,0,0.08); min-height: 0; }
         .canvas-wrapper { flex: 1; position: relative; background-image: linear-gradient(to right, rgba(203,213,225,0.4) 1px, transparent 1px), linear-gradient(to bottom, rgba(203,213,225,0.4) 1px, transparent 1px); background-size: 25px 25px; background-color: rgba(255,255,255,0.6); overflow: hidden; touch-action: none; }
@@ -72,7 +99,7 @@
         .status-bar { background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); color: white; padding: 8px 16px; border-radius: 40px; font-size: 12px; position: absolute; bottom: 20px; left: 20px; z-index: 200; font-family: monospace; font-weight: 500; display: flex; align-items: center; gap: 8px; pointer-events: none; }
         .selected-toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(230,126,34,0.95); backdrop-filter: blur(8px); color: white; padding: 8px 16px; border-radius: 40px; font-size: 12px; z-index: 300; display: none; white-space: nowrap; font-weight: bold; }
         .invoice { background: rgba(250,249,254,0.8); backdrop-filter: blur(8px); border-radius: 16px; padding: 16px; }
-        .invoice p { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.08); font-size: 0.85rem; }
+        .invoice p { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.08); font-size: 0.85rem; color: #1e293b; }
         .invoice i { width: 28px; color: #e67e22; }
         .previews-section { margin-bottom: 16px; display: flex; flex-direction: column; gap: 16px; }
         .preview-card { background: rgba(255,255,255,0.9); border-radius: 16px; overflow: hidden; border: 1px solid rgba(230,126,34,0.3); }
@@ -94,13 +121,6 @@
         .loading.active { display: flex; }
         .spinner { width: 45px; height: 45px; border: 5px solid rgba(255,255,255,0.3); border-top-color: #e67e22; border-radius: 50%; animation: spin 0.7s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .pdf-download-btn { display: inline-flex; align-items: center; gap: 8px; background: #dc3545; color: white; padding: 6px 14px; border-radius: 30px; text-decoration: none; font-size: 0.75rem; font-weight: bold; margin-top: 8px; border: none; cursor: pointer; transition: all 0.2s; }
-        .pdf-download-btn:hover { background: #c82333; transform: scale(1.05); }
-        .pdf-download-btn i { font-size: 14px; }
-        .pdf-item-content { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .pdf-code-badge { background: rgba(0,0,0,0.2); padding: 2px 10px; border-radius: 12px; font-size: 0.7rem; color: #fff; }
-        .step-container { display: none; }
-        .step-container.active { display: block; }
     </style>
 </head>
 <body>
@@ -108,7 +128,7 @@
 <canvas id="bgCanvas"></canvas>
 
 <div class="loading" id="loading"><div class="spinner"></div></div>
-<div class="selected-toast" id="selectedToast">✅ انتخاب شد | می‌توانید جابجا، ویرایش یا حذف کنید</div>
+<div class="selected-toast" id="selectedToast">✅ انتخاب شد</div>
 
 <div class="header" id="mainHeader">
     <h1>سفارش چاپی DECO B2B</h1>
@@ -117,24 +137,29 @@
 
 <div class="progress-wrap" id="progressWrap">
     <div class="progress-steps">
-        <div class="step"><div class="step-badge" id="step1Badge">1</div><div class="step-label">نصبیات</div></div>
+        <div class="step"><div class="step-badge" id="step1Badge">1</div><div class="step-label">نصبیات + PDF</div></div>
         <div class="step"><div class="step-badge" id="step2Badge">2</div><div class="step-label">جنس</div></div>
-        <div class="step"><div class="step-badge" id="step3Badge">3</div><div class="step-label">مستندات</div></div>
-        <div class="step"><div class="step-badge" id="step4Badge">4</div><div class="step-label">ابعاد</div></div>
-        <div class="step"><div class="step-badge" id="step5Badge">5</div><div class="step-label">طراحی</div></div>
-        <div class="step"><div class="step-badge" id="step6Badge">6</div><div class="step-label">نهایی</div></div>
+        <div class="step"><div class="step-badge" id="step3Badge">3</div><div class="step-label">ابعاد</div></div>
+        <div class="step"><div class="step-badge" id="step4Badge">4</div><div class="step-label">طراحی</div></div>
+        <div class="step"><div class="step-badge" id="step5Badge">5</div><div class="step-label">نهایی</div></div>
     </div>
 </div>
 
 <div class="main" id="mainContainer">
     <div class="container" id="containerInner">
+
+        <!-- ==================== مرحله ۱: نصبیات + PDFها ==================== -->
         <div class="step-container active" id="step1">
             <div class="card">
-                <div class="card-title"><i class="fas fa-cubes"></i> انتخاب نوع نصبیات</div>
-                <div class="grid-2" id="installationsList"></div>
+                <div class="card-title"><i class="fas fa-cubes"></i> انتخاب نصبیات و مستندات PDF</div>
+                <div id="installationsList"></div>
+                <button class="verify-all-btn" id="verifyAllBtn" style="display:none;">
+                    <i class="fas fa-check-double"></i> تأیید همه کدهای وارد شده و ادامه
+                </button>
             </div>
         </div>
 
+        <!-- ==================== مرحله ۲: جنس ==================== -->
         <div class="step-container" id="step2">
             <div class="card">
                 <div class="card-title"><i class="fas fa-palette"></i> جنس سقف کشسان</div>
@@ -142,22 +167,8 @@
             </div>
         </div>
 
+        <!-- ==================== مرحله ۳: ابعاد و طرح اولیه ==================== -->
         <div class="step-container" id="step3">
-            <div class="card">
-                <div class="card-title"><i class="fas fa-file-pdf"></i> مستندات PDF</div>
-                <div class="form-group">
-                    <label>کد اختصاصی PDF</label>
-                    <div class="code-group">
-                        <input type="text" id="pdfCode" placeholder="مثال: PDF-123456">
-                        <button class="btn-verify" id="verifyBtn">تایید</button>
-                    </div>
-                    <div id="verifyResult" style="margin-top: 8px; font-size: 11px;"></div>
-                </div>
-                <div id="pdfsList" class="grid-2"></div>
-            </div>
-        </div>
-
-        <div class="step-container" id="step4">
             <div class="card">
                 <div class="card-title"><i class="fas fa-drafting-compass"></i> ابعاد و طرح اولیه</div>
                 <div class="row-2">
@@ -169,7 +180,7 @@
                     <div class="design-opt" data-type="upload"><i class="fas fa-cloud-upload-alt"></i><h3>آپلود عکس</h3></div>
                 </div>
                 <div id="readyTemplatesBox" class="hidden">
-                    <div class="card-title" style="font-size: 13px;">✨ طرح‌های آماده</div>
+                    <div class="card-title" style="font-size: 13px; color:#1e293b;">✨ طرح‌های آماده</div>
                     <div class="grid-2" id="readyTemplatesList"></div>
                 </div>
                 <div id="uploadBox" class="hidden">
@@ -179,9 +190,10 @@
             </div>
         </div>
 
-        <div class="step-container" id="step5">
+        <!-- ==================== مرحله ۴: طراحی ==================== -->
+        <div class="step-container" id="step4">
             <div class="card" style="padding: 12px; height: 100%; display: flex; flex-direction: column;">
-                <div class="card-title"><i class="fas fa-draw-polygon"></i> طراحی پلن | نقشه کار | لمس کنید، بکشید، ویرایش کنید</div>
+                <div class="card-title"><i class="fas fa-draw-polygon"></i> طراحی پلن | لمس کنید، بکشید، ویرایش کنید</div>
                 <div class="design-area">
                     <div class="canvas-wrapper" id="canvasWrapper">
                         <canvas id="designCanvas"></canvas>
@@ -193,7 +205,8 @@
             </div>
         </div>
 
-        <div class="step-container" id="step6">
+        <!-- ==================== مرحله ۵: نهایی ==================== -->
+        <div class="step-container" id="step5">
             <div class="card">
                 <div class="card-title"><i class="fas fa-clipboard-list"></i> نهایی‌سازی سفارش</div>
 
@@ -213,6 +226,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -221,10 +235,9 @@
     <button class="btn btn-primary" id="nextBtn">بعدی</button>
 </div>
 
+<!-- ابزارهای طراحی -->
 <div class="floating-tools">
-    <button class="float-btn" id="mainToolBtn">
-        <i class="fas fa-pencil-ruler"></i>
-    </button>
+    <button class="float-btn" id="mainToolBtn"><i class="fas fa-pencil-ruler"></i></button>
 </div>
 <div class="tools-panel" id="toolsPanel">
     <div class="tool-item" data-tool="polyline" title="خط‌روند"><i class="fas fa-draw-polygon"></i></div>
@@ -247,7 +260,7 @@
 </div>
 
 <script>
-    // ==================== انیمیشن پس‌زمینه ====================
+    // ==================== پس‌زمینه متحرک ====================
     (function initAnimatedBackground() {
         const canvas = document.getElementById('bgCanvas');
         const ctx = canvas.getContext('2d');
@@ -339,40 +352,35 @@
             requestAnimationFrame(animate);
         }
 
-        window.addEventListener('resize', () => { resize(); });
+        window.addEventListener('resize', resize);
         resize();
         animate();
     })();
 
-    // ==================== کد اصلی اپلیکیشن ====================
+    // ==================== اپلیکیشن ====================
     const API_BASE = '/pro/api';
 
-    // بازیابی state از localStorage در صورت وجود
-    function loadState() {
-        try {
-            const saved = localStorage.getItem('designerState');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                // فقط state های معتبر رو بازیابی کن
-                if (parsed.installation) state.installation = parsed.installation;
-                if (parsed.material) state.material = parsed.material;
-                if (parsed.pdf) state.pdf = parsed.pdf;
-                if (parsed.pdfCode) state.pdfCode = parsed.pdfCode;
-                if (parsed.designType) state.designType = parsed.designType;
-                if (parsed.selectedTemplate) state.selectedTemplate = parsed.selectedTemplate;
-                if (parsed.selectedTemplateImage) state.selectedTemplateImage = parsed.selectedTemplateImage;
-                if (parsed.uploadedImage) state.uploadedImage = parsed.uploadedImage;
-                if (parsed.length) document.getElementById('length').value = parsed.length;
-                if (parsed.width) document.getElementById('width').value = parsed.width;
-                if (parsed.notes) document.getElementById('notes').value = parsed.notes;
-                // مرحله رو هم بازیابی کن
-                if (parsed.step) return parsed.step;
-            }
-        } catch(e) { console.log('State load error:', e); }
-        return 1;
-    }
+    // ✅ state اول تعریف می‌شود (رفع باگ ReferenceError)
+    let state = {
+        step: 1,
+        installation: null,
+        material: null,
+        pdf: null,
+        pdfCode: null,
+        // کدهای وارد شده برای هر PDF: { [installationId]: { [pdfId]: { code, valid, pdfInfo } } }
+        pdfCodesByInstallation: {},
+        length: 0,
+        width: 0,
+        designType: null,
+        selectedTemplate: null,
+        selectedTemplateImage: null,
+        uploadedImage: null,
+    };
 
-    // ذخیره state در localStorage
+    // کش نصبیات‌ها با PDFهایشان
+    let installationsCache = [];
+
+    // ==================== ذخیره/بازیابی state ====================
     function saveState() {
         try {
             const toSave = {
@@ -381,35 +389,52 @@
                 material: state.material,
                 pdf: state.pdf,
                 pdfCode: state.pdfCode,
+                pdfCodesByInstallation: state.pdfCodesByInstallation,
                 designType: state.designType,
                 selectedTemplate: state.selectedTemplate,
                 selectedTemplateImage: state.selectedTemplateImage,
                 uploadedImage: state.uploadedImage,
-                length: document.getElementById('length').value,
-                width: document.getElementById('width').value,
-                notes: document.getElementById('notes').value
+                length: document.getElementById('length')?.value || '',
+                width: document.getElementById('width')?.value || '',
+                notes: document.getElementById('notes')?.value || ''
             };
-            localStorage.setItem('designerState', JSON.stringify(toSave));
+            localStorage.setItem('designerState_v2', JSON.stringify(toSave));
         } catch(e) { console.log('State save error:', e); }
     }
 
-    let state = {
-        step: 1,
-        installation: null,
-        material: null,
-        pdf: null,
-        pdfCode: null,
-        length: 0,
-        width: 0,
-        designType: null,
-        selectedTemplate: null,
-        selectedTemplateImage: null,
-        uploadedImage: null
-    };
+    function loadState() {
+        try {
+            const saved = localStorage.getItem('designerState_v2');
+            if (!saved) return 1;
+            const parsed = JSON.parse(saved);
+            if (parsed.installation) state.installation = parsed.installation;
+            if (parsed.material) state.material = parsed.material;
+            if (parsed.pdf) state.pdf = parsed.pdf;
+            if (parsed.pdfCode) state.pdfCode = parsed.pdfCode;
+            if (parsed.pdfCodesByInstallation) state.pdfCodesByInstallation = parsed.pdfCodesByInstallation;
+            if (parsed.designType) state.designType = parsed.designType;
+            if (parsed.selectedTemplate) state.selectedTemplate = parsed.selectedTemplate;
+            if (parsed.selectedTemplateImage) state.selectedTemplateImage = parsed.selectedTemplateImage;
+            if (parsed.uploadedImage) state.uploadedImage = parsed.uploadedImage;
+            if (parsed.length) { const el = document.getElementById('length'); if (el) el.value = parsed.length; }
+            if (parsed.width) { const el = document.getElementById('width'); if (el) el.value = parsed.width; }
+            if (parsed.notes) { const el = document.getElementById('notes'); if (el) el.value = parsed.notes; }
+            return parsed.step || 1;
+        } catch(e) { console.log('State load error:', e); return 1; }
+    }
 
     function showLoading() { document.getElementById('loading').classList.add('active'); }
     function hideLoading() { document.getElementById('loading').classList.remove('active'); }
 
+    function showToastMessage(msg, isError = false) {
+        const toast = document.getElementById('selectedToast');
+        toast.style.backgroundColor = isError ? '#dc3545' : '#e67e22';
+        toast.innerHTML = isError ? `⚠️ ${msg}` : `✅ ${msg}`;
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 2000);
+    }
+
+    // ==================== API ====================
     async function apiCall(url, options = {}) {
         showLoading();
         try {
@@ -419,128 +444,268 @@
             });
             return await res.json();
         } catch (e) {
-            if (url.includes('/installations/')) return { status: 'success', data: [{ id: 1, title: 'نصبیات مدرن', image: 'https://placehold.co/70x70?text=Modern' }, { id: 2, title: 'نصبیات کلاسیک', image: 'https://placehold.co/70x70?text=Classic' }] };
-            if (url.includes('/materials/')) return { status: 'success', data: [{ id: 1, title: 'مات سفید', image: null }, { id: 2, title: 'براق نقره‌ای', image: null }] };
-            if (url.includes('/pdfs/')) return { status: 'success', data: [{ id: 1, title: 'کاتالوگ حرفه‌ای', code: 'PDF-001' }, { id: 2, title: 'راهنمای نصب', code: 'PDF-002' }] };
-            if (url.includes('/verify-pdf/')) return { valid: true, id: 99, title: 'سند تایید شده' };
-            if (url.includes('/templates/')) return { status: 'success', data: [{ id: 1, title: 'طرح مدرن', image: 'https://placehold.co/100x70' }] };
-            return { status: 'error' };
+            console.error('API error:', e);
+            return { status: 'error', message: 'خطای ارتباط با سرور' };
         } finally { hideLoading(); }
     }
 
+    // ==================== مرحله ۱: نصبیات + PDF ====================
     async function loadInstallations() {
         const res = await apiCall('/installations/');
         if (res.status === 'success') {
-            document.getElementById('installationsList').innerHTML = res.data.map(ins => `
-                <div class="installation-item" onclick="selectInstallation(${ins.id}, '${ins.title.replace(/'/g, "\\'")}')">
-                    <img src="${ins.image}" class="installation-img" onerror="this.src='https://placehold.co/70x70'">
-                    <div class="installation-title">${ins.title}</div>
-                </div>
-            `).join('');
-            // اگر state قبلی داشت، هایلایتش کن
-            if (state.installation) {
-                document.querySelectorAll('.installation-item').forEach(el => {
-                    if (el.textContent.trim() === state.installation.title) {
-                        el.classList.add('selected');
-                    }
-                });
-            }
+            installationsCache = res.data;
+            renderInstallations();
         }
     }
 
-    window.selectInstallation = function (id, title) {
-        document.querySelectorAll('.installation-item').forEach(i => i.classList.remove('selected'));
-        event.currentTarget.classList.add('selected');
-        state.installation = { id, title };
+    function renderInstallations() {
+        const container = document.getElementById('installationsList');
+        container.innerHTML = '';
+
+        installationsCache.forEach(ins => {
+            const block = document.createElement('div');
+            block.className = 'installation-block';
+
+            // هدر نصبیات
+            const mainDiv = document.createElement('div');
+            mainDiv.className = 'installation-main';
+            if (state.installation && state.installation.id === ins.id) {
+                mainDiv.classList.add('selected');
+            }
+            mainDiv.innerHTML = `
+                <img src="${ins.image}" onerror="this.src='https://placehold.co/70x70?text=IMG'">
+                <div class="installation-info">
+                    <div class="name">${ins.title}</div>
+                    <div class="desc">${ins.description || 'برای انتخاب کلیک کنید'}</div>
+                </div>
+                <i class="fas fa-chevron-${state.installation && state.installation.id === ins.id ? 'up' : 'down'}" style="color:#e67e22;"></i>
+            `;
+            mainDiv.onclick = () => selectInstallation(ins);
+            block.appendChild(mainDiv);
+
+            // بخش PDFها
+            if (state.installation && state.installation.id === ins.id) {
+                const pdfsSection = document.createElement('div');
+                pdfsSection.className = 'pdfs-section';
+
+                if (ins.pdfs && ins.pdfs.length > 0) {
+                    pdfsSection.innerHTML = `<div class="pdfs-section-title"><i class="fas fa-file-pdf"></i> مستندات PDF این نصبیات</div>`;
+
+                    ins.pdfs.forEach(pdf => {
+                        const row = document.createElement('div');
+                        row.className = 'pdf-row';
+                        row.dataset.pdfId = pdf.id;
+
+                        const savedCode = state.pdfCodesByInstallation[ins.id]?.[pdf.id]?.code || '';
+
+                        row.innerHTML = `
+                            <div class="pdf-name">
+                                <i class="fas fa-file-pdf" style="color:#e63946;"></i>
+                                <span>${pdf.title}</span>
+                                ${pdf.material_title ? `<span class="material-tag">${pdf.material_title}</span>` : ''}
+                            </div>
+                            <a href="${pdf.file_url || '#'}" target="_blank" class="pdf-download" onclick="event.stopPropagation();">
+                                <i class="fas fa-download"></i> دانلود
+                            </a>
+                            <input type="text" class="pdf-code-input"
+                                   placeholder="کد PDF را وارد کنید"
+                                   value="${savedCode}"
+                                   data-pdf-id="${pdf.id}"
+                                   data-inst-id="${ins.id}">
+                            <button class="pdf-verify-btn" data-pdf-id="${pdf.id}" data-inst-id="${ins.id}">
+                                تأیید
+                            </button>
+                            <div class="pdf-status" data-pdf-id="${pdf.id}" data-inst-id="${ins.id}"></div>
+                        `;
+                        pdfsSection.appendChild(row);
+                    });
+                } else {
+                    pdfsSection.innerHTML = `<div style="color:rgba(255,255,255,0.6); font-size:0.75rem; text-align:center; padding:10px;">📄 PDF برای این نصبیات ثبت نشده است</div>`;
+                }
+
+                block.appendChild(pdfsSection);
+            }
+
+            container.appendChild(block);
+        });
+
+        // اتصال رویدادهای دکمه تأیید و input
+        container.querySelectorAll('.pdf-verify-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                verifySinglePdf(btn.dataset.pdfId, btn.dataset.instId);
+            };
+        });
+
+        container.querySelectorAll('.pdf-code-input').forEach(input => {
+            input.onchange = () => {
+                const pdfId = input.dataset.pdfId;
+                const instId = input.dataset.instId;
+                savePdfCode(instId, pdfId, input.value.trim());
+            };
+            input.onkeypress = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    verifySinglePdf(input.dataset.pdfId, input.dataset.instId);
+                }
+            };
+        });
+
+        // بازگرداندن وضعیت تأیید شده قبلی به UI
+        restoreVerifiedStatus();
+
+        // نمایش/عدم نمایش دکمه تأیید همه
+        updateVerifyAllButton();
+    }
+
+    function savePdfCode(instId, pdfId, code) {
+        if (!state.pdfCodesByInstallation[instId]) {
+            state.pdfCodesByInstallation[instId] = {};
+        }
+        if (!state.pdfCodesByInstallation[instId][pdfId]) {
+            state.pdfCodesByInstallation[instId][pdfId] = {};
+        }
+        state.pdfCodesByInstallation[instId][pdfId].code = code;
         saveState();
+    }
+
+    async function verifySinglePdf(pdfId, instId) {
+        const input = document.querySelector(`.pdf-code-input[data-pdf-id="${pdfId}"][data-inst-id="${instId}"]`);
+        const statusDiv = document.querySelector(`.pdf-status[data-pdf-id="${pdfId}"][data-inst-id="${instId}"]`);
+        if (!input || !statusDiv) return;
+
+        const code = input.value.trim();
+        if (!code) {
+            statusDiv.innerHTML = '<span class="pdf-status err">❌ کد را وارد کنید</span>';
+            return;
+        }
+
+        statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال بررسی...';
+
+        const res = await apiCall('/verify-pdf/', {
+            method: 'POST',
+            body: JSON.stringify({ code: code })
+        });
+
+        if (res.valid) {
+            statusDiv.innerHTML = `<span class="pdf-status ok">✅ تأیید شد: ${res.title}</span>`;
+            if (!state.pdfCodesByInstallation[instId]) state.pdfCodesByInstallation[instId] = {};
+            state.pdfCodesByInstallation[instId][pdfId] = {
+                code: code,
+                valid: true,
+                pdfInfo: { id: res.id, title: res.title, material_id: res.material_id }
+            };
+            saveState();
+            updateVerifyAllButton();
+        } else {
+            statusDiv.innerHTML = `<span class="pdf-status err">❌ ${res.message || 'کد معتبر نیست'}</span>`;
+            if (!state.pdfCodesByInstallation[instId]) state.pdfCodesByInstallation[instId] = {};
+            state.pdfCodesByInstallation[instId][pdfId] = { code: code, valid: false };
+            saveState();
+        }
+    }
+
+    function restoreVerifiedStatus() {
+        Object.entries(state.pdfCodesByInstallation).forEach(([instId, pdfs]) => {
+            Object.entries(pdfs).forEach(([pdfId, data]) => {
+                const statusDiv = document.querySelector(`.pdf-status[data-pdf-id="${pdfId}"][data-inst-id="${instId}"]`);
+                if (statusDiv && data.valid && data.pdfInfo) {
+                    statusDiv.innerHTML = `<span class="pdf-status ok">✅ تأیید شد: ${data.pdfInfo.title}</span>`;
+                }
+            });
+        });
+    }
+
+    function updateVerifyAllButton() {
+        const btn = document.getElementById('verifyAllBtn');
+        if (state.installation) {
+            btn.style.display = 'block';
+        } else {
+            btn.style.display = 'none';
+        }
+    }
+
+    // انتخاب نصبیات
+    function selectInstallation(ins) {
+        // اگر همین نصبیات دوباره کلیک شد، فقط باز/بسته شود
+        if (state.installation && state.installation.id === ins.id) {
+            // حفظ انتخاب، فقط UI را رندر کن
+            renderInstallations();
+            return;
+        }
+
+        state.installation = { id: ins.id, title: ins.title };
+
+        // پاک کردن material/pdf قبلی چون نصبیات عوض شده
+        state.material = null;
+        state.pdf = null;
+        state.pdfCode = null;
+
+        saveState();
+        renderInstallations();
+        updateVerifyAllButton();
+        showToastMessage(`نصبیات "${ins.title}" انتخاب شد`);
+    }
+
+    // دکمه تأیید همه و ادامه
+    document.getElementById('verifyAllBtn').onclick = () => {
+        if (!state.installation) {
+            showToastMessage('ابتدا یک نصبیات انتخاب کنید', true);
+            return;
+        }
+
+        // چک کنیم که آیا کد معتبری برای این نصبیات ثبت شده؟
+        const codes = state.pdfCodesByInstallation[state.installation.id] || {};
+        const validOnes = Object.values(codes).filter(c => c.valid);
+
+        if (validOnes.length === 0) {
+            showToastMessage('حداقل یک کد PDF معتبر وارد کنید', true);
+            return;
+        }
+
+        // اولین کد معتبر را به عنوان pdf اصلی ست کن
+        const firstValid = validOnes[0];
+        state.pdf = { id: firstValid.pdfInfo.id, title: firstValid.pdfInfo.title };
+        state.pdfCode = firstValid.code;
+        saveState();
+
         goToStep(2);
-        loadMaterials(id);
+        loadMaterials(state.installation.id);
     };
 
+    // ==================== مرحله ۲: جنس ====================
     async function loadMaterials(installationId) {
         const res = await apiCall(`/installations/${installationId}/materials/`);
         if (res.status === 'success') {
-            document.getElementById('materialsList').innerHTML = res.data.map(mat => `
-                <div class="material-item" onclick="selectMaterial(${mat.id}, '${mat.title.replace(/'/g, "\\'")}')">
+            const container = document.getElementById('materialsList');
+            container.innerHTML = res.data.map(mat => `
+                <div class="material-item ${state.material && state.material.id === mat.id ? 'selected' : ''}"
+                     data-mat-id="${mat.id}">
                     ${mat.image ? `<img src="${mat.image}" style="width:50px;height:50px;border-radius:12px;">` : '<i class="fas fa-palette" style="font-size:34px;color:#e67e22"></i>'}
                     <div class="material-title">${mat.title}</div>
                 </div>
             `).join('');
-            if (state.material) {
-                document.querySelectorAll('.material-item').forEach(el => {
-                    if (el.textContent.trim() === state.material.title) {
-                        el.classList.add('selected');
-                    }
-                });
-            }
+
+            container.querySelectorAll('.material-item').forEach(el => {
+                el.onclick = () => selectMaterial(parseInt(el.dataset.matId));
+            });
         }
     }
 
-    window.selectMaterial = function (id, title) {
+    function selectMaterial(matId) {
+        const matEl = document.querySelector(`.material-item[data-mat-id="${matId}"]`);
+        if (!matEl) return;
         document.querySelectorAll('.material-item').forEach(i => i.classList.remove('selected'));
-        event.currentTarget.classList.add('selected');
-        state.material = { id, title };
-        saveState();
-        goToStep(3);
-        loadPdfs(id);
-    };
+        matEl.classList.add('selected');
 
-    async function loadPdfs(materialId) {
-        const res = await apiCall(`/materials/${materialId}/pdfs/`);
-        if (res.status === 'success') {
-            document.getElementById('pdfsList').innerHTML = res.data.map(pdf => {
-                const pdfDownloadLink = `https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf`;
-                return `
-                    <div class="pdf-item" onclick="selectPdf(${pdf.id}, '${pdf.code}', '${pdf.title}')">
-                        <div class="pdf-item-content">
-                            <i class="fas fa-file-pdf" style="font-size:28px;color:#e63946"></i>
-                            <div style='color:#ffff;'><strong>${pdf.title}</strong></div>
-                            <span class="pdf-code-badge">${pdf.code}</span>
-                            <a href="${pdfDownloadLink}" download="${pdf.title}.pdf" class="pdf-download-btn" onclick="event.stopPropagation();">
-                                <i class="fas fa-download"></i> دانلود PDF
-                            </a>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            if (state.pdf) {
-                document.querySelectorAll('.pdf-item').forEach(el => {
-                    if (el.textContent.includes(state.pdf.title)) {
-                        el.classList.add('selected');
-                    }
-                });
-                if (state.pdfCode) {
-                    document.getElementById('pdfCode').value = state.pdfCode;
-                    document.getElementById('verifyResult').innerHTML = `<span style="color:#27ae60">✅ کد تایید شد: ${state.pdfCode}</span>`;
-                }
-            }
-        }
+        // پیدا کردن عنوان
+        const title = matEl.querySelector('.material-title')?.textContent || '';
+        state.material = { id: matId, title };
+        saveState();
+        showToastMessage(`جنس "${title}" انتخاب شد`);
     }
 
-    window.selectPdf = function (id, code, title) {
-        document.querySelectorAll('.pdf-item').forEach(i => i.classList.remove('selected'));
-        event.currentTarget.classList.add('selected');
-        state.pdf = { id, title };
-        state.pdfCode = code;
-        document.getElementById('pdfCode').value = code;
-        document.getElementById('verifyResult').innerHTML = `<span style="color:#27ae60">✅ کد تایید شد: ${code}</span>`;
-        saveState();
-    };
-
-    async function verifyPdfCode() {
-        const code = document.getElementById('pdfCode').value.trim();
-        if (!code) return;
-        const res = await apiCall('/verify-pdf/', { method: 'POST', body: JSON.stringify({ code, material_id: state.material?.id }) });
-        if (res.valid) {
-            state.pdf = { id: res.id, title: res.title };
-            state.pdfCode = code;
-            document.getElementById('verifyResult').innerHTML = `<span style="color:#27ae60">✅ ${res.title}</span>`;
-            saveState();
-        } else {
-            document.getElementById('verifyResult').innerHTML = '<span style="color:#e67e22">❌ کد معتبر نیست</span>';
-        }
-    }
-
+    // ==================== مرحله ۳: ابعاد و طرح ====================
     function initDesignOptions() {
         document.querySelectorAll('.design-opt').forEach(opt => {
             opt.onclick = () => {
@@ -560,7 +725,7 @@
                 saveState();
             };
         });
-        // بازیابی انتخاب قبلی
+
         if (state.designType) {
             document.querySelectorAll('.design-opt').forEach(opt => {
                 if (opt.getAttribute('data-type') === state.designType) {
@@ -581,31 +746,28 @@
     }
 
     async function loadReadyTemplates() {
-        const res = await apiCall(`/installations/${state.installation?.id}/templates/`);
+        if (!state.installation) return;
+        const res = await apiCall(`/installations/${state.installation.id}/templates/`);
         if (res.status === 'success') {
-            document.getElementById('readyTemplatesList').innerHTML = res.data.map(t => `
-                <div class="template-item" onclick="selectTemplate(${t.id}, '${t.image}')">
+            const container = document.getElementById('readyTemplatesList');
+            container.innerHTML = res.data.map(t => `
+                <div class="template-item ${state.selectedTemplate === t.id ? 'selected' : ''}" data-tpl-id="${t.id}" data-tpl-img="${t.image}">
                     <img src="${t.image}" style="width:100%;height:70px;object-fit:cover;border-radius:12px">
-                    <strong>${t.title}</strong>
+                    <strong style="color:#1e293b; font-size:0.75rem;">${t.title}</strong>
                 </div>
             `).join('');
-            if (state.selectedTemplateImage) {
-                document.querySelectorAll('.template-item').forEach(el => {
-                    if (el.querySelector('img')?.src === state.selectedTemplateImage) {
-                        el.classList.add('selected');
-                    }
-                });
-            }
+
+            container.querySelectorAll('.template-item').forEach(el => {
+                el.onclick = () => {
+                    document.querySelectorAll('.template-item').forEach(i => i.classList.remove('selected'));
+                    el.classList.add('selected');
+                    state.selectedTemplate = parseInt(el.dataset.tplId);
+                    state.selectedTemplateImage = el.dataset.tplImg;
+                    saveState();
+                };
+            });
         }
     }
-
-    window.selectTemplate = function (id, imageUrl) {
-        document.querySelectorAll('.template-item').forEach(i => i.classList.remove('selected'));
-        event.currentTarget.classList.add('selected');
-        state.selectedTemplate = id;
-        state.selectedTemplateImage = imageUrl;
-        saveState();
-    };
 
     document.getElementById('uploadFile').onchange = (e) => {
         const file = e.target.files[0];
@@ -625,6 +787,7 @@
     document.getElementById('width').addEventListener('change', saveState);
     document.getElementById('notes').addEventListener('change', saveState);
 
+    // ==================== مرحله ۴: طراحی ====================
     let canvas = null;
     let currentTool = 'polyline';
     let polylinePoints = [];
@@ -642,21 +805,13 @@
         }
     }
 
-    function showToastMessage(msg, isError = false) {
-        const toast = document.getElementById('selectedToast');
-        toast.style.backgroundColor = isError ? '#dc3545' : '#e67e22';
-        toast.innerHTML = isError ? `⚠️ ${msg}` : `✅ ${msg}`;
-        toast.style.display = 'block';
-        setTimeout(() => { toast.style.display = 'none'; }, 2000);
-    }
-
     function addText() {
         const textContent = prompt('متن خود را وارد کنید:', 'متن جدید');
         if (!textContent) return;
         const color = document.getElementById('penColorPicker').value;
         const fontSize = parseInt(document.getElementById('penWidthSlider').value) * 3;
         const textObj = new fabric.IText(textContent, {
-            left: 100, top: 100, fontSize: fontSize, fill: color, fontFamily: 'Vazir, Tahoma',
+            left: 100, top: 100, fontSize: fontSize, fill: color, fontFamily: 'Tahoma',
             editable: true, hasControls: true, hasBorders: true
         });
         canvas.add(textObj);
@@ -667,15 +822,21 @@
 
     function initCanvasDesign() {
         const wrapper = document.getElementById('canvasWrapper');
-        const width = wrapper.clientWidth;
-        const height = wrapper.clientHeight;
+        if (!wrapper) return;
+        const width = wrapper.clientWidth || 300;
+        const height = wrapper.clientHeight || 400;
         const canvasEl = document.getElementById('designCanvas');
         canvasEl.setAttribute('width', width);
         canvasEl.setAttribute('height', height);
         canvasEl.style.width = `${width}px`;
         canvasEl.style.height = `${height}px`;
-        if (canvas) canvas.dispose();
-        canvas = new fabric.Canvas('designCanvas', { selection: true, allowTouchScrolling: true, width, height, preserveObjectStacking: true });
+        if (canvas) { canvas.dispose(); canvas = null; }
+        canvas = new fabric.Canvas('designCanvas', {
+            selection: true,
+            allowTouchScrolling: true,
+            width, height,
+            preserveObjectStacking: true
+        });
         canvas.setBackgroundColor('rgba(0,0,0,0)', canvas.renderAll.bind(canvas));
         canvas.freeDrawingBrush.color = '#e67e22';
         canvas.freeDrawingBrush.width = 4;
@@ -687,17 +848,29 @@
     }
 
     function attachCanvasEvents() {
+        if (!canvas) return;
         canvas.off('mouse:down');
+        canvas.off('mouse:up');
+
         if (currentTool === 'polyline') {
             canvas.on('mouse:down', (e) => {
                 const pointer = canvas.getPointer(e.e);
-                const dot = new fabric.Circle({ radius: 6, fill: document.getElementById('penColorPicker').value, left: pointer.x - 6, top: pointer.y - 6, selectable: false, evented: false });
+                const dot = new fabric.Circle({
+                    radius: 6,
+                    fill: document.getElementById('penColorPicker').value,
+                    left: pointer.x - 6, top: pointer.y - 6,
+                    selectable: false, evented: false
+                });
                 canvas.add(dot);
                 polylinePoints.push({ x: pointer.x, y: pointer.y, dot });
                 if (polylinePoints.length >= 2) {
                     const prev = polylinePoints[polylinePoints.length - 2];
                     const curr = polylinePoints[polylinePoints.length - 1];
-                    const line = new fabric.Line([prev.x, prev.y, curr.x, curr.y], { stroke: document.getElementById('penColorPicker').value, strokeWidth: parseInt(document.getElementById('penWidthSlider').value), selectable: false, evented: false });
+                    const line = new fabric.Line([prev.x, prev.y, curr.x, curr.y], {
+                        stroke: document.getElementById('penColorPicker').value,
+                        strokeWidth: parseInt(document.getElementById('penWidthSlider').value),
+                        selectable: false, evented: false
+                    });
                     canvas.add(line);
                     polylinePoints[polylinePoints.length - 1].line = line;
                 }
@@ -720,14 +893,16 @@
             canvas.selection = false;
             canvas.on('mouse:down', () => { addText(); setActiveTool('select'); });
         }
-        canvas.on('mouse:up', () => { if (currentTool === 'pen' || currentTool === 'eraser') canvas.isDrawingMode = false; });
     }
 
     function finishCurrentPolyline() {
         if (polylinePoints.length < 2) { showToastMessage('حداقل دو نقطه نیاز است', true); return; }
         const groupItems = [];
         polylinePoints.forEach(p => { groupItems.push(p.dot); if(p.line) groupItems.push(p.line); });
-        const group = new fabric.Group(groupItems, { selectable: true, hasControls: true, borderColor: '#e67e22', cornerColor: '#e67e22' });
+        const group = new fabric.Group(groupItems, {
+            selectable: true, hasControls: true,
+            borderColor: '#e67e22', cornerColor: '#e67e22'
+        });
         canvas.remove(...groupItems);
         canvas.add(group);
         canvas.renderAll();
@@ -740,16 +915,32 @@
         canvas.renderAll();
         showToastMessage('لغو شد', true);
     }
-    function deleteSelectedObject() { if(canvas.getActiveObject()) { canvas.remove(canvas.getActiveObject()); canvas.discardActiveObject(); canvas.renderAll(); showToastMessage('حذف شد'); } else showToastMessage('چیزی انتخاب نشده', true); }
-    function clearAllCanvas() { if(confirm('حذف شود؟')) { canvas.clear(); canvas.setBackgroundColor('rgba(0,0,0,0)', canvas.renderAll.bind(canvas)); polylinePoints = []; showToastMessage('پاک شد'); } }
+    function deleteSelectedObject() {
+        if(canvas && canvas.getActiveObject()) {
+            canvas.remove(canvas.getActiveObject());
+            canvas.discardActiveObject();
+            canvas.renderAll();
+            showToastMessage('حذف شد');
+        } else showToastMessage('چیزی انتخاب نشده', true);
+    }
+    function clearAllCanvas() {
+        if(canvas && confirm('حذف شود؟')) {
+            canvas.clear();
+            canvas.setBackgroundColor('rgba(0,0,0,0)', canvas.renderAll.bind(canvas));
+            polylinePoints = [];
+            showToastMessage('پاک شد');
+        }
+    }
     function applyColorToSelected() {
+        if (!canvas) return;
         const obj = canvas.getActiveObject();
         if(!obj) return showToastMessage('عنصری انتخاب نشده', true);
         const color = document.getElementById('penColorPicker').value;
         if(obj.type === 'group') obj.forEachObject(item => { if(item.stroke) item.set('stroke', color); });
         else if(obj.stroke) obj.set('stroke', color);
         else if(obj.fill) obj.set('fill', color);
-        canvas.renderAll(); showToastMessage('رنگ تغییر کرد');
+        canvas.renderAll();
+        showToastMessage('رنگ تغییر کرد');
     }
 
     function setActiveTool(tool) {
@@ -769,14 +960,29 @@
     function setupFloatingMenu() {
         const mainBtn = document.getElementById('mainToolBtn'), toolsPanel = document.getElementById('toolsPanel'), colorPanel = document.getElementById('colorPanel');
         mainBtn.onclick = (e) => { e.stopPropagation(); toolsPanel.classList.toggle('open'); colorPanel.classList.remove('open'); };
-        document.querySelectorAll('.tool-item[data-tool]').forEach(item => { item.onclick = () => { setActiveTool(item.getAttribute('data-tool')); toolsPanel.classList.remove('open'); if(['pen','polyline'].includes(item.getAttribute('data-tool'))) colorPanel.classList.add('open'); else colorPanel.classList.remove('open'); }; });
+        document.querySelectorAll('.tool-item[data-tool]').forEach(item => {
+            item.onclick = () => {
+                setActiveTool(item.getAttribute('data-tool'));
+                toolsPanel.classList.remove('open');
+                if(['pen','polyline'].includes(item.getAttribute('data-tool'))) colorPanel.classList.add('open');
+                else colorPanel.classList.remove('open');
+            };
+        });
         document.getElementById('finishPolylineItem').onclick = () => { finishCurrentPolyline(); toolsPanel.classList.remove('open'); };
         document.getElementById('cancelPolylineItem').onclick = () => { cancelCurrentPolyline(); toolsPanel.classList.remove('open'); };
         document.getElementById('clearCanvasItem').onclick = () => { clearAllCanvas(); toolsPanel.classList.remove('open'); };
         document.getElementById('applyColorBtn').onclick = () => { applyColorToSelected(); colorPanel.classList.remove('open'); };
         document.getElementById('deleteSelectedItem').onclick = () => { deleteSelectedObject(); colorPanel.classList.remove('open'); };
-        document.getElementById('penWidthSlider').oninput = (e) => { document.getElementById('widthVal').innerText = e.target.value; if(canvas && (currentTool === 'pen' || currentTool === 'eraser') && canvas.isDrawingMode) canvas.freeDrawingBrush.width = parseInt(e.target.value); };
-        document.addEventListener('click', (e) => { if(!mainBtn.contains(e.target) && !toolsPanel.contains(e.target) && !colorPanel.contains(e.target)) { toolsPanel.classList.remove('open'); colorPanel.classList.remove('open'); } });
+        document.getElementById('penWidthSlider').oninput = (e) => {
+            document.getElementById('widthVal').innerText = e.target.value;
+            if(canvas && (currentTool === 'pen' || currentTool === 'eraser') && canvas.isDrawingMode) canvas.freeDrawingBrush.width = parseInt(e.target.value);
+        };
+        document.addEventListener('click', (e) => {
+            if(!mainBtn.contains(e.target) && !toolsPanel.contains(e.target) && !colorPanel.contains(e.target)) {
+                toolsPanel.classList.remove('open');
+                colorPanel.classList.remove('open');
+            }
+        });
     }
 
     function getCanvasImage() {
@@ -786,55 +992,49 @@
         return null;
     }
 
-    function getCanvasImageUrl() {
-        if(canvas && canvas.getObjects().length > 0) {
-            return canvas.toDataURL({ format: 'png', quality: 0.9 });
-        }
-        return null;
-    }
-
+    // ==================== مرحله ۵: پیش‌نمایش و نهایی ====================
     function displayPreviews() {
         const previewsSection = document.getElementById('previewsSection');
         previewsSection.innerHTML = '';
 
         if (state.designType === 'ready' && state.selectedTemplateImage) {
-            const templateCard = document.createElement('div');
-            templateCard.className = 'preview-card';
-            templateCard.innerHTML = `
+            const c = document.createElement('div');
+            c.className = 'preview-card';
+            c.innerHTML = `
                 <div class="preview-title"><i class="fas fa-th-large"></i> طرح آماده انتخابی</div>
                 <div class="preview-container">
                     <img src="${state.selectedTemplateImage}" alt="طرح آماده">
                     <button class="view-full-btn" data-img="${state.selectedTemplateImage}"><i class="fas fa-expand"></i> مشاهده بزرگ</button>
                 </div>
             `;
-            previewsSection.appendChild(templateCard);
+            previewsSection.appendChild(c);
         }
 
         if (state.designType === 'upload' && state.uploadedImage) {
-            const uploadCard = document.createElement('div');
-            uploadCard.className = 'preview-card';
-            uploadCard.innerHTML = `
+            const c = document.createElement('div');
+            c.className = 'preview-card';
+            c.innerHTML = `
                 <div class="preview-title"><i class="fas fa-cloud-upload-alt"></i> عکس آپلود شده</div>
                 <div class="preview-container">
                     <img src="${state.uploadedImage}" alt="عکس آپلود شده">
                     <button class="view-full-btn" data-img="${state.uploadedImage}"><i class="fas fa-expand"></i> مشاهده بزرگ</button>
                 </div>
             `;
-            previewsSection.appendChild(uploadCard);
+            previewsSection.appendChild(c);
         }
 
-        const canvasImage = getCanvasImageUrl();
-        if (canvasImage && canvasImage !== 'data:image/png;base64,') {
-            const planCard = document.createElement('div');
-            planCard.className = 'preview-card';
-            planCard.innerHTML = `
-                <div class="preview-title"><i class="fas fa-draw-polygon"></i> پلن طراحی شده دستی (مرحله ۵)</div>
+        const canvasImage = getCanvasImage();
+        if (canvasImage) {
+            const c = document.createElement('div');
+            c.className = 'preview-card';
+            c.innerHTML = `
+                <div class="preview-title"><i class="fas fa-draw-polygon"></i> پلن طراحی شده دستی</div>
                 <div class="preview-container">
                     <img src="${canvasImage}" alt="پلن طراحی شده">
                     <button class="view-full-btn" data-img="${canvasImage}"><i class="fas fa-expand"></i> مشاهده بزرگ</button>
                 </div>
             `;
-            previewsSection.appendChild(planCard);
+            previewsSection.appendChild(c);
         }
 
         if (previewsSection.children.length === 0) {
@@ -855,7 +1055,7 @@
         modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:10000;display:flex;align-items:center;justify-content:center;cursor:pointer;';
         const fullImg = document.createElement('img');
         fullImg.src = imgSrc;
-        fullImg.style.cssText = 'max-width:90%;max-height:90%;object-fit:contain;border-radius:12px;box-shadow:0 0 30px rgba(230,126,34,0.3);';
+        fullImg.style.cssText = 'max-width:90%;max-height:90%;object-fit:contain;border-radius:12px;';
         modal.appendChild(fullImg);
         modal.onclick = () => modal.remove();
         document.body.appendChild(modal);
@@ -872,10 +1072,12 @@
         displayPreviews();
     }
 
+    // ==================== ثبت سفارش ====================
     async function submitOrderWithRedirect() {
         const length = parseFloat(document.getElementById('length').value) || 0;
         const width = parseFloat(document.getElementById('width').value) || 0;
         if(length <= 0 || width <= 0) { alert('لطفاً طول و عرض را وارد کنید'); return; }
+
         const orderData = {
             installation_id: state.installation?.id,
             material_id: state.material?.id,
@@ -886,6 +1088,7 @@
             notes: document.getElementById('notes').value || '',
             plan_image: getCanvasImage()
         };
+
         showLoading();
         try {
             const res = await fetch('/pro/api/create-order/', {
@@ -895,39 +1098,35 @@
             });
             const result = await res.json();
             hideLoading();
-            if(result.status === 'success' && result.redirect_url) window.location.href = result.redirect_url;
-            else if(result.redirect_url) window.location.href = result.redirect_url;
-            else if(result.order_id) window.location.href = `/order/checkout/${result.order_id}/`;
-            else {
-                const toastDiv = document.createElement('div');
-                toastDiv.className = 'toast-success';
-                toastDiv.innerHTML = `
-                    <i class="fas fa-check-circle" style="font-size:48px"></i>
-                    <h3>✅ سفارش با موفقیت ثبت شد</h3>
-                    <p>شماره سفارش: ${Math.floor(Math.random()*9999)}</p>
-                    <button onclick="window.location.href='/order/checkout/'">مشاهده فاکتور و پرداخت</button>
-                `;
-                document.body.appendChild(toastDiv);
+
+            if(result.status === 'success' && result.redirect_url) {
+                window.location.href = result.redirect_url;
+            } else if(result.order_id) {
+                window.location.href = `/order/checkout/${result.order_id}/`;
+            } else {
+                throw new Error(result.message || 'خطا در ثبت سفارش');
             }
         } catch(err) {
             hideLoading();
             const toastDiv = document.createElement('div');
             toastDiv.className = 'toast-success';
+            toastDiv.style.background = 'rgba(220,53,69,0.95)';
             toastDiv.innerHTML = `
-                <i class="fas fa-check-circle" style="font-size:48px"></i>
-                <h3>✅ سفارش با موفقیت ثبت شد</h3>
-                <p>شماره سفارش: ${Math.floor(Math.random()*9999)}</p>
-                <button onclick="window.location.href='/order/checkout/'">مشاهده فاکتور و پرداخت</button>
+                <i class="fas fa-exclamation-triangle" style="font-size:48px"></i>
+                <h3>❌ خطا در ثبت سفارش</h3>
+                <p>${err.message || 'لطفاً دوباره تلاش کنید'}</p>
+                <button onclick="this.parentElement.remove()" style="background:white;color:#dc3545;">بستن</button>
             `;
             document.body.appendChild(toastDiv);
         }
     }
 
+    // ==================== ناوبری مراحل ====================
     function toggleFullscreenMode(hide) {
         document.getElementById('mainHeader').classList.toggle('hide-header', hide);
         document.getElementById('progressWrap').classList.toggle('hide-progress', hide);
         document.getElementById('mainContainer').classList.toggle('fullscreen-mode', hide);
-        document.getElementById('step5').classList.toggle('fullscreen-step', hide);
+        document.getElementById('step4').classList.toggle('fullscreen-step', hide);
         document.body.classList.toggle('step5-active', hide);
     }
 
@@ -935,60 +1134,88 @@
         document.querySelectorAll('.step-container').forEach(s => s.classList.remove('active'));
         const target = document.getElementById(`step${step}`);
         if (target) target.classList.add('active');
-        for (let i=1;i<=6;i++) {
+
+        // آپدیت progress
+        for (let i=1;i<=5;i++) {
             const badge = document.getElementById(`step${i}Badge`);
             if (!badge) continue;
-            if(i<step) { badge.classList.add('done'); badge.classList.remove('active'); }
-            else if(i===step) { badge.classList.add('active'); badge.classList.remove('done'); }
-            else badge.classList.remove('active','done');
+            badge.classList.remove('active', 'done');
+            if(i<step) badge.classList.add('done');
+            else if(i===step) badge.classList.add('active');
         }
+
         state.step = step;
         saveState();
-        if(step===5) {
+
+        if(step===4) {
             toggleFullscreenMode(true);
-            setTimeout(() => { initCanvasDesign(); setupFloatingMenu(); setTimeout(resizeCanvas, 50); }, 100);
+            setTimeout(() => {
+                initCanvasDesign();
+                setupFloatingMenu();
+                setTimeout(resizeCanvas, 50);
+            }, 100);
         } else {
             toggleFullscreenMode(false);
         }
-        if(step===4) initDesignOptions();
-        if(step===6) updateFinal();
+        if(step===3) initDesignOptions();
+        if(step===5) updateFinal();
     }
 
     async function nextStep() {
         const s = state.step;
-        if(s===1 && !state.installation) { alert('نصبیات را انتخاب کنید'); return; }
-        if(s===2 && !state.material) { alert('جنس را انتخاب کنید'); return; }
-        if(s===3) { goToStep(4); return; }
-        if(s===4) {
+
+        if(s===1) {
+            // اعتبارسنجی: باید نصبیات انتخاب شود + حداقل یک PDF معتبر
+            if(!state.installation) { alert('نصبیات را انتخاب کنید'); return; }
+            const codes = state.pdfCodesByInstallation[state.installation.id] || {};
+            const validOnes = Object.values(codes).filter(c => c.valid);
+            if(validOnes.length === 0) { alert('حداقل یک کد PDF معتبر وارد کنید'); return; }
+            // ست کردن اولین PDF معتبر
+            const firstValid = validOnes[0];
+            state.pdf = { id: firstValid.pdfInfo.id, title: firstValid.pdfInfo.title };
+            state.pdfCode = firstValid.code;
+            saveState();
+            goToStep(2);
+            await loadMaterials(state.installation.id);
+            return;
+        }
+
+        if(s===2) {
+            if(!state.material) { alert('جنس را انتخاب کنید'); return; }
+            goToStep(3);
+            return;
+        }
+
+        if(s===3) {
             if(!document.getElementById('length').value || !document.getElementById('width').value) { alert('طول و عرض را وارد کنید'); return; }
             if(!state.designType) { alert('نوع طرح را انتخاب کنید'); return; }
             if(state.designType === 'ready' && !state.selectedTemplate) { alert('طرح آماده را انتخاب کنید'); return; }
-            goToStep(5); return;
+            if(state.designType === 'upload' && !state.uploadedImage) { alert('عکس را آپلود کنید'); return; }
+            goToStep(4);
+            return;
         }
-        if(s===5) { goToStep(6); return; }
-        if(s===6) { await submitOrderWithRedirect(); return; }
-        if(s<6) goToStep(s+1);
+
+        if(s===4) { goToStep(5); return; }
+        if(s===5) { await submitOrderWithRedirect(); return; }
     }
 
-    function prevStep() { if(state.step>1) goToStep(state.step-1); }
+    function prevStep() {
+        if(state.step > 1) goToStep(state.step - 1);
+    }
 
     document.getElementById('nextBtn').onclick = nextStep;
     document.getElementById('prevBtn').onclick = prevStep;
-    document.getElementById('verifyBtn').onclick = verifyPdfCode;
 
-    // بارگذاری اولیه با بازیابی state
+    // ==================== بارگذاری اولیه ====================
     (async function init() {
         await loadInstallations();
         const savedStep = loadState();
-        // اگر state ذخیره شده داشت، برو به همون مرحله
-        if (savedStep > 1) {
-            // ولی برای اینکه آیتم‌ها لود بشن، مرحله به مرحله بریم
-            if (state.installation) {
-                await loadMaterials(state.installation.id);
-            }
-            if (state.material) {
-                await loadPdfs(state.material.id);
-            }
+
+        // رندر مجدد با state بازیابی شده
+        renderInstallations();
+
+        if (savedStep > 1 && state.installation) {
+            await loadMaterials(state.installation.id);
             goToStep(savedStep);
         } else {
             goToStep(1);

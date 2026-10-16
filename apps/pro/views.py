@@ -10,7 +10,8 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.utils import timezone
-from decimal import Decimal
+from django.db import transaction
+from decimal import Decimal, InvalidOperation
 
 from .models import Installation, InstallationMaterial, MaterialPDF, ReadyTemplate, OrderMaterial
 from apps.order.models import Order, OrderItem, OrderStatusHistory, OrderStatus, OrderType
@@ -25,16 +26,37 @@ def proorder_page(request):
 # ==================== API های مرحله به مرحله ====================
 
 def get_installations(request):
-    """مرحله 1: لیست نصبیات"""
-    installations = Installation.objects.filter(is_active=True)
-    data = [{
-        'id': ins.id,
-        'title': ins.title,
-        'description': ins.description,
-        'image': ins.main_image.url if ins.main_image else '',
-        'order': ins.order,
-        'price': str(ins.price) if ins.price else '0'
-    } for ins in installations]
+    """مرحله 1: لیست نصبیات همراه با PDFهای هر کدام"""
+    installations = Installation.objects.filter(is_active=True).prefetch_related(
+        'materials__pdfs'
+    )
+
+    data = []
+    for ins in installations:
+        # جمع‌آوری PDFها از طریق materials
+        pdfs = []
+        for material in ins.materials.filter(is_active=True):
+            for pdf in material.pdfs.all():
+                pdfs.append({
+                    'id': pdf.id,
+                    'title': pdf.title,
+                    'code': pdf.code,
+                    'material_id': material.id,
+                    'material_title': material.title,
+                    'file_url': pdf.pdf_file.url if pdf.pdf_file else '',
+                    'download_count': pdf.download_count,
+                })
+
+        data.append({
+            'id': ins.id,
+            'title': ins.title,
+            'description': ins.description,
+            'image': ins.main_image.url if ins.main_image else '',
+            'order': ins.order,
+            'price': str(ins.price) if ins.price else '0',
+            'pdfs': pdfs,
+        })
+
     return JsonResponse({'status': 'success', 'data': data})
 
 
@@ -54,44 +76,38 @@ def get_materials_by_installation(request, installation_id):
     return JsonResponse({'status': 'success', 'data': data})
 
 
-def get_pdfs_by_material(request, material_id):
-    """مرحله 3: PDFهای مخصوص یک جنس"""
-    pdfs = MaterialPDF.objects.filter(material_id=material_id)
-    data = [{
-        'id': p.id,
-        'title': p.title,
-        'code': p.code,
-        'file_url': p.pdf_file.url if p.pdf_file else '',
-        'download_count': p.download_count
-    } for p in pdfs]
-    return JsonResponse({'status': 'success', 'data': data})
-
-
 @csrf_exempt
 @require_http_methods(["POST"])
 def verify_pdf_code(request):
-    """تایید کد PDF"""
+    """تایید کد PDF (بدون وابستگی به material_id)"""
     try:
         body = json.loads(request.body)
-        code = body.get('code', '')
-        material_id = body.get('material_id')
+        code = (body.get('code') or '').strip()
 
-        pdf = MaterialPDF.objects.filter(code=code, material_id=material_id).first()
+        if not code:
+            return JsonResponse({
+                'status': 'error', 'valid': False,
+                'message': 'کد را وارد کنید'
+            })
+
+        pdf = MaterialPDF.objects.filter(code=code).select_related('material').first()
         if pdf:
             return JsonResponse({
                 'status': 'success',
                 'valid': True,
                 'id': pdf.id,
                 'title': pdf.title,
+                'material_id': pdf.material_id,
+                'material_title': pdf.material.title if pdf.material else '',
                 'file_url': pdf.pdf_file.url if pdf.pdf_file else ''
             })
         return JsonResponse({'status': 'error', 'valid': False, 'message': 'کد معتبر نیست'})
-    except:
-        return JsonResponse({'status': 'error', 'valid': False, 'message': 'خطا'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'valid': False, 'message': str(e)})
 
 
 def get_templates_by_installation(request, installation_id):
-    """مرحله 4: طرح‌های آماده یک نصبیات"""
+    """مرحله 3 (قبلاً 4): طرح‌های آماده یک نصبیات"""
     templates = ReadyTemplate.objects.filter(installation_id=installation_id, is_active=True)
     data = [{
         'id': t.id,
@@ -116,26 +132,20 @@ def calculate_price(request):
 
         length = Decimal(str(body.get('length', 0)))
         width = Decimal(str(body.get('width', 0)))
-
-        # محاسبه مساحت به متر مربع
         area = length * width
 
-        # گرفتن قیمت نصبیات (قیمت پایه برای هر متر مربع)
         installation_price = Decimal('0')
         if body.get('installation_id'):
             installation = Installation.objects.filter(id=body.get('installation_id')).first()
             if installation:
                 installation_price = Decimal(str(installation.price))
 
-        # گرفتن ضریب جنس
         material_multiplier = Decimal('1.0')
         if body.get('material_id'):
             material = InstallationMaterial.objects.filter(id=body.get('material_id')).first()
             if material:
                 material_multiplier = Decimal(str(material.price_multiplier))
 
-        # فرمول محاسبه قیمت نهایی:
-        # قیمت نهایی = (قیمت نصبیات × ضریب جنس) × مساحت (متر مربع)
         base_price_per_meter = installation_price * material_multiplier
         total_price = base_price_per_meter * area
 
@@ -155,63 +165,31 @@ def calculate_price(request):
         })
 
     except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': str(e)
-        })
-
-
-# ==================== ثبت سفارش قدیمی (submit_order) ====================
-
-@csrf_exempt
-@require_http_methods(["POST"])
-def submit_order(request):
-    """مرحله نهایی: ثبت سفارش (نسخه قدیمی)"""
-    try:
-        body = json.loads(request.body)
-
-        order = OrderMaterial.objects.create(
-            user=request.user if request.user.is_authenticated else None,
-            installation_id=body.get('installation_id'),
-            material_id=body.get('material_id'),
-            pdf_document_id=body.get('pdf_id'),
-            ready_template_id=body.get('template_id'),
-            design_type=body.get('design_type', 'custom'),
-            length=body.get('length', 0),
-            width=body.get('width', 0),
-            notes=body.get('notes', '')
-        )
-
-        # ذخیره عکس پلن اگه باشه
-        if body.get('plan_image'):
-            format, imgstr = body.get('plan_image').split(';base64,')
-            ext = format.split('/')[-1]
-            order.plan_image.save(f"plan_{order.id}.{ext}", ContentFile(base64.b64decode(imgstr)), save=True)
-
-        return JsonResponse({
-            'status': 'success',
-            'message': 'سفارش ثبت شد',
-            'order_id': str(order.id)
-        })
-    except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
 
 
-# ==================== ثبت سفارش جدید با ادغام در سیستم اصلی Order ====================
+# ==================== ثبت سفارش (ادغام در سیستم اصلی Order) ====================
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@transaction.atomic
 def create_pro_order(request):
     """ایجاد سفارش نصبیات و ادغام با سیستم اصلی Order"""
     try:
         body = json.loads(request.body)
 
         # ==================== محاسبه مساحت و قیمت ====================
-        length = Decimal(str(body.get('length', 0)))
-        width = Decimal(str(body.get('width', 0)))
-        area = length * width  # مساحت به متر مربع
+        try:
+            length = Decimal(str(body.get('length', 0)))
+            width = Decimal(str(body.get('width', 0)))
+        except (InvalidOperation, ValueError, TypeError):
+            return JsonResponse({'status': 'error', 'message': 'ابعاد نامعتبر است'})
 
-        # گرفتن نصبیات و قیمت آن (قیمت هر متر مربع)
+        if length <= 0 or width <= 0:
+            return JsonResponse({'status': 'error', 'message': 'طول و عرض باید مثبت باشند'})
+
+        area = length * width
+
         installation_price = Decimal('0')
         installation_title = "نصبیات"
         if body.get('installation_id'):
@@ -220,7 +198,6 @@ def create_pro_order(request):
                 installation_price = Decimal(str(installation.price))
                 installation_title = installation.title
 
-        # گرفتن جنس و ضریب آن
         material_multiplier = Decimal('1.0')
         material_title = ""
         if body.get('material_id'):
@@ -229,7 +206,6 @@ def create_pro_order(request):
                 material_multiplier = Decimal(str(material.price_multiplier))
                 material_title = material.title
 
-        # ==================== فرمول محاسبه قیمت نهایی ====================
         base_price_per_meter = installation_price * material_multiplier
         total_price = base_price_per_meter * area
 
@@ -247,17 +223,15 @@ def create_pro_order(request):
         )
 
         # ==================== ایجاد OrderItem ====================
-        product_title = f"{installation_title} - {material_title}".strip()
-        if not product_title or product_title == "-":
+        product_title = f"{installation_title} - {material_title}".strip(" -")
+        if not product_title:
             product_title = "سفارش چاپی"
-
-        dimensions_text = f"ابعاد: {length} × {width} متر | مساحت: {area:,.2f} متر مربع"
 
         order_item = OrderItem.objects.create(
             order=order,
             product=None,
             product_title=product_title,
-            product_code=f"PRINT-{timezone.now().strftime('%Y%m%d')}-{order.order_number}",
+            product_code=f"PRINT-{timezone.now().strftime('%Y%m%d%H%M%S')}-{str(order.id)[:8]}",
             quantity=1,
             unit_price=total_price,
             unit_price_before_discount=total_price,
@@ -284,14 +258,21 @@ def create_pro_order(request):
         )
 
         # ذخیره عکس پلن اگر وجود داشته باشد
-        if body.get('plan_image'):
-            format, imgstr = body.get('plan_image').split(';base64,')
-            ext = format.split('/')[-1]
-            pro_order_material.plan_image.save(
-                f"plan_{pro_order_material.id}.{ext}",
-                ContentFile(base64.b64decode(imgstr)),
-                save=True
-            )
+        plan_image_data = body.get('plan_image')
+        if plan_image_data and isinstance(plan_image_data, str) and ';base64,' in plan_image_data:
+            try:
+                fmt, imgstr = plan_image_data.split(';base64,', 1)
+                ext = fmt.split('/')[-1].split(';')[0] or 'png'
+                filename = f"plan_{pro_order_material.id}.{ext}"
+                pro_order_material.plan_image.save(
+                    filename,
+                    ContentFile(base64.b64decode(imgstr)),
+                    save=False
+                )
+                pro_order_material.save(update_fields=['plan_image'])
+            except Exception as img_err:
+                # اگر عکس خراب بود، حداقل بقیه سفارش ذخیره شود
+                print(f"Plan image save error: {img_err}")
 
         # اتصال OrderMaterial به Order
         order.printing = pro_order_material
@@ -301,14 +282,14 @@ def create_pro_order(request):
         OrderStatusHistory.objects.create(
             order=order,
             status=OrderStatus.PENDING.value,
-            note=f"سفارش چاپی: {product_title} | {dimensions_text} | مبلغ: {total_price:,.0f} تومان"
+            note=f"سفارش چاپی: {product_title} | ابعاد: {length}×{width} متر | مبلغ: {total_price:,.0f} تومان"
         )
 
         return JsonResponse({
             'status': 'success',
             'message': 'سفارش با موفقیت ایجاد شد',
             'order_id': str(order.id),
-            'order_number': order.order_number,
+            'order_number': getattr(order, 'order_number', str(order.id)[:8]),
             'total_price': f"{total_price:,.0f}",
             'redirect_url': f'/order/checkout/{str(order.id)}/'
         })
@@ -318,6 +299,5 @@ def create_pro_order(request):
         traceback.print_exc()
         return JsonResponse({
             'status': 'error',
-            'message': str(e)
+            'message': f'خطا در ثبت سفارش: {str(e)}'
         })
-
