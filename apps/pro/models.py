@@ -5,7 +5,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 import uuid
 
-# ==================== 1. نصبیات (محصول اصلی) ====================
+
+# ==================== 1. نصبیات ====================
 class Installation(models.Model):
     """نصبیات اصلی - مثل: سقف کشسان، پوستر سه بعدی"""
     title = models.CharField(_("عنوان"), max_length=200)
@@ -14,7 +15,7 @@ class Installation(models.Model):
     order = models.PositiveIntegerField(_("ترتیب نمایش"), default=0)
     is_active = models.BooleanField(_("فعال"), default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    price = models.PositiveIntegerField(default=0,verbose_name='قیمت نصبیات')
+    price = models.PositiveIntegerField(default=0, verbose_name='قیمت نصبیات')
 
     class Meta:
         verbose_name = _("نصبیات")
@@ -266,10 +267,18 @@ class OrderMaterial(models.Model):
         help_text="توضیحات اضافی سفارش"
     )
 
+    # ⭐ کدهای انتخاب‌شده از PDF توسط کاربر
+    selected_codes = models.TextField(
+        "کدهای انتخاب‌شده از PDF",
+        blank=True,
+        default="",
+        help_text="کدهای طرح که کاربر از PDF استخراج کرده (با کاما جدا شده)"
+    )
+
     # تاریخ‌ها
     created_at = models.DateTimeField("تاریخ ثبت", default=timezone.now)
     updated_at = models.DateTimeField("آخرین بروزرسانی", auto_now=True)
-    isEnd = models.BooleanField(default=False,verbose_name='اتمام طرح')
+    isEnd = models.BooleanField(default=False, verbose_name='اتمام طرح')
 
     class Meta:
         verbose_name = "سفارش"
@@ -283,6 +292,13 @@ class OrderMaterial(models.Model):
     def area(self):
         """مساحت به متر مربع"""
         return float(self.length) * float(self.width)
+
+    @property
+    def selected_codes_list(self):
+        """لیست کدهای انتخاب‌شده"""
+        if not self.selected_codes:
+            return []
+        return [c.strip() for c in self.selected_codes.split(',') if c.strip()]
 
 
 # ==================== 7. وضعیت طراحی و فایل نهایی ====================
@@ -352,7 +368,7 @@ class OrderDesignStatus(models.Model):
         return f"وضعیت طراحی سفارش {self.order.id} - {self.get_status_display()}"
 
 
-# ==================== 8. تاریخچه رد و تاییدها (حداکثر ۳ بار) ====================
+# ==================== 8. تاریخچه رد و تاییدها ====================
 class OrderReviewHistory(models.Model):
     """تاریخچه بررسی‌های کاربر و اپراتور (رد/تایید)"""
 
@@ -381,7 +397,6 @@ class OrderReviewHistory(models.Model):
         help_text="دلیل رد یا توضیحات"
     )
 
-    # تصویر یا فایل ارسالی در این مرحله (در صورت وجود)
     attached_image = models.ImageField(
         "تصویر پیوست",
         upload_to="review_images/%Y/%m/%d/",
@@ -389,7 +404,6 @@ class OrderReviewHistory(models.Model):
         null=True
     )
 
-    # مرحله چندم رد شدن (از ۱ تا ۳)
     reject_round = models.PositiveSmallIntegerField(
         "مرحله رد شدن",
         blank=True,
@@ -414,5 +428,3 @@ class OrderReviewHistory(models.Model):
 
     def __str__(self):
         return f"{self.order.id} - {self.get_action_display()} - {self.created_at.strftime('%Y/%m/%d %H:%M')}"
-
-

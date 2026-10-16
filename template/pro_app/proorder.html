@@ -657,16 +657,38 @@ function updFinal(){
 }
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>goTo(+b.dataset.go));
 async function submit(){
-    const [length,width]=dims(); if(length<=0||width<=0) return toast('طول و عرض را وارد کنید',true);
-    const body={installation_id:S.installation?.id,material_id:S.material?.id,design_type:S.designType||'custom',length,width,notes:$('notes').value||'',plan_image:canvasImage()||planImg,selected_codes:S.codes[S.installation?.id]||{}};
+    const [length,width]=dims();
+    if(length<=0||width<=0) return toast('طول و عرض را وارد کنید',true);
+
+    // ⭐ جمع‌آوری کدها به صورت آرایه ساده
+    const codesObj = S.codes[S.installation?.id] || {};
+    const codesArray = Object.values(codesObj).filter(c => c && String(c).trim());
+
+    const body = {
+        installation_id: S.installation?.id,
+        material_id: S.material?.id,
+        design_type: S.designType || 'custom',
+        length, width,
+        notes: $('notes').value || '',
+        plan_image: canvasImage() || planImg,
+        selected_codes: codesArray  // ⭐ آرایه ساده به جای آبجکت
+    };
+
     load_(true);
-    try{
-        const r=await (await fetch('/pro/api/create-order/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})).json();
+    try {
+        const r = await (await fetch('/pro/api/create-order/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        })).json();
         load_(false);
-        if(r.status==='success'&&r.redirect_url) location.href=r.redirect_url;
-        else if(r.order_id) location.href=`/order/checkout/${r.order_id}/`;
-        else throw new Error(r.message||'خطا در ثبت سفارش');
-    }catch(e){ load_(false); toast(e.message||'خطا در ثبت سفارش، دوباره تلاش کنید',true); }
+        if (r.status === 'success' && r.redirect_url) location.href = r.redirect_url;
+        else if (r.order_id) location.href = `/order/checkout/${r.order_id}/`;
+        else throw new Error(r.message || 'خطا در ثبت سفارش');
+    } catch(e) {
+        load_(false);
+        toast(e.message || 'خطا در ثبت سفارش، دوباره تلاش کنید', true);
+    }
 }
 
 // ---------- ناوبری با History ----------

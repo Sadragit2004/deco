@@ -37,7 +37,7 @@ def get_installations(request):
                 pdfs.append({
                     'id': pdf.id,
                     'title': pdf.title,
-                    'code': pdf.code,  # کد خود PDF (فقط برای نمایش، نه مقایسه)
+                    'code': pdf.code,
                     'material_id': material.id,
                     'material_title': material.title,
                     'file_url': pdf.pdf_file.url if pdf.pdf_file else '',
@@ -217,17 +217,16 @@ def create_pro_order(request):
 
         # ==================== جمع‌آوری کدهای وارد شده ====================
         # کدها به صورت دیکشنری می‌آیند: {pdfId: code, ...}
-        # یا به صورت آرایه: [{pdf_id, code}, ...]
+        # یا به صورت آرایه: ["A-001", ...]
+        # یا به صورت رشته: "A-001, B-102"
         selected_codes_data = body.get('selected_codes', {})
         codes_list = []
 
         if isinstance(selected_codes_data, dict):
-            # { "12": "A-001", "13": "B-102" }
             for pdf_id, code in selected_codes_data.items():
                 if code and str(code).strip():
                     codes_list.append(str(code).strip())
         elif isinstance(selected_codes_data, list):
-            # ["A-001", "B-102"] یا [{"pdf_id": 12, "code": "A-001"}]
             for item in selected_codes_data:
                 if isinstance(item, dict):
                     c = item.get('code', '')
@@ -237,10 +236,16 @@ def create_pro_order(request):
                     if item and str(item).strip():
                         codes_list.append(str(item).strip())
         elif isinstance(selected_codes_data, str):
-            # "A-001, B-102"
             codes_list = [c.strip() for c in selected_codes_data.split(',') if c.strip()]
 
-        selected_codes_str = ', '.join(codes_list)
+        # حذف تکراری‌ها با حفظ ترتیب
+        seen = set()
+        unique_codes = []
+        for c in codes_list:
+            if c not in seen:
+                seen.add(c)
+                unique_codes.append(c)
+        selected_codes_str = ', '.join(unique_codes)
 
         # ==================== ایجاد OrderMaterial ====================
         pro_order_material = OrderMaterial.objects.create(
