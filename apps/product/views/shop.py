@@ -11,7 +11,6 @@ from django.views import View
 from apps.product.models import (
     Brand,
     Category,
-
     Product,
 )
 
