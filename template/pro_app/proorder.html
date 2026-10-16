@@ -1,1038 +1,718 @@
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>سفارش چاپی DECO B2B | طراحی حرفه‌ای</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', 'Tahoma', system-ui, sans-serif; color: #1a1a2e; position: relative; overflow-x: hidden; min-height: 100vh; }
-        #bgCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; display: block; pointer-events: none; }
-        .header, .progress-wrap, .main, .bottom-fixed, .floating-tools, .tools-panel, .color-panel { position: relative; z-index: 10; }
-        .header { background: rgba(26, 26, 46, 0.85); backdrop-filter: blur(12px); padding: 14px 20px; position: sticky; top: 0; z-index: 100; transition: all 0.2s; border-bottom: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        .header.hide-header { display: none; }
-        .header h1 { color: #e67e22; font-size: 1.3rem; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .header p { color: rgba(255,255,255,0.9); font-size: 0.7rem; margin-top: 4px; }
-        .progress-wrap { background: rgba(255,255,255,0.75); backdrop-filter: blur(12px); padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.3); }
-        .progress-wrap.hide-progress { display: none; }
-        .progress-steps { display: flex; justify-content: space-around; max-width: 550px; margin: 0 auto; }
-        .step { text-align: center; flex: 1; }
-        .step-badge { width: 32px; height: 32px; margin: 0 auto 5px; background: rgba(0,0,0,0.2); backdrop-filter: blur(4px); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; color: #333; }
-        .step-badge.active { background: #e67e22; color: white; box-shadow: 0 0 12px rgba(230,126,34,0.5); }
-        .step-badge.done { background: #27ae60; color: white; }
-        .step-label { font-size: 9px; color: #fff; font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
-        .step.active .step-label { color: #e67e22; font-weight: bold; }
-        .main { padding: 16px 12px 80px; min-height: calc(100vh - 110px); }
-        .main.fullscreen-mode { padding: 0; height: 100vh; display: flex; flex-direction: column; }
-        .container { max-width: 600px; margin: 0 auto; }
-        .main.fullscreen-mode .container { max-width: 100%; height: 100%; display: flex; flex-direction: column; }
-        .card { border-radius: 20px; padding: 16px; margin-bottom: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(8px); background: rgba(0,0,0,0.3); }
-        .card-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 16px; border-right: 3px solid #e67e22; padding-right: 10px; display: flex; align-items: center; gap: 8px; color: #ffffff; }
-        .step-container { display: none; }
-        .step-container.active { display: block; }
-        .step-container.fullscreen-step { flex: 1; display: flex; flex-direction: column; height: 100%; }
-        .step-container.fullscreen-step .card { flex: 1; border-radius: 0; margin-bottom: 0; display: flex; flex-direction: column; padding: 12px; background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); }
-        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-
-        /* ============ نصبیات + PDF ============ */
-        .installation-block { margin-bottom: 16px; }
-        .installation-main { display: flex; gap: 12px; align-items: center; background: rgba(255,255,255,0.08); border-radius: 16px; padding: 12px; border: 2px solid transparent; cursor: pointer; transition: all 0.2s; }
-        .installation-main.selected { border-color: #e67e22; background: rgba(230,126,34,0.15); box-shadow: 0 4px 15px rgba(230,126,34,0.2); }
-        .installation-main img { width: 70px; height: 70px; object-fit: cover; border-radius: 14px; flex-shrink: 0; }
-        .installation-info { flex: 1; text-align: right; }
-        .installation-info .name { font-weight: bold; font-size: 0.9rem; color: #fff; }
-        .installation-info .desc { font-size: 0.7rem; color: rgba(255,255,255,0.7); margin-top: 4px; }
-
-        .pdfs-section { margin-top: 10px; padding: 12px; background: rgba(0,0,0,0.25); border-radius: 14px; border: 1px solid rgba(230,126,34,0.2); }
-        .pdfs-section-title { font-size: 0.8rem; color: #e67e22; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; font-weight: bold; }
-        .pdf-hint { font-size: 0.7rem; color: rgba(255,255,255,0.65); padding: 8px 10px; background: rgba(230,126,34,0.1); border-radius: 10px; margin-bottom: 10px; line-height: 1.6; border-right: 3px solid #e67e22; }
-        .pdf-row { display: flex; flex-direction: column; gap: 8px; padding: 10px; background: rgba(255,255,255,0.06); border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.1); }
-        .pdf-row-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .pdf-name { flex: 1; min-width: 100px; color: #fff; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; }
-        .pdf-name .material-tag { font-size: 0.62rem; background: rgba(230,126,34,0.3); padding: 2px 8px; border-radius: 8px; color: #e67e22; }
-        .pdf-download { background: linear-gradient(135deg, #dc3545, #c82333); color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 0.72rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; font-weight: bold; transition: all 0.2s; }
-        .pdf-download:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(220,53,69,0.4); }
-        .pdf-code-wrapper { display: flex; gap: 8px; align-items: center; }
-        .pdf-code-input { flex: 1; padding: 10px 14px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.95); font-size: 0.82rem; font-family: monospace; letter-spacing: 1px; color: #1a1a2e; }
-        .pdf-code-input:focus { outline: none; border-color: #e67e22; box-shadow: 0 0 0 3px rgba(230,126,34,0.2); }
-        .pdf-code-input.filled { background: #f0fff4; border-color: #27ae60; }
-        .pdf-clear-btn { background: rgba(220,53,69,0.15); color: #dc3545; border: 1px solid rgba(220,53,69,0.3); width: 36px; height: 36px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.2s; }
-        .pdf-clear-btn:hover { background: rgba(220,53,69,0.3); }
-        .code-counter { font-size: 0.7rem; color: #27ae60; text-align: right; padding: 4px 8px; display: flex; align-items: center; gap: 4px; }
-
-        .continue-btn { width: 100%; background: linear-gradient(135deg, #e67e22, #d35400); color: white; border: none; padding: 14px; border-radius: 14px; font-weight: bold; font-size: 0.9rem; cursor: pointer; margin-top: 12px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .continue-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(230,126,34,0.4); }
-        .continue-btn:disabled { background: #666; cursor: not-allowed; transform: none; box-shadow: none; }
-
-        /* ============ جنس ============ */
-        .material-item { border-radius: 16px; padding: 12px; text-align: center; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; background: rgba(255,255,255,0.1); }
-        .material-item.selected { border-color: #e67e22; box-shadow: 0 4px 12px rgba(230,126,34,0.3); background: rgba(230,126,34,0.15); }
-        .material-title { font-weight: bold; font-size: 0.85rem; margin-top: 6px; color: #ffffff; }
-
-        /* ============ فرم ============ */
-        .form-group { margin-bottom: 14px; }
-        label { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.8rem; margin-bottom: 6px; color: #1e293b; }
-        input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; font-size: 0.85rem; background: rgba(255,255,255,0.9); }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #e67e22; }
-        .row-2 { display: flex; gap: 12px; }
-        .row-2 .form-group { flex: 1; }
-
-        /* ============ طرح آماده / آپلود ============ */
-        .design-options { display: flex; gap: 12px; margin: 16px 0; }
-        .design-opt { flex: 1; background: rgba(248,249,250,0.8); border-radius: 16px; padding: 14px; text-align: center; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
-        .design-opt i { font-size: 28px; color: #e67e22; }
-        .design-opt h3 { font-size: 0.82rem; margin-top: 6px; color: #1e293b; }
-        .design-opt.selected { border-color: #e67e22; background: rgba(255,248,240,0.95); box-shadow: 0 4px 12px rgba(230,126,34,0.2); }
-        .template-item { border-radius: 16px; padding: 8px; text-align: center; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; background: rgba(255,255,255,0.1); }
-        .template-item.selected { border-color: #e67e22; background: rgba(230,126,34,0.15); }
-
-        /* ============ کانواس ============ */
-        .design-area { position: relative; flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.03); border-radius: 20px; overflow: hidden; border: 1px solid rgba(0,0,0,0.08); min-height: 0; }
-        .canvas-wrapper { flex: 1; position: relative; background-image: linear-gradient(to right, rgba(203,213,225,0.4) 1px, transparent 1px), linear-gradient(to bottom, rgba(203,213,225,0.4) 1px, transparent 1px); background-size: 25px 25px; background-color: rgba(255,255,255,0.6); overflow: hidden; touch-action: none; }
-        #designCanvas { display: block; width: 100%; height: 100%; cursor: crosshair; position: absolute; top: 0; left: 0; }
-        .floating-tools { position: fixed; bottom: 100px; right: 20px; z-index: 200; display: none; }
-        .step5-active .floating-tools { display: block; }
-        .float-btn { width: 48px; height: 48px; background: rgba(26,26,46,0.95); backdrop-filter: blur(8px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.25); transition: all 0.3s; color: white; font-size: 22px; border: none; }
-        .tools-panel { position: fixed; bottom: 160px; right: 20px; background: rgba(30,30,40,0.95); backdrop-filter: blur(20px); border-radius: 40px; padding: 8px; display: flex; flex-direction: column; gap: 8px; z-index: 199; transform: scale(0) translateY(30px); opacity: 0; visibility: hidden; transition: all 0.25s; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
-        .tools-panel.open { transform: scale(1) translateY(0); opacity: 1; visibility: visible; }
-        .tool-item { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 30px; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.1); }
-        .tool-item i { font-size: 20px; color: #e67e22; }
-        .tool-item:hover { background: rgba(230,126,34,0.3); }
-        .tool-item.active { background: #e67e22; }
-        .tool-item.active i { color: white; }
-        .divider { height: 1px; background: rgba(255,255,255,0.2); margin: 4px 0; }
-        .color-panel { position: fixed; bottom: 160px; right: 80px; background: rgba(30,30,40,0.95); backdrop-filter: blur(20px); border-radius: 40px; padding: 8px 12px; display: flex; gap: 12px; z-index: 198; transform: scale(0) translateY(30px); opacity: 0; visibility: hidden; transition: all 0.25s; border: 1px solid rgba(255,255,255,0.2); align-items: center; }
-        .color-panel.open { transform: scale(1) translateY(0); opacity: 1; visibility: visible; }
-        .color-panel input[type="color"] { width: 40px; height: 40px; border-radius: 50%; border: 2px solid white; cursor: pointer; background: transparent; padding: 0; }
-        .status-bar { background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); color: white; padding: 8px 16px; border-radius: 40px; font-size: 12px; position: absolute; bottom: 20px; left: 20px; z-index: 200; font-family: monospace; font-weight: 500; display: flex; align-items: center; gap: 8px; pointer-events: none; }
-
-        /* ============ فاکتور ============ */
-        .invoice { background: rgba(250,249,254,0.9); backdrop-filter: blur(8px); border-radius: 16px; padding: 16px; }
-        .invoice p { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.08); font-size: 0.85rem; color: #1e293b; }
-        .invoice p:last-child { border-bottom: none; }
-        .invoice i { width: 24px; color: #e67e22; text-align: center; }
-        .invoice .codes-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-        .invoice .code-chip { background: rgba(230,126,34,0.15); color: #d35400; padding: 3px 10px; border-radius: 10px; font-size: 0.72rem; font-family: monospace; font-weight: bold; border: 1px solid rgba(230,126,34,0.3); }
-
-        .previews-section { margin-bottom: 16px; display: flex; flex-direction: column; gap: 16px; }
-        .preview-card { background: rgba(255,255,255,0.95); border-radius: 16px; overflow: hidden; border: 1px solid rgba(230,126,34,0.3); }
-        .preview-title { font-size: 0.8rem; color: #e67e22; padding: 10px 12px; background: rgba(230,126,34,0.1); display: flex; align-items: center; gap: 6px; font-weight: bold; border-bottom: 1px solid rgba(230,126,34,0.2); }
-        .preview-container { padding: 12px; text-align: center; background: #f8f9fa; }
-        .preview-container img { max-width: 100%; max-height: 180px; object-fit: contain; display: block; margin: 0 auto; border-radius: 8px; }
-        .view-full-btn { background: none; border: none; color: #e67e22; font-size: 0.7rem; cursor: pointer; padding: 6px 12px; margin-top: 6px; display: inline-flex; align-items: center; gap: 4px; }
-        .empty-preview { color: #999; font-size: 0.75rem; padding: 20px; text-align: center; }
-
-        .toast-success { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(39,174,96,0.95); backdrop-filter: blur(12px); color: white; padding: 22px 32px; border-radius: 28px; text-align: center; z-index: 2000; box-shadow: 0 20px 35px rgba(0,0,0,0.2); animation: fadeInUp 0.3s ease; display: flex; flex-direction: column; gap: 12px; max-width: 90%; }
-        .toast-success button { background: white; color: #27ae60; border: none; padding: 8px 24px; border-radius: 40px; font-weight: bold; cursor: pointer; margin-top: 8px; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translate(-50%,-50%) scale(0.9); } to { opacity: 1; transform: translate(-50%,-50%) scale(1); } }
-
-        .bottom-fixed { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; gap: 12px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); max-width: 600px; margin: 0 auto; z-index: 99; }
-        .btn { flex: 1; padding: 12px; border-radius: 40px; font-weight: bold; cursor: pointer; border: none; font-size: 0.85rem; transition: all 0.2s; }
-        .btn-primary { background: #e67e22; color: white; }
-        .btn-primary:hover { background: #d35400; }
-        .btn-secondary { background: rgba(233,236,239,0.9); color: #2c3e50; }
-        .hidden { display: none !important; }
-        .loading { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .loading.active { display: flex; }
-        .spinner { width: 45px; height: 45px; border: 5px solid rgba(255,255,255,0.3); border-top-color: #e67e22; border-radius: 50%; animation: spin 0.7s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .selected-toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(230,126,34,0.95); backdrop-filter: blur(8px); color: white; padding: 8px 16px; border-radius: 40px; font-size: 12px; z-index: 300; display: none; white-space: nowrap; font-weight: bold; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>سفارش چاپی DECO B2B | طراحی حرفه‌ای</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+:root{--o:#e67e22;--o2:#d35400;--g:#27ae60;--r:#e5484d;--glass:rgba(15,20,35,.62);--line:rgba(255,255,255,.14);--tx:#fff;--mut:rgba(255,255,255,.62)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Segoe UI',Tahoma,system-ui,sans-serif;color:var(--tx);overflow-x:hidden;min-height:100dvh}
+#bgCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+button{font-family:inherit;cursor:pointer;border:none;color:inherit}
+.hd,.pg,.mn,.bar{position:relative;z-index:10}
+.hd{position:sticky;top:0;z-index:100;background:rgba(10,15,28,.82);backdrop-filter:blur(14px);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.hd h1{font-size:1.05rem;color:var(--o)}.hd small{color:var(--mut);font-size:.7rem}
+.pill{background:rgba(230,126,34,.18);color:var(--o);padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:bold}
+.pg{padding:12px 16px 4px;max-width:600px;margin:0 auto}
+.track{position:relative;display:flex;justify-content:space-between}
+.track:before,.fill{content:"";position:absolute;top:15px;right:16px;left:16px;height:3px;background:rgba(255,255,255,.18);border-radius:3px}
+.fill{background:var(--o);left:auto;width:0;transition:width .35s}
+.st{position:relative;text-align:center;width:48px;background:none}
+.st b{display:flex;width:32px;height:32px;margin:0 auto 4px;border-radius:50%;align-items:center;justify-content:center;font-size:.75rem;background:#2a3042;border:2px solid #3b4258;transition:.25s}
+.st span{font-size:.62rem;color:var(--mut)}
+.st.on b{background:var(--o);border-color:var(--o);box-shadow:0 0 14px rgba(230,126,34,.6)}.st.on span{color:var(--o);font-weight:bold}
+.st.done b{background:var(--g);border-color:var(--g)}
+.mn{padding:12px 14px 92px}.wrap{max-width:600px;margin:0 auto}
+.step{display:none}.step.on{display:block}
+.card{background:var(--glass);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.ttl{font-size:1.02rem;font-weight:bold;margin-bottom:4px;display:flex;align-items:center;gap:8px}.ttl i{color:var(--o)}
+.sub{font-size:.75rem;color:var(--mut);margin-bottom14px;margin-bottom:14px;line-height:1.7}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.opt{background:rgba(255,255,255,.07);border:2px solid transparent;border-radius:16px;padding:10px;text-align:center;cursor:pointer;transition:.2s;position:relative}
+.opt img{width:100%;height:84px;object-fit:cover;border-radius:12px;margin-bottom:6px;background:#222}
+.opt b{font-size:.82rem;display:block}.opt small{font-size:.68rem;color:var(--mut)}
+.opt.sel{border-color:var(--o);background:rgba(230,126,34,.16);box-shadow:0 6px 18px rgba(230,126,34,.25)}
+.opt.sel:after{content:"\f00c";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;top:8px;left:8px;width:22px;height:22px;border-radius:50%;background:var(--o);font-size:.65rem;display:flex;align-items:center;justify-content:center}
+.pdfs{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
+.pdf{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:8px}
+.pdf>i{color:#ff6b6b;font-size:1.5rem}.pdf .t{flex:1;min-width:0;font-size:.82rem}.pdf .t small{display:block;color:var(--mut);font-size:.68rem;margin-top:2px}
+.pdf .t small.ok{color:#5fe08f;font-family:monospace;letter-spacing:1px}
+.btn-s{background:var(--o);color:#fff;border-radius:20px;padding:8px 14px;font-size:.74rem;font-weight:bold;white-space:nowrap}
+.btn-s.ghost{background:rgba(255,255,255,.12)}
+.field{margin-bottom:14px}.field label{display:block;font-size:.78rem;margin-bottom:6px;color:var(--mut)}
+input,textarea{width:100%;padding:11px 12px;border:1px solid rgba(255,255,255,.18);border-radius:12px;font-size:.9rem;background:rgba(255,255,255,.95);color:#1a1a2e;font-family:inherit}
+input:focus,textarea:focus{outline:2px solid var(--o);outline-offset:1px}
+.dims{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.num{display:flex;align-items:center;background:rgba(255,255,255,.95);border-radius:12px;overflow:hidden}
+.num button{width:42px;height:44px;background:rgba(230,126,34,.15);color:var(--o2);font-size:1.1rem}
+.num input{border:none;border-radius:0;text-align:center;font-weight:bold;min-width:0}
+.areabox{display:flex;align-items:center;justify-content:space-between;background:rgba(230,126,34,.14);border:1px solid rgba(230,126,34,.4);border-radius:14px;padding:12px 14px;margin-bottom:14px}
+.areabox b{font-size:1.4rem;color:var(--o)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.seg .opt{padding:14px}.seg i{font-size:1.5rem;color:var(--o);margin-bottom:4px}
+.hide{display:none!important}
+/* design tool */
+body.fs .hd,body.fs .pg{display:none}
+body.fs .mn{padding:0 0 68px;height:100dvh}body.fs .wrap{max-width:none;height:100%}
+body.fs #s4{height:100%;display:flex;flex-direction:column}
+.tbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(10,15,28,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);font-size:.8rem}
+.tbar small{color:var(--mut)}
+.cw{flex:1;position:relative;background-color:#f6f3ee;touch-action:none;overflow:hidden;background-image:linear-gradient(to right,rgba(120,100,80,.22) 1px,transparent 1px),linear-gradient(to bottom,rgba(120,100,80,.22) 1px,transparent 1px)}
+.hint{position:absolute;bottom:10px;right:10px;left:10px;background:rgba(10,15,28,.82);color:#fff;font-size:.74rem;padding:8px 14px;border-radius:30px;text-align:center;pointer-events:none;z-index:5}
+.dock{display:flex;gap:6px;overflow-x:auto;padding:8px 10px;background:rgba(10,15,28,.94);backdrop-filter:blur(14px);border-top:1px solid var(--line);scrollbar-width:none;align-items:center}
+.dock::-webkit-scrollbar{display:none}
+.tb{flex:0 0 auto;min-width:52px;padding:7px 6px;border-radius:12px;background:rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.6rem;color:var(--mut)}
+.tb i{font-size:1.05rem;color:var(--o)}.tb.on{background:var(--o);color:#fff}.tb.on i{color:#fff}.tb:disabled{opacity:.35}
+.tb.ok i{color:#5fe08f}.tb.no i{color:#ff7b7b}
+.sep{flex:0 0 1px;height:30px;background:var(--line)}
+.dock input[type=color]{width:34px;height:34px;padding:0;border:2px solid #fff;border-radius:50%;background:none;flex:0 0 auto}
+.dock input[type=range]{width:70px;flex:0 0 auto;padding:0;background:none;accent-color:var(--o)}
+/* final */
+.sum{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.sum:last-of-type{border:none}
+.sum>i{width:38px;height:38px;border-radius:12px;background:rgba(230,126,34,.18);color:var(--o);display:flex;align-items:center;justify-content:center}
+.sum .v{flex:1;min-width:0}.sum small{color:var(--mut);font-size:.68rem;display:block}.sum b{font-size:.88rem}
+.edit{background:rgba(255,255,255,.1);border-radius:10px;width:34px;height:34px;color:var(--o)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.chip{background:rgba(230,126,34,.2);border:1px solid rgba(230,126,34,.45);color:#ffb26b;border-radius:10px;padding:2px 9px;font-family:monospace;font-size:.72rem;font-weight:bold}
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.hero div{background:linear-gradient(135deg,rgba(230,126,34,.28),rgba(230,126,34,.08));border:1px solid rgba(230,126,34,.4);border-radius:16px;padding:12px;text-align:center}
+.hero b{font-size:1.5rem;display:block}.hero small{font-size:.68rem;color:var(--mut)}
+.pv{display:flex;gap:8px;overflow-x:auto;margin-bottom:6px}
+.pv figure{flex:0 0 46%;background:#fff;border-radius:14px;padding:6px;text-align:center;cursor:pointer}
+.pv img{width:100%;height:110px;object-fit:contain}.pv figcaption{color:#555;font-size:.65rem;margin-top:3px}
+.bar{position:fixed;bottom:0;left:0;right:0;max-width:600px;margin:0 auto;padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;gap:10px;background:rgba(10,15,28,.9);backdrop-filter:blur(14px);border-top:1px solid var(--line);z-index:99}
+.nb{flex:1;padding:13px;border-radius:40px;font-weight:bold;font-size:.88rem;background:rgba(255,255,255,.12)}
+.nb.p{flex:2;background:linear-gradient(135deg,var(--o),var(--o2));box-shadow:0 6px 18px rgba(230,126,34,.35)}
+.nb.p.final{background:linear-gradient(135deg,#2ecc71,#1e9e55)}
+.nb:disabled{opacity:.45}
+.toast{position:fixed;top:14px;left:50%;transform:translate(-50%,-90px);background:var(--o);color:#fff;padding:9px 18px;border-radius:30px;font-size:.78rem;font-weight:bold;z-index:3000;transition:.3s;max-width:90%;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.toast.show{transform:translate(-50%,0)}.toast.err{background:var(--r)}
+.loading{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:none;justify-content:center;align-items:center;z-index:4000}
+.loading.on{display:flex}
+.spin{width:44px;height:44px;border:5px solid rgba(255,255,255,.3);border-top-color:var(--o);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* pdf modal */
+.modal{position:fixed;inset:0;z-index:2000;background:rgba(5,8,16,.78);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:.25s}
+.modal.on{opacity:1;visibility:visible}
+.sheet{width:100%;max-width:720px;height:94dvh;background:#12172a;border-radius:24px 24px 0 0;display:flex;flex-direction:column;transform:translateY(40px);transition:.3s;border:1px solid var(--line);overflow:hidden}
+.modal.on .sheet{transform:none}
+.sh{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.sh b{flex:1;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ib{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:#fff;font-size:.85rem}
+.pb{flex:1;overflow:auto;background:#3a3f55;padding:8px;touch-action:pan-x pan-y pinch-zoom;text-align:center}
+.pb canvas{display:block;margin:0 auto 8px;background:#fff;border-radius:4px;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.pb iframe{width:100%;height:100%;border:none;background:#fff}
+.pb .ld{color:var(--mut);padding:40px;font-size:.8rem}
+.sf{padding:12px 14px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#12172a}
+.sf p{font-size:.72rem;color:var(--mut);margin-bottom:8px}
+.sf div{display:flex;gap:8px}.sf input{font-family:monospace;letter-spacing:1px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.hint{top:10px;bottom:auto}
+.fab{position:absolute;bottom:12px;right:10px;left:10px;display:flex;gap:8px;align-items:center;z-index:6}
+.fab .go{flex:1;min-height:54px;border-radius:30px;background:#2ecc71;color:#fff;font-weight:bold;font-size:.92rem;box-shadow:0 6px 20px rgba(46,204,113,.55);animation:pls 1.5s infinite}
+.fab .go:disabled{background:#6b7280;box-shadow:none;animation:none}
+.fab .sb{flex:0 0 54px;height:54px;border-radius:50%;background:rgba(10,15,28,.92);color:#fff;font-size:1rem}
+.fab .sb.no{color:#ffb26b}
+@keyframes pls{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+.ep{position:absolute;bottom:0;left:0;right:0;z-index:6;background:rgba(10,15,28,.95);backdrop-filter:blur(14px);border-radius:20px 20px 0 0;padding:10px 12px;max-height:48%;overflow:auto;border-top:1px solid var(--line);color:#fff}
+.eh{display:flex;align-items:center;gap:8px;font-size:.78rem;margin-bottom:8px}.eh span{flex:1;color:var(--mut);font-size:.7rem}
+.chips2{display:flex;gap:6px;overflow-x:auto;margin-bottom:8px;scrollbar-width:none}
+.sc{flex:0 0 auto;padding:8px 12px;border-radius:20px;background:rgba(255,255,255,.1);font-size:.74rem;font-family:monospace}.sc.on{background:var(--o)}
+.el{display:flex;gap:8px;margin-bottom:8px}.el input{padding:9px 10px}
+.acts{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.tb.good{background:#2ecc71;color:#fff}.tb.good i{color:#fff}
+</style>
 </head>
 <body>
-
 <canvas id="bgCanvas"></canvas>
+<div class="loading" id="loading"><div class="spin"></div></div>
+<div class="toast" id="toast"></div>
 
-<div class="loading" id="loading"><div class="spinner"></div></div>
-<div class="selected-toast" id="selectedToast">✅</div>
+<div class="hd" id="hd"><div><h1>سفارش چاپی DECO B2B</h1><small>سقف کشسان چاپی، از انتخاب تا ثبت</small></div><span class="pill" id="stepPill">مرحله ۱ از ۵</span></div>
+<div class="pg" id="pg"><div class="track"><div class="fill" id="fill"></div>
+<button class="st" data-s="1"><b>1</b><span>نصبیات</span></button><button class="st" data-s="2"><b>2</b><span>جنس</span></button><button class="st" data-s="3"><b>3</b><span>ابعاد</span></button><button class="st" data-s="4"><b>4</b><span>طراحی</span></button><button class="st" data-s="5"><b>5</b><span>نهایی</span></button></div></div>
 
-<div class="header" id="mainHeader">
-    <h1>سفارش چاپی DECO B2B</h1>
-    <p>نصبیات + PDF | طراحی خط‌روند + متن</p>
+<div class="mn" id="mn"><div class="wrap">
+<div class="step on" id="s1"><div class="card">
+<div class="ttl"><i class="fas fa-cubes"></i> نصبیات را انتخاب کنید</div>
+<div class="sub">بعد از انتخاب، PDF کاتالوگ را باز کنید و کد عکس مورد نظر را ثبت کنید.</div>
+<div class="grid" id="insGrid"></div><div class="pdfs hide" id="pdfBox"></div></div></div>
+
+<div class="step" id="s2"><div class="card"><div class="ttl"><i class="fas fa-palette"></i> جنس سقف کشسان</div><div class="sub">جنس مناسب این نصبیات را انتخاب کنید.</div><div class="grid" id="matGrid"></div></div></div>
+
+<div class="step" id="s3"><div class="card">
+<div class="ttl"><i class="fas fa-drafting-compass"></i> ابعاد و طرح</div><div class="sub">ابعاد اتاق، مقیاس نقشه را در مرحله طراحی می‌سازد.</div>
+<div class="dims"><div class="field"><label>طول (متر)</label><div class="num"><button data-d="length" data-k="1">+</button><input type="number" inputmode="decimal" step="0.1" id="length" placeholder="5.2"><button data-d="length" data-k="-1">−</button></div></div>
+<div class="field"><label>عرض (متر)</label><div class="num"><button data-d="width" data-k="1">+</button><input type="number" inputmode="decimal" step="0.1" id="width" placeholder="3.8"><button data-d="width" data-k="-1">−</button></div></div></div>
+<div class="areabox"><span>مساحت تقریبی</span><span><b id="liveArea">0</b> متر مربع</span></div>
+<div class="seg"><div class="opt" data-type="ready"><i class="fas fa-th-large"></i><b>طرح آماده</b></div><div class="opt" data-type="upload"><i class="fas fa-cloud-upload-alt"></i><b>آپلود عکس</b></div></div>
+<div id="readyBox" class="hide"><div class="grid" id="tplGrid"></div></div>
+<div id="uploadBox" class="hide"><input type="file" id="uploadFile" accept="image/*"><img id="previewImg" class="hide" style="width:100%;margin-top:12px;border-radius:16px"></div>
+</div></div>
+
+<div class="step" id="s4">
+<div class="tbar"><b><i class="fas fa-draw-polygon" style="color:var(--o)"></i> نقشه سقف</b><small id="scaleInfo"></small></div>
+<div class="cw" id="cw"><div class="hint" id="hint"></div>
+<div class="fab hide" id="fab"><button class="sb no" id="fBack" title="حذف آخرین نقطه"><i class="fas fa-undo"></i></button><button class="go" id="fOk" disabled></button><button class="sb" id="fNo" title="لغو"><i class="fas fa-times"></i></button></div>
+<div class="ep hide" id="ep"></div></div>
+<div class="dock" id="dock">
+<button class="tb on" data-t="line"><i class="fas fa-draw-polygon"></i><span>خط‌روند</span></button>
+<button class="tb" data-t="select"><i class="fas fa-hand-pointer"></i><span>ویرایش</span></button>
+<button class="tb" data-t="pen"><i class="fas fa-pencil-alt"></i><span>آزاد</span></button>
+<button class="tb" data-t="text"><i class="fas fa-font"></i><span>متن</span></button>
+<button class="tb" data-t="erase"><i class="fas fa-eraser"></i><span>پاک‌کن</span></button>
+<span class="sep"></span>
+<button class="tb" id="bUndo"><i class="fas fa-undo"></i><span>بازگشت</span></button>
+<button class="tb" id="bRedo"><i class="fas fa-redo"></i><span>جلو</span></button>
+<button class="tb on" id="bSnap"><i class="fas fa-magnet"></i><span>چسبیدن</span></button>
+<span class="sep"></span>
+<input type="color" id="col" value="#d35400"><input type="range" id="wid" min="1" max="12" value="3">
+<button class="tb" id="bDel"><i class="fas fa-trash"></i><span>حذف</span></button>
+<button class="tb no" id="bClr"><i class="fas fa-broom"></i><span>پاک همه</span></button>
+</div></div>
+
+<div class="step" id="s5">
+<div class="hero"><div><b id="fArea">0</b><small>متر مربع</small></div><div><b id="fDim">-</b><small>طول × عرض (متر)</small></div></div>
+<div class="card" style="padding:6px 16px">
+<div class="sum"><i class="fas fa-cube"></i><div class="v"><small>نصبیات</small><b id="fIns">-</b></div><button class="edit" data-go="1"><i class="fas fa-pen"></i></button></div>
+<div class="sum"><i class="fas fa-palette"></i><div class="v"><small>جنس</small><b id="fMat">-</b></div><button class="edit" data-go="2"><i class="fas fa-pen"></i></button></div>
+<div class="sum"><i class="fas fa-barcode"></i><div class="v"><small>کدهای انتخاب‌شده</small><div class="chips" id="fCodes">-</div></div><button class="edit" data-go="1"><i class="fas fa-pen"></i></button></div>
+<div class="sum"><i class="fas fa-arrows-alt"></i><div class="v"><small>ابعاد</small><b id="fDim2">-</b></div><button class="edit" data-go="3"><i class="fas fa-pen"></i></button></div></div>
+<div class="card"><div class="ttl"><i class="fas fa-images"></i> پیش‌نمایش طرح</div><div class="pv" id="pv"></div></div>
+<div class="card"><div class="field" style="margin:0"><label>توضیحات تکمیلی</label><textarea id="notes" rows="3" placeholder="هر نکته مهم درباره سفارش..."></textarea></div></div>
 </div>
+</div></div>
 
-<div class="progress-wrap" id="progressWrap">
-    <div class="progress-steps">
-        <div class="step"><div class="step-badge" id="step1Badge">1</div><div class="step-label">نصبیات + PDF</div></div>
-        <div class="step"><div class="step-badge" id="step2Badge">2</div><div class="step-label">جنس</div></div>
-        <div class="step"><div class="step-badge" id="step3Badge">3</div><div class="step-label">ابعاد</div></div>
-        <div class="step"><div class="step-badge" id="step4Badge">4</div><div class="step-label">طراحی</div></div>
-        <div class="step"><div class="step-badge" id="step5Badge">5</div><div class="step-label">نهایی</div></div>
-    </div>
-</div>
+<div class="bar" id="bar"><button class="nb" id="prevBtn">قبلی</button><button class="nb p" id="nextBtn">ادامه</button></div>
 
-<div class="main" id="mainContainer">
-    <div class="container" id="containerInner">
-
-        <!-- ==================== مرحله ۱: نصبیات + PDF ==================== -->
-        <div class="step-container active" id="step1">
-            <div class="card">
-                <div class="card-title"><i class="fas fa-cubes"></i> انتخاب نصبیات و مستندات PDF</div>
-                <div id="installationsList"></div>
-                <button class="continue-btn" id="continueBtn1" disabled>
-                    <i class="fas fa-arrow-left"></i> ادامه به انتخاب جنس
-                </button>
-            </div>
-        </div>
-
-        <!-- ==================== مرحله ۲: جنس ==================== -->
-        <div class="step-container" id="step2">
-            <div class="card">
-                <div class="card-title"><i class="fas fa-palette"></i> جنس سقف کشسان</div>
-                <div class="grid-2" id="materialsList"></div>
-            </div>
-        </div>
-
-        <!-- ==================== مرحله ۳: ابعاد و طرح ==================== -->
-        <div class="step-container" id="step3">
-            <div class="card">
-                <div class="card-title"><i class="fas fa-drafting-compass"></i> ابعاد و طرح اولیه</div>
-                <div class="row-2">
-                    <div class="form-group"><label>طول (متر)</label><input type="number" step="0.1" id="length" placeholder="مثال 5.2"></div>
-                    <div class="form-group"><label>عرض (متر)</label><input type="number" step="0.1" id="width" placeholder="مثال 3.8"></div>
-                </div>
-                <div class="design-options" id="designOptions">
-                    <div class="design-opt" data-type="ready"><i class="fas fa-th-large"></i><h3>طرح آماده</h3></div>
-                    <div class="design-opt" data-type="upload"><i class="fas fa-cloud-upload-alt"></i><h3>آپلود عکس</h3></div>
-                </div>
-                <div id="readyTemplatesBox" class="hidden">
-                    <div class="card-title" style="font-size: 13px; color:#1e293b;">✨ طرح‌های آماده</div>
-                    <div class="grid-2" id="readyTemplatesList"></div>
-                </div>
-                <div id="uploadBox" class="hidden">
-                    <input type="file" id="uploadFile" accept="image/*">
-                    <div id="uploadPreview" class="hidden" style="margin-top: 12px;"><img id="previewImg" style="max-width: 100%; border-radius: 16px;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== مرحله ۴: طراحی ==================== -->
-        <div class="step-container" id="step4">
-            <div class="card" style="padding: 12px; height: 100%; display: flex; flex-direction: column;">
-                <div class="card-title"><i class="fas fa-draw-polygon"></i> طراحی پلن | لمس کنید، بکشید، ویرایش کنید</div>
-                <div class="design-area">
-                    <div class="canvas-wrapper" id="canvasWrapper">
-                        <canvas id="designCanvas"></canvas>
-                    </div>
-                    <div class="status-bar" id="statusBar">
-                        <i class="fas fa-info-circle"></i> حالت: خط‌روند
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== مرحله ۵: نهایی ==================== -->
-        <div class="step-container" id="step5">
-            <div class="card">
-                <div class="card-title"><i class="fas fa-clipboard-list"></i> نهایی‌سازی سفارش</div>
-
-                <div class="previews-section" id="previewsSection"></div>
-
-                <div class="invoice">
-                    <p><i class="fas fa-cube"></i> <strong>نصبیات:</strong> <span id="finalInstallation">-</span></p>
-                    <p><i class="fas fa-palette"></i> <strong>جنس:</strong> <span id="finalMaterial">-</span></p>
-                    <p style="flex-direction: column; align-items: flex-start;">
-                        <span style="display:flex; align-items:center; gap:12px;"><i class="fas fa-barcode"></i> <strong>کدهای طرح انتخاب‌شده:</strong></span>
-                        <span class="codes-list" id="finalCodesList">-</span>
-                    </p>
-                    <p><i class="fas fa-arrows-alt"></i> <strong>ابعاد:</strong> <span id="finalDim">-</span></p>
-                    <p><i class="fas fa-chart-area"></i> <strong>مساحت تقریبی:</strong> <span id="finalArea">0</span> متر مربع</p>
-                </div>
-
-                <div class="form-group" style="margin-top: 16px;">
-                    <label>توضیحات تکمیلی</label>
-                    <textarea id="notes" rows="3" placeholder="هر نکته مهم درباره سفارش..."></textarea>
-                </div>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-<div class="bottom-fixed">
-    <button class="btn btn-secondary" id="prevBtn">قبلی</button>
-    <button class="btn btn-primary" id="nextBtn">بعدی</button>
-</div>
-
-<!-- ابزارهای طراحی -->
-<div class="floating-tools">
-    <button class="float-btn" id="mainToolBtn"><i class="fas fa-pencil-ruler"></i></button>
-</div>
-<div class="tools-panel" id="toolsPanel">
-    <div class="tool-item" data-tool="polyline" title="خط‌روند"><i class="fas fa-draw-polygon"></i></div>
-    <div class="tool-item" data-tool="pen" title="مداد آزاد"><i class="fas fa-pencil-alt"></i></div>
-    <div class="tool-item" data-tool="text" title="افزودن متن"><i class="fas fa-font"></i></div>
-    <div class="tool-item" data-tool="eraser" title="پاک‌کن"><i class="fas fa-eraser"></i></div>
-    <div class="tool-item" data-tool="select" title="انتخاب"><i class="fas fa-mouse-pointer"></i></div>
-    <div class="divider"></div>
-    <div class="tool-item" id="finishPolylineItem" title="تکمیل خط"><i class="fas fa-check-circle"></i></div>
-    <div class="tool-item" id="cancelPolylineItem" title="لغو خط"><i class="fas fa-times-circle"></i></div>
-    <div class="tool-item" id="clearCanvasItem" title="پاک کردن همه"><i class="fas fa-trash-alt"></i></div>
-</div>
-<div class="color-panel" id="colorPanel">
-    <i class="fas fa-palette" style="color:#e67e22"></i>
-    <input type="color" id="penColorPicker" value="#e67e22">
-    <input type="range" id="penWidthSlider" min="1" max="20" value="4" style="width:80px">
-    <span id="widthVal" style="color:white">4</span>
-    <button id="applyColorBtn" style="background:#e67e22; border:none; border-radius:20px; padding:6px 12px; color:white; cursor:pointer;">اعمال</button>
-    <button id="deleteSelectedItem" style="background:#dc3545; border:none; border-radius:20px; padding:6px 12px; color:white; cursor:pointer;">🗑 حذف</button>
-</div>
+<div class="modal" id="pm"><div class="sheet">
+<div class="sh"><b id="pmT"></b><button class="ib" id="zOut"><i class="fas fa-search-minus"></i></button><button class="ib" id="zIn"><i class="fas fa-search-plus"></i></button><a class="ib" id="pmOpen" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i></a><button class="ib" id="pmX"><i class="fas fa-times"></i></button></div>
+<div class="pb" id="pmB"></div>
+<div class="sf"><p>کد زیر عکس مورد نظر را وارد کنید</p><div><input id="pmCode" placeholder="مثلاً A-102"><button class="btn-s" id="pmSave">ثبت کد</button></div></div>
+</div></div>
 
 <script>
-    // ==================== پس‌زمینه متحرک ====================
-    (function initAnimatedBackground() {
-        const canvas = document.getElementById('bgCanvas');
-        const ctx = canvas.getContext('2d');
-        let width, height, particles = [], time = 0;
+// ==================== پس‌زمینه متحرک (بدون تغییر) ====================
+(function initAnimatedBackground() {
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, particles = [], time = 0;
+    function resize() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; initParticles(); }
+    function initParticles() {
+        particles = [];
+        const colors = ['#e67e22', '#f39c12', '#d35400', '#f1c40f', '#e67e2266', '#f39c1266'];
+        for (let i = 0; i < 65; i++) {
+            particles.push({ x: Math.random() * width, y: Math.random() * height, radius: Math.random() * 4 + 2, color: colors[Math.floor(Math.random() * colors.length)], vx: (Math.random() - 0.5) * 0.45, vy: (Math.random() - 0.5) * 0.45 });
+        }
+    }
+    function drawGradient() {
+        const grad = ctx.createLinearGradient(0, 0, width, height);
+        grad.addColorStop(0, '#0a0f1c'); grad.addColorStop(0.5, '#111827'); grad.addColorStop(1, '#0f172a');
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, width, height);
+    }
+    function drawWaves() {
+        time += 0.008; ctx.save(); ctx.globalCompositeOperation = 'lighter';
+        for (let i = 0; i < 4; i++) {
+            ctx.beginPath();
+            for (let x = 0; x < width; x += 20) {
+                const y = height / 2 + Math.sin(x * 0.008 + time + i * 1.5) * 45 + Math.cos(x * 0.015 + time * 0.7) * 25;
+                if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = `rgba(230, 126, 34, ${0.08 - i * 0.015})`; ctx.lineWidth = 2.5; ctx.stroke();
+        }
+        ctx.restore();
+    }
+    function drawStars() {
+        for (let i = 0; i < 120; i++) {
+            ctx.beginPath();
+            const flicker = Math.sin(time * 5 + i) * 0.3 + 0.7;
+            ctx.arc((i * 131) % width, (i * 253) % height, 1.3, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 200, 100, ${0.25 * flicker})`; ctx.fill();
+        }
+    }
+    function drawParticles() {
+        for (let p of particles) {
+            p.x += p.vx; p.y += p.vy;
+            if (p.x - p.radius < 0) { p.x = p.radius; p.vx *= -1; }
+            if (p.x + p.radius > width) { p.x = width - p.radius; p.vx *= -1; }
+            if (p.y - p.radius < 0) { p.y = p.radius; p.vy *= -1; }
+            if (p.y + p.radius > height) { p.y = height - p.radius; p.vy *= -1; }
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.fill();
+        }
+    }
+    function animate() { drawGradient(); drawWaves(); drawStars(); drawParticles(); requestAnimationFrame(animate); }
+    window.addEventListener('resize', resize);
+    resize(); animate();
+})();
 
-        function resize() {
-            width = window.innerWidth; height = window.innerHeight;
-            canvas.width = width; canvas.height = height;
-            initParticles();
-        }
-        function initParticles() {
-            particles = [];
-            const colors = ['#e67e22', '#f39c12', '#d35400', '#f1c40f', '#e67e2266', '#f39c1266'];
-            for (let i = 0; i < 65; i++) {
-                particles.push({ x: Math.random() * width, y: Math.random() * height, radius: Math.random() * 4 + 2, color: colors[Math.floor(Math.random() * colors.length)], vx: (Math.random() - 0.5) * 0.45, vy: (Math.random() - 0.5) * 0.45 });
-            }
-        }
-        function drawGradient() {
-            const grad = ctx.createLinearGradient(0, 0, width, height);
-            grad.addColorStop(0, '#0a0f1c'); grad.addColorStop(0.5, '#111827'); grad.addColorStop(1, '#0f172a');
-            ctx.fillStyle = grad; ctx.fillRect(0, 0, width, height);
-        }
-        function drawWaves() {
-            time += 0.008; ctx.save(); ctx.globalCompositeOperation = 'lighter';
-            for (let i = 0; i < 4; i++) {
-                ctx.beginPath();
-                for (let x = 0; x < width; x += 20) {
-                    const y = height / 2 + Math.sin(x * 0.008 + time + i * 1.5) * 45 + Math.cos(x * 0.015 + time * 0.7) * 25;
-                    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-                }
-                ctx.strokeStyle = `rgba(230, 126, 34, ${0.08 - i * 0.015})`; ctx.lineWidth = 2.5; ctx.stroke();
-            }
-            ctx.restore();
-        }
-        function drawStars() {
-            for (let i = 0; i < 120; i++) {
-                ctx.beginPath();
-                const flicker = Math.sin(time * 5 + i) * 0.3 + 0.7;
-                ctx.arc((i * 131) % width, (i * 253) % height, 1.3, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 200, 100, ${0.25 * flicker})`; ctx.fill();
-            }
-        }
-        function drawParticles() {
-            for (let p of particles) {
-                p.x += p.vx; p.y += p.vy;
-                if (p.x - p.radius < 0) { p.x = p.radius; p.vx *= -1; }
-                if (p.x + p.radius > width) { p.x = width - p.radius; p.vx *= -1; }
-                if (p.y - p.radius < 0) { p.y = p.radius; p.vy *= -1; }
-                if (p.y + p.radius > height) { p.y = height - p.radius; p.vy *= -1; }
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.fill();
-            }
-        }
-        function animate() { drawGradient(); drawWaves(); drawStars(); drawParticles(); requestAnimationFrame(animate); }
-        window.addEventListener('resize', resize);
-        resize(); animate();
-    })();
+// ==================== اپلیکیشن ====================
+const $ = id => document.getElementById(id);
+const API = '/pro/api', KEY = 'designerState_v4';
+let S = { step:1, installation:null, material:null, codes:{}, designType:null, tpl:null, tplImg:null, upload:null, canvas:null };
+let insCache = [];
 
-    // ==================== اپلیکیشن ====================
-    const API_BASE = '/pro/api';
+function save(){
+    try{ localStorage.setItem(KEY, JSON.stringify({...S, length:$('length').value, width:$('width').value, notes:$('notes').value})); }catch(e){}
+}
+function load(){
+    try{
+        const p = JSON.parse(localStorage.getItem(KEY)||'null'); if(!p) return 1;
+        ['installation','material','codes','designType','tpl','tplImg','upload','canvas'].forEach(k=>{ if(p[k]!=null) S[k]=p[k]; });
+        ['length','width','notes'].forEach(k=>{ if(p[k]) $(k).value=p[k]; });
+        return p.step||1;
+    }catch(e){ return 1; }
+}
+let tT;
+function toast(m, err){ const t=$('toast'); t.textContent=m; t.className='toast show'+(err?' err':''); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('show'),2000); }
+const load_=on=>$('loading').classList.toggle('on',on);
+async function api(url, o={}){
+    load_(true);
+    try{ return await (await fetch(API+url,{headers:{'Content-Type':'application/json'},...o})).json(); }
+    catch(e){ return {status:'error'}; } finally{ load_(false); }
+}
+const codesOf = () => Object.entries(S.codes[S.installation?.id]||{}).filter(([,c])=>c&&c.trim());
+const dims = () => [parseFloat($('length').value)||0, parseFloat($('width').value)||0];
 
-    let state = {
-        step: 1,
-        installation: null,
-        material: null,
-        // { [installationId]: { [pdfId]: "code" } }
-        pdfCodesByInstallation: {},
-        length: 0,
-        width: 0,
-        designType: null,
-        selectedTemplate: null,
-        selectedTemplateImage: null,
-        uploadedImage: null,
+// ---------- مرحله ۱ ----------
+async function loadIns(){ const r=await api('/installations/'); if(r.status==='success'){ insCache=r.data; renderIns(); } }
+function renderIns(){
+    $('insGrid').innerHTML = insCache.map(i=>`<div class="opt ${S.installation?.id===i.id?'sel':''}" data-id="${i.id}"><img src="${i.image}" onerror="this.src='https://placehold.co/200x120?text=IMG'"><b>${i.title}</b>${i.description?`<small>${i.description}</small>`:''}</div>`).join('');
+    $('insGrid').querySelectorAll('.opt').forEach(el=>el.onclick=()=>{
+        const i = insCache.find(x=>x.id==el.dataset.id);
+        if(S.installation?.id!==i.id){ S.installation={id:i.id,title:i.title}; S.material=null; S.tpl=null; S.tplImg=null; save(); }
+        renderIns();
+        setTimeout(()=>$('pdfBox').scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+    });
+    renderPdfs();
+}
+function renderPdfs(){
+    const box=$('pdfBox'), ins=insCache.find(i=>i.id===S.installation?.id);
+    box.classList.toggle('hide',!ins); if(!ins) return;
+    const list=ins.pdfs||[];
+    box.innerHTML = `<div class="ttl" style="font-size:.9rem"><i class="fas fa-file-pdf"></i> کاتالوگ‌ها (${list.length})</div>` + (list.length? list.map(p=>{
+        const c=S.codes[ins.id]?.[p.id]||'';
+        return `<div class="pdf"><i class="fas fa-file-pdf"></i><div class="t">${p.title}<small class="${c?'ok':''}">${c?c:(p.material_title||'هنوز کدی ثبت نشده')}</small></div><button class="btn-s ${c?'ghost':''}" data-p="${p.id}">${c?'ویرایش':'مشاهده'}</button></div>`;
+    }).join('') : '<div class="sub" style="text-align:center">PDF ثبت نشده</div>');
+    box.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>openPdf(ins,list.find(p=>p.id==b.dataset.p)));
+}
+
+// ---------- مودال PDF ----------
+let pm={doc:null,zoom:1,tok:0,ins:null,pdf:null};
+if(window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+function openPdf(ins,pdf){
+    pm={doc:null,zoom:1,tok:++pm.tok,ins,pdf};
+    $('pmT').textContent=pdf.title; $('pmOpen').href=pdf.file_url||'#';
+    $('pmCode').value=S.codes[ins.id]?.[pdf.id]||'';
+    $('pmB').innerHTML='<div class="ld"><div class="spin" style="margin:0 auto 12px"></div>در حال بارگذاری PDF…</div>';
+    $('pm').classList.add('on'); document.body.style.overflow='hidden';
+    history.pushState({step:S.step,modal:1},'');
+    renderPdf(pdf.file_url);
+}
+async function renderPdf(url){
+    const tok=pm.tok;
+    try{
+        if(!window.pdfjsLib) throw 0;
+        if(!pm.doc) pm.doc=await pdfjsLib.getDocument(url).promise;
+        const b=$('pmB'), bw=b.clientWidth-16, dpr=Math.min(devicePixelRatio||1,2), frag=[];
+        for(let n=1;n<=pm.doc.numPages;n++){
+            const pg=await pm.doc.getPage(n); if(tok!==pm.tok) return;
+            const w1=pg.getViewport({scale:1}).width, sc=bw*pm.zoom/w1, vp=pg.getViewport({scale:sc*dpr});
+            const c=document.createElement('canvas'); c.width=vp.width; c.height=vp.height; c.style.width=bw*pm.zoom+'px';
+            await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise; if(tok!==pm.tok) return;
+            if(n===1) b.innerHTML=''; b.appendChild(c);
+        }
+    }catch(e){ if(tok===pm.tok) $('pmB').innerHTML=`<iframe src="${url}"></iframe>`; }
+}
+function closePdf(user){
+    $('pm').classList.remove('on'); document.body.style.overflow=''; pm.tok++;
+    if(user && history.state?.modal) history.back();
+}
+$('pmX').onclick=()=>closePdf(true);
+$('pm').onclick=e=>{ if(e.target===$('pm')) closePdf(true); };
+$('zIn').onclick=()=>{ pm.zoom=Math.min(3,pm.zoom+.25); pm.tok++; renderPdf(pm.pdf.file_url); };
+$('zOut').onclick=()=>{ pm.zoom=Math.max(.5,pm.zoom-.25); pm.tok++; renderPdf(pm.pdf.file_url); };
+$('pmSave').onclick=()=>{
+    const v=$('pmCode').value.trim(); if(!v) return toast('کد را وارد کنید',true);
+    (S.codes[pm.ins.id]=S.codes[pm.ins.id]||{})[pm.pdf.id]=v;
+    save(); renderPdfs(); closePdf(true); toast('کد ثبت شد');
+};
+
+// ---------- مرحله ۲ ----------
+async function loadMats(){
+    const r=await api(`/installations/${S.installation.id}/materials/`);
+    if(r.status!=='success') return;
+    $('matGrid').innerHTML=r.data.map(m=>`<div class="opt ${S.material?.id===m.id?'sel':''}" data-id="${m.id}">${m.image?`<img src="${m.image}">`:'<i class="fas fa-palette" style="font-size:34px;color:var(--o);margin:20px 0"></i>'}<b>${m.title}</b></div>`).join('');
+    $('matGrid').querySelectorAll('.opt').forEach(el=>el.onclick=()=>{
+        $('matGrid').querySelectorAll('.opt').forEach(i=>i.classList.remove('sel')); el.classList.add('sel');
+        S.material={id:parseInt(el.dataset.id),title:el.querySelector('b').textContent}; save();
+    });
+}
+
+// ---------- مرحله ۳ ----------
+function liveArea(){ const [l,w]=dims(); $('liveArea').textContent=(l*w).toFixed(2); }
+document.querySelectorAll('.num button').forEach(b=>b.onclick=()=>{
+    const i=$(b.dataset.d); i.value=Math.max(0,(parseFloat(i.value)||0)+0.1*b.dataset.k).toFixed(1); liveArea(); save();
+});
+['length','width'].forEach(k=>$(k).addEventListener('input',()=>{liveArea();save();}));
+$('notes').addEventListener('change',save);
+function pickType(t){
+    S.designType=t;
+    document.querySelectorAll('.seg .opt').forEach(o=>o.classList.toggle('sel',o.dataset.type===t));
+    $('readyBox').classList.toggle('hide',t!=='ready'); $('uploadBox').classList.toggle('hide',t!=='upload');
+    if(t==='ready') loadTpls();
+    if(t==='upload'&&S.upload){ $('previewImg').src=S.upload; $('previewImg').classList.remove('hide'); }
+    save();
+}
+document.querySelectorAll('.seg .opt').forEach(o=>o.onclick=()=>pickType(o.dataset.type));
+async function loadTpls(){
+    const r=await api(`/installations/${S.installation.id}/templates/`); if(r.status!=='success') return;
+    $('tplGrid').innerHTML=r.data.map(t=>`<div class="opt ${S.tpl===t.id?'sel':''}" data-id="${t.id}" data-img="${t.image}"><img src="${t.image}"><b>${t.title}</b></div>`).join('');
+    $('tplGrid').querySelectorAll('.opt').forEach(el=>el.onclick=()=>{
+        $('tplGrid').querySelectorAll('.opt').forEach(i=>i.classList.remove('sel')); el.classList.add('sel');
+        S.tpl=parseInt(el.dataset.id); S.tplImg=el.dataset.img; save();
+    });
+}
+$('uploadFile').onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader(); r.onload=ev=>{ S.upload=ev.target.result; $('previewImg').src=S.upload; $('previewImg').classList.remove('hide'); save(); }; r.readAsDataURL(f);
+};
+
+// ---------- مرحله ۴: ابزار طراحی با مقیاس واقعی (مدل شکل‌ها بر حسب متر) ----------
+let cv=null,tool='line',ppm=1,ox=0,oy=0,snapOn=true,hist=[],hi=-1,busy=false,sig='',lastW=0;
+let shapes=[],draft=null,selId=null,selV=-1,selSeg=-1,drag=null,hover=null,nid=1;
+const JP=['isRoom','selectable','evented'];
+const px=m=>({x:ox+m.x*ppm,y:oy+m.y*ppm}), toM=p=>({x:(p.x-ox)/ppm,y:(p.y-oy)/ppm});
+const sn=m=>snapOn?{x:Math.round(m.x*10)/10,y:Math.round(m.y*10)/10}:m;
+const dm=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y), f2=n=>n.toFixed(2);
+const rgba=(h,a)=>{const n=parseInt(h.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`;};
+const nSeg=s=>s.pts.length>2&&s.closed?s.pts.length:s.pts.length-1;
+const segA=(s,i)=>s.pts[i], segB=(s,i)=>s.pts[(i+1)%s.pts.length];
+const segLen=(s,i)=>dm(segA(s,i),segB(s,i));
+const perim=s=>{let t=0;for(let i=0;i<nSeg(s);i++)t+=segLen(s,i);return t;};
+const area=s=>{let a=0;const n=s.pts.length;for(let i=0;i<n;i++){const p=s.pts[i],q=s.pts[(i+1)%n];a+=p.x*q.y-q.x*p.y;}return Math.abs(a)/2;};
+const selShape=()=>shapes.find(x=>x.id===selId);
+const parse=j=>{try{const x=JSON.parse(j);return x.o?x:{o:x,s:[]};}catch(e){return null;}};
+const HINTS={line:'برای هر گوشه ضربه بزنید • برای پایان، دکمه سبز را بزنید',select:'روی یک خط بزنید تا نقاطش ظاهر شود • نقطه را بکشید • با + نقطه اضافه کنید',pen:'با انگشت بکشید',text:'روی نقشه ضربه بزنید تا متن اضافه شود',erase:'روی هر خط یا عنصر ضربه بزنید تا حذف شود'};
+
+function room(){
+    const [L,W]=dims(), w=L*ppm, h=W*ppm, b={selectable:false,evented:false,isRoom:true};
+    const r=new fabric.Rect({...b,left:ox,top:oy,width:w,height:h,fill:'rgba(230,126,34,.1)',stroke:'#e67e22',strokeWidth:3,strokeDashArray:[10,6]});
+    cv.add(r); r.sendToBack();
+    cv.add(new fabric.Text(L+' m',{...b,left:ox+w/2,top:oy-22,originX:'center',fontSize:14,fill:'#d35400',fontWeight:'bold'}));
+    cv.add(new fabric.Text(W+' m',{...b,left:ox-12,top:oy+h/2,originX:'center',originY:'center',angle:-90,fontSize:14,fill:'#d35400',fontWeight:'bold'}));
+}
+function pushHist(){
+    if(busy||!cv) return; hist=hist.slice(0,hi+1);
+    hist.push(JSON.stringify({o:cv.toJSON(JP),s:shapes})); hi=hist.length-1;
+    S.canvas={sig,json:hist[hi]}; save(); updUndo();
+}
+function restore(i){
+    const d=parse(hist[i]); if(!d) return; busy=true; hi=i; draft=null; selId=null; selV=-1; selSeg=-1; shapes=d.s||[];
+    cv.loadFromJSON(d.o,()=>{ busy=false; S.canvas={sig,json:hist[i]}; save(); setTool(tool); updUndo(); updFab(); });
+}
+function updUndo(){ $('bUndo').disabled=hi<=0; $('bRedo').disabled=hi>=hist.length-1; }
+
+function initCanvas(){
+    const cw=$('cw'); cw.querySelectorAll('canvas,.canvas-container').forEach(n=>n.remove());
+    const el=document.createElement('canvas'); el.id='dc'; cw.prepend(el);
+    const w=cw.clientWidth||300, h=cw.clientHeight||400, [L,W]=dims(); lastW=w;
+    cv=new fabric.Canvas('dc',{width:w,height:h,selection:false,preserveObjectStacking:true,renderOnAddRemove:false,backgroundColor:'rgba(0,0,0,0)'});
+    const pad=34, avail=Math.max(h-170,h*.5);
+    ppm=Math.min((w-pad*2)/L,(avail-pad)/W); if(!isFinite(ppm)||ppm<=0) ppm=40;
+    ox=(w-L*ppm)/2; oy=pad+10+Math.max(0,(avail-pad-W*ppm)/2);
+    cw.style.backgroundSize=`${ppm*.5}px ${ppm*.5}px`; cw.style.backgroundPosition=`${ox}px ${oy}px`;
+    $('scaleInfo').textContent='هر خانه = ۵۰ سانتی‌متر';
+    sig=`${L}x${W}`; hist=[]; hi=-1; draft=null; selId=null; selV=-1; selSeg=-1; drag=null; hover=null; shapes=[];
+    const d=S.canvas?.sig===sig?parse(S.canvas.json):null;
+    cv.on('mouse:down',onDown); cv.on('mouse:move',onMove); cv.on('mouse:up',onUp);
+    cv.on('path:created',e=>{ e.path.set({selectable:false,evented:false}); pushHist(); });
+    cv.on('object:modified',()=>pushHist()); cv.on('text:editing:exited',()=>pushHist());
+    if(d){
+        shapes=d.s||[]; nid=shapes.reduce((m,s)=>Math.max(m,s.id),0)+1; busy=true;
+        cv.loadFromJSON(d.o,()=>{
+            cv.getObjects().filter(o=>o.isRoom).forEach(o=>cv.remove(o)); room();
+            busy=false; hist=[S.canvas.json]; hi=0; setTool(tool); updUndo(); updFab();
+        });
+    }else{ room(); setTool(tool); pushHist(); updFab(); }
+}
+
+// ---------- رسم ----------
+function renderShapes(){
+    if(!cv) return;
+    cv.getObjects().filter(o=>o._sh).forEach(o=>cv.remove(o));
+    const all=draft?[...shapes,draft]:shapes, out=[];
+    all.forEach(s=>out.push(...drawShape(s,s===draft)));
+    out.forEach(o=>{o._sh=1;o.excludeFromExport=true;o.selectable=false;o.evented=false;cv.add(o);});
+    cv.renderAll();
+}
+function drawShape(s,isD){
+    const sel=s.id===selId&&!isD, P=s.pts.map(px), n=P.length, cl=s.closed&&n>2, out=[];
+    const B={objectCaching:false,strokeLineJoin:'round',strokeLineCap:'round'};
+    const T=(t,x,y,o={})=>new fabric.Text(t,{left:x,top:y,originX:'center',originY:'center',fontSize:12,fill:'#1a1a2e',backgroundColor:'rgba(255,255,255,.9)',fontFamily:'Tahoma',...o});
+    const C=(p,r,o)=>new fabric.Circle({left:p.x,top:p.y,originX:'center',originY:'center',radius:r,...o});
+    if(n>1){
+        if(sel) out.push(new fabric.Polyline(cl?[...P,P[0]]:P,{...B,fill:'transparent',stroke:'rgba(46,204,113,.4)',strokeWidth:s.w+12}));
+        out.push(new (cl?fabric.Polygon:fabric.Polyline)(P,{...B,fill:cl?rgba(s.color,.14):'transparent',stroke:s.color,strokeWidth:s.w}));
+    }
+    if(isD&&hover&&n){
+        const a=P[n-1], b=px(hover);
+        out.push(new fabric.Line([a.x,a.y,b.x,b.y],{stroke:s.color,strokeWidth:2,strokeDashArray:[6,5],opacity:.6}));
+        out.push(T(f2(dm(draft.pts[n-1],hover))+' m',(a.x+b.x)/2,(a.y+b.y)/2-14,{fill:'#d35400'}));
+    }
+    for(let i=0;i<nSeg(s);i++){
+        const a=P[i], b=P[(i+1)%n], Lm=segLen(s,i); if(!sel&&!isD&&dm(a,b)<30) continue;
+        const d=dm(a,b)||1, nx=-(b.y-a.y)/d*14, ny=(b.x-a.x)/d*14, on=sel&&i===selSeg;
+        out.push(T(f2(Lm)+' m',(a.x+b.x)/2+nx,(a.y+b.y)/2+ny,{fontSize:on?14:12,fill:on?'#fff':'#1a1a2e',backgroundColor:on?'#e67e22':'rgba(255,255,255,.9)'}));
+    }
+    P.forEach((p,i)=>{
+        if(sel) out.push(C(p,i===selV?13:11,{fill:i===selV?'#e67e22':'#fff',stroke:'#2ecc71',strokeWidth:3}));
+        else out.push(C(p,isD?6:4,{fill:s.color}));
+    });
+    if(isD&&n>=3) out.push(C(P[0],17,{fill:'rgba(46,204,113,.15)',stroke:'#2ecc71',strokeWidth:2}));
+    if(isD&&n>=2) out.push(C(P[n-1],11,{fill:'rgba(46,204,113,.25)',stroke:'#2ecc71',strokeWidth:2}));
+    if(sel) for(let i=0;i<nSeg(s);i++){
+        const a=P[i], b=P[(i+1)%n], m={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+        out.push(C(m,10,{fill:'rgba(46,204,113,.92)'}),T('+',m.x,m.y,{fontSize:15,fill:'#fff',backgroundColor:'',fontWeight:'bold'}));
+    }
+    return out;
+}
+
+// ---------- لمس و ماوس ----------
+const ptr=e=>cv.getPointer(e.e);
+function distSeg(p,a,b){const dx=b.x-a.x,dy=b.y-a.y,l=dx*dx+dy*dy;let t=l?((p.x-a.x)*dx+(p.y-a.y)*dy)/l:0;t=Math.max(0,Math.min(1,t));return Math.hypot(p.x-a.x-t*dx,p.y-a.y-t*dy);}
+function hitShape(p){for(let k=shapes.length-1;k>=0;k--){const s=shapes[k];for(let i=0;i<nSeg(s);i++) if(distSeg(p,px(segA(s,i)),px(segB(s,i)))<18) return {s,i};}return null;}
+function nearV(s,p,r){let b=-1,bd=r;s.pts.forEach((m,i)=>{const d=dm(px(m),p);if(d<bd){bd=d;b=i;}});return b;}
+function nearMid(s,p,r){for(let i=0;i<nSeg(s);i++){const a=px(segA(s,i)),b=px(segB(s,i));if(dm({x:(a.x+b.x)/2,y:(a.y+b.y)/2},p)<r)return i;}return -1;}
+function snapAxis(m){
+    if(!draft||!draft.pts.length||!snapOn) return m; const l=draft.pts[draft.pts.length-1], dx=m.x-l.x, dy=m.y-l.y;
+    if(Math.abs(dx)<Math.abs(dy)*.14) return {x:l.x,y:m.y}; if(Math.abs(dy)<Math.abs(dx)*.14) return {x:m.x,y:l.y}; return m;
+}
+function drawTap(p){
+    const m=sn(snapAxis(toM(p)));
+    if(!draft) draft={id:'draft',pts:[],closed:false,color:$('col').value,w:+$('wid').value};
+    const n=draft.pts.length;
+    if(n>=3&&dm(px(draft.pts[0]),p)<24){ draft.closed=true; return finishLine(); }
+    if(n>=2&&dm(px(draft.pts[n-1]),p)<20) return finishLine();
+    if(n&&dm(draft.pts[n-1],m)<0.02) return;
+    draft.pts.push(m); hover=null; renderShapes(); updFab();
+}
+function finishLine(){
+    if(!draft||draft.pts.length<2) return toast('حداقل دو نقطه لازم است',true);
+    const s=draft; s.id=nid++; shapes.push(s); draft=null; hover=null; selId=s.id; selV=-1; selSeg=-1;
+    setTool('select'); updFab(); pushHist(); toast('✓ خط ثبت شد. نقاط را بکشید تا ویرایش شود');
+}
+function commitDraft(){ if(draft){ if(draft.pts.length>=2) finishLine(); else cancelDraft(); } }
+function cancelDraft(){ draft=null; hover=null; renderShapes(); updFab(); }
+function backPt(){ if(!draft) return; draft.pts.pop(); if(!draft.pts.length) draft=null; hover=null; renderShapes(); updFab(); }
+function onDown(e){
+    const p=ptr(e);
+    if(tool==='line') return drawTap(p);
+    if(tool==='text'){
+        const t=new fabric.IText('متن',{left:p.x,top:p.y,fontSize:+$('wid').value*4+10,fill:$('col').value,fontFamily:'Tahoma'});
+        cv.add(t); setTool('select'); cv.setActiveObject(t); t.enterEditing(); t.selectAll(); cv.renderAll(); return;
+    }
+    if(tool==='erase'){
+        const h=hitShape(p);
+        if(h){ shapes=shapes.filter(x=>x!==h.s); selId=null; renderShapes(); pushHist(); }
+        else if(e.target&&!e.target.isRoom&&!e.target._sh){ cv.remove(e.target); cv.renderAll(); pushHist(); }
+        return;
+    }
+    if(tool!=='select') return;
+    if(e.target&&!e.target._sh&&!e.target.isRoom) return;
+    const s=selShape();
+    if(s){
+        let i=nearV(s,p,26);
+        if(i>=0){ selV=i; selSeg=-1; drag={t:'v',s,i,moved:false}; renderShapes(); return; }
+        i=nearMid(s,p,22);
+        if(i>=0){ const a=segA(s,i), b=segB(s,i); s.pts.splice(i+1,0,{x:(a.x+b.x)/2,y:(a.y+b.y)/2}); selV=i+1; selSeg=-1; drag={t:'v',s,i:i+1,moved:true}; renderShapes(); return; }
+    }
+    const h=hitShape(p);
+    if(h){ selId=h.s.id; selSeg=h.i; selV=-1; drag={t:'s',s:h.s,start:toM(p),orig:h.s.pts.map(q=>({...q})),moved:false}; }
+    else{ selId=null; selV=-1; selSeg=-1; cv.discardActiveObject(); }
+    renderShapes(); panel();
+}
+function onMove(e){
+    const p=ptr(e);
+    if(tool==='line'&&draft){ hover=sn(snapAxis(toM(p))); renderShapes(); return; }
+    if(!drag) return; const m=toM(p);
+    if(drag.t==='v'){
+        const q=sn(m), c=drag.s.pts[drag.i];
+        if(q.x!==c.x||q.y!==c.y){ drag.s.pts[drag.i]=q; drag.moved=true; renderShapes(); }
+    }else{
+        const dx=m.x-drag.start.x, dy=m.y-drag.start.y; if(!drag.moved&&Math.hypot(dx,dy)*ppm<8) return;
+        const o=drag.orig[0], t=sn({x:o.x+dx,y:o.y+dy});
+        drag.s.pts=drag.orig.map(q=>({x:q.x+t.x-o.x,y:q.y+t.y-o.y})); drag.moved=true; renderShapes();
+    }
+}
+function onUp(){ const d=drag; drag=null; if(d&&d.moved) pushHist(); if(d) panel(); }
+
+// ---------- پنل ویرایش ----------
+function setSegLen(s,i,m){
+    if(!(m>0)) return toast('طول معتبر وارد کنید',true);
+    const n=s.pts.length, j=(i+1)%n, a=s.pts[i], b=s.pts[j], cur=dm(a,b), ux=cur>1e-5?(b.x-a.x)/cur:1, uy=cur>1e-5?(b.y-a.y)/cur:0, d=m-cur;
+    const mv=k=>{s.pts[k]={x:s.pts[k].x+ux*d,y:s.pts[k].y+uy*d};};
+    if(j>i) for(let k=j;k<n;k++) mv(k); else mv(0);
+    renderShapes(); pushHist(); panel(); toast('طول ضلع تغییر کرد');
+}
+function panel(){
+    const ep=$('ep'), s=selShape();
+    if(!s||tool!=='select'){ ep.classList.add('hide'); return; }
+    const c=nSeg(s), cl=s.closed&&s.pts.length>2;
+    let h=`<div class="eh"><b>خط ${shapes.indexOf(s)+1}</b><span>${s.pts.length} نقطه • محیط ${f2(perim(s))} m${cl?` • مساحت ${f2(area(s))} m²`:''}</span><button class="ib" id="eX"><i class="fas fa-times"></i></button></div><div class="chips2">`;
+    for(let i=0;i<c;i++) h+=`<button class="sc ${i===selSeg?'on':''}" data-i="${i}">ضلع ${i+1}: ${f2(segLen(s,i))}</button>`;
+    h+='</div>';
+    if(selSeg>=0&&selSeg<c) h+=`<div class="el"><input id="eLen" type="number" inputmode="decimal" step="0.01" value="${f2(segLen(s,selSeg))}"><button class="btn-s" id="eApply">اعمال طول</button></div>`;
+    h+=`<div class="acts"><button class="tb" id="eDelP" ${selV<0?'disabled':''}><i class="fas fa-minus-circle"></i><span>حذف نقطه</span></button><button class="tb" id="eClose"><i class="fas fa-${cl?'unlink':'link'}"></i><span>${cl?'باز کردن':'بستن شکل'}</span></button><button class="tb" id="eCopy"><i class="fas fa-clone"></i><span>کپی</span></button><button class="tb no" id="eDelL"><i class="fas fa-trash"></i><span>حذف خط</span></button></div>`;
+    ep.innerHTML=h; ep.classList.remove('hide');
+    const done=()=>{ renderShapes(); pushHist(); panel(); };
+    $('eX').onclick=()=>{ selId=null; selV=-1; selSeg=-1; renderShapes(); panel(); };
+    ep.querySelectorAll('.sc').forEach(b=>b.onclick=()=>{ selSeg=+b.dataset.i; selV=-1; renderShapes(); panel(); });
+    if($('eApply')) $('eApply').onclick=()=>setSegLen(s,selSeg,parseFloat($('eLen').value));
+    $('eDelP').onclick=()=>{
+        if(selV<0) return; s.pts.splice(selV,1); selV=-1; selSeg=-1; if(s.pts.length<3) s.closed=false;
+        if(s.pts.length<2){ shapes=shapes.filter(x=>x!==s); selId=null; } done();
     };
-
-    let installationsCache = [];
-
-    // ==================== ذخیره / بازیابی ====================
-    function saveState() {
-        try {
-            const toSave = {
-                step: state.step,
-                installation: state.installation,
-                material: state.material,
-                pdfCodesByInstallation: state.pdfCodesByInstallation,
-                designType: state.designType,
-                selectedTemplate: state.selectedTemplate,
-                selectedTemplateImage: state.selectedTemplateImage,
-                uploadedImage: state.uploadedImage,
-                length: document.getElementById('length')?.value || '',
-                width: document.getElementById('width')?.value || '',
-                notes: document.getElementById('notes')?.value || ''
-            };
-            localStorage.setItem('designerState_v3', JSON.stringify(toSave));
-        } catch(e) { console.log('save error', e); }
+    $('eClose').onclick=()=>{ if(s.pts.length<3) return toast('برای بستن شکل حداقل ۳ نقطه لازم است',true); s.closed=!s.closed; selSeg=-1; done(); };
+    $('eCopy').onclick=()=>{ const k={...s,id:nid++,pts:s.pts.map(p=>({x:p.x+.3,y:p.y+.3}))}; shapes.push(k); selId=k.id; selSeg=-1; selV=-1; done(); toast('کپی شد'); };
+    $('eDelL').onclick=()=>{ shapes=shapes.filter(x=>x!==s); selId=null; done(); };
+}
+function updFab(){
+    const n=draft?draft.pts.length:0, ok=n>=2;
+    $('fab').classList.toggle('hide',!n); $('fOk').disabled=!ok;
+    $('fOk').innerHTML=ok?`<i class="fas fa-check-circle"></i> تکمیل خط • ${n} نقطه • ${f2(perim(draft))} m`:'نقطه دوم را بگذارید…';
+    const lb=document.querySelector('[data-t="line"]'); lb.classList.toggle('good',ok);
+    lb.querySelector('span').textContent=ok?'تکمیل ✓':'خط‌روند'; lb.querySelector('i').className=ok?'fas fa-check-circle':'fas fa-draw-polygon';
+    setHint();
+}
+function setHint(){ $('hint').textContent=(tool==='line'&&draft)?'روی آخرین نقطه یا دکمه سبز بزنید تا خط تمام شود • نقطه اول = بستن شکل':HINTS[tool]; }
+function setTool(t){
+    if(draft&&t!=='line'){ draft=null; hover=null; }
+    tool=t; document.querySelectorAll('[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+    if(cv){
+        cv.isDrawingMode=t==='pen'; cv.selection=false;
+        cv.forEachObject(o=>{ if(!o.isRoom&&!o._sh){ o.selectable=t==='select'; o.evented=t==='select'||t==='erase'; } });
+        if(t==='pen'){ cv.freeDrawingBrush.color=$('col').value; cv.freeDrawingBrush.width=+$('wid').value; }
+        if(t!=='select'){ selId=null; selV=-1; selSeg=-1; cv.discardActiveObject(); }
+        renderShapes();
     }
+    updFab(); panel();
+}
+document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{
+    const t=b.dataset.t; if(t==='line'&&tool==='line'&&draft&&draft.pts.length>=2) return finishLine(); setTool(t);
+});
+$('fOk').onclick=finishLine; $('fNo').onclick=cancelDraft; $('fBack').onclick=backPt;
+$('bUndo').onclick=()=>{ if(hi>0) restore(hi-1); }; $('bRedo').onclick=()=>{ if(hi<hist.length-1) restore(hi+1); };
+$('bSnap').onclick=()=>{ snapOn=!snapOn; $('bSnap').classList.toggle('on',snapOn); toast(snapOn?'چسبیدن به شبکه و راست‌کردن خودکار فعال شد':'چسبیدن غیرفعال شد'); };
+$('bDel').onclick=()=>{
+    const s=selShape(); if(s){ shapes=shapes.filter(x=>x!==s); selId=null; renderShapes(); pushHist(); panel(); return; }
+    const o=cv.getActiveObject(); if(o&&!o.isRoom){ cv.remove(o); cv.discardActiveObject(); cv.renderAll(); pushHist(); } else toast('ابتدا یک خط یا عنصر را انتخاب کنید',true);
+};
+$('bClr').onclick=()=>{
+    if(!confirm('همه‌ی طرح پاک شود؟')) return;
+    shapes=[]; draft=null; selId=null; selV=-1; selSeg=-1; cv.clear(); cv.backgroundColor='rgba(0,0,0,0)'; room(); renderShapes(); pushHist(); panel(); updFab();
+};
+$('col').oninput=()=>{
+    const s=selShape(); if(s){ s.color=$('col').value; renderShapes(); } else if(draft){ draft.color=$('col').value; renderShapes(); }
+    if(cv&&cv.isDrawingMode) cv.freeDrawingBrush.color=$('col').value;
+};
+$('wid').oninput=()=>{
+    const s=selShape(); if(s){ s.w=+$('wid').value; renderShapes(); } else if(draft){ draft.w=+$('wid').value; renderShapes(); }
+    if(cv&&cv.isDrawingMode) cv.freeDrawingBrush.width=+$('wid').value;
+};
+$('col').onchange=$('wid').onchange=()=>{ if(selShape()) pushHist(); };
+window.addEventListener('keydown',e=>{
+    if(S.step!==4||!cv||/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+    if(e.key==='Enter') commitDraft(); else if(e.key==='Escape') cancelDraft(); else if(e.key==='Delete'||e.key==='Backspace') $('bDel').click();
+});
+window.addEventListener('resize',()=>{ if(S.step===4&&cv&&Math.abs($('cw').clientWidth-lastW)>40) setTimeout(initCanvas,150); });
+function canvasImage(){
+    if(!cv) return null;
+    if(!shapes.length&&!draft&&cv.getObjects().filter(o=>!o.isRoom&&!o._sh).length===0) return null;
+    const k=[selId,draft]; selId=null; draft=null; renderShapes();
+    cv.backgroundColor='#ffffff'; const d=cv.toDataURL({format:'png',multiplier:1.5}); cv.backgroundColor='rgba(0,0,0,0)';
+    selId=k[0]; draft=k[1]; renderShapes(); return d;
+}
 
-    function loadState() {
-        try {
-            const saved = localStorage.getItem('designerState_v3');
-            if (!saved) return 1;
-            const p = JSON.parse(saved);
-            if (p.installation) state.installation = p.installation;
-            if (p.material) state.material = p.material;
-            if (p.pdfCodesByInstallation) state.pdfCodesByInstallation = p.pdfCodesByInstallation;
-            if (p.designType) state.designType = p.designType;
-            if (p.selectedTemplate) state.selectedTemplate = p.selectedTemplate;
-            if (p.selectedTemplateImage) state.selectedTemplateImage = p.selectedTemplateImage;
-            if (p.uploadedImage) state.uploadedImage = p.uploadedImage;
-            if (p.length) { const el = document.getElementById('length'); if (el) el.value = p.length; }
-            if (p.width) { const el = document.getElementById('width'); if (el) el.value = p.width; }
-            if (p.notes) { const el = document.getElementById('notes'); if (el) el.value = p.notes; }
-            return p.step || 1;
-        } catch(e) { return 1; }
-    }
+// ---------- مرحله ۵ ----------
+let planImg=null;
+function updFinal(){
+    const [l,w]=dims(); planImg=canvasImage()||planImg;
+    $('fIns').textContent=S.installation?.title||'-'; $('fMat').textContent=S.material?.title||'-';
+    const cs=codesOf(); $('fCodes').innerHTML=cs.length?cs.map(([,c])=>`<span class="chip">${c}</span>`).join(''):'-';
+    const d=l&&w?`${l} × ${w}`:'-'; $('fDim').textContent=d; $('fDim2').textContent=d+(l&&w?' متر':''); $('fArea').textContent=(l*w).toFixed(2);
+    const items=[];
+    if(S.designType==='ready'&&S.tplImg) items.push(['طرح آماده',S.tplImg]);
+    if(S.designType==='upload'&&S.upload) items.push(['عکس آپلودی',S.upload]);
+    if(planImg) items.push(['پلن طراحی‌شده',planImg]);
+    $('pv').innerHTML=items.length?items.map(([t,s])=>`<figure data-img="${s}"><img src="${s}"><figcaption>${t}</figcaption></figure>`).join(''):'<div class="sub">طرحی انتخاب نشده</div>';
+    $('pv').querySelectorAll('figure').forEach(f=>f.onclick=()=>{
+        const m=document.createElement('div'); m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:5000;display:flex;align-items:center;justify-content:center';
+        m.innerHTML=`<img src="${f.dataset.img}" style="max-width:94%;max-height:90%;object-fit:contain;background:#fff;border-radius:12px">`; m.onclick=()=>m.remove(); document.body.appendChild(m);
+    });
+}
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>goTo(+b.dataset.go));
+async function submit(){
+    const [length,width]=dims(); if(length<=0||width<=0) return toast('طول و عرض را وارد کنید',true);
+    const body={installation_id:S.installation?.id,material_id:S.material?.id,design_type:S.designType||'custom',length,width,notes:$('notes').value||'',plan_image:canvasImage()||planImg,selected_codes:S.codes[S.installation?.id]||{}};
+    load_(true);
+    try{
+        const r=await (await fetch('/pro/api/create-order/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})).json();
+        load_(false);
+        if(r.status==='success'&&r.redirect_url) location.href=r.redirect_url;
+        else if(r.order_id) location.href=`/order/checkout/${r.order_id}/`;
+        else throw new Error(r.message||'خطا در ثبت سفارش');
+    }catch(e){ load_(false); toast(e.message||'خطا در ثبت سفارش، دوباره تلاش کنید',true); }
+}
 
-    function showLoading() { document.getElementById('loading').classList.add('active'); }
-    function hideLoading() { document.getElementById('loading').classList.remove('active'); }
+// ---------- ناوبری با History ----------
+const LBL=['','ادامه','ادامه','ادامه به طراحی','ادامه به مرور نهایی','ثبت و پرداخت'];
+function show(step){
+    document.querySelectorAll('.step').forEach(s=>s.classList.remove('on')); $('s'+step).classList.add('on');
+    document.querySelectorAll('.st').forEach(b=>{ const i=+b.dataset.s; b.classList.toggle('on',i===step); b.classList.toggle('done',i<step); b.querySelector('b').innerHTML=i<step?'<i class="fas fa-check"></i>':i; });
+    $('fill').style.width=`calc((100% - 32px) * ${(step-1)/4})`;
+    $('stepPill').textContent=`مرحله ${step} از 5`;
+    $('nextBtn').textContent=LBL[step]; $('nextBtn').classList.toggle('final',step===5);
+    $('prevBtn').classList.toggle('hide',step===1);
+    document.body.classList.toggle('fs',step===4);
+    S.step=step; save(); window.scrollTo(0,0);
+    if(step===2) loadMats();
+    if(step===3){ liveArea(); if(S.designType) pickType(S.designType); }
+    if(step===4){ if(cv&&S.canvas&&hist.length) S.canvas={sig,json:hist[hi]}; setTimeout(initCanvas,60); }
+    if(step===5){ if(cv&&S.step!==4) {} updFinal(); }
+}
+function goTo(step){ if(step===S.step) return; history.pushState({step},''); show(step); }
+window.addEventListener('popstate',e=>{
+    if($('pm').classList.contains('on')){ closePdf(false); return; }
+    const st=e.state?.step||1;
+    if(S.step===4&&cv){ planImg=canvasImage()||planImg; }
+    if(e.state?.modal) return;
+    show(st);
+});
+function valid(s){
+    if(s===1){ if(!S.installation) return toast('نصبیات را انتخاب کنید',true),0; if(!codesOf().length) return toast('حداقل یک کد عکس ثبت کنید',true),0; }
+    if(s===2&&!S.material) return toast('جنس را انتخاب کنید',true),0;
+    if(s===3){ const [l,w]=dims();
+        if(!l||!w) return toast('طول و عرض را وارد کنید',true),0;
+        if(!S.designType) return toast('نوع طرح را انتخاب کنید',true),0;
+        if(S.designType==='ready'&&!S.tpl) return toast('یک طرح آماده انتخاب کنید',true),0;
+        if(S.designType==='upload'&&!S.upload) return toast('عکس را آپلود کنید',true),0; }
+    return 1;
+}
+$('nextBtn').onclick=()=>{ const s=S.step; if(!valid(s)) return; if(s===4){ commitDraft(); planImg=canvasImage()||planImg; } if(s===5) submit(); else goTo(s+1); };
+$('prevBtn').onclick=()=>history.back();
+document.querySelectorAll('.st').forEach(b=>b.onclick=()=>{ const i=+b.dataset.s; if(i<S.step) goTo(i); });
 
-    function showToastMessage(msg, isError = false) {
-        const t = document.getElementById('selectedToast');
-        t.style.backgroundColor = isError ? '#dc3545' : '#e67e22';
-        t.innerHTML = (isError ? '⚠️ ' : '✅ ') + msg;
-        t.style.display = 'block';
-        setTimeout(() => { t.style.display = 'none'; }, 2000);
-    }
-
-    async function apiCall(url, options = {}) {
-        showLoading();
-        try {
-            const res = await fetch(`${API_BASE}${url}`, {
-                headers: { 'Content-Type': 'application/json' }, ...options
-            });
-            return await res.json();
-        } catch (e) {
-            console.error('API error:', e);
-            return { status: 'error', message: 'خطای ارتباط' };
-        } finally { hideLoading(); }
-    }
-
-    // ==================== مرحله ۱ ====================
-    async function loadInstallations() {
-        const res = await apiCall('/installations/');
-        if (res.status === 'success') {
-            installationsCache = res.data;
-            renderInstallations();
-        }
-    }
-
-    function renderInstallations() {
-        const container = document.getElementById('installationsList');
-        container.innerHTML = '';
-
-        installationsCache.forEach(ins => {
-            const block = document.createElement('div');
-            block.className = 'installation-block';
-
-            const isSelected = state.installation && state.installation.id === ins.id;
-
-            const mainDiv = document.createElement('div');
-            mainDiv.className = 'installation-main' + (isSelected ? ' selected' : '');
-            mainDiv.innerHTML = `
-                <img src="${ins.image}" onerror="this.src='https://placehold.co/70x70?text=IMG'">
-                <div class="installation-info">
-                    <div class="name">${ins.title}</div>
-                    <div class="desc">${ins.description || 'برای انتخاب کلیک کنید'}</div>
-                </div>
-                <i class="fas fa-chevron-${isSelected ? 'up' : 'down'}" style="color:#e67e22;"></i>
-            `;
-            mainDiv.onclick = () => selectInstallation(ins);
-            block.appendChild(mainDiv);
-
-            // PDFها
-            if (isSelected) {
-                const pdfsSection = document.createElement('div');
-                pdfsSection.className = 'pdfs-section';
-
-                if (ins.pdfs && ins.pdfs.length > 0) {
-                    pdfsSection.innerHTML = `
-                        <div class="pdfs-section-title"><i class="fas fa-file-pdf"></i> مستندات PDF (${ins.pdfs.length})</div>
-                        <div class="pdf-hint">
-                            💡 هر PDF را باز کنید، عکس مورد نظرتان را ببینید و <b>کد زیر آن عکس</b> را در کادر روبه‌رو وارد کنید.
-                        </div>
-                    `;
-
-                    ins.pdfs.forEach(pdf => {
-                        const savedCode = state.pdfCodesByInstallation[ins.id]?.[pdf.id] || '';
-                        const row = document.createElement('div');
-                        row.className = 'pdf-row';
-                        row.innerHTML = `
-                            <div class="pdf-row-header">
-                                <div class="pdf-name">
-                                    <i class="fas fa-file-pdf" style="color:#e63946;"></i>
-                                    <span>${pdf.title}</span>
-                                    ${pdf.material_title ? `<span class="material-tag">${pdf.material_title}</span>` : ''}
-                                </div>
-                                <a href="${pdf.file_url || '#'}" target="_blank" class="pdf-download" onclick="event.stopPropagation();">
-                                    <i class="fas fa-external-link-alt"></i> باز کردن PDF
-                                </a>
-                            </div>
-                            <div class="pdf-code-wrapper">
-                                <input type="text" class="pdf-code-input ${savedCode ? 'filled' : ''}"
-                                       placeholder="کد عکس انتخابی را وارد کنید..."
-                                       value="${savedCode}"
-                                       data-pdf-id="${pdf.id}"
-                                       data-inst-id="${ins.id}">
-                                <button class="pdf-clear-btn" data-pdf-id="${pdf.id}" data-inst-id="${ins.id}" title="پاک کردن">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <div class="code-counter" data-counter-for="${pdf.id}" style="${savedCode ? '' : 'display:none;'}">
-                                <i class="fas fa-check-circle"></i> کد ثبت شد
-                            </div>
-                        `;
-                        pdfsSection.appendChild(row);
-                    });
-                } else {
-                    pdfsSection.innerHTML = `<div style="color:rgba(255,255,255,0.6); font-size:0.75rem; text-align:center; padding:10px;">📄 PDF ثبت نشده</div>`;
-                }
-                block.appendChild(pdfsSection);
-            }
-
-            container.appendChild(block);
-        });
-
-        // ذخیره خودکار کد
-        container.querySelectorAll('.pdf-code-input').forEach(input => {
-            input.oninput = () => {
-                const pdfId = input.dataset.pdfId;
-                const instId = input.dataset.instId;
-                const code = input.value.trim();
-
-                if (!state.pdfCodesByInstallation[instId]) {
-                    state.pdfCodesByInstallation[instId] = {};
-                }
-                state.pdfCodesByInstallation[instId][pdfId] = code;
-                input.classList.toggle('filled', !!code);
-
-                const counter = document.querySelector(`.code-counter[data-counter-for="${pdfId}"]`);
-                if (counter) counter.style.display = code ? 'flex' : 'none';
-
-                saveState();
-                updateContinueButton();
-            };
-        });
-
-        // دکمه پاک کردن
-        container.querySelectorAll('.pdf-clear-btn').forEach(btn => {
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                const pdfId = btn.dataset.pdfId;
-                const instId = btn.dataset.instId;
-                const input = container.querySelector(`.pdf-code-input[data-pdf-id="${pdfId}"][data-inst-id="${instId}"]`);
-                if (input) {
-                    input.value = '';
-                    input.classList.remove('filled');
-                }
-                if (state.pdfCodesByInstallation[instId]) {
-                    state.pdfCodesByInstallation[instId][pdfId] = '';
-                }
-                const counter = document.querySelector(`.code-counter[data-counter-for="${pdfId}"]`);
-                if (counter) counter.style.display = 'none';
-                saveState();
-                updateContinueButton();
-            };
-        });
-
-        updateContinueButton();
-    }
-
-    function updateContinueButton() {
-        const btn = document.getElementById('continueBtn1');
-        if (!state.installation) { btn.disabled = true; return; }
-        const codes = state.pdfCodesByInstallation[state.installation.id] || {};
-        const hasAny = Object.values(codes).some(c => c && c.trim());
-        btn.disabled = !hasAny;
-    }
-
-    function selectInstallation(ins) {
-        if (state.installation && state.installation.id === ins.id) {
-            renderInstallations();
-            return;
-        }
-        state.installation = { id: ins.id, title: ins.title };
-        state.material = null;
-        saveState();
-        renderInstallations();
-        showToastMessage(`نصبیات "${ins.title}" انتخاب شد`);
-    }
-
-    document.getElementById('continueBtn1').onclick = () => {
-        if (!state.installation) { showToastMessage('نصبیات را انتخاب کنید', true); return; }
-        const codes = state.pdfCodesByInstallation[state.installation.id] || {};
-        const filled = Object.values(codes).filter(c => c && c.trim());
-        if (filled.length === 0) { showToastMessage('حداقل یک کد عکس وارد کنید', true); return; }
-        goToStep(2);
-        loadMaterials(state.installation.id);
-    };
-
-    // ==================== مرحله ۲ ====================
-    async function loadMaterials(installationId) {
-        const res = await apiCall(`/installations/${installationId}/materials/`);
-        if (res.status === 'success') {
-            const container = document.getElementById('materialsList');
-            container.innerHTML = res.data.map(mat => `
-                <div class="material-item ${state.material && state.material.id === mat.id ? 'selected' : ''}"
-                     data-mat-id="${mat.id}">
-                    ${mat.image ? `<img src="${mat.image}" style="width:50px;height:50px;border-radius:12px;">` : '<i class="fas fa-palette" style="font-size:34px;color:#e67e22"></i>'}
-                    <div class="material-title">${mat.title}</div>
-                </div>
-            `).join('');
-
-            container.querySelectorAll('.material-item').forEach(el => {
-                el.onclick = () => {
-                    const matId = parseInt(el.dataset.matId);
-                    container.querySelectorAll('.material-item').forEach(i => i.classList.remove('selected'));
-                    el.classList.add('selected');
-                    const title = el.querySelector('.material-title')?.textContent || '';
-                    state.material = { id: matId, title };
-                    saveState();
-                    showToastMessage(`جنس "${title}" انتخاب شد`);
-                };
-            });
-        }
-    }
-
-    // ==================== مرحله ۳ ====================
-    function initDesignOptions() {
-        document.querySelectorAll('.design-opt').forEach(opt => {
-            opt.onclick = () => {
-                document.querySelectorAll('.design-opt').forEach(o => o.classList.remove('selected'));
-                opt.classList.add('selected');
-                state.designType = opt.getAttribute('data-type');
-                document.getElementById('readyTemplatesBox').classList.add('hidden');
-                document.getElementById('uploadBox').classList.add('hidden');
-
-                if (state.designType === 'ready') {
-                    document.getElementById('readyTemplatesBox').classList.remove('hidden');
-                    loadReadyTemplates();
-                } else if (state.designType === 'upload') {
-                    document.getElementById('uploadBox').classList.remove('hidden');
-                }
-                saveState();
-            };
-        });
-
-        if (state.designType) {
-            document.querySelectorAll('.design-opt').forEach(opt => {
-                if (opt.getAttribute('data-type') === state.designType) {
-                    opt.click();
-                }
-            });
-        }
-    }
-
-    async function loadReadyTemplates() {
-        if (!state.installation) return;
-        const res = await apiCall(`/installations/${state.installation.id}/templates/`);
-        if (res.status === 'success') {
-            const container = document.getElementById('readyTemplatesList');
-            container.innerHTML = res.data.map(t => `
-                <div class="template-item ${state.selectedTemplate === t.id ? 'selected' : ''}"
-                     data-tpl-id="${t.id}" data-tpl-img="${t.image}">
-                    <img src="${t.image}" style="width:100%;height:70px;object-fit:cover;border-radius:12px">
-                    <strong style="color:#1e293b; font-size:0.75rem;">${t.title}</strong>
-                </div>
-            `).join('');
-
-            container.querySelectorAll('.template-item').forEach(el => {
-                el.onclick = () => {
-                    container.querySelectorAll('.template-item').forEach(i => i.classList.remove('selected'));
-                    el.classList.add('selected');
-                    state.selectedTemplate = parseInt(el.dataset.tplId);
-                    state.selectedTemplateImage = el.dataset.tplImg;
-                    saveState();
-                };
-            });
-        }
-    }
-
-    document.getElementById('uploadFile').onchange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                state.uploadedImage = ev.target.result;
-                document.getElementById('previewImg').src = ev.target.result;
-                document.getElementById('uploadPreview').classList.remove('hidden');
-                saveState();
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    document.getElementById('length').addEventListener('change', saveState);
-    document.getElementById('width').addEventListener('change', saveState);
-    document.getElementById('notes').addEventListener('change', saveState);
-
-    // ==================== مرحله ۴: کانواس ====================
-    let canvas = null;
-    let currentTool = 'polyline';
-    let polylinePoints = [];
-
-    function resizeCanvas() {
-        if (!canvas) return;
-        const wrapper = document.getElementById('canvasWrapper');
-        if (!wrapper) return;
-        const w = wrapper.clientWidth, h = wrapper.clientHeight;
-        if (w > 0 && h > 0) { canvas.setWidth(w); canvas.setHeight(h); canvas.renderAll(); }
-    }
-
-    function addText() {
-        const txt = prompt('متن خود را وارد کنید:', 'متن جدید');
-        if (!txt) return;
-        const color = document.getElementById('penColorPicker').value;
-        const size = parseInt(document.getElementById('penWidthSlider').value) * 3;
-        const t = new fabric.IText(txt, { left: 100, top: 100, fontSize: size, fill: color, fontFamily: 'Tahoma' });
-        canvas.add(t); canvas.setActiveObject(t); canvas.renderAll();
-        showToastMessage('متن اضافه شد');
-    }
-
-    function initCanvasDesign() {
-        const wrapper = document.getElementById('canvasWrapper');
-        if (!wrapper) return;
-        const w = wrapper.clientWidth || 300, h = wrapper.clientHeight || 400;
-        const el = document.getElementById('designCanvas');
-        el.setAttribute('width', w); el.setAttribute('height', h);
-        el.style.width = `${w}px`; el.style.height = `${h}px`;
-        if (canvas) { canvas.dispose(); canvas = null; }
-        canvas = new fabric.Canvas('designCanvas', { selection: true, allowTouchScrolling: true, width: w, height: h, preserveObjectStacking: true });
-        canvas.setBackgroundColor('rgba(0,0,0,0)', canvas.renderAll.bind(canvas));
-        canvas.freeDrawingBrush.color = '#e67e22';
-        canvas.freeDrawingBrush.width = 4;
-        canvas.isDrawingMode = false;
-        canvas.selection = false;
-        setActiveTool('polyline');
-        attachCanvasEvents();
-        window.addEventListener('resize', () => setTimeout(resizeCanvas, 100));
-    }
-
-    function attachCanvasEvents() {
-        if (!canvas) return;
-        canvas.off('mouse:down'); canvas.off('mouse:up');
-
-        if (currentTool === 'polyline') {
-            canvas.on('mouse:down', (e) => {
-                const p = canvas.getPointer(e.e);
-                const dot = new fabric.Circle({ radius: 6, fill: document.getElementById('penColorPicker').value, left: p.x - 6, top: p.y - 6, selectable: false, evented: false });
-                canvas.add(dot);
-                polylinePoints.push({ x: p.x, y: p.y, dot });
-                if (polylinePoints.length >= 2) {
-                    const prev = polylinePoints[polylinePoints.length - 2];
-                    const curr = polylinePoints[polylinePoints.length - 1];
-                    const line = new fabric.Line([prev.x, prev.y, curr.x, curr.y], { stroke: document.getElementById('penColorPicker').value, strokeWidth: parseInt(document.getElementById('penWidthSlider').value), selectable: false, evented: false });
-                    canvas.add(line);
-                    polylinePoints[polylinePoints.length - 1].line = line;
-                }
-                canvas.renderAll();
-                document.getElementById('statusBar').innerHTML = `<i class="fas fa-info-circle"></i> نقطه ${polylinePoints.length}`;
-            });
-        } else if (currentTool === 'pen') {
-            canvas.isDrawingMode = true;
-            canvas.freeDrawingBrush.color = document.getElementById('penColorPicker').value;
-            canvas.freeDrawingBrush.width = parseInt(document.getElementById('penWidthSlider').value);
-        } else if (currentTool === 'eraser') {
-            canvas.isDrawingMode = true;
-            canvas.freeDrawingBrush.color = '#ffffff';
-            canvas.freeDrawingBrush.width = parseInt(document.getElementById('penWidthSlider').value);
-        } else if (currentTool === 'select') {
-            canvas.isDrawingMode = false; canvas.selection = true;
-        } else if (currentTool === 'text') {
-            canvas.isDrawingMode = false; canvas.selection = false;
-            canvas.on('mouse:down', () => { addText(); setActiveTool('select'); });
-        }
-    }
-
-    function finishCurrentPolyline() {
-        if (polylinePoints.length < 2) { showToastMessage('حداقل دو نقطه', true); return; }
-        const items = [];
-        polylinePoints.forEach(p => { items.push(p.dot); if (p.line) items.push(p.line); });
-        const g = new fabric.Group(items, { selectable: true, hasControls: true, borderColor: '#e67e22', cornerColor: '#e67e22' });
-        canvas.remove(...items); canvas.add(g); canvas.renderAll();
-        polylinePoints = [];
-        showToastMessage('خط ساخته شد');
-    }
-    function cancelCurrentPolyline() {
-        polylinePoints.forEach(p => { canvas.remove(p.dot); if (p.line) canvas.remove(p.line); });
-        polylinePoints = []; canvas.renderAll();
-        showToastMessage('لغو شد', true);
-    }
-    function deleteSelectedObject() {
-        if (canvas && canvas.getActiveObject()) {
-            canvas.remove(canvas.getActiveObject()); canvas.discardActiveObject(); canvas.renderAll();
-            showToastMessage('حذف شد');
-        } else showToastMessage('چیزی انتخاب نشده', true);
-    }
-    function clearAllCanvas() {
-        if (canvas && confirm('حذف شود؟')) {
-            canvas.clear();
-            canvas.setBackgroundColor('rgba(0,0,0,0)', canvas.renderAll.bind(canvas));
-            polylinePoints = [];
-            showToastMessage('پاک شد');
-        }
-    }
-    function applyColorToSelected() {
-        if (!canvas) return;
-        const o = canvas.getActiveObject();
-        if (!o) return showToastMessage('عنصری انتخاب نشده', true);
-        const c = document.getElementById('penColorPicker').value;
-        if (o.type === 'group') o.forEachObject(i => { if (i.stroke) i.set('stroke', c); });
-        else if (o.stroke) o.set('stroke', c);
-        else if (o.fill) o.set('fill', c);
-        canvas.renderAll();
-        showToastMessage('رنگ تغییر کرد');
-    }
-    function setActiveTool(tool) {
-        currentTool = tool;
-        if (canvas) { canvas.isDrawingMode = false; canvas.selection = (tool === 'select'); }
-        const msgs = { polyline:'خط‌روند: کلیک برای نقاط', pen:'مداد آزاد', eraser:'پاک‌کن', text:'افزودن متن', select:'انتخاب' };
-        document.getElementById('statusBar').innerHTML = `<i class="fas fa-info-circle"></i> ${msgs[tool]}`;
-        document.querySelectorAll('.tool-item').forEach(i => i.classList.remove('active'));
-        const a = document.querySelector(`.tool-item[data-tool="${tool}"]`);
-        if (a) a.classList.add('active');
-        if (canvas) attachCanvasEvents();
-    }
-
-    function setupFloatingMenu() {
-        const mainBtn = document.getElementById('mainToolBtn'), tp = document.getElementById('toolsPanel'), cp = document.getElementById('colorPanel');
-        mainBtn.onclick = (e) => { e.stopPropagation(); tp.classList.toggle('open'); cp.classList.remove('open'); };
-        document.querySelectorAll('.tool-item[data-tool]').forEach(item => {
-            item.onclick = () => {
-                setActiveTool(item.getAttribute('data-tool'));
-                tp.classList.remove('open');
-                if (['pen','polyline'].includes(item.getAttribute('data-tool'))) cp.classList.add('open');
-                else cp.classList.remove('open');
-            };
-        });
-        document.getElementById('finishPolylineItem').onclick = () => { finishCurrentPolyline(); tp.classList.remove('open'); };
-        document.getElementById('cancelPolylineItem').onclick = () => { cancelCurrentPolyline(); tp.classList.remove('open'); };
-        document.getElementById('clearCanvasItem').onclick = () => { clearAllCanvas(); tp.classList.remove('open'); };
-        document.getElementById('applyColorBtn').onclick = () => { applyColorToSelected(); cp.classList.remove('open'); };
-        document.getElementById('deleteSelectedItem').onclick = () => { deleteSelectedObject(); cp.classList.remove('open'); };
-        document.getElementById('penWidthSlider').oninput = (e) => {
-            document.getElementById('widthVal').innerText = e.target.value;
-            if (canvas && (currentTool === 'pen' || currentTool === 'eraser') && canvas.isDrawingMode) canvas.freeDrawingBrush.width = parseInt(e.target.value);
-        };
-        document.addEventListener('click', (e) => {
-            if (!mainBtn.contains(e.target) && !tp.contains(e.target) && !cp.contains(e.target)) {
-                tp.classList.remove('open'); cp.classList.remove('open');
-            }
-        });
-    }
-
-    function getCanvasImage() {
-        if (canvas && canvas.getObjects().length > 0) return canvas.toDataURL({ format: 'png', quality: 0.9 });
-        return null;
-    }
-
-    // ==================== مرحله ۵ ====================
-    function displayPreviews() {
-        const s = document.getElementById('previewsSection');
-        s.innerHTML = '';
-
-        if (state.designType === 'ready' && state.selectedTemplateImage) {
-            const c = document.createElement('div'); c.className = 'preview-card';
-            c.innerHTML = `<div class="preview-title"><i class="fas fa-th-large"></i> طرح آماده</div>
-                <div class="preview-container"><img src="${state.selectedTemplateImage}"><button class="view-full-btn" data-img="${state.selectedTemplateImage}"><i class="fas fa-expand"></i> بزرگ</button></div>`;
-            s.appendChild(c);
-        }
-        if (state.designType === 'upload' && state.uploadedImage) {
-            const c = document.createElement('div'); c.className = 'preview-card';
-            c.innerHTML = `<div class="preview-title"><i class="fas fa-cloud-upload-alt"></i> عکس آپلود شده</div>
-                <div class="preview-container"><img src="${state.uploadedImage}"><button class="view-full-btn" data-img="${state.uploadedImage}"><i class="fas fa-expand"></i> بزرگ</button></div>`;
-            s.appendChild(c);
-        }
-        const ci = getCanvasImage();
-        if (ci) {
-            const c = document.createElement('div'); c.className = 'preview-card';
-            c.innerHTML = `<div class="preview-title"><i class="fas fa-draw-polygon"></i> پلن طراحی شده</div>
-                <div class="preview-container"><img src="${ci}"><button class="view-full-btn" data-img="${ci}"><i class="fas fa-expand"></i> بزرگ</button></div>`;
-            s.appendChild(c);
-        }
-        if (s.children.length === 0) s.innerHTML = '<div class="empty-preview">⚠️ طرحی انتخاب نشده</div>';
-
-        s.querySelectorAll('.view-full-btn').forEach(b => {
-            b.onclick = (e) => { e.stopPropagation(); showFullscreenImage(b.dataset.img); };
-        });
-    }
-
-    function showFullscreenImage(src) {
-        const m = document.createElement('div');
-        m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:10000;display:flex;align-items:center;justify-content:center;cursor:pointer;';
-        const img = document.createElement('img');
-        img.src = src;
-        img.style.cssText = 'max-width:90%;max-height:90%;object-fit:contain;border-radius:12px;';
-        m.appendChild(img);
-        m.onclick = () => m.remove();
-        document.body.appendChild(m);
-    }
-
-    function updateFinal() {
-        document.getElementById('finalInstallation').innerText = state.installation?.title || '-';
-        document.getElementById('finalMaterial').innerText = state.material?.title || '-';
-
-        // نمایش کدها به صورت چیپ
-        const codesObj = state.pdfCodesByInstallation[state.installation?.id] || {};
-        const codes = Object.values(codesObj).filter(c => c && c.trim());
-        const codesList = document.getElementById('finalCodesList');
-        if (codes.length > 0) {
-            codesList.innerHTML = codes.map(c => `<span class="code-chip">${c}</span>`).join('');
-        } else {
-            codesList.innerHTML = '-';
-        }
-
-        const len = parseFloat(document.getElementById('length').value) || 0;
-        const wid = parseFloat(document.getElementById('width').value) || 0;
-        document.getElementById('finalDim').innerText = len && wid ? `${len} × ${wid} متر` : '-';
-        document.getElementById('finalArea').innerText = (len * wid).toFixed(2);
-        displayPreviews();
-    }
-
-    // ==================== ثبت سفارش ====================
-    async function submitOrderWithRedirect() {
-        const length = parseFloat(document.getElementById('length').value) || 0;
-        const width = parseFloat(document.getElementById('width').value) || 0;
-        if (length <= 0 || width <= 0) { alert('طول و عرض را وارد کنید'); return; }
-
-        // ارسال کدها به صورت dict {pdfId: code}
-        const codesObj = state.pdfCodesByInstallation[state.installation?.id] || {};
-
-        const orderData = {
-            installation_id: state.installation?.id,
-            material_id: state.material?.id,
-            design_type: state.designType || 'custom',
-            length, width,
-            notes: document.getElementById('notes').value || '',
-            plan_image: getCanvasImage(),
-            selected_codes: codesObj   // ⭐ دیکشنری کدها
-        };
-
-        showLoading();
-        try {
-            const res = await fetch('/pro/api/create-order/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderData)
-            });
-            const result = await res.json();
-            hideLoading();
-
-            if (result.status === 'success' && result.redirect_url) {
-                window.location.href = result.redirect_url;
-            } else if (result.order_id) {
-                window.location.href = `/order/checkout/${result.order_id}/`;
-            } else {
-                throw new Error(result.message || 'خطا در ثبت سفارش');
-            }
-        } catch (err) {
-            hideLoading();
-            const t = document.createElement('div');
-            t.className = 'toast-success';
-            t.style.background = 'rgba(220,53,69,0.95)';
-            t.innerHTML = `
-                <i class="fas fa-exclamation-triangle" style="font-size:48px"></i>
-                <h3>❌ خطا در ثبت سفارش</h3>
-                <p>${err.message || 'لطفاً دوباره تلاش کنید'}</p>
-                <button onclick="this.parentElement.remove()" style="background:white;color:#dc3545;">بستن</button>
-            `;
-            document.body.appendChild(t);
-        }
-    }
-
-    // ==================== ناوبری ====================
-    function toggleFullscreenMode(hide) {
-        document.getElementById('mainHeader').classList.toggle('hide-header', hide);
-        document.getElementById('progressWrap').classList.toggle('hide-progress', hide);
-        document.getElementById('mainContainer').classList.toggle('fullscreen-mode', hide);
-        document.getElementById('step4').classList.toggle('fullscreen-step', hide);
-        document.body.classList.toggle('step5-active', hide);
-    }
-
-    function goToStep(step) {
-        document.querySelectorAll('.step-container').forEach(s => s.classList.remove('active'));
-        const target = document.getElementById(`step${step}`);
-        if (target) target.classList.add('active');
-
-        for (let i = 1; i <= 5; i++) {
-            const b = document.getElementById(`step${i}Badge`);
-            if (!b) continue;
-            b.classList.remove('active', 'done');
-            if (i < step) b.classList.add('done');
-            else if (i === step) b.classList.add('active');
-        }
-
-        state.step = step;
-        saveState();
-
-        if (step === 4) {
-            toggleFullscreenMode(true);
-            setTimeout(() => { initCanvasDesign(); setupFloatingMenu(); setTimeout(resizeCanvas, 50); }, 100);
-        } else {
-            toggleFullscreenMode(false);
-        }
-        if (step === 3) initDesignOptions();
-        if (step === 5) updateFinal();
-    }
-
-    async function nextStep() {
-        const s = state.step;
-
-        if (s === 1) {
-            if (!state.installation) { alert('نصبیات را انتخاب کنید'); return; }
-            const codes = state.pdfCodesByInstallation[state.installation.id] || {};
-            const filled = Object.values(codes).filter(c => c && c.trim());
-            if (filled.length === 0) { alert('حداقل یک کد عکس وارد کنید'); return; }
-            goToStep(2);
-            await loadMaterials(state.installation.id);
-            return;
-        }
-        if (s === 2) {
-            if (!state.material) { alert('جنس را انتخاب کنید'); return; }
-            goToStep(3); return;
-        }
-        if (s === 3) {
-            if (!document.getElementById('length').value || !document.getElementById('width').value) { alert('طول و عرض را وارد کنید'); return; }
-            if (!state.designType) { alert('نوع طرح را انتخاب کنید'); return; }
-            if (state.designType === 'ready' && !state.selectedTemplate) { alert('طرح آماده را انتخاب کنید'); return; }
-            if (state.designType === 'upload' && !state.uploadedImage) { alert('عکس را آپلود کنید'); return; }
-            goToStep(4); return;
-        }
-        if (s === 4) { goToStep(5); return; }
-        if (s === 5) { await submitOrderWithRedirect(); return; }
-    }
-
-    function prevStep() { if (state.step > 1) goToStep(state.step - 1); }
-
-    document.getElementById('nextBtn').onclick = nextStep;
-    document.getElementById('prevBtn').onclick = prevStep;
-
-    // ==================== Init ====================
-    (async function init() {
-        await loadInstallations();
-        const savedStep = loadState();
-        renderInstallations();
-
-        if (savedStep > 1 && state.installation) {
-            await loadMaterials(state.installation.id);
-            goToStep(savedStep);
-        } else {
-            goToStep(1);
-        }
-    })();
+(async function init(){
+    const saved=load(); await loadIns(); liveArea();
+    const ok=saved>1&&S.installation;
+    history.replaceState({step:1},'');
+    if(ok){ if(saved>=2&&S.material===null&&saved>2) { /* ادامه بدون جنس */ } history.pushState({step:saved},''); show(saved); } else show(1);
+})();
 </script>
 </body>
 </html>
