@@ -8,24 +8,16 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.views import View
 
-from apps.product.models import (
-    Brand,
-    Category,
-    Product,
-)
-
-from apps.discount.models import  Discount,DiscountScope, DiscountType
-
-
-
-
+from apps.product.models import Brand, Category, Product
+from apps.discount.models import Discount, DiscountScope, DiscountType
 from apps.product.service.shop_cache import (
-    SHOP_CACHE_TTL,
-    SHOP_PAGE_SIZE,
+    SHOP_CACHE_TIMEOUT,
     get_or_build_shop_cache,
 )
 
 logger = logging.getLogger(__name__)
+
+SHOP_PAGE_SIZE = 24
 
 
 class ShopView(View):
@@ -51,16 +43,8 @@ class ShopView(View):
         params["page"] = str(page_number)
 
         try:
-            min_price = (
-                int(params["min_price"])
-                if params["min_price"]
-                else None
-            )
-            max_price = (
-                int(params["max_price"])
-                if params["max_price"]
-                else None
-            )
+            min_price = int(params["min_price"]) if params["min_price"] else None
+            max_price = int(params["max_price"]) if params["max_price"] else None
         except (TypeError, ValueError):
             min_price = None
             max_price = None
@@ -86,12 +70,8 @@ class ShopView(View):
 
         cache_params = {
             **params,
-            "min_price": (
-                str(min_price) if min_price is not None else ""
-            ),
-            "max_price": (
-                str(max_price) if max_price is not None else ""
-            ),
+            "min_price": str(min_price) if min_price is not None else "",
+            "max_price": str(max_price) if max_price is not None else "",
             "page_size": str(SHOP_PAGE_SIZE),
         }
 
@@ -103,7 +83,7 @@ class ShopView(View):
                 max_price=max_price,
                 page_number=page_number,
             ),
-            timeout=SHOP_CACHE_TTL,
+            timeout=SHOP_CACHE_TIMEOUT,
         )
 
         logger.debug(
@@ -127,6 +107,7 @@ class ShopView(View):
 
             for product in payload["products"]:
                 image = product["image"]
+                brand = product["brand"]
 
                 data.append({
                     "id": product["id"],
@@ -137,11 +118,7 @@ class ShopView(View):
                     "discount_percent": product["discount_percent"],
                     "has_discount": product["has_discount"],
                     "image": image.url if image else None,
-                    "brand": (
-                        product["brand"].title
-                        if product["brand"]
-                        else ""
-                    ),
+                    "brand": brand.title if brand else "",
                     "brand_slug": product["brand_slug"],
                     "code": product["code"] or "",
                     "has_next": products_page.has_next(),
@@ -200,19 +177,13 @@ class ShopView(View):
             )
 
         if params["brand"]:
-            products = products.filter(
-                brand__slug=params["brand"]
-            )
+            products = products.filter(brand__slug=params["brand"])
 
         if params["category"]:
-            products = products.filter(
-                categories__slug=params["category"]
-            )
+            products = products.filter(categories__slug=params["category"])
 
         if params["catalog"]:
-            products = products.filter(
-                catalog__slug=params["catalog"]
-            )
+            products = products.filter(catalog__slug=params["catalog"])
 
         if min_price is not None:
             products = products.filter(price__gte=min_price)
@@ -230,10 +201,7 @@ class ShopView(View):
         }
 
         products = products.order_by(
-            *sort_options.get(
-                params["sort"],
-                sort_options["newest"],
-            )
+            *sort_options.get(params["sort"], sort_options["newest"])
         )
 
         total_products = products.count()
@@ -243,27 +211,19 @@ class ShopView(View):
             max_price=Max("price"),
         )
 
-        paginator = Paginator(
-            range(total_products),
-            SHOP_PAGE_SIZE,
-        )
-
+        paginator = Paginator(range(total_products), SHOP_PAGE_SIZE)
         page_obj = paginator.get_page(page_number)
         page_number = page_obj.number
 
         start = page_obj.start_index() - 1
         end = page_obj.end_index()
-
         page_products = list(products[start:end])
 
         discounts = self.get_active_discounts()
         products_with_discount = []
 
         for product in page_products:
-            discount_info = self.get_discount_info(
-                product,
-                discounts,
-            )
+            discount_info = self.get_discount_info(product, discounts)
 
             products_with_discount.append({
                 "id": product.id,
@@ -272,20 +232,14 @@ class ShopView(View):
                 "code": product.code,
                 "image": product.image,
                 "brand": product.brand,
-                "brand_slug": (
-                    product.brand.slug if product.brand else ""
-                ),
+                "brand_slug": product.brand.slug if product.brand else "",
                 "price": product.price,
                 "sales_unit_symbol": product.get_sales_unit_symbol(),
                 "has_discount": discount_info["has_discount"],
                 "discount_percent": discount_info["discount_percent"],
                 "final_price": discount_info["final_price"],
-                "final_price_display": (
-                    discount_info["final_price_display"]
-                ),
-                "old_price_display": (
-                    discount_info["old_price_display"]
-                ),
+                "final_price_display": discount_info["final_price_display"],
+                "old_price_display": discount_info["old_price_display"],
             })
 
         brands = list(
@@ -309,9 +263,7 @@ class ShopView(View):
             "brands": brands,
             "categories": categories,
             "price_min": int(price_range["min_price"] or 0),
-            "price_max": int(
-                price_range["max_price"] or 10000000
-            ),
+            "price_max": int(price_range["max_price"] or 10000000),
         }
 
     @staticmethod
@@ -330,11 +282,7 @@ class ShopView(View):
                 | Q(usage_limit=0)
                 | Q(used_count__lt=F("usage_limit"))
             )
-            .prefetch_related(
-                "categories",
-                "brands",
-                "products",
-            )
+            .prefetch_related("categories", "brands", "products")
             .order_by("-priority", "start_date")
         )
 
@@ -346,10 +294,8 @@ class ShopView(View):
             best_amount = 0.0
 
             product_category_ids = {
-                category.id
-                for category in product.categories.all()
+                category.id for category in product.categories.all()
             }
-
             product_brand_id = product.brand_id or None
 
             for discount in discounts:
@@ -370,23 +316,20 @@ class ShopView(View):
 
                 elif discount.scope == DiscountScope.PRODUCT:
                     applies = product.id in {
-                        item.id
-                        for item in discount.products.all()
+                        item.id for item in discount.products.all()
                     }
 
                 elif discount.scope == DiscountScope.BRAND:
                     applies = (
                         product_brand_id is not None
                         and product_brand_id in {
-                            item.id
-                            for item in discount.brands.all()
+                            item.id for item in discount.brands.all()
                         }
                     )
 
                 elif discount.scope == DiscountScope.CATEGORY:
                     discount_category_ids = {
-                        item.id
-                        for item in discount.categories.all()
+                        item.id for item in discount.categories.all()
                     }
                     applies = bool(
                         product_category_ids & discount_category_ids
@@ -407,15 +350,8 @@ class ShopView(View):
                     best_amount = amount
                     best_discount = discount
 
-            has_discount = (
-                best_discount is not None and best_amount > 0
-            )
-
-            final_price = (
-                max(0, price - best_amount)
-                if has_discount
-                else price
-            )
+            has_discount = best_discount is not None and best_amount > 0
+            final_price = max(0, price - best_amount) if has_discount else price
 
             discount_percent = (
                 int((best_amount / price) * 100)
@@ -426,9 +362,7 @@ class ShopView(View):
             return {
                 "has_discount": has_discount,
                 "discount_percent": discount_percent,
-                "discount_amount": (
-                    best_amount if has_discount else 0
-                ),
+                "discount_amount": best_amount if has_discount else 0,
                 "final_price": final_price,
                 "final_price_display": f"{int(final_price):,}",
                 "old_price_display": (
