@@ -11,11 +11,15 @@ from django.views import View
 from apps.product.models import (
     Brand,
     Category,
-    Discount,
-    DiscountScope,
-    DiscountType,
+
     Product,
 )
+
+from apps.discount.models import  Discount,DiscountScope, DiscountType
+
+
+
+
 from apps.product.service.shop_cache import (
     SHOP_CACHE_TTL,
     SHOP_PAGE_SIZE,
