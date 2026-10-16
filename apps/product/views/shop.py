@@ -2,21 +2,27 @@
 import logging
 
 from django.core.paginator import Page, Paginator
-from django.db.models import Q, Min, Max, F
+from django.db.models import F, Max, Min, Q
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.views import View
 from django.utils import timezone
+from django.views import View
 
-from apps.product.models import Product, Brand, Category
-from apps.discount.models import Discount, DiscountScope, DiscountType
-from apps.product.service.shop_cache import get_or_build_shop_cache
-
+from apps.product.models import (
+    Brand,
+    Category,
+    Discount,
+    DiscountScope,
+    DiscountType,
+    Product,
+)
+from apps.product.services.shop_cache import (
+    SHOP_CACHE_TTL,
+    SHOP_PAGE_SIZE,
+    get_or_build_shop_cache,
+)
 
 logger = logging.getLogger(__name__)
-
-SHOP_PAGE_SIZE = 20
-SHOP_CACHE_TTL = 45
 
 
 class ShopView(View):
@@ -58,6 +64,23 @@ class ShopView(View):
             params["min_price"] = ""
             params["max_price"] = ""
 
+        if min_price is not None and min_price < 0:
+            min_price = None
+            params["min_price"] = ""
+
+        if max_price is not None and max_price < 0:
+            max_price = None
+            params["max_price"] = ""
+
+        if (
+            min_price is not None
+            and max_price is not None
+            and min_price > max_price
+        ):
+            min_price, max_price = max_price, min_price
+            params["min_price"] = str(min_price)
+            params["max_price"] = str(max_price)
+
         cache_params = {
             **params,
             "min_price": (
@@ -92,8 +115,8 @@ class ShopView(View):
 
         products_page = Page(
             payload["products"],
-            paginator,
             payload["page_number"],
+            paginator,
         )
 
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -125,6 +148,9 @@ class ShopView(View):
                 "status": "success",
                 "data": data,
                 "has_next": products_page.has_next(),
+                "current_page": payload["page_number"],
+                "total_pages": paginator.num_pages,
+                "total_products": payload["total_products"],
             })
 
         context = {
@@ -228,7 +254,6 @@ class ShopView(View):
         page_products = list(products[start:end])
 
         discounts = self.get_active_discounts()
-
         products_with_discount = []
 
         for product in page_products:
@@ -318,23 +343,23 @@ class ShopView(View):
             best_amount = 0.0
 
             product_category_ids = {
-                category.id for category in product.categories.all()
+                category.id
+                for category in product.categories.all()
             }
 
-            product_brand_id = (
-                product.brand_id if product.brand_id else None
-            )
+            product_brand_id = product.brand_id or None
 
             for discount in discounts:
                 if (
                     discount.min_quantity
-                    and 1 < float(discount.min_quantity)
+                    and float(discount.min_quantity) > 1
                 ):
                     continue
 
-                if discount.min_cart_amount and float(
+                if (
                     discount.min_cart_amount
-                ) > 0:
+                    and float(discount.min_cart_amount) > 0
+                ):
                     continue
 
                 if discount.scope == DiscountScope.GLOBAL:
@@ -342,20 +367,23 @@ class ShopView(View):
 
                 elif discount.scope == DiscountScope.PRODUCT:
                     applies = product.id in {
-                        item.id for item in discount.products.all()
+                        item.id
+                        for item in discount.products.all()
                     }
 
                 elif discount.scope == DiscountScope.BRAND:
                     applies = (
                         product_brand_id is not None
                         and product_brand_id in {
-                            item.id for item in discount.brands.all()
+                            item.id
+                            for item in discount.brands.all()
                         }
                     )
 
                 elif discount.scope == DiscountScope.CATEGORY:
                     discount_category_ids = {
-                        item.id for item in discount.categories.all()
+                        item.id
+                        for item in discount.categories.all()
                     }
                     applies = bool(
                         product_category_ids & discount_category_ids
@@ -395,7 +423,9 @@ class ShopView(View):
             return {
                 "has_discount": has_discount,
                 "discount_percent": discount_percent,
-                "discount_amount": best_amount if has_discount else 0,
+                "discount_amount": (
+                    best_amount if has_discount else 0
+                ),
                 "final_price": final_price,
                 "final_price_display": f"{int(final_price):,}",
                 "old_price_display": (
