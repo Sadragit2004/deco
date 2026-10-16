@@ -7,22 +7,19 @@ from . import panel
 app_name = 'pro'
 
 urlpatterns = [
-    # ==================== صفحه اصلی ====================
+    # صفحه اصلی
     path('', views.proorder_page, name='proorder_page'),
 
-    # ==================== API های مرحله به مرحله ====================
-    # مرحله ۱: نصبیات + PDFها (ادغام شده)
+    # ==================== API ها ====================
+    # مرحله ۱: نصبیات + PDFها
     path('api/installations/', views.get_installations, name='get_installations'),
 
-    # مرحله ۲: جنس‌های یک نصبیات
+    # مرحله ۲: جنس‌ها
     path('api/installations/<int:installation_id>/materials/',
          views.get_materials_by_installation,
          name='get_materials_by_installation'),
 
-    # تأیید کد PDF (بدون نیاز به material_id)
-    path('api/verify-pdf/', views.verify_pdf_code, name='verify_pdf_code'),
-
-    # طرح‌های آماده یک نصبیات (مرحله ۳ - ابعاد و طرح)
+    # مرحله ۳: طرح‌های آماده
     path('api/installations/<int:installation_id>/templates/',
          views.get_templates_by_installation,
          name='get_templates_by_installation'),
@@ -30,7 +27,7 @@ urlpatterns = [
     # محاسبه قیمت
     path('api/calculate-price/', views.calculate_price, name='calculate_price'),
 
-    # ثبت نهایی سفارش (ادغام با سیستم Order)
+    # ثبت نهایی
     path('api/create-order/', views.create_pro_order, name='create_pro_order'),
 
     # ==================== پنل کاربر ====================
@@ -38,7 +35,6 @@ urlpatterns = [
          panel.ProUserOrdersPanelView.as_view(),
          name='user_pro_orders_panel'),
 
-    # ==================== API های پنل ====================
     path('panel/api/user/pro-orders/list/',
          panel.UserProOrdersListAPIView.as_view(),
          name='user_api_pro_orders_list'),
