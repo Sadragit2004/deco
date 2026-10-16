@@ -16,7 +16,7 @@ from apps.product.models import (
     DiscountType,
     Product,
 )
-from apps.product.services.shop_cache import (
+from apps.product.service.shop_cache import (
     SHOP_CACHE_TTL,
     SHOP_PAGE_SIZE,
     get_or_build_shop_cache,
