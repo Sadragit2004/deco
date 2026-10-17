@@ -1,649 +1,701 @@
+
 {% load static %}
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
-    <title>ورود رسمی | Deco B2B</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#f5f0e8">
+    <title>ورود به Deco B2B</title>
+
     <link rel="stylesheet" href="https://lib.arvancloud.ir/font-awesome/6.3.0/css/all.css">
     <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+
     <style>
+        :root {
+            --page: #f5f0e8;
+            --surface: #fffdf9;
+            --surface-soft: #fff7ef;
+            --orange: #d97732;
+            --orange-dark: #a94f20;
+            --orange-light: #edb27f;
+            --ink: #34251d;
+            --muted: #857367;
+            --line: #ead9c8;
+            --success: #327650;
+            --danger: #bf4435;
+            --shadow: 0 28px 80px rgba(104, 67, 39, .13);
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
         }
 
-        :root {
-            --orange: #e07c3c;
-            --orange-light: #f0a06a;
-            --orange-dark: #c96a2e;
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --radius-card: 2rem;
-            --blur-amount: 24px;
-        }
-
-        html, body {
-            height: 100%;
-            overflow: hidden;
-            position: fixed;
-            width: 100%;
-            font-family: 'IRANYekan', system-ui, -apple-system, 'Vazirmatn', sans-serif;
-            direction: rtl;
-            background: #0a0a0a;
-            margin: 0;
-            padding: 0;
+        html {
+            min-height: 100%;
+            background: var(--page);
         }
 
         body {
+            min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            isolation: isolate;
+            overflow-x: hidden;
+            padding: 40px 24px;
+            color: var(--ink);
+            font-family: "IRANYekan", "Vazirmatn", Tahoma, sans-serif;
+            background:
+                radial-gradient(ellipse at 8% 12%, rgba(237, 178, 127, .42), transparent 32%),
+                radial-gradient(ellipse at 92% 86%, rgba(217, 119, 50, .17), transparent 34%),
+                linear-gradient(135deg, #fbf7f0 0%, #f2e8db 52%, #f9f3ea 100%);
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
             inset: 0;
-            position: fixed;
-            transform: translateY(-20px);
+            z-index: -2;
+            pointer-events: none;
+            opacity: .48;
+            background-image:
+                linear-gradient(rgba(166, 111, 72, .075) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(166, 111, 72, .075) 1px, transparent 1px);
+            background-size: 54px 54px;
+            mask-image: linear-gradient(135deg, #000, transparent 80%);
         }
 
-        /* ===== BACKGROUND ===== */
-        .bg-wrapper {
+        body::after {
+            content: "";
             position: fixed;
-            top: 0;
-            left: 0;
+            z-index: -1;
+            width: min(60vw, 720px);
+            aspect-ratio: 1;
+            left: -24%;
+            top: 8%;
+            border: 1px solid rgba(169, 79, 32, .17);
+            border-radius: 46% 54% 62% 38% / 40% 43% 57% 60%;
+            box-shadow:
+                0 0 0 38px rgba(217, 119, 50, .035),
+                0 0 0 82px rgba(217, 119, 50, .025),
+                0 0 0 132px rgba(217, 119, 50, .018);
+            transform: rotate(-24deg);
+            pointer-events: none;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button,
+        a {
+            touch-action: manipulation;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        .page-shell {
             width: 100%;
-            height: 100vh;
-            z-index: 0;
-            overflow: hidden;
-            background: url('/media/images/bglogin2.jpg') no-repeat center center;
-            background-size: contain;
-            background-color: #0a0a0a;
+            max-width: 1180px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* ===== کارت لاگین ===== */
+        .auth-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(370px, 460px);
+            align-items: center;
+            gap: clamp(40px, 7vw, 100px);
+        }
+
+        .brand-panel {
+            width: 100%;
+            max-width: 520px;
+            padding: 20px 0;
+        }
+
+        .brand-top {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .brand-logo {
+            width: 88px;
+            height: 88px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            border: 1px solid rgba(217, 119, 50, .28);
+            border-radius: 25px;
+            background: rgba(255, 253, 249, .86);
+            box-shadow:
+                0 13px 32px rgba(115, 70, 37, .12),
+                inset 0 1px 0 #fff;
+        }
+
+        .brand-logo img {
+            display: block;
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+        }
+
+        .brand-name {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .brand-name strong {
+            font-size: 23px;
+            font-weight: 900;
+            letter-spacing: -.6px;
+        }
+
+        .brand-name span {
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            direction: ltr;
+            text-align: right;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 15px;
+            color: var(--orange-dark);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .eyebrow::before {
+            content: "";
+            width: 25px;
+            height: 2px;
+            border-radius: 5px;
+            background: var(--orange);
+        }
+
+        .brand-title {
+            max-width: 510px;
+            font-size: clamp(32px, 4vw, 48px);
+            line-height: 1.65;
+            letter-spacing: -1.5px;
+            font-weight: 900;
+        }
+
+        .brand-title span {
+            color: var(--orange-dark);
+        }
+
+        .brand-description {
+            max-width: 440px;
+            margin-top: 15px;
+            color: #78685b;
+            font-size: 13px;
+            line-height: 2.35;
+        }
+
+        .features-heading {
+            margin-top: 32px;
+            margin-bottom: 14px;
+            color: #705544;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .brand-features {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 13px;
+        }
+
+        .feature-card {
+            min-height: 112px;
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+            padding: 17px 15px;
+            border: 1px solid rgba(201, 143, 99, .27);
+            border-radius: 19px;
+            background: linear-gradient(145deg, rgba(255, 253, 249, .96), rgba(255, 246, 235, .83));
+            box-shadow:
+                0 9px 24px rgba(115, 70, 37, .055),
+                inset 0 1px 0 rgba(255, 255, 255, .95);
+            transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(217, 119, 50, .46);
+            box-shadow: 0 15px 30px rgba(115, 70, 37, .10);
+        }
+
+        .feature-icon {
+            width: 43px;
+            height: 43px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(217, 119, 50, .18);
+            border-radius: 14px;
+            background: linear-gradient(145deg, #fff0df, #f9dfc4);
+            color: var(--orange-dark);
+            font-size: 17px;
+        }
+
+        .feature-content {
+            min-width: 0;
+            padding-top: 2px;
+        }
+
+        .feature-content strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #493326;
+            font-size: 12px;
+            line-height: 1.9;
+            font-weight: 900;
+        }
+
+        .feature-content span {
+            display: block;
+            color: #8b7665;
+            font-size: 10px;
+            line-height: 1.9;
+        }
+
+        .brand-note {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-top: 20px;
+            color: #8a7665;
+            font-size: 11px;
+            line-height: 2;
+        }
+
+        .brand-note i {
+            color: var(--orange);
+        }
+
         .glass-auth-card {
             width: 100%;
-            max-width: 460px;
-            margin: 0 16px;
-            padding: 28px 24px 32px;
-            background: rgba(0, 0, 0, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: var(--radius-card);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
+            min-width: 0;
             position: relative;
-            z-index: 10;
-        }
-
-        @media (max-width: 560px) {
-            .glass-auth-card {
-                padding: 20px 18px 24px;
-                border-radius: 28px;
-                margin: 0 12px;
-                background: rgba(0, 0, 0, 0.7);
-                backdrop-filter: blur(20px);
-                -webkit-backdrop-filter: blur(20px);
-            }
-        }
-
-        @media (max-width: 400px) {
-            .glass-auth-card {
-                padding: 16px 14px 20px;
-                border-radius: 24px;
-                margin: 0 8px;
-            }
-        }
-
-        /* ===== LOGO - فقط در موبایل با سایز بزرگ ===== */
-        .logo-wrapper {
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            .logo-wrapper {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                margin-bottom: 12px;
-            }
-        }
-
-        .logo-container {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo-circle {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            background: #f9f9f9;
-            border: 3.5px solid var(--orange);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 40px rgba(224, 124, 60, 0.08);
-            flex-shrink: 0;
             overflow: hidden;
+            padding: 35px 32px 25px;
+            border: 1px solid rgba(255, 255, 255, .96);
+            border-radius: 29px;
+            background: rgba(255, 253, 249, .94);
+            box-shadow: var(--shadow), inset 0 1px 0 #fff;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
         }
 
-        .logo-circle img {
-            width: 85%;
-            height: 85%;
-            object-fit: contain;
+        .glass-auth-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 30px;
+            left: 30px;
+            height: 3px;
+            border-radius: 0 0 8px 8px;
+            background: linear-gradient(90deg, transparent, var(--orange), var(--orange-light), transparent);
+        }
+
+        .card-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 13px;
+        }
+
+        .card-logo {
+            width: 94px;
+            height: 94px;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            border: 2px solid #e9b384;
+            border-radius: 26px;
+            background: #fff;
+            box-shadow: 0 9px 26px rgba(169, 79, 32, .12);
+        }
+
+        .card-logo img {
+            width: 90%;
+            height: 90%;
             display: block;
+            object-fit: contain;
         }
 
-        @media (max-width: 560px) {
-            .logo-container {
-                width: 130px;
-                height: 130px;
-            }
-            .logo-circle {
-                width: 120px;
-                height: 120px;
-                border-width: 4px;
-            }
-            .logo-circle img {
-                width: 82%;
-                height: 82%;
-            }
+        .card-brand-name {
+            margin-top: 9px;
+            color: #8c6c54;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.7px;
+            direction: ltr;
         }
 
-        @media (max-width: 400px) {
-            .logo-container {
-                width: 110px;
-                height: 110px;
-            }
-            .logo-circle {
-                width: 100px;
-                height: 100px;
-                border-width: 3.5px;
-            }
-            .logo-circle img {
-                width: 80%;
-                height: 80%;
-            }
-        }
-
-        /* ===== HEADER ===== */
         .auth-header {
+            margin-bottom: 25px;
             text-align: center;
-            margin-top: 4px;
-            margin-bottom: 20px;
         }
 
         .auth-header h1 {
-            font-size: 1.6rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--orange), var(--orange-light));
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            letter-spacing: -0.5px;
-            line-height: 1.2;
+            color: var(--ink);
+            font-size: 25px;
+            font-weight: 900;
+            letter-spacing: -.6px;
+            line-height: 1.8;
         }
 
-        .auth-header .subtitle {
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 0.75rem;
-            font-weight: 500;
-            background: rgba(0, 0, 0, 0.3);
-            display: inline-block;
-            padding: 4px 16px;
-            border-radius: 60px;
-            border: 1px solid rgba(224, 124, 60, 0.1);
-            margin-top: 2px;
+        .subtitle {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 5px;
+            padding: 7px 12px;
+            border: 1px solid #f0dfcd;
+            border-radius: 50px;
+            background: #fbf0e5;
+            color: #8a6b55;
+            font-size: 10px;
+            font-weight: 700;
         }
 
-        @media (max-width: 560px) {
-            .auth-header h1 {
-                font-size: 1.8rem;
-            }
-            .auth-header .subtitle {
-                font-size: 0.7rem;
-                padding: 3px 14px;
-            }
+        .subtitle::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--orange);
+            box-shadow: 0 0 0 4px rgba(217, 119, 50, .10);
         }
 
-        @media (max-width: 400px) {
-            .auth-header h1 {
-                font-size: 1.5rem;
-            }
-        }
-
-        /* ===== FORM ===== */
         .form-group {
-            margin-bottom: -28px;
-            position: relative;
+            margin-bottom: 13px;
         }
 
         .input-label {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 6px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 9px;
+            color: #665347;
+            font-size: 12px;
+            font-weight: 900;
         }
 
         .input-label svg {
-            width: 16px;
-            height: 16px;
-            stroke: var(--orange);
-            stroke-width: 2;
+            width: 18px;
+            height: 18px;
             flex-shrink: 0;
-            opacity: 0.6;
+            stroke: var(--orange);
+            stroke-width: 1.8;
         }
 
         .input-wrapper {
-            position: relative;
             display: flex;
             align-items: center;
             direction: ltr;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 14px;
-            border: 1.5px solid rgba(255, 255, 255, 0.06);
-            transition: all 0.3s ease;
             overflow: hidden;
+            border: 1.5px solid #e8d9ca;
+            border-radius: 14px;
+            background: #fff;
+            transition: border-color .2s ease, box-shadow .2s ease;
         }
 
         .input-wrapper:focus-within {
             border-color: var(--orange);
-            box-shadow: 0 0 0 3px rgba(224, 124, 60, 0.05);
-            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 4px rgba(217, 119, 50, .10);
         }
 
-        .input-wrapper .input-icon {
-            padding: 0 12px 0 4px;
-            color: rgba(255, 255, 255, 0.15);
-            font-size: 0.9rem;
+        .input-icon {
             flex-shrink: 0;
-            transition: color 0.3s ease;
-            direction: rtl;
-        }
-
-        .input-wrapper:focus-within .input-icon {
-            color: var(--orange);
+            padding: 0 14px 0 6px;
+            font-size: 17px;
         }
 
         .auth-input {
             width: 100%;
-            padding: 14px 8px 14px 14px;
-            font-size: 1.1rem;
-            font-family: 'Vazirmatn', monospace;
-            border: none;
-            background: transparent;
-            text-align: left;
-            direction: ltr;
-            font-weight: 600;
-            color: #ffffff;
-            letter-spacing: 2px;
+            min-width: 0;
+            min-height: 54px;
+            padding: 13px 8px 13px 14px;
             outline: none;
-            box-sizing: border-box;
-            min-height: 52px;
+            border: 0;
+            background: transparent;
+            color: var(--ink);
+            direction: ltr;
+            text-align: left;
+            font-family: "Vazirmatn", Tahoma, sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 1px;
         }
 
         .auth-input::placeholder {
-            color: rgba(255, 255, 255, 0.15);
+            color: #c5b3a3;
+            font-size: 14px;
             font-weight: 400;
-            font-size: 0.95rem;
-            letter-spacing: 1px;
-            opacity: 1;
-        }
-
-        .auth-input:-webkit-autofill {
-            -webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.4) inset !important;
-            -webkit-text-fill-color: #fff !important;
-            border-radius: 14px;
+            letter-spacing: .3px;
         }
 
         .auth-input.error-input {
-            border-color: #dc3545 !important;
+            color: var(--danger);
         }
 
         .auth-input.valid-input {
-            border-color: var(--orange) !important;
+            color: var(--success);
         }
 
-        @media (max-width: 400px) {
-            .auth-input {
-                font-size: 1rem;
-                padding: 12px 6px 12px 12px;
-                min-height: 46px;
-                letter-spacing: 1.5px;
-            }
-            .auth-input::placeholder {
-                font-size: 0.85rem;
-            }
-        }
-
-        /* ===== FEEDBACK ===== */
-        .live-feedback {
-            margin-top: 4px;
-            min-height: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .feedback-content {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 2px 12px;
-            border-radius: 40px;
-            font-weight: 500;
-            font-size: 0.7rem;
-            transition: all 0.25s ease;
-            opacity: 0;
-            transform: translateY(-4px) scale(0.95);
-            pointer-events: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) translateY(-4px) scale(0.95);
-            white-space: nowrap;
-        }
-
-        .feedback-content.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) translateY(0) scale(1);
-            pointer-events: auto;
-        }
-
-        .valid-feedback {
-            color: var(--orange-light);
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(224, 124, 60, 0.15);
-        }
-
-        .invalid-feedback {
-            color: #f87171;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(220, 53, 69, 0.15);
-        }
-
+        .live-feedback,
         .error-list {
             min-height: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            margin-top: 2px;
+            margin-top: 5px;
         }
 
+        .feedback-content,
         .error-list li {
-            background: rgba(0, 0, 0, 0.5);
-            color: #f87171;
-            font-size: 0.7rem;
-            font-weight: 500;
-            padding: 2px 14px;
-            border-radius: 40px;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            border: 1px solid rgba(220, 53, 69, 0.15);
-            opacity: 0;
-            transform: translateY(-4px) scale(0.95);
-            transition: all 0.25s ease;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) translateY(-4px) scale(0.95);
-            white-space: nowrap;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 10px;
+            font-weight: 800;
+            list-style: none;
         }
 
-        .error-list li.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) translateY(0) scale(1);
+        .valid-feedback {
+            color: #347650;
+            background: #eaf5ed;
         }
 
-        /* ===== BUTTONS ===== */
+        .invalid-feedback,
+        .error-list li {
+            color: var(--danger);
+            background: #fff0ed;
+        }
+
+        .server-messages {
+            margin-bottom: 15px;
+        }
+
+        .server-message {
+            padding: 11px 13px;
+            margin-bottom: 8px;
+            border: 1px solid #f0d5c7;
+            border-radius: 12px;
+            background: #fff2eb;
+            color: #984b2a;
+            font-size: 12px;
+            line-height: 1.9;
+        }
+
+        .server-message.success {
+            border-color: #cde7d5;
+            background: #eff9f1;
+            color: #2d6d48;
+        }
+
         .btn-submit {
             width: 100%;
-            padding: 16px 20px;
-            margin-top: 8px;
-            background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 100%);
-            border: 2px solid var(--orange);
-            border-radius: 16px;
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--orange);
+            min-height: 54px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            margin-top: 8px;
+            padding: 14px 20px;
+            border: 1px solid #d97732;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #e58b4a, #c96328);
+            box-shadow: 0 10px 23px rgba(201, 99, 40, .22);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 900;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.6);
-            font-family: 'IRANYekan', 'Vazirmatn', sans-serif;
-            min-height: 54px;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-user-select: none;
+            transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+        }
+
+        .btn-submit:hover {
+            filter: saturate(1.08);
+            box-shadow: 0 14px 28px rgba(201, 99, 40, .29);
         }
 
         .btn-submit:active {
-            transform: scale(0.96);
+            transform: scale(.985);
         }
 
         .btn-submit:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
+            opacity: .7;
+            cursor: wait;
         }
 
-        .btn-submit .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2.5px solid rgba(224, 124, 60, 0.2);
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, .4);
+            border-top-color: #fff;
             border-radius: 50%;
-            border-top-color: var(--orange);
-            animation: spin 0.7s linear infinite;
+            animation: spin .7s linear infinite;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        .btn-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .btn-row .btn-register,
-        .btn-row .btn-guide {
-            flex: 1;
-            padding: 14px 10px;
-            border-radius: 16px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: 'IRANYekan', 'Vazirmatn', sans-serif;
-            text-decoration: none;
-            min-height: 48px;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-user-select: none;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1.5px solid rgba(224, 124, 60, 0.1);
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .btn-row .btn-register i,
-        .btn-row .btn-guide i {
-            color: var(--orange) !important;
-            opacity: 0.5;
-            transition: opacity 0.2s ease;
-        }
-
-        .btn-row .btn-register:active i,
-        .btn-row .btn-guide:active i {
-            opacity: 1;
-        }
-
-        .btn-row .btn-register:active,
-        .btn-row .btn-guide:active {
-            transform: scale(0.96);
-            background: rgba(0, 0, 0, 0.5);
-        }
-
-        .btn-row .btn-guide {
-            border-color: rgba(224, 124, 60, 0.2);
-            background: rgba(224, 124, 60, 0.03);
-        }
-
-        @media (max-width: 400px) {
-            .btn-row .btn-register,
-            .btn-row .btn-guide {
-                font-size: 0.75rem;
-                padding: 12px 6px;
-                min-height: 42px;
-                gap: 4px;
-            }
-            .btn-row {
-                gap: 6px;
-            }
-        }
-
         .divider {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin: 14px 0 6px;
-            color: rgba(255, 255, 255, 0.1);
-            font-size: 0.7rem;
-            font-weight: 500;
+            margin: 18px 0 12px;
+            color: #aa9786;
+            font-size: 10px;
         }
 
         .divider::before,
         .divider::after {
-            content: '';
-            flex: 1;
+            content: "";
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(224, 124, 60, 0.1), transparent);
+            flex: 1;
+            background: #eadfd3;
         }
 
-        /* ===== FOOTER ===== */
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-register,
+        .btn-guide {
+            flex: 1;
+            min-width: 0;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 8px;
+            border: 1px solid #e8d3bf;
+            border-radius: 13px;
+            background: #fffaf4;
+            color: #6e4b36;
+            font-size: 11px;
+            font-weight: 900;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            transition: background .2s ease, border-color .2s ease, transform .2s ease;
+        }
+
+        .btn-register i,
+        .btn-guide i {
+            color: var(--orange);
+            font-size: 14px;
+        }
+
+        .btn-register:hover,
+        .btn-guide:hover {
+            border-color: #e5b48c;
+            background: #fff1e3;
+        }
+
+        .btn-register:active,
+        .btn-guide:active {
+            transform: scale(.98);
+        }
+
         .footer-section {
-            margin-top: 16px;
-            border-top: 1px solid rgba(224, 124, 60, 0.05);
-            padding-top: 14px;
+            margin-top: 21px;
+            padding-top: 16px;
+            border-top: 1px solid #f0e6dc;
         }
 
         .trust-seal-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 4px;
-            margin-bottom: 8px;
+            gap: 7px;
+            margin-bottom: 10px;
         }
 
         .trust-seal-label {
-            color: rgba(255, 255, 255, 0.2);
-            font-size: 0.6rem;
-            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 6px;
-            letter-spacing: 0.3px;
+            color: #9a8778;
+            font-size: 10px;
+            font-weight: 700;
         }
 
         .trust-seal-label i {
             color: var(--orange);
-            font-size: 0.6rem;
-            opacity: 0.4;
         }
 
         .trust-seal-link {
             display: inline-block;
-            transition: transform 0.2s ease;
             border-radius: 8px;
             line-height: 0;
         }
 
-        .trust-seal-link:active {
-            transform: scale(0.94);
-        }
-
         .trust-seal-img {
-            height: 48px;
             width: auto;
+            height: 46px;
+            padding: 4px;
+            border: 1px solid #e8ded3;
             border-radius: 8px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 3px 5px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(150, 185, 200, 0.08);
-        }
-
-        @media (max-width: 560px) {
-            .trust-seal-img {
-                height: 40px;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .trust-seal-img {
-                height: 34px;
-            }
+            background: #fff;
         }
 
         .terms-note {
+            color: #a39284;
             text-align: center;
-            font-size: 0.6rem;
-            color: rgba(255, 255, 255, 0.2);
-            line-height: 1.6;
+            font-size: 10px;
+            line-height: 1.9;
         }
 
         .terms-note a {
-            color: var(--orange);
+            color: var(--orange-dark);
+            font-weight: 800;
             text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s ease;
-            opacity: 0.5;
         }
 
-        .terms-note a:active {
-            opacity: 1;
-        }
-
-        @media (max-width: 400px) {
-            .terms-note {
-                font-size: 0.55rem;
-            }
-        }
-
-        /* ===== MODAL ===== */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            z-index: 999;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
+            background: rgba(62, 41, 27, .38);
+            backdrop-filter: blur(9px);
+            -webkit-backdrop-filter: blur(9px);
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            padding: 20px;
+            transition: opacity .25s ease, visibility .25s ease;
         }
 
         .modal-overlay.active {
@@ -652,23 +704,21 @@
         }
 
         .modal-glass {
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 32px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.8);
-            padding: 32px 28px 28px;
-            max-width: 420px;
             width: 100%;
-            transform: scale(0.92) translateY(20px);
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
-            opacity: 0;
+            max-width: 420px;
             position: relative;
+            padding: 32px 25px 25px;
+            border: 1px solid #fff;
+            border-radius: 25px;
+            background: #fffdf9;
+            box-shadow: 0 30px 80px rgba(67, 42, 24, .22);
+            transform: translateY(14px) scale(.98);
+            opacity: 0;
+            transition: transform .3s ease, opacity .3s ease;
         }
 
         .modal-overlay.active .modal-glass {
-            transform: scale(1) translateY(0);
+            transform: translateY(0) scale(1);
             opacity: 1;
         }
 
@@ -676,502 +726,419 @@
             position: absolute;
             top: 12px;
             left: 12px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 40px;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 1.1rem;
+            width: 35px;
+            height: 35px;
+            display: grid;
+            place-items: center;
+            border: 1px solid #eee1d4;
+            border-radius: 50%;
+            background: #fff7ef;
+            color: #8a6a53;
             cursor: pointer;
-            transition: all 0.2s ease;
-            touch-action: manipulation;
-        }
-
-        .modal-close:active {
-            transform: scale(0.92);
-            background: rgba(255, 255, 255, 0.06);
         }
 
         .modal-glass h2 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--orange), var(--orange-light));
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            text-align: center;
             margin-bottom: 6px;
+            color: var(--orange-dark);
+            font-size: 20px;
+            font-weight: 900;
+            text-align: center;
         }
 
         .modal-sub {
+            margin-bottom: 22px;
+            color: #9b8776;
+            font-size: 12px;
+            line-height: 1.9;
             text-align: center;
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 0.7rem;
-            margin-bottom: 20px;
-            font-weight: 400;
         }
 
         .modal-contact-item {
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 12px 14px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
+            gap: 13px;
+            padding: 13px;
             margin-bottom: 10px;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9rem;
-            transition: background 0.2s ease;
+            border: 1px solid #f0e4d8;
+            border-radius: 13px;
+            background: #fff9f2;
+            color: #594538;
+            font-size: 12px;
         }
 
-        .modal-contact-item:active {
-            background: rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-contact-item i {
+        .modal-contact-item > i {
+            width: 22px;
+            flex-shrink: 0;
             color: var(--orange);
-            font-size: 1.1rem;
-            width: 24px;
+            font-size: 17px;
             text-align: center;
-            opacity: 0.6;
         }
 
         .modal-contact-item .label {
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 0.65rem;
-            font-weight: 500;
             display: block;
-            line-height: 1.2;
+            margin-bottom: 4px;
+            color: #a18b79;
+            font-size: 10px;
         }
 
         .modal-contact-item .value {
-            font-weight: 600;
-            letter-spacing: 0.3px;
-            direction: ltr;
             display: block;
+            direction: ltr;
+            font-weight: 900;
         }
 
         .modal-contact-item .value-rtl {
-            font-weight: 600;
             display: block;
+            font-weight: 800;
+            line-height: 1.9;
         }
 
         .modal-divider {
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(224, 124, 60, 0.06), transparent);
-            margin: 14px 0 8px;
+            margin: 16px 0 12px;
+            background: #efe1d3;
         }
 
         .modal-hours {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 0.75rem;
-            padding: 8px 0 2px;
+            flex-wrap: wrap;
+            gap: 7px;
+            color: #8d7868;
+            font-size: 11px;
         }
 
         .modal-hours i {
             color: var(--orange);
-            opacity: 0.4;
-            font-size: 0.8rem;
         }
 
-        .modal-hours span {
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.5);
-        }
+        @media (max-width: 900px) {
+            body {
+                padding: 24px 16px;
+            }
 
-        @media (max-width: 400px) {
-            .modal-glass {
-                padding: 24px 18px 20px;
-                border-radius: 28px;
+            .auth-layout {
+                grid-template-columns: minmax(0, 1fr) minmax(340px, 430px);
+                gap: 26px;
             }
-            .modal-contact-item {
-                padding: 10px 12px;
-                font-size: 0.8rem;
-            }
-            .modal-glass h2 {
-                font-size: 1.1rem;
-            }
-            .modal-close {
-                width: 32px;
-                height: 32px;
-                font-size: 0.9rem;
-                top: 10px;
-                left: 10px;
-            }
-        }
 
-        /* ===== DESKTOP ===== */
-        @media (min-width: 768px) {
+            .brand-logo {
+                width: 72px;
+                height: 72px;
+                border-radius: 21px;
+            }
+
+            .brand-top {
+                gap: 12px;
+            }
+
+            .brand-title {
+                font-size: 34px;
+            }
+
+            .brand-features {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-card {
+                min-height: 85px;
+            }
+
             .glass-auth-card {
-                padding: 32px 36px 36px;
-                border-radius: 32px;
-                background: rgba(0, 0, 0, 0.7);
-                backdrop-filter: blur(16px);
-                -webkit-backdrop-filter: blur(16px);
-                box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.8);
-                margin-right: 5%;
-                margin-left: auto;
+                padding: 29px 23px 23px;
+            }
+        }
+
+        @media (max-width: 720px) {
+            body {
+                padding: 18px 13px;
             }
 
-            .logo-wrapper {
-                display: none !important;
+            .auth-layout {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .brand-panel {
+                display: none;
+            }
+
+            .glass-auth-card {
+                max-width: 460px;
+                margin-inline: auto;
+                padding: 26px 23px 22px;
+            }
+
+            .card-brand {
+                margin-bottom: 12px;
+            }
+
+            .card-logo {
+                width: 100px;
+                height: 100px;
+                border-radius: 27px;
+            }
+
+            .auth-header {
+                margin-bottom: 22px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            body {
+                padding: 12px;
+            }
+
+            .glass-auth-card {
+                padding: 23px 16px 19px;
+                border-radius: 23px;
+            }
+
+            .card-logo {
+                width: 88px;
+                height: 88px;
+                border-radius: 24px;
             }
 
             .auth-header h1 {
-                font-size: 1.5rem;
+                font-size: 23px;
             }
 
             .auth-input {
-                padding: 12px 8px 12px 16px;
-                min-height: 48px;
-                font-size: 1rem;
+                min-height: 51px;
+                font-size: 16px;
             }
 
-            .btn-submit {
-                min-height: 48px;
-                padding: 14px 20px;
-                border-radius: 14px;
+            .btn-row {
+                gap: 7px;
             }
 
-            .btn-submit:hover {
-                background: linear-gradient(145deg, #1a1a1a 0%, #0a0a0a 100%);
-                box-shadow: 0 8px 32px -12px rgba(0, 0, 0, 0.8);
-                border-color: var(--orange-light);
-                color: var(--orange-light);
-            }
-
-            .btn-row .btn-register,
-            .btn-row .btn-guide {
-                min-height: 44px;
-                border-radius: 14px;
-                padding: 12px 14px;
-            }
-
-            .btn-row .btn-register:hover,
-            .btn-row .btn-guide:hover {
-                background: rgba(0, 0, 0, 0.5);
-                border-color: rgba(224, 124, 60, 0.2);
-            }
-
-            .btn-row .btn-guide:hover {
-                background: rgba(224, 124, 60, 0.08);
-                border-color: rgba(224, 124, 60, 0.3);
+            .btn-register,
+            .btn-guide {
+                padding-inline: 5px;
+                font-size: 10px;
             }
 
             .trust-seal-img {
-                height: 55px;
+                height: 40px;
             }
 
             .modal-glass {
-                padding: 36px 32px 32px;
-            }
-            .modal-contact-item:hover {
-                background: rgba(0, 0, 0, 0.5);
-            }
-            .modal-close:hover {
-                background: rgba(255, 255, 255, 0.06);
-                color: rgba(255, 255, 255, 0.5);
+                padding: 29px 17px 20px;
             }
         }
 
-        @media (min-width: 1024px) {
-            .glass-auth-card {
-                padding: 40px 44px 44px;
-                max-width: 480px;
-                border-radius: 36px;
-                margin-right: 8%;
-            }
-
-            .auth-header h1 {
-                font-size: 1.7rem;
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
             }
         }
-
-        /* ===== SAFE AREA ===== */
-        @supports (padding: max(0px)) {
-            .glass-auth-card {
-                padding-left: max(24px, env(safe-area-inset-left));
-                padding-right: max(24px, env(safe-area-inset-right));
-                padding-bottom: max(24px, env(safe-area-inset-bottom));
-            }
-        }
-
-        @media (max-width: 560px) {
-            @supports (padding: max(0px)) {
-                .glass-auth-card {
-                    padding-left: max(16px, env(safe-area-inset-left));
-                    padding-right: max(16px, env(safe-area-inset-right));
-                    padding-bottom: max(16px, env(safe-area-inset-bottom));
-                }
-            }
-        }
-
-    @media (max-width: 768px) {
-    .logo-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 12px;
-    }
-
-    /* ===== اینجا اندازه‌ها رو بزرگ‌تر کن ===== */
-    .logo-container {
-        width: 160px;      /* قبلاً 120px */
-        height: 160px;
-    }
-
-    .logo-circle {
-        width: 150px;      /* قبلاً 110px */
-        height: 150px;
-        border-width: 4px; /* ضخیم‌تر برای چشم‌زدن */
-    }
-
-    .logo-circle img {
-        width: 88%;        /* قبلاً 85% */
-        height: 88%;
-        object-fit: contain;
-        display: block;
-    }
-}
-
-@media (max-width: 560px) {
-    .logo-container {
-        width: 180px;      /* قبلاً 130px */
-        height: 180px;
-    }
-    .logo-circle {
-        width: 170px;      /* قبلاً 120px */
-        height: 170px;
-        border-width: 5px; /* ضخیم‌تر */
-    }
-    .logo-circle img {
-        width: 85%;
-        height: 85%;
-    }
-}
-
-@media (max-width: 400px) {
-    .logo-container {
-        width: 150px;      /* قبلاً 110px */
-        height: 150px;
-    }
-    .logo-circle {
-        width: 140px;      /* قبلاً 100px */
-        height: 140px;
-        border-width: 4px;
-    }
-    .logo-circle img {
-        width: 123%;
-        height: 82%;
-    }
-}
-    </style>
-    <style>
-        /* ===== LOGO - فقط در موبایل با سایز بزرگ ===== */
-.logo-wrapper {
-    display: none;
-}
-
-@media (max-width: 768px) {
-    .logo-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 8px;
-    }
-
-    .logo-container {
-        position: relative;
-        width: 170px;
-        height: 170px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .logo-circle {
-        width: 130px;
-        height: 130px;
-        border-radius: 50%;
-        background: rgba(249, 249, 249, 0.95);
-        border: 3px solid var(--orange);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 60px rgba(224, 124, 60, 0.12);
-        flex-shrink: 0;
-        overflow: visible; /* ✅ ترفند شماره ۱: خروج لوگو از دایره */
-        position: relative;
-        transition: all 0.3s ease;
-    }
-
-    .logo-circle img {
-        width: 140%; /* ✅ ترفند شماره ۳: بزرگ‌تر از دایره */
-        height: 140%;
-        object-fit: contain;
-        display: block;
-        transform: scale(1.15); /* ✅ ترفند شماره ۳: اسکیل اضافی */
-        filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.25)); /* ✅ ترفند شماره ۵: سایه برای برجستگی */
-        transition: transform 0.3s ease;
-    }
-
-    /* ✅ ترفند شماره ۶: لوگو کمی بیرون از دایره */
-    .logo-circle img {
-        margin-top: -5%;
-    }
-}
-
-@media (max-width: 560px) {
-    .logo-container {
-        width: 160px;
-        height: 160px;
-    }
-    .logo-circle {
-        width: 120px;
-        height: 120px;
-        border-width: 3.5px;
-        border-color: var(--orange);
-    }
-    .logo-circle img {
-        width: 145%;
-        height: 145%;
-        transform: scale(1.2);
-        margin-top: -8%;
-    }
-}
-
-@media (max-width: 400px) {
-    .logo-container {
-        width: 140px;
-        height: 140px;
-    }
-    .logo-circle {
-        width: 105px;
-        height: 105px;
-        border-width: 3px;
-    }
-    .logo-circle img {
-        width: 150%;
-        height: 150%;
-        transform: scale(1.25);
-        margin-top: -10%;
-    }
-}
     </style>
 </head>
+
 <body>
+    <main class="page-shell">
+        <div class="auth-layout">
+            <section class="brand-panel" aria-label="معرفی Deco B2B">
+                <div class="brand-top">
+                    <div class="brand-logo">
+                        <img src="/media/images/deco.png" alt="لوگوی Deco B2B">
+                    </div>
 
-    <!-- ===== BACKGROUND ===== -->
-    <div class="bg-wrapper"></div>
-
-    <!-- ===== AUTH CARD ===== -->
-    <div class="glass-auth-card">
-
-        <div class="logo-wrapper">
-            <div class="logo-container">
-                <div class="logo-circle">
-                    <img src="/media/images/deco.png" alt="Deco B2B" loading="lazy">
+                    <div class="brand-name">
+                        <strong>Deco B2B</strong>
+                        <span>WHOLESALE DECOR</span>
+                    </div>
                 </div>
-            </div>
+
+                <div class="eyebrow">ویژه فعالان حوزه دکوراسیون</div>
+
+                <h2 class="brand-title">
+                    تجارت حرفه‌ای در دنیای
+                    <span>دکوراسیون</span>
+                </h2>
+
+                <p class="brand-description">
+                    به فضای تخصصی Deco B2B وارد شوید؛ محیطی برای فعالان حوزه دکوراسیون
+                    با دسترسی ویژه اعضا و فرایند عضویت و تأیید حساب کاربری.
+                </p>
+
+                <div class="features-heading">مزایای حضور در پلتفرم</div>
+
+                <div class="brand-features">
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                        </div>
+                        <div class="feature-content">
+                            <strong>فضای اختصاصی اعضا</strong>
+                            <span>دسترسی به محیط تخصصی پس از تأیید حساب کاربری</span>
+                        </div>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-user-check" aria-hidden="true"></i>
+                        </div>
+                        <div class="feature-content">
+                            <strong>عضویت هدفمند</strong>
+                            <span>فرایند ثبت‌نام متناسب با کاربران و فعالان کسب‌وکار</span>
+                        </div>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-key" aria-hidden="true"></i>
+                        </div>
+                        <div class="feature-content">
+                            <strong>ورود با شماره همراه</strong>
+                            <span>شروع فرایند ورود با شماره موبایل و دریافت کد تأیید</span>
+                        </div>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-headset" aria-hidden="true"></i>
+                        </div>
+                        <div class="feature-content">
+                            <strong>راهنمایی عضویت</strong>
+                            <span>امکان ارتباط با مجموعه برای پیگیری فرایند ثبت‌نام</span>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="brand-note">
+                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                    <span>تجربه‌ای اختصاصی برای تجارت حرفه‌ای دکوراسیون</span>
+                </div>
+            </section>
+
+            <section class="glass-auth-card">
+                <div class="card-brand">
+                    <div class="card-logo">
+                        <img src="/media/images/deco.png" alt="لوگوی Deco B2B">
+                    </div>
+                    <span class="card-brand-name">DECO B2B</span>
+                </div>
+
+                <header class="auth-header">
+                    <h1>ورود به حساب کاربری</h1>
+                    <span class="subtitle">پلتفرم تخصصی Deco B2B</span>
+                </header>
+
+                {% if messages %}
+                    <div class="server-messages" aria-live="polite">
+                        {% for message in messages %}
+                            <div class="server-message{% if message.tags == 'success' %} success{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{% url 'account:send_mobile' %}" id="authForm" novalidate>
+                    {% csrf_token %}
+
+                    <div class="form-group" id="mobileGroup">
+                        <label class="input-label" for="id_mobileNumber">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                <rect x="5" y="2" width="14" height="20" rx="2"></rect>
+                                <line x1="12" y1="18" x2="12" y2="18"></line>
+                            </svg>
+                            <span>شماره همراه</span>
+                        </label>
+
+                        <div class="input-wrapper">
+                            <span class="input-icon" aria-hidden="true">🇮🇷</span>
+                            <input
+                                type="tel"
+                                name="mobileNumber"
+                                id="id_mobileNumber"
+                                class="auth-input"
+                                maxlength="11"
+                                minlength="11"
+                                placeholder="0912 345 6789"
+                                inputmode="numeric"
+                                autocomplete="tel"
+                                value=""
+                                aria-describedby="liveValidation errorContainer"
+                            >
+                        </div>
+
+                        <div id="liveValidation" class="live-feedback" aria-live="polite"></div>
+                        <ul id="errorContainer" class="error-list" aria-live="polite"></ul>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn-submit">
+                        <span>دریافت کد تأیید</span>
+                        <i class="fa-regular fa-paper-plane" aria-hidden="true"></i>
+                    </button>
+
+                    <div class="divider">
+                        <span>یا</span>
+                    </div>
+
+                    <div class="btn-row">
+                        <a href="{% url 'account:registration_form' %}" class="btn-register">
+                            <i class="fa-regular fa-user-plus" aria-hidden="true"></i>
+                            <span>عضویت</span>
+                        </a>
+
+                        <button type="button" class="btn-guide" id="guideBtn">
+                            <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
+                            <span>راهنمایی عضویت</span>
+                        </button>
+                    </div>
+
+                    <div class="footer-section">
+                        <div class="trust-seal-wrapper">
+                            <span class="trust-seal-label">
+                                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                                نماد اعتماد الکترونیکی
+                            </span>
+
+                            <a
+                                class="trust-seal-link"
+                                referrerpolicy="origin"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                href="https://trustseal.enamad.ir/?id=6899091&Code=hDK7e5u0UTvYE5yeCYIwWg3XGaTJDSi0"
+                            >
+                                <img
+                                    loading="lazy"
+                                    referrerpolicy="origin"
+                                    src="https://trustseal.enamad.ir/logo.aspx?id=6899091&Code=hDK7e5u0UTvYE5yeCYIwWg3XGaTJDSi0"
+                                    alt="نماد اعتماد الکترونیکی"
+                                    class="trust-seal-img"
+                                >
+                            </a>
+                        </div>
+
+                        <div class="terms-note">
+                            ورود به منزله پذیرش قوانین Deco B2B است.
+                        </div>
+                    </div>
+                </form>
+            </section>
         </div>
+    </main>
 
-        <div class="auth-header">
-            <h1>Deco B2B</h1>
-            <span class="subtitle">پلتفرم هوشمند B2B</span>
-        </div>
-
-        <form method="post" action="{% url 'account:send_mobile' %}" id="authForm" novalidate>
-            {% csrf_token %}
-
-            <div class="form-group" id="mobileGroup">
-                <div class="input-label">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2" stroke="currentColor" fill="none"/>
-                        <line x1="12" y1="18" x2="12" y2="18" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                    <span>شماره همراه</span>
-                </div>
-                <div class="input-wrapper">
-                    <span class="input-icon">🇮🇷</span>
-                    <input type="tel"
-                           name="mobileNumber"
-                           id="id_mobileNumber"
-                           class="auth-input"
-                           maxlength="11"
-                           minlength="11"
-                           placeholder="0912 345 6789"
-                           inputmode="numeric"
-                           autocomplete="tel"
-                           value=""
-                           aria-describedby="mobileHelp">
-                </div>
-                <div id="liveValidation" class="live-feedback"></div>
-                <div id="errorContainer" class="error-list"></div>
-            </div>
-
-            <button type="submit" id="submitBtn" class="btn-submit">
-                <span>دریافت کد تایید</span>
-                <i class="fa-regular fa-paper-plane"></i>
+    <div class="modal-overlay" id="guideModal" aria-hidden="true">
+        <section class="modal-glass" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+            <button type="button" class="modal-close" id="modalCloseBtn" aria-label="بستن">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
             </button>
 
-            <div class="divider">
-                <span>یا</span>
-            </div>
-
-            <div  class="btn-row">
-                <a style="border:1px solid orange;" href="{% url 'account:registration_form' %}" class="btn-register">
-                    <i class="fa-regular fa-user-plus"></i>
-                    <span>عضویت</span>
-                </a>
-                <button style="border:1px solid orange;" type="button" class="btn-guide" id="guideBtn">
-                    <i class="fa-regular fa-circle-question"></i>
-                    <span>راهنمایی عضویت</span>
-                </button>
-            </div>
-
-            <div class="footer-section">
-                <div class="trust-seal-wrapper">
-                    <span class="trust-seal-label">
-                        <i class="fa-regular fa-shield-check"></i>
-                        نماد اعتماد الکترونیکی
-                    </span>
-                    <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=6899091&Code=hDK7e5u0UTvYE5yeCYIwWg3XGaTJDSi0'>
-                        <img loading="lazy" referrerpolicy='origin'
-                             src='https://trustseal.enamad.ir/logo.aspx?id=6899091&Code=hDK7e5u0UTvYE5yeCYIwWg3XGaTJDSi0'
-                             alt='نماد اعتماد'
-                             class="trust-seal-img"
-                             code='hDK7e5u0UTvYE5yeCYIwWg3XGaTJDSi0'>
-                    </a>
-                </div>
-
-                <div style="color:#ffff; font-size:12px;" class="terms-note">
-                 ورود به منزله پذیرش قوانین decob2b
-                </div>
-            </div>
-        </form>
-    </div>
-
-    <!-- ===== MODAL ===== -->
-    <div class="modal-overlay" id="guideModal">
-        <div class="modal-glass">
-            <button class="modal-close" id="modalCloseBtn" aria-label="بستن">
-                <i class="fa-regular fa-xmark"></i>
-            </button>
-
-            <h2>راهنمای عضویت</h2>
-            <p class="modal-sub">برای ثبت‌نام با ما در ارتباط باشید</p>
+            <h2 id="guideTitle">راهنمای عضویت</h2>
+            <p class="modal-sub">برای اطلاعات بیشتر درباره فرایند عضویت با مجموعه در ارتباط باشید.</p>
 
             <div class="modal-contact-item">
-                <i class="fa-regular fa-phone"></i>
+                <i class="fa-solid fa-phone" aria-hidden="true"></i>
                 <div>
                     <span class="label">شماره تماس</span>
                     <span class="value">۰۲۱-۱۲۳۴۵۶۷۸</span>
@@ -1179,7 +1146,7 @@
             </div>
 
             <div class="modal-contact-item">
-                <i class="fa-regular fa-location-dot"></i>
+                <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
                 <div>
                     <span class="label">آدرس</span>
                     <span class="value-rtl">تهران، خیابان آزادی، برج دکو، طبقه ۵</span>
@@ -1189,277 +1156,221 @@
             <div class="modal-divider"></div>
 
             <div class="modal-hours">
-                <i class="fa-regular fa-clock"></i>
+                <i class="fa-regular fa-clock" aria-hidden="true"></i>
                 <span>ساعت کاری:</span>
-                <span>شنبه تا چهارشنبه ۹ الی ۱۷</span>
+                <span>شنبه تا چهارشنبه، ۹ الی ۱۷</span>
             </div>
-        </div>
+        </section>
     </div>
 
-    <!-- ===== JAVASCRIPT ===== -->
     <script>
-        (function() {
-            'use strict';
+        (function () {
+            "use strict";
 
-            const mobileInput = document.getElementById('id_mobileNumber');
-            const submitBtn = document.getElementById('submitBtn');
-            const form = document.getElementById('authForm');
-            const liveFeedback = document.getElementById('liveValidation');
-            const errorContainer = document.getElementById('errorContainer');
+            const form = document.getElementById("authForm");
+            const mobileInput = document.getElementById("id_mobileNumber");
+            const submitBtn = document.getElementById("submitBtn");
+            const liveFeedback = document.getElementById("liveValidation");
+            const errorContainer = document.getElementById("errorContainer");
 
-            // Modal
-            const modalOverlay = document.getElementById('guideModal');
-            const guideBtn = document.getElementById('guideBtn');
-            const modalCloseBtn = document.getElementById('modalCloseBtn');
+            const modalOverlay = document.getElementById("guideModal");
+            const guideBtn = document.getElementById("guideBtn");
+            const modalCloseBtn = document.getElementById("modalCloseBtn");
 
-            function openModal() {
-                modalOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
+            const originalButtonContent = submitBtn.innerHTML;
+
+            function normalizeDigits(value) {
+                const persianDigits = "۰۱۲۳۴۵۶۷۸۹";
+                const arabicDigits = "٠١٢٣٤٥٦٧٨٩";
+
+                return value
+                    .replace(/[۰-۹]/g, function (digit) {
+                        return String(persianDigits.indexOf(digit));
+                    })
+                    .replace(/[٠-٩]/g, function (digit) {
+                        return String(arabicDigits.indexOf(digit));
+                    })
+                    .replace(/\D/g, "")
+                    .slice(0, 11);
             }
 
-            function closeModal() {
-                modalOverlay.classList.remove('active');
-                document.body.style.overflow = '';
+            function isValidMobile(number) {
+                return /^09\d{9}$/.test(number) ||
+                    /^9\d{9}$/.test(number);
             }
 
-            guideBtn.addEventListener('click', openModal);
-            modalCloseBtn.addEventListener('click', closeModal);
-
-            modalOverlay.addEventListener('click', function(e) {
-                if (e.target === modalOverlay) {
-                    closeModal();
-                }
-            });
-
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
-                    closeModal();
-                }
-            });
-
-            // Helpers
-            function normalizeMobileDigits(value) {
-                return value.replace(/\D/g, '').slice(0, 11);
+            function clearValidation() {
+                liveFeedback.replaceChildren();
+                errorContainer.replaceChildren();
             }
 
-            function isValidIranMobile(digits) {
-                if (digits.length === 11 && digits.startsWith('09')) {
-                    return /^09[0-9]{9}$/.test(digits);
-                }
-                if (digits.length === 10 && digits.startsWith('9')) {
-                    return /^9[0-9]{9}$/.test(digits);
-                }
-                return false;
-            }
+            function showFeedback(message, valid) {
+                liveFeedback.replaceChildren();
 
-            function getFinalMobile(digits) {
-                if (digits.length === 10 && digits.startsWith('9')) {
-                    return '0' + digits;
-                }
-                if (digits.length === 11 && digits.startsWith('09')) {
-                    return digits;
-                }
-                return digits;
-            }
+                const badge = document.createElement("span");
+                badge.className = "feedback-content " +
+                    (valid ? "valid-feedback" : "invalid-feedback");
 
-            function formatDisplayNumber(digits) {
-                if (digits.length >= 4) {
-                    let parts = [];
-                    if (digits.startsWith('0')) {
-                        parts.push(digits.slice(0, 4));
-                        if (digits.length > 4) parts.push(digits.slice(4, 7));
-                        if (digits.length > 7) parts.push(digits.slice(7, 11));
-                    } else if (digits.startsWith('9')) {
-                        parts.push('0' + digits.slice(0, 3));
-                        if (digits.length > 3) parts.push(digits.slice(3, 6));
-                        if (digits.length > 6) parts.push(digits.slice(6, 10));
-                    } else {
-                        if (digits.length >= 4) parts.push(digits.slice(0, 4));
-                        if (digits.length > 4) parts.push(digits.slice(4, 7));
-                        if (digits.length > 7) parts.push(digits.slice(7, 11));
-                    }
-                    return parts.filter(p => p.length > 0).join(' ');
-                }
-                return digits;
-            }
+                const icon = document.createElement("i");
+                icon.className = valid
+                    ? "fa-solid fa-circle-check"
+                    : "fa-solid fa-circle-xmark";
 
-            function updateLiveValidationUI() {
-                let raw = mobileInput.value;
-                let digits = normalizeMobileDigits(raw);
+                const text = document.createElement("span");
+                text.textContent = message;
 
-                if (raw !== digits) {
-                    mobileInput.value = digits;
-                }
-
-                const isValid = isValidIranMobile(digits);
-                const wrapper = mobileInput.closest('.input-wrapper');
-                mobileInput.classList.remove('error-input', 'valid-input');
-
-                liveFeedback.innerHTML = '';
-                errorContainer.innerHTML = '';
-
-                if (wrapper) {
-                    wrapper.style.borderColor = 'rgba(255, 255, 255, 0.06)';
-                }
-
-                if (digits.length === 0) {
-                    return;
-                }
-
-                if (!isValid) {
-                    let message = '';
-                    if (digits.length > 0 && digits.length < 10) {
-                        message = 'شماره ناقص است';
-                    } else if (digits.length === 10 && !digits.startsWith('9')) {
-                        message = 'باید با 9 شروع شود';
-                    } else if (digits.length === 11 && !digits.startsWith('09')) {
-                        message = 'باید با 09 شروع شود';
-                    } else {
-                        message = 'شماره نامعتبر';
-                    }
-
-                    const span = document.createElement('span');
-                    span.className = 'feedback-content invalid-feedback show';
-                    span.innerHTML = `<i class="fa-regular fa-circle-xmark"></i> ${message}`;
-                    liveFeedback.appendChild(span);
-
-                    mobileInput.classList.add('error-input');
-                    if (wrapper) {
-                        wrapper.style.borderColor = '#dc3545';
-                    }
-
-                } else {
-                    const displayVal = formatDisplayNumber(digits);
-                    const span = document.createElement('span');
-                    span.className = 'feedback-content valid-feedback show';
-                    span.innerHTML = `<i class="fa-regular fa-circle-check"></i> ✓ ${displayVal}`;
-                    liveFeedback.appendChild(span);
-
-                    mobileInput.classList.add('valid-input');
-                    if (wrapper) {
-                        wrapper.style.borderColor = 'var(--orange)';
-                    }
-                }
+                badge.append(icon, text);
+                liveFeedback.appendChild(badge);
             }
 
             function showError(message) {
-                errorContainer.innerHTML = '';
-                const li = document.createElement('li');
-                li.className = 'show';
-                li.innerHTML = `<i class="fa-regular fa-circle-xmark"></i> ${message}`;
-                errorContainer.appendChild(li);
+                errorContainer.replaceChildren();
 
-                const wrapper = mobileInput.closest('.input-wrapper');
-                if (wrapper) {
-                    wrapper.style.borderColor = '#dc3545';
-                }
-                mobileInput.classList.add('error-input');
+                const item = document.createElement("li");
+                const icon = document.createElement("i");
+                const text = document.createElement("span");
+
+                icon.className = "fa-solid fa-circle-xmark";
+                text.textContent = message;
+
+                item.append(icon, text);
+                errorContainer.appendChild(item);
+                mobileInput.classList.add("error-input");
+                mobileInput.focus();
             }
 
-            function clearErrors() {
-                errorContainer.innerHTML = '';
-                const wrapper = mobileInput.closest('.input-wrapper');
-                if (wrapper && !mobileInput.classList.contains('valid-input')) {
-                    wrapper.style.borderColor = 'rgba(255, 255, 255, 0.06)';
-                }
-            }
+            function updateValidation() {
+                const digits = normalizeDigits(mobileInput.value);
 
-            function autoCorrectOnBlur() {
-                let digits = normalizeMobileDigits(mobileInput.value);
-                if (digits.length === 10 && digits.startsWith('9')) {
-                    mobileInput.value = '0' + digits;
-                } else {
+                if (mobileInput.value !== digits) {
                     mobileInput.value = digits;
                 }
-                updateLiveValidationUI();
-            }
 
-            async function handleFormSubmit(e) {
-                e.preventDefault();
+                clearValidation();
+                mobileInput.classList.remove("error-input", "valid-input");
 
-                errorContainer.innerHTML = '';
+                const wrapper = mobileInput.closest(".input-wrapper");
+                if (wrapper) {
+                    wrapper.style.borderColor = "";
+                }
 
-                let rawDigits = normalizeMobileDigits(mobileInput.value);
-
-                if (!isValidIranMobile(rawDigits)) {
-                    showError('شماره موبایل صحیح نیست. مثال: 09123456789');
-                    mobileInput.focus();
+                if (!digits) {
                     return;
                 }
 
-                let finalMobileNumber = getFinalMobile(rawDigits);
+                if (isValidMobile(digits)) {
+                    mobileInput.classList.add("valid-input");
+                    showFeedback("شماره همراه معتبر است", true);
 
-                const originalContent = submitBtn.innerHTML;
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = `<span class="spinner"></span> <span>ارسال کد ...</span>`;
+                    if (wrapper) {
+                        wrapper.style.borderColor = "var(--success)";
+                    }
 
-                let mobileField = document.querySelector('input[name="mobileNumber"]');
-                if (!mobileField || mobileField === mobileInput) {
-                    let hiddenMobile = document.createElement('input');
-                    hiddenMobile.type = 'hidden';
-                    hiddenMobile.name = 'mobileNumber';
-                    hiddenMobile.value = finalMobileNumber;
-                    form.appendChild(hiddenMobile);
-                    mobileInput.setAttribute('name', 'mobile_display');
+                    return;
+                }
+
+                mobileInput.classList.add("error-input");
+
+                let message = "شماره همراه نامعتبر است";
+
+                if (digits.length < 10) {
+                    message = "شماره همراه ناقص است";
+                } else if (digits.length === 10 && !digits.startsWith("9")) {
+                    message = "شماره باید با 9 شروع شود";
+                } else if (digits.length === 11 && !digits.startsWith("09")) {
+                    message = "شماره باید با 09 شروع شود";
+                }
+
+                showFeedback(message, false);
+
+                if (wrapper) {
+                    wrapper.style.borderColor = "var(--danger)";
+                }
+            }
+
+            mobileInput.addEventListener("input", function () {
+                updateValidation();
+            });
+
+            mobileInput.addEventListener("blur", function () {
+                const digits = normalizeDigits(mobileInput.value);
+
+                if (digits.length === 10 && digits.startsWith("9")) {
+                    mobileInput.value = "0" + digits;
                 } else {
-                    mobileField.value = finalMobileNumber;
+                    mobileInput.value = digits;
                 }
 
-                try {
-                    form.submit();
-                } catch (err) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalContent;
-                    showError('خطا در ارتباط، دوباره تلاش کنید');
+                updateValidation();
+            });
+
+            form.addEventListener("submit", function (event) {
+                const digits = normalizeDigits(mobileInput.value);
+
+                if (!isValidMobile(digits)) {
+                    event.preventDefault();
+                    showError("شماره موبایل صحیح نیست؛ مثال: 09123456789");
+                    return;
                 }
+
+                const finalMobileNumber = digits.length === 10
+                    ? "0" + digits
+                    : digits;
+
+                /*
+                 * Keep the original Django field name and native form submission.
+                 * Do not replace the field or invoke form.submit() manually.
+                 */
+                mobileInput.value = finalMobileNumber;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML =
+                    '<span class="spinner" aria-hidden="true"></span>' +
+                    '<span>در حال ارسال...</span>';
+
+                /*
+                 * The browser continues the normal POST request to
+                 * account:send_mobile with the original CSRF token.
+                 */
+            });
+
+            window.addEventListener("pageshow", function () {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalButtonContent;
+            });
+
+            function openModal() {
+                modalOverlay.classList.add("active");
+                modalOverlay.setAttribute("aria-hidden", "false");
+                document.body.style.overflow = "hidden";
+                modalCloseBtn.focus();
             }
 
-            // Events
-            mobileInput.addEventListener('input', function() {
-                let val = mobileInput.value;
-                let cleaned = val.replace(/\D/g, '').slice(0, 11);
+            function closeModal() {
+                modalOverlay.classList.remove("active");
+                modalOverlay.setAttribute("aria-hidden", "true");
+                document.body.style.overflow = "";
+                guideBtn.focus();
+            }
 
-                if (cleaned !== val) {
-                    const cursorPos = mobileInput.selectionStart;
-                    mobileInput.value = cleaned;
-                    if (cursorPos !== null) {
-                        let newPos = cursorPos - (val.length - cleaned.length);
-                        if (newPos < 0) newPos = 0;
-                        if (newPos > cleaned.length) newPos = cleaned.length;
-                        try {
-                            mobileInput.setSelectionRange(newPos, newPos);
-                        } catch (e) {}
-                    }
+            guideBtn.addEventListener("click", openModal);
+            modalCloseBtn.addEventListener("click", closeModal);
+
+            modalOverlay.addEventListener("click", function (event) {
+                if (event.target === modalOverlay) {
+                    closeModal();
                 }
-
-                clearErrors();
-                updateLiveValidationUI();
             });
 
-            mobileInput.addEventListener('blur', autoCorrectOnBlur);
-            mobileInput.addEventListener('focus', function() {
-                this.style.fontSize = '16px';
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape" && modalOverlay.classList.contains("active")) {
+                    closeModal();
+                }
             });
 
-            form.addEventListener('submit', handleFormSubmit);
-
-            // Initial
             if (mobileInput.value) {
-                let cleaned = mobileInput.value.replace(/\D/g, '').slice(0, 11);
-                mobileInput.value = cleaned;
-                updateLiveValidationUI();
+                mobileInput.value = normalizeDigits(mobileInput.value);
+                updateValidation();
             }
-
-            // Keyboard safe
-            if ('visualViewport' in window) {
-                let vp = window.visualViewport;
-                vp.addEventListener('scroll', function() {
-                    if (document.activeElement === mobileInput) {
-                        window.scrollTo(0, 0);
-                    }
-                });
-            }
-
         })();
     </script>
 </body>

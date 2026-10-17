@@ -1,223 +1,454 @@
-{% load static %}
 
+{% load static %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#f5f0e8">
+    <title>تأیید کد | Deco B2B</title>
 
-    <title>تایید کد | Deco B2B | ورود سازمانی</title>
-
-    <link
-        rel="stylesheet"
-        href="https://lib.arvancloud.ir/font-awesome/6.3.0/css/all.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="{% static 'css/fonts.css' %}"
-    >
+    <link rel="stylesheet" href="https://lib.arvancloud.ir/font-awesome/6.3.0/css/all.css">
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
 
     <style>
+        :root {
+            --page: #f5f0e8;
+            --surface: #fffdf9;
+            --surface-soft: #fff7ef;
+            --orange: #d97732;
+            --orange-dark: #a94f20;
+            --orange-light: #edb27f;
+            --ink: #34251d;
+            --muted: #857367;
+            --line: #ead9c8;
+            --success: #327650;
+            --danger: #bf4435;
+            --shadow: 0 28px 80px rgba(104, 67, 39, .13);
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.94);
-            --glass-border: rgba(79, 70, 229, 0.2);
-            --glass-shadow: 0 25px 45px rgba(0, 0, 0, 0.12);
-
-            --primary-start: #1e3a8a;
-            --primary-end: #3b82f6;
-
-            --error-text: #dc2626;
-            --success-text: #059669;
-
-            --text-dark: #0f172a;
-            --text-muted: #475569;
-
-            --radius-card: 1.75rem;
-
-            --transition: all 0.2s ease;
-        }
-
-        html,
-        body {
+        html {
             min-height: 100%;
+            background: var(--page);
         }
 
         body {
-            font-family:
-                'IRANYekan',
-                'Vazirmatn',
-                system-ui,
-                -apple-system,
-                sans-serif;
-
-            direction: rtl;
-
             min-height: 100vh;
-
-            background:
-                radial-gradient(
-                    ellipse at 20% 30%,
-                    #eef2ff 0%,
-                    #e0e7ff 100%
-                );
-
+            min-height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;
-
-            padding: 1rem;
-
             position: relative;
+            isolation: isolate;
+            overflow-x: hidden;
+            padding: 30px 18px;
+            color: var(--ink);
+            font-family: "IRANYekan", "Vazirmatn", Tahoma, sans-serif;
+            background:
+                radial-gradient(ellipse at 8% 12%, rgba(237, 178, 127, .42), transparent 32%),
+                radial-gradient(ellipse at 92% 86%, rgba(217, 119, 50, .17), transparent 34%),
+                linear-gradient(135deg, #fbf7f0 0%, #f2e8db 52%, #f9f3ea 100%);
         }
 
         body::before {
             content: "";
-
             position: fixed;
             inset: 0;
-
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' opacity='0.03'><path fill='none' d='M10 10 L90 10 M10 20 L90 20 M10 30 L90 30 M10 40 L90 40 M10 50 L90 50 M10 60 L90 60 M10 70 L90 70 M10 80 L90 80 M10 90 L90 90 M20 10 L20 90 M30 10 L30 90 M40 10 L40 90 M50 10 L50 90 M60 10 L60 90 M70 10 L70 90 M80 10 L80 90' stroke='%234f46e5' stroke-width='0.5'/></svg>");
-
-            background-repeat: repeat;
-
+            z-index: -2;
             pointer-events: none;
+            opacity: .45;
+            background-image:
+                linear-gradient(rgba(166, 111, 72, .075) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(166, 111, 72, .075) 1px, transparent 1px);
+            background-size: 54px 54px;
+            mask-image: linear-gradient(135deg, #000, transparent 80%);
+        }
 
-            z-index: 0;
+        body::after {
+            content: "";
+            position: fixed;
+            z-index: -1;
+            width: min(65vw, 650px);
+            aspect-ratio: 1;
+            left: -28%;
+            top: 5%;
+            border: 1px solid rgba(169, 79, 32, .17);
+            border-radius: 46% 54% 62% 38% / 40% 43% 57% 60%;
+            box-shadow:
+                0 0 0 38px rgba(217, 119, 50, .035),
+                0 0 0 82px rgba(217, 119, 50, .025),
+                0 0 0 132px rgba(217, 119, 50, .018);
+            transform: rotate(-24deg);
+            pointer-events: none;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            touch-action: manipulation;
+        }
+
+        button:focus-visible,
+        input:focus-visible {
+            outline: 3px solid rgba(217, 119, 50, .35);
+            outline-offset: 3px;
+        }
+
+        .page-shell {
+            width: 100%;
+            max-width: 1180px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(370px, 460px);
+            align-items: center;
+            gap: clamp(40px, 7vw, 100px);
+        }
+
+        .brand-panel {
+            width: 100%;
+            max-width: 520px;
+            padding: 20px 0;
+        }
+
+        .brand-top {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .brand-logo {
+            width: 88px;
+            height: 88px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            border: 1px solid rgba(217, 119, 50, .28);
+            border-radius: 25px;
+            background: rgba(255, 253, 249, .86);
+            box-shadow:
+                0 13px 32px rgba(115, 70, 37, .12),
+                inset 0 1px 0 #fff;
+        }
+
+        .brand-logo img {
+            display: block;
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+        }
+
+        .brand-name {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .brand-name strong {
+            font-size: 23px;
+            font-weight: 900;
+            letter-spacing: -.6px;
+        }
+
+        .brand-name span {
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            direction: ltr;
+            text-align: right;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 15px;
+            color: var(--orange-dark);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .eyebrow::before {
+            content: "";
+            width: 25px;
+            height: 2px;
+            border-radius: 5px;
+            background: var(--orange);
+        }
+
+        .brand-title {
+            max-width: 510px;
+            font-size: clamp(32px, 4vw, 48px);
+            line-height: 1.65;
+            letter-spacing: -1.5px;
+            font-weight: 900;
+        }
+
+        .brand-title span {
+            color: var(--orange-dark);
+        }
+
+        .brand-description {
+            max-width: 440px;
+            margin-top: 15px;
+            color: #78685b;
+            font-size: 13px;
+            line-height: 2.35;
+        }
+
+        .features-heading {
+            margin-top: 32px;
+            margin-bottom: 14px;
+            color: #705544;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .brand-features {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 13px;
+        }
+
+        .feature-card {
+            min-height: 112px;
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+            padding: 17px 15px;
+            border: 1px solid rgba(201, 143, 99, .27);
+            border-radius: 19px;
+            background: linear-gradient(145deg, rgba(255, 253, 249, .96), rgba(255, 246, 235, .83));
+            box-shadow:
+                0 9px 24px rgba(115, 70, 37, .055),
+                inset 0 1px 0 rgba(255, 255, 255, .95);
+            transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(217, 119, 50, .46);
+            box-shadow: 0 15px 30px rgba(115, 70, 37, .10);
+        }
+
+        .feature-icon {
+            width: 43px;
+            height: 43px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(217, 119, 50, .18);
+            border-radius: 14px;
+            background: linear-gradient(145deg, #fff0df, #f9dfc4);
+            color: var(--orange-dark);
+            font-size: 17px;
+        }
+
+        .feature-content {
+            min-width: 0;
+            padding-top: 2px;
+        }
+
+        .feature-content strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #493326;
+            font-size: 12px;
+            line-height: 1.9;
+            font-weight: 900;
+        }
+
+        .feature-content span {
+            display: block;
+            color: #8b7665;
+            font-size: 10px;
+            line-height: 1.9;
+        }
+
+        .brand-note {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-top: 20px;
+            color: #8a7665;
+            font-size: 11px;
+            line-height: 2;
+        }
+
+        .brand-note i {
+            color: var(--orange);
         }
 
         .glass-auth-card {
             width: 100%;
-            max-width: 520px;
-
-            background: var(--glass-bg);
-
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-
-            border-radius: var(--radius-card);
-
-            box-shadow: var(--glass-shadow);
-
-            border: 1px solid var(--glass-border);
-
-            padding: 2rem 2rem 2.2rem;
-
+            min-width: 0;
             position: relative;
-            z-index: 2;
-        }
-
-        @media (max-width: 560px) {
-            .glass-auth-card {
-                max-width: 95%;
-                padding: 1.5rem 1.2rem;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .glass-auth-card {
-                padding: 1.2rem 0.8rem;
-            }
-        }
-
-        .brand {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 1rem;
-        }
-
-        .logo-circle {
-            width: 70px;
-            height: 70px;
-
-            border-radius: 20px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
             overflow: hidden;
-
-            background: white;
-
-            border: 2px solid #e2e8f0;
-
-            box-shadow:
-                0 10px 20px -5px rgba(30, 58, 138, 0.3);
-
-            transition: all 0.3s ease;
+            padding: 35px 32px 25px;
+            border: 1px solid rgba(255, 255, 255, .96);
+            border-radius: 29px;
+            background: rgba(255, 253, 249, .95);
+            box-shadow: var(--shadow), inset 0 1px 0 #fff;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            animation: card-enter .55s cubic-bezier(.2, .8, .2, 1) both;
         }
 
-        .logo-circle:hover {
-            transform: scale(1.05);
-
-            box-shadow:
-                0 15px 30px -8px rgba(30, 58, 138, 0.4);
+        .glass-auth-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 30px;
+            left: 30px;
+            height: 3px;
+            border-radius: 0 0 8px 8px;
+            background: linear-gradient(90deg, transparent, var(--orange), var(--orange-light), transparent);
         }
 
-        .logo-circle img {
-            width: 100%;
-            height: 100%;
+        @keyframes card-enter {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-            object-fit: cover;
+        .card-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 14px;
+        }
 
+        .card-logo {
+            width: 94px;
+            height: 94px;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            border: 2px solid #e9b384;
+            border-radius: 26px;
+            background: #fff;
+            box-shadow: 0 9px 26px rgba(169, 79, 32, .12);
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+
+        .card-logo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 13px 30px rgba(169, 79, 32, .17);
+        }
+
+        .card-logo img {
+            width: 90%;
+            height: 90%;
             display: block;
+            object-fit: contain;
+        }
+
+        .card-brand-name {
+            margin-top: 9px;
+            color: #8c6c54;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.7px;
+            direction: ltr;
         }
 
         .auth-header {
+            margin-bottom: 23px;
             text-align: center;
-            margin-bottom: 1.8rem;
         }
 
         .auth-header h1 {
-            font-size: 1.9rem;
-            font-weight: 800;
-
-            color: var(--text-dark);
-
-            margin-bottom: 0.4rem;
+            color: var(--ink);
+            font-size: 25px;
+            font-weight: 900;
+            letter-spacing: -.6px;
+            line-height: 1.8;
         }
 
-        .auth-header p {
-            color: var(--text-muted);
+        .auth-header .description {
+            margin-top: 4px;
+            color: #8b7767;
+            font-size: 12px;
+            line-height: 2;
+        }
 
-            font-size: 0.85rem;
-            font-weight: 500;
+        .subtitle {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 9px;
+            padding: 7px 12px;
+            border: 1px solid #f0dfcd;
+            border-radius: 50px;
+            background: #fbf0e5;
+            color: #8a6b55;
+            font-size: 10px;
+            font-weight: 700;
+        }
 
-            background: #f1f5f9;
-
-            display: inline-block;
-
-            padding: 0.25rem 1.2rem;
-
-            border-radius: 40px;
+        .subtitle::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: var(--orange);
+            box-shadow: 0 0 0 4px rgba(217, 119, 50, .10);
         }
 
         .mobile-number-highlight {
-            color: var(--primary-start);
-
-            font-weight: 800;
-
-            background: rgba(59, 130, 246, 0.12);
-
-            padding: 0.2rem 0.6rem;
-
-            border-radius: 40px;
-
-            font-family: monospace;
-
-            font-size: 0.9rem;
-
-            direction: ltr;
-
             display: inline-block;
+            margin: 9px 0 0;
+            padding: 8px 15px;
+            border: 1px solid #efd6bf;
+            border-radius: 12px;
+            background: #fff5e9;
+            color: var(--orange-dark);
+            font-family: "Vazirmatn", Tahoma, sans-serif;
+            font-size: 16px;
+            font-weight: 900;
+            letter-spacing: .7px;
+            direction: ltr;
+            unicode-bidi: isolate;
+            box-shadow: inset 0 1px 0 #fff;
+        }
+
+        .otp-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #665347;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .otp-heading .required-label {
+            color: #a18b79;
+            font-size: 10px;
+            font-weight: 600;
         }
 
         .form-group {
@@ -226,330 +457,162 @@
 
         .code-inputs {
             display: flex;
-
             justify-content: center;
             align-items: center;
-
             gap: 10px;
-
             direction: ltr;
-
-            margin: 1.5rem 0 0.8rem;
-
-            flex-wrap: nowrap;
-
             width: 100%;
+            padding: 14px 12px;
+            border: 1px solid #f0e1d1;
+            border-radius: 18px;
+            background: linear-gradient(145deg, #fffaf4, #fff4e8);
+            box-shadow: inset 0 2px 5px rgba(125, 77, 42, .035);
         }
 
         .code-input {
-            width: clamp(48px, 14vw, 68px);
-            height: clamp(54px, 14vw, 74px);
-
-            font-size: clamp(1.4rem, 4vw, 1.8rem);
-
-            text-align: center;
-
-            border: 2px solid #e2e8f0;
-
-            border-radius: 16px;
-
-            background: white;
-
-            font-family:
-                'Vazirmatn',
-                monospace;
-
-            font-weight: 700;
-
-            color: var(--text-dark);
-
-            transition: all 0.2s;
-
-            flex-shrink: 0;
-            flex-grow: 0;
-
-            min-width: 44px;
-            min-height: 50px;
-
+            width: 100%;
+            max-width: 58px;
+            min-width: 0;
+            height: 65px;
+            flex: 1 1 0;
+            padding: 0;
+            border: 1.5px solid #e8d9ca;
+            border-radius: 14px;
             outline: none;
-
+            background: #fffdfb;
+            color: var(--ink);
+            font-family: "Vazirmatn", Tahoma, sans-serif;
+            font-size: 25px;
+            font-weight: 900;
+            text-align: center;
             direction: ltr;
-
+            caret-color: var(--orange);
+            box-shadow: 0 3px 8px rgba(115, 70, 37, .035);
+            transition: border-color .2s ease, background .2s ease, box-shadow .2s ease, transform .2s ease;
             -webkit-appearance: none;
             appearance: none;
         }
 
+        .code-input:hover:not(:disabled) {
+            border-color: #dfb18a;
+        }
+
         .code-input:focus {
-            border-color: var(--primary-end);
+            border-color: var(--orange);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(217, 119, 50, .12);
+            transform: translateY(-2px);
+        }
 
-            outline: none;
-
-            box-shadow:
-                0 0 0 4px rgba(59, 130, 246, 0.2);
-
-            transform: scale(1.02);
+        .code-input.filled {
+            border-color: #e2b18a;
+            background: #fff8f0;
+            color: var(--orange-dark);
         }
 
         .code-input.error-otp {
-            border-color: var(--error-text);
-            background: #fef2f2;
+            border-color: var(--danger);
+            background: #fff0ed;
+            color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(191, 68, 53, .07);
         }
 
         .code-input:disabled {
-            opacity: 0.7;
+            opacity: .65;
             cursor: not-allowed;
         }
 
-        @media (max-width: 480px) {
-            .code-inputs {
-                gap: 6px;
-            }
-
-            .code-input {
-                width: clamp(42px, 13vw, 52px);
-                height: clamp(48px, 13vw, 58px);
-
-                font-size: clamp(1.2rem, 3.5vw, 1.4rem);
-
-                border-radius: 12px;
-
-                min-width: 38px;
-                min-height: 42px;
-            }
+        .otp-hint {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            margin-top: 10px;
+            color: #9a8778;
+            font-size: 10px;
+            line-height: 1.9;
         }
 
-        @media (max-width: 380px) {
-            .code-inputs {
-                gap: 4px;
-            }
-
-            .code-input {
-                width: clamp(36px, 11vw, 44px);
-                height: clamp(42px, 11vw, 50px);
-
-                font-size: clamp(1rem, 3vw, 1.2rem);
-
-                border-radius: 10px;
-
-                min-width: 32px;
-                min-height: 36px;
-            }
-        }
-
-        @media (max-width: 340px) {
-            .code-inputs {
-                gap: 3px;
-            }
-
-            .code-input {
-                width: clamp(30px, 10vw, 38px);
-                height: clamp(36px, 10vw, 44px);
-
-                font-size: clamp(0.9rem, 2.5vw, 1rem);
-
-                border-radius: 8px;
-
-                min-width: 28px;
-                min-height: 32px;
-
-                border-width: 1.5px;
-            }
+        .otp-hint i {
+            color: var(--orange);
         }
 
         .message-container {
             width: 100%;
-
             display: flex;
-
             justify-content: center;
-
-            margin-top: 0.75rem;
+            margin-top: 10px;
         }
 
         .error-message {
-            color: var(--error-text);
-
-            font-size: 0.75rem;
-
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #f0d0c9;
+            border-radius: 12px;
+            background: #fff0ed;
+            color: var(--danger);
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1.9;
             text-align: center;
-
-            background: #fee2e2;
-
-            padding: 0.35rem 1rem;
-
-            border-radius: 60px;
-
-            max-width: 100%;
+            overflow-wrap: anywhere;
         }
 
         .success-message {
-            color: var(--success-text);
-            background: #d1fae5;
+            border-color: #cde7d5;
+            background: #eff9f1;
+            color: var(--success);
         }
 
         .btn {
             width: 100%;
-
-            background:
-                linear-gradient(
-                    95deg,
-                    #ff8300,
-                    #000
-                );
-
-            border: none;
-
-            padding: 0.9rem 1rem;
-
-            border-radius: 60px;
-
-            font-size: 1rem;
-
-            font-weight: 700;
-
-            color: white;
-
-            cursor: pointer;
-
-            margin-top: 1.8rem;
-
-            font-family:
-                'IRANYekan',
-                'Vazirmatn',
-                sans-serif;
-
-            transition: all 0.2s;
-
-            box-shadow:
-                0 6px 14px -6px #2563eb70;
-
+            min-height: 54px;
             display: flex;
-
             align-items: center;
-
             justify-content: center;
-
-            gap: 8px;
+            gap: 10px;
+            margin-top: 17px;
+            padding: 14px 20px;
+            border: 1px solid #d97732;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #e58b4a, #c96328);
+            box-shadow: 0 10px 23px rgba(201, 99, 40, .22);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
         }
 
         .btn:hover:not(:disabled) {
+            filter: saturate(1.08);
+            box-shadow: 0 14px 28px rgba(201, 99, 40, .29);
             transform: translateY(-2px);
+        }
 
-            background:
-                linear-gradient(
-                    95deg,
-                    #1e3a8a,
-                    #2563eb
-                );
-
-            box-shadow:
-                0 12px 20px -10px #3b82f6;
+        .btn:active:not(:disabled) {
+            transform: scale(.985);
         }
 
         .btn:disabled {
-            opacity: 0.7;
-
+            opacity: .7;
+            cursor: wait;
             transform: none;
-
-            cursor: not-allowed;
         }
 
-        .timer-section {
-            text-align: center;
-
-            margin-top: 1.8rem;
-
-            padding: 0.7rem 1rem;
-
-            border-radius: 60px;
-
-            background: #f8fafc;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            gap: 12px;
-
-            flex-wrap: wrap;
-
-            font-size: 0.85rem;
-
-            font-weight: 500;
-
-            border: 1px solid #e2e8f0;
-        }
-
-        #timer {
-            font-weight: 800;
-
-            color: var(--primary-start);
-
-            background: white;
-
-            padding: 0.2rem 0.9rem;
-
-            border-radius: 40px;
-
-            font-family: monospace;
-
-            font-size: 1rem;
-
-            letter-spacing: 1px;
-
-            direction: ltr;
-        }
-
-        .resend-btn {
-            background: none;
-
-            border: none;
-
-            color: var(--primary-start);
-
-            font-weight: 700;
-
-            cursor: pointer;
-
-            font-family: inherit;
-
-            font-size: 0.85rem;
-
-            padding: 0.3rem 1rem;
-
-            border-radius: 40px;
-
-            transition: all 0.2s;
-        }
-
-        .resend-btn:hover:not(:disabled) {
-            background: #e0e7ff;
-            text-decoration: underline;
-        }
-
-        .resend-btn:disabled {
-            color: #94a3b8;
-
-            cursor: not-allowed;
-
-            opacity: 0.6;
+        .btn svg {
+            flex-shrink: 0;
         }
 
         .spinner-small {
             display: inline-block;
-
             width: 18px;
             height: 18px;
-
-            border: 2px solid rgba(255, 255, 255, 0.3);
-
+            flex-shrink: 0;
+            border: 2px solid rgba(255, 255, 255, .4);
+            border-top-color: #fff;
             border-radius: 50%;
-
-            border-top-color: white;
-
-            animation: spin 0.6s linear infinite;
+            animation: spin .7s linear infinite;
         }
 
         @keyframes spin {
@@ -558,1168 +621,1032 @@
             }
         }
 
-        .security-note {
-            text-align: center;
-
-            font-size: 0.65rem;
-
-            color: #5b6e8c;
-
-            margin-top: 1.5rem;
-
-            border-top: 1px solid #e2e8f0;
-
-            padding-top: 1rem;
+        .timer-card {
+            margin-top: 17px;
+            padding: 15px;
+            border: 1px solid #eddfd0;
+            border-radius: 16px;
+            background: rgba(255, 248, 240, .85);
         }
 
-        @media (max-width: 480px) {
-            .security-note {
-                font-size: 0.6rem;
+        .timer-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .timer-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #826b59;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .timer-label i {
+            color: var(--orange);
+            font-size: 14px;
+        }
+
+        #timer {
+            min-width: 68px;
+            padding: 6px 11px;
+            border: 1px solid #edd9c5;
+            border-radius: 10px;
+            background: #fffdf9;
+            color: var(--orange-dark);
+            font-family: "Vazirmatn", monospace;
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-align: center;
+            direction: ltr;
+            font-variant-numeric: tabular-nums;
+        }
+
+        #timer.expired {
+            border-color: #efc9c1;
+            background: #fff0ed;
+            color: var(--danger);
+        }
+
+        .timer-track {
+            width: 100%;
+            height: 5px;
+            overflow: hidden;
+            border-radius: 20px;
+            background: #f0dfcf;
+        }
+
+        .timer-progress {
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #c96328, #edb27f);
+            transform-origin: right center;
+            transition: width .3s linear;
+        }
+
+        .resend-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 13px;
+        }
+
+        .resend-description {
+            color: #9a8778;
+            font-size: 10px;
+            line-height: 1.8;
+        }
+
+        .resend-btn {
+            min-height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            flex-shrink: 0;
+            padding: 8px 12px;
+            border: 1px solid #e8d3bf;
+            border-radius: 11px;
+            background: #fffaf4;
+            color: var(--orange-dark);
+            font-size: 10px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: background .2s ease, border-color .2s ease, transform .2s ease;
+        }
+
+        .resend-btn:hover:not(:disabled) {
+            border-color: #e5b48c;
+            background: #fff0df;
+            transform: translateY(-1px);
+        }
+
+        .resend-btn:disabled {
+            border-color: #eadfd3;
+            background: #f5efe8;
+            color: #b7a99b;
+            cursor: not-allowed;
+        }
+
+        .footer-section {
+            margin-top: 21px;
+            padding-top: 16px;
+            border-top: 1px solid #f0e6dc;
+        }
+
+        .security-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #9a8778;
+            font-size: 10px;
+            line-height: 2;
+            text-align: center;
+        }
+
+        .security-note i {
+            color: var(--orange);
+            font-size: 14px;
+        }
+
+        .terms-note {
+            margin-top: 6px;
+            color: #b0a092;
+            font-size: 9px;
+            line-height: 1.9;
+            text-align: center;
+        }
+
+        .server-messages {
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 900px) {
+            body {
+                padding: 24px 16px;
+            }
+
+            .auth-layout {
+                grid-template-columns: minmax(0, 1fr) minmax(340px, 430px);
+                gap: 26px;
+            }
+
+            .brand-logo {
+                width: 72px;
+                height: 72px;
+                border-radius: 21px;
+            }
+
+            .brand-top {
+                gap: 12px;
+            }
+
+            .brand-title {
+                font-size: 34px;
+            }
+
+            .brand-features {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-card {
+                min-height: 85px;
+            }
+
+            .glass-auth-card {
+                padding: 29px 23px 23px;
+            }
+        }
+
+        @media (max-width: 720px) {
+            body {
+                padding: 18px 13px;
+            }
+
+            .auth-layout {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .brand-panel {
+                display: none;
+            }
+
+            .glass-auth-card {
+                max-width: 460px;
+                margin-inline: auto;
+                padding: 26px 23px 22px;
+            }
+
+            .card-logo {
+                width: 94px;
+                height: 94px;
+            }
+
+            .auth-header {
+                margin-bottom: 21px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            body {
+                padding: 12px;
+            }
+
+            .glass-auth-card {
+                padding: 23px 16px 19px;
+                border-radius: 23px;
+            }
+
+            .card-logo {
+                width: 84px;
+                height: 84px;
+                border-radius: 23px;
+            }
+
+            .auth-header h1 {
+                font-size: 23px;
+            }
+
+            .code-inputs {
+                gap: 7px;
+                padding: 11px 8px;
+                border-radius: 15px;
+            }
+
+            .code-input {
+                height: 55px;
+                border-radius: 11px;
+                font-size: 22px;
+            }
+
+            .timer-card {
+                padding: 12px;
+            }
+
+            .resend-description {
+                max-width: 125px;
+            }
+
+            .resend-btn {
+                padding-inline: 9px;
+            }
+        }
+
+        @media (max-width: 350px) {
+            .glass-auth-card {
+                padding-inline: 12px;
+            }
+
+            .code-inputs {
+                gap: 5px;
+                padding-inline: 6px;
+            }
+
+            .code-input {
+                height: 48px;
+                border-radius: 9px;
+                font-size: 19px;
+            }
+
+            .resend-row {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .resend-description {
+                max-width: none;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
+                scroll-behavior: auto !important;
             }
         }
     </style>
 </head>
 
 <body>
-
-<div class="glass-auth-card">
-
-    <!-- Logo -->
-    <div class="brand">
-        <div class="logo-circle">
-            <img
-                src="/media/images/deco.png"
-                alt="Deco B2B"
-                loading="lazy"
-            >
-        </div>
-    </div>
-
-
-    <!-- Header -->
-    <div class="auth-header">
-
-        <h1>تایید هویت</h1>
-
-        <p>
-            کد ۵ رقمی به شماره
-
-            <strong
-                class="mobile-number-highlight"
-                id="dynamic-mobile-display"
-            >
-                {{ mobile|default:"**********" }}
-            </strong>
-
-            ارسال شد
-        </p>
-
-    </div>
-
-
-    <!-- Verification Form -->
-    <form
-        id="verify-form"
-        method="post"
-        action=""
-        novalidate
-        autocomplete="off"
-    >
-
-        {% csrf_token %}
-
-
-        <div class="form-group">
-
-            <div
-                class="code-inputs"
-                id="otp-container"
-            >
-
-                <input
-                    type="text"
-                    name="code1"
-                    class="code-input"
-                    maxlength="1"
-                    inputmode="numeric"
-                    autocomplete="one-time-code"
-                    aria-label="رقم اول"
-                    autofocus
-                >
-
-                <input
-                    type="text"
-                    name="code2"
-                    class="code-input"
-                    maxlength="1"
-                    inputmode="numeric"
-                    aria-label="رقم دوم"
-                >
-
-                <input
-                    type="text"
-                    name="code3"
-                    class="code-input"
-                    maxlength="1"
-                    inputmode="numeric"
-                    aria-label="رقم سوم"
-                >
-
-                <input
-                    type="text"
-                    name="code4"
-                    class="code-input"
-                    maxlength="1"
-                    inputmode="numeric"
-                    aria-label="رقم چهارم"
-                >
-
-                <input
-                    type="text"
-                    name="code5"
-                    class="code-input"
-                    maxlength="1"
-                    inputmode="numeric"
-                    aria-label="رقم پنجم"
-                >
-
-            </div>
-
-
-            <!-- Django Messages -->
-            {% if messages %}
-
-                {% for message in messages %}
-
-                    <div class="message-container">
-
-                        <div
-                            class="error-message {% if message.tags != 'error' %}success-message{% endif %}"
-                        >
-                            {{ message }}
-                        </div>
-
+    <main class="page-shell">
+        <div class="auth-layout">
+            <section class="brand-panel" aria-label="معرفی Deco B2B">
+                <div class="brand-top">
+                    <div class="brand-logo">
+                        <img src="/media/images/deco.png" alt="لوگوی Deco B2B">
                     </div>
 
-                {% endfor %}
-
-            {% endif %}
-
-
-            <!-- Django Form Errors -->
-            {% if form.non_field_errors %}
-
-                <div class="message-container">
-
-                    <div class="error-message">
-
-                        {% for error in form.non_field_errors %}
-                            {{ error }}
-                        {% endfor %}
-
+                    <div class="brand-name">
+                        <strong>Deco B2B</strong>
+                        <span>WHOLESALE DECOR</span>
                     </div>
-
                 </div>
 
-            {% endif %}
+                <div class="eyebrow">امنیت حساب کاربری شما</div>
 
+                <h2 class="brand-title">
+                    یک قدم تا ورود به دنیای
+                    <span>دکوراسیون</span>
+                </h2>
 
-            <!-- Client Error -->
-            <div
-                id="client-error"
-                class="message-container"
-                style="display:none;"
-            >
-                <div class="error-message"></div>
-            </div>
+                <p class="brand-description">
+                    کد تأیید ارسال‌شده به شماره همراه خود را وارد کنید تا
+                    فرایند احراز هویت تکمیل شود و بتوانید به فضای اختصاصی
+                    کاربران Deco B2B دسترسی پیدا کنید.
+                </p>
 
+                <div class="features-heading">ورود امن و سریع</div>
+
+                <div class="brand-features">
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                        </div>
+                        <div class="feature-content">
+                            <strong>احراز هویت امن</strong>
+                            <span>تأیید شماره همراه برای محافظت از حساب کاربری</span>
+                        </div>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-key" aria-hidden="true"></i>
+                        </div>
+                        <div class="feature-content">
+                            <strong>کد یک‌بارمصرف</strong>
+                            <span>استفاده از کد پنج‌رقمی برای ادامه فرایند ورود</span>
+                        </div>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-clock" aria-hidden="true"></i>
+                        </div>
+                        <div class="feature-content">
+                            <strong>زمان اعتبار مشخص</strong>
+                            <span>مشاهده زمان باقی‌مانده برای استفاده از کد</span>
+                        </div>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+                        </div>
+                        <div class="feature-content">
+                            <strong>ارسال مجدد کد</strong>
+                            <span>در صورت پایان اعتبار، امکان درخواست کد جدید</span>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="brand-note">
+                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                    <span>تجربه‌ای اختصاصی برای تجارت حرفه‌ای دکوراسیون</span>
+                </div>
+            </section>
+
+            <section class="glass-auth-card" aria-labelledby="auth-title">
+                <div class="card-brand">
+                    <div class="card-logo">
+                        <img src="/media/images/deco.png" alt="لوگوی Deco B2B">
+                    </div>
+                    <span class="card-brand-name">DECO B2B</span>
+                </div>
+
+                <header class="auth-header">
+                    <h1 id="auth-title">تأیید هویت</h1>
+
+                    <p class="description">
+                        کد پنج‌رقمی ارسال‌شده به شماره همراه زیر را وارد کنید.
+                    </p>
+
+                    <span class="mobile-number-highlight" id="dynamic-mobile-display" dir="ltr">
+                        {{ mobile|default:"**********" }}
+                    </span>
+
+                    <div>
+                        <span class="subtitle">ورود امن به حساب کاربری</span>
+                    </div>
+                </header>
+
+                {% if messages %}
+                    <div class="server-messages" aria-live="polite">
+                        {% for message in messages %}
+                            <div class="message-container">
+                                <div class="error-message{% if 'error' not in message.tags and 'warning' not in message.tags %} success-message{% endif %}">
+                                    {{ message }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if form.non_field_errors %}
+                    <div class="server-messages" aria-live="polite">
+                        {% for error in form.non_field_errors %}
+                            <div class="message-container">
+                                <div class="error-message">{{ error }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form
+                    id="verify-form"
+                    method="post"
+                    action=""
+                    novalidate
+                    autocomplete="off"
+                >
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <div class="otp-heading">
+                            <span>کد تأیید پیامک‌شده</span>
+                            <span class="required-label">۵ رقم</span>
+                        </div>
+
+                        <div class="code-inputs" id="otp-container">
+                            <input
+                                type="text"
+                                name="code1"
+                                class="code-input"
+                                maxlength="1"
+                                inputmode="numeric"
+                                autocomplete="one-time-code"
+                                aria-label="رقم اول"
+                                autofocus
+                                required
+                            >
+
+                            <input
+                                type="text"
+                                name="code2"
+                                class="code-input"
+                                maxlength="1"
+                                inputmode="numeric"
+                                aria-label="رقم دوم"
+                                required
+                            >
+
+                            <input
+                                type="text"
+                                name="code3"
+                                class="code-input"
+                                maxlength="1"
+                                inputmode="numeric"
+                                aria-label="رقم سوم"
+                                required
+                            >
+
+                            <input
+                                type="text"
+                                name="code4"
+                                class="code-input"
+                                maxlength="1"
+                                inputmode="numeric"
+                                aria-label="رقم چهارم"
+                                required
+                            >
+
+                            <input
+                                type="text"
+                                name="code5"
+                                class="code-input"
+                                maxlength="1"
+                                inputmode="numeric"
+                                aria-label="رقم پنجم"
+                                required
+                            >
+                        </div>
+
+                        <div class="otp-hint">
+                            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                            <span>می‌توانید هر پنج رقم را یکجا وارد یا جای‌گذاری کنید.</span>
+                        </div>
+
+                        <div
+                            id="client-error"
+                            class="message-container"
+                            style="display: none;"
+                            aria-live="polite"
+                        >
+                            <div class="error-message"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="btn">
+                        <span id="submit-text">تأیید کد و ورود به پنل</span>
+
+                        <svg
+                            width="17"
+                            height="17"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            aria-hidden="true"
+                        >
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </form>
+
+                <section class="timer-card" aria-label="زمان اعتبار کد">
+                    <div class="timer-top">
+                        <div class="timer-label">
+                            <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                            <span>زمان اعتبار کد</span>
+                        </div>
+
+                        <span id="timer" role="timer" aria-live="off">--:--</span>
+                    </div>
+
+                    <div
+                        class="timer-track"
+                        role="progressbar"
+                        aria-label="زمان باقی‌مانده اعتبار کد"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        aria-valuenow="100"
+                        id="timer-track"
+                    >
+                        <div class="timer-progress" id="timer-progress"></div>
+                    </div>
+
+                    <div class="resend-row">
+                        <span class="resend-description" id="resend-description">
+                            پس از پایان زمان، می‌توانید کد جدید دریافت کنید.
+                        </span>
+
+                        <button
+                            type="button"
+                            id="resend-code"
+                            class="resend-btn"
+                            disabled
+                        >
+                            <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+                            <span>ارسال مجدد کد</span>
+                        </button>
+                    </div>
+                </section>
+
+                <footer class="footer-section">
+                    <div class="security-note">
+                        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                        <span>کد تأیید خود را در اختیار دیگران قرار ندهید.</span>
+                    </div>
+
+                    <div class="terms-note">
+                        امنیت حساب شما برای Deco B2B اهمیت دارد.
+                    </div>
+                </footer>
+            </section>
         </div>
-
-
-        <!-- Submit -->
-        <button
-            type="submit"
-            id="submit-btn"
-            class="btn"
-        >
-
-            <span id="submit-text">
-                تأیید و ورود به پنل
-            </span>
-
-            <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                aria-hidden="true"
-            >
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-
-        </button>
-
-    </form>
-
-
-    <!-- Timer -->
-    <div class="timer-section">
-
-        <span>
-            🕒 زمان اعتبار کد:
-        </span>
-
-        <span id="timer">
-            --:--
-        </span>
-
-        <span>
-            |
-        </span>
-
-        <button
-            type="button"
-            id="resend-code"
-            class="resend-btn"
-            disabled
-        >
-            ارسال مجدد کد
-        </button>
-
-    </div>
-
-
-    <!-- Security -->
-    <div class="security-note">
-
-        <i class="fa-regular fa-shield"></i>
-
-        کد احراز هویت محرمانه است
-        |
-        امنیت حساب شما برای ما اولویت دارد
-
-    </div>
-
-</div>
-
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    const inputs = Array.from(
-        document.querySelectorAll(".code-input")
-    );
-
-    const verifyForm =
-        document.getElementById("verify-form");
-
-    const submitBtn =
-        document.getElementById("submit-btn");
-
-    const clientErrorDiv =
-        document.getElementById("client-error");
-
-    const resendBtn =
-        document.getElementById("resend-code");
-
-    const timerElement =
-        document.getElementById("timer");
-
-
-    let timeLeft =
-        parseInt(
-            "{{ remaining_seconds|default:'0' }}",
-            10
-        );
-
-    let isResending = false;
-
-    let isSubmitting = false;
-
-    let timerInterval = null;
-
-
-    /* ============================================================
-       تبدیل اعداد فارسی و عربی به انگلیسی
-       ============================================================ */
-
-    function normalizeDigits(value) {
-
-        return String(value || "")
-            .replace(/[۰-۹]/g, function (digit) {
-                return String(
-                    "۰۱۲۳۴۵۶۷۸۹".indexOf(digit)
-                );
-            })
-            .replace(/[٠-٩]/g, function (digit) {
-                return String(
-                    "٠١٢٣٤٥٦٧٨٩".indexOf(digit)
-                );
-            })
-            .replace(/[^0-9]/g, "");
-
-    }
-
-
-    /* ============================================================
-       Focus next
-       ============================================================ */
-
-    function focusNext(index) {
-
-        if (index < inputs.length - 1) {
-
-            inputs[index + 1].focus();
-
-        }
-
-    }
-
-
-    /* ============================================================
-       Focus previous
-       ============================================================ */
-
-    function focusPrev(index) {
-
-        if (index > 0) {
-
-            inputs[index - 1].focus();
-
-        }
-
-    }
-
-
-    /* ============================================================
-       Input events
-       ============================================================ */
-
-    inputs.forEach(function (input, idx) {
-
-
-        input.addEventListener("input", function () {
-
-            if (isSubmitting) {
-                return;
-            }
-
-
-            let value =
-                normalizeDigits(
-                    input.value
-                );
-
-
-            /*
-             * فقط یک رقم در هر باکس
-             */
-
-            if (value.length > 1) {
-                value = value.slice(0, 1);
-            }
-
-
-            input.value = value;
-
-
-            input.classList.remove(
-                "error-otp"
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            "use strict";
+
+            const inputs = Array.from(document.querySelectorAll(".code-input"));
+            const verifyForm = document.getElementById("verify-form");
+            const submitBtn = document.getElementById("submit-btn");
+            const clientErrorDiv = document.getElementById("client-error");
+            const resendBtn = document.getElementById("resend-code");
+            const timerElement = document.getElementById("timer");
+            const timerProgress = document.getElementById("timer-progress");
+            const timerTrack = document.getElementById("timer-track");
+            const resendDescription = document.getElementById("resend-description");
+
+            const initialSeconds = Math.max(
+                0,
+                Number.parseInt("{{ remaining_seconds|default:'0' }}", 10) || 0
             );
 
+            let timeLeft = initialSeconds;
+            let timerDuration = initialSeconds;
+            let isResending = false;
+            let isSubmitting = false;
+            let timerInterval = null;
 
-            if (clientErrorDiv) {
-                clientErrorDiv.style.display =
-                    "none";
+            const originalButtonContent = submitBtn.innerHTML;
+            const originalResendContent = resendBtn.innerHTML;
+
+            function normalizeDigits(value) {
+                return String(value || "")
+                    .replace(/[۰-۹]/g, function (digit) {
+                        return String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit));
+                    })
+                    .replace(/[٠-٩]/g, function (digit) {
+                        return String("٠١٢٣٤٥٦٧٨٩".indexOf(digit));
+                    })
+                    .replace(/[^0-9]/g, "");
             }
 
-
-            /*
-             * رفتن به خانه بعدی
-             */
-
-            if (
-                value &&
-                idx < inputs.length - 1
-            ) {
-
-                focusNext(idx);
-
-            }
-
-        });
-
-
-        /* ========================================================
-           Keyboard
-           ======================================================== */
-
-        input.addEventListener(
-            "keydown",
-            function (e) {
-
-                if (isSubmitting) {
+            function showClientMessage(message, isError) {
+                if (!clientErrorDiv) {
                     return;
                 }
 
+                const box = clientErrorDiv.querySelector(".error-message");
 
-                /*
-                 * Backspace
-                 */
-
-                if (
-                    e.key === "Backspace" &&
-                    !input.value &&
-                    idx > 0
-                ) {
-
-                    e.preventDefault();
-
-                    focusPrev(idx);
-
+                if (!box) {
+                    return;
                 }
 
+                box.textContent = message;
+                box.classList.toggle("success-message", !isError);
+                clientErrorDiv.style.display = "flex";
+            }
 
-                /*
-                 * Arrow Right
-                 */
+            function clearClientMessage() {
+                if (clientErrorDiv) {
+                    clientErrorDiv.style.display = "none";
 
-                if (
-                    e.key === "ArrowRight" &&
-                    idx < inputs.length - 1
-                ) {
+                    const box = clientErrorDiv.querySelector(".error-message");
 
-                    e.preventDefault();
+                    if (box) {
+                        box.textContent = "";
+                        box.classList.remove("success-message");
+                    }
+                }
+            }
 
-                    focusNext(idx);
+            function updateInputState(input) {
+                input.classList.toggle("filled", Boolean(input.value));
+            }
 
+            function focusNext(index) {
+                if (index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            }
+
+            function focusPrev(index) {
+                if (index > 0) {
+                    inputs[index - 1].focus();
+                }
+            }
+
+            function fillCode(value, startIndex) {
+                const digits = normalizeDigits(value).slice(0, inputs.length);
+
+                if (!digits) {
+                    return;
                 }
 
+                const start = Math.max(0, Math.min(startIndex, inputs.length - 1));
 
-                /*
-                 * Arrow Left
-                 */
-
-                if (
-                    e.key === "ArrowLeft" &&
-                    idx > 0
-                ) {
-
-                    e.preventDefault();
-
-                    focusPrev(idx);
-
+                for (let i = 0; i < digits.length && start + i < inputs.length; i++) {
+                    inputs[start + i].value = digits[i];
+                    inputs[start + i].classList.remove("error-otp");
+                    updateInputState(inputs[start + i]);
                 }
 
+                clearClientMessage();
 
-                /*
-                 * Enter
-                 *
-                 * مهم:
-                 * dispatchEvent حذف شده
-                 */
+                const nextIndex = Math.min(start + digits.length, inputs.length - 1);
 
-                if (e.key === "Enter") {
+                if (digits.length === inputs.length && start === 0) {
+                    inputs[inputs.length - 1].focus();
+                } else {
+                    inputs[nextIndex].focus();
+                }
+            }
 
-                    e.preventDefault();
-
-                    if (!isSubmitting) {
-
-                        verifyForm.requestSubmit();
-
+            inputs.forEach(function (input, index) {
+                input.addEventListener("input", function () {
+                    if (isSubmitting) {
+                        return;
                     }
 
-                }
-
-            }
-        );
-
-
-        /* ========================================================
-           Paste
-           ======================================================== */
-
-        input.addEventListener(
-            "paste",
-            function (e) {
-
-                e.preventDefault();
-
-
-                if (isSubmitting) {
-                    return;
-                }
-
-
-                const clipboard =
-                    e.clipboardData ||
-                    window.clipboardData;
-
-
-                if (!clipboard) {
-                    return;
-                }
-
-
-                let pasteData =
-                    normalizeDigits(
-                        clipboard.getData("text")
-                    );
-
-
-                if (!pasteData) {
-                    return;
-                }
-
-
-                /*
-                 * حداکثر ۵ رقم
-                 */
-
-                pasteData =
-                    pasteData.slice(
-                        0,
-                        inputs.length
-                    );
-
-
-                /*
-                 * پر کردن خانه‌ها
-                 */
-
-                for (
-                    let i = 0;
-                    i < inputs.length;
-                    i++
-                ) {
-
-                    inputs[i].value =
-                        pasteData[i] || "";
-
-                }
-
-
-                /*
-                 * فوکوس
-                 */
-
-                const focusIndex =
-                    Math.min(
-                        pasteData.length,
-                        inputs.length - 1
-                    );
-
-
-                inputs[focusIndex].focus();
-
-
-                /*
-                 * اگر کامل بود submit
-                 */
-
-                const allFilled =
-                    inputs.every(function (inp) {
-                        return inp.value.length === 1;
-                    });
-
-
-                if (
-                    allFilled &&
-                    !isSubmitting
-                ) {
-
-                    setTimeout(
-                        function () {
-
-                            verifyForm.requestSubmit();
-
-                        },
-                        100
-                    );
-
-                }
-
-            }
-        );
-
-
-        /* ========================================================
-           Focus
-           ======================================================== */
-
-        input.addEventListener(
-            "focus",
-            function () {
-
-                if (clientErrorDiv) {
-                    clientErrorDiv.style.display =
-                        "none";
-                }
-
-                input.classList.remove(
-                    "error-otp"
-                );
-
-            }
-        );
-
-    });
-
-
-    /* ============================================================
-       Submit
-       ============================================================ */
-
-    verifyForm.addEventListener(
-        "submit",
-        function (e) {
-
-            /*
-             * جلوگیری از submit دوباره
-             */
-
-            if (isSubmitting) {
-
-                e.preventDefault();
-
-                return;
-
-            }
-
-
-            let otpCode = "";
-
-            let isValid = true;
-
-
-            /* ====================================================
-               Normalize + validate
-               ==================================================== */
-
-            inputs.forEach(function (inp) {
-
-                const value =
-                    normalizeDigits(
-                        inp.value.trim()
-                    );
-
-
-                /*
-                 * فقط یک رقم
-                 */
-
-                inp.value =
-                    value.slice(0, 1);
-
-
-                if (
-                    !inp.value ||
-                    !/^[0-9]$/.test(inp.value)
-                ) {
-
-                    inp.classList.add(
-                        "error-otp"
-                    );
-
-                    isValid = false;
-
-                } else {
-
-                    otpCode += inp.value;
-
-                }
-
+                    const digits = normalizeDigits(input.value);
+
+                    if (digits.length > 1) {
+                        input.value = "";
+                        fillCode(digits, index);
+                        return;
+                    }
+
+                    input.value = digits;
+                    input.classList.remove("error-otp");
+                    updateInputState(input);
+                    clearClientMessage();
+
+                    if (digits) {
+                        focusNext(index);
+                    }
+                });
+
+                input.addEventListener("keydown", function (event) {
+                    if (isSubmitting) {
+                        return;
+                    }
+
+                    if (event.key === "Backspace" && !input.value && index > 0) {
+                        event.preventDefault();
+                        inputs[index - 1].value = "";
+                        updateInputState(inputs[index - 1]);
+                        focusPrev(index);
+                        return;
+                    }
+
+                    if (event.key === "ArrowRight" && index < inputs.length - 1) {
+                        event.preventDefault();
+                        focusNext(index);
+                        return;
+                    }
+
+                    if (event.key === "ArrowLeft" && index > 0) {
+                        event.preventDefault();
+                        focusPrev(index);
+                        return;
+                    }
+
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        verifyForm.requestSubmit();
+                    }
+                });
+
+                input.addEventListener("paste", function (event) {
+                    if (isSubmitting) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    const clipboard = event.clipboardData || window.clipboardData;
+
+                    if (!clipboard) {
+                        return;
+                    }
+
+                    const pastedText = normalizeDigits(clipboard.getData("text"));
+
+                    if (pastedText) {
+                        fillCode(pastedText.slice(0, inputs.length), 0);
+
+                        if (pastedText.length >= inputs.length) {
+                            inputs[inputs.length - 1].focus();
+                        }
+                    }
+                });
+
+                input.addEventListener("focus", function () {
+                    if (!isSubmitting) {
+                        input.select();
+                        clearClientMessage();
+                        input.classList.remove("error-otp");
+                    }
+                });
+
+                input.addEventListener("blur", function () {
+                    updateInputState(input);
+                });
             });
 
-
-            /* ====================================================
-               Validation
-               ==================================================== */
-
-            if (
-                !isValid ||
-                otpCode.length !== 5
-            ) {
-
-                e.preventDefault();
-
-
-                if (clientErrorDiv) {
-
-                    clientErrorDiv.style.display =
-                        "block";
-
-                    clientErrorDiv.innerHTML =
-                        "⚠️ کد ۵ رقمی را کامل و عددی وارد کنید";
-
-                    clientErrorDiv.style.background =
-                        "#fee2e2";
-
-                    clientErrorDiv.style.color =
-                        "#dc2626";
-
+            verifyForm.addEventListener("submit", function (event) {
+                if (isSubmitting) {
+                    event.preventDefault();
+                    return;
                 }
 
+                let otpCode = "";
+                let isValid = true;
 
-                return false;
+                inputs.forEach(function (input) {
+                    const value = normalizeDigits(input.value).slice(0, 1);
 
-            }
+                    input.value = value;
+                    updateInputState(input);
 
+                    if (!value || !/^[0-9]$/.test(value)) {
+                        input.classList.add("error-otp");
+                        isValid = false;
+                    } else {
+                        input.classList.remove("error-otp");
+                        otpCode += value;
+                    }
+                });
 
-            /* ====================================================
-               verification_code
-               ==================================================== */
+                if (!isValid || otpCode.length !== 5) {
+                    event.preventDefault();
 
-            let hiddenFullCode =
-                document.querySelector(
+                    showClientMessage("کد پنج‌رقمی را کامل و به‌صورت عددی وارد کنید.", true);
+
+                    const firstInvalid = inputs.find(function (input) {
+                        return !input.value;
+                    });
+
+                    if (firstInvalid) {
+                        firstInvalid.focus();
+                    }
+
+                    return;
+                }
+
+                let hiddenFullCode = verifyForm.querySelector(
                     'input[name="verification_code"]'
                 );
 
-
-            if (!hiddenFullCode) {
-
-                hiddenFullCode =
-                    document.createElement("input");
-
-                hiddenFullCode.type =
-                    "hidden";
-
-                hiddenFullCode.name =
-                    "verification_code";
-
-                verifyForm.appendChild(
-                    hiddenFullCode
-                );
-
-            }
-
-
-            hiddenFullCode.value =
-                otpCode;
-
-
-            /* ====================================================
-               Submit lock
-               ==================================================== */
-
-            isSubmitting = true;
-
-
-            submitBtn.disabled = true;
-
-
-            submitBtn.innerHTML =
-                '<span class="spinner-small"></span>' +
-                '<span>در حال بررسی کد...</span>';
-
-
-            /*
-             * خیلی مهم:
-             *
-             * اینجا preventDefault نداریم.
-             *
-             * بنابراین فرم به صورت عادی POST می‌شود.
-             */
-
-            return true;
-
-        }
-    );
-
-
-    /* ============================================================
-       Show message
-       ============================================================ */
-
-    function showMessage(
-        text,
-        isError = true
-    ) {
-
-        const msgDiv =
-            document.createElement("div");
-
-
-        msgDiv.className =
-            isError
-                ? "error-message"
-                : "error-message success-message";
-
-
-        msgDiv.textContent =
-            (isError ? "❌ " : "✅ ") +
-            text;
-
-
-        const formGroup =
-            document.querySelector(
-                ".form-group"
-            );
-
-
-        if (formGroup) {
-
-            formGroup.appendChild(
-                msgDiv
-            );
-
-        }
-
-
-        setTimeout(
-            function () {
-
-                msgDiv.remove();
-
-            },
-            3500
-        );
-
-    }
-
-
-    /* ============================================================
-       Resend
-       ============================================================ */
-
-    if (resendBtn) {
-
-        resendBtn.addEventListener(
-            "click",
-            function () {
-
-                if (
-                    resendBtn.disabled ||
-                    isResending
-                ) {
-
-                    return;
-
+                if (!hiddenFullCode) {
+                    hiddenFullCode = document.createElement("input");
+                    hiddenFullCode.type = "hidden";
+                    hiddenFullCode.name = "verification_code";
+                    verifyForm.appendChild(hiddenFullCode);
                 }
 
+                hiddenFullCode.value = otpCode;
 
-                isResending = true;
+                isSubmitting = true;
+                submitBtn.disabled = true;
+                inputs.forEach(function (input) {
+                    input.disabled = true;
+                });
 
-                resendBtn.disabled = true;
+                submitBtn.innerHTML =
+                    '<span class="spinner-small" aria-hidden="true"></span>' +
+                    '<span>در حال بررسی کد...</span>';
+            });
 
+            function updateTimerDisplay() {
+                const safeTime = Math.max(0, timeLeft);
+                const minutes = Math.floor(safeTime / 60);
+                const seconds = String(safeTime % 60).padStart(2, "0");
 
-                const originalText =
-                    resendBtn.innerText;
+                timerElement.textContent = minutes + ":" + seconds;
 
+                const percentage = timerDuration > 0
+                    ? Math.max(0, Math.min(100, (safeTime / timerDuration) * 100))
+                    : 0;
 
-                resendBtn.innerText =
-                    "در حال ارسال...";
+                timerProgress.style.width = percentage + "%";
+                timerTrack.setAttribute("aria-valuenow", String(Math.round(percentage)));
 
+                const expired = safeTime <= 0;
 
-                const formData =
-                    new FormData();
+                timerElement.classList.toggle("expired", expired);
 
+                if (resendBtn && !isResending) {
+                    resendBtn.disabled = !expired;
+                }
 
-                const csrfToken =
-                    document.querySelector(
+                if (resendDescription) {
+                    resendDescription.textContent = expired
+                        ? "زمان کد به پایان رسیده است؛ کد جدید درخواست کنید."
+                        : "پس از پایان زمان، می‌توانید کد جدید دریافت کنید.";
+                }
+            }
+
+            function startTimer() {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    return;
+                }
+
+                timerInterval = setInterval(function () {
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        timeLeft = 0;
+                        updateTimerDisplay();
+                        return;
+                    }
+
+                    timeLeft -= 1;
+                    updateTimerDisplay();
+                }, 1000);
+            }
+
+            function showTemporaryMessage(message, isError) {
+                clearClientMessage();
+                showClientMessage(message, isError);
+
+                if (!isError) {
+                    window.setTimeout(function () {
+                        clearClientMessage();
+                    }, 4000);
+                }
+            }
+
+            if (resendBtn) {
+                resendBtn.addEventListener("click", async function () {
+                    if (resendBtn.disabled || isResending || isSubmitting) {
+                        return;
+                    }
+
+                    isResending = true;
+                    resendBtn.disabled = true;
+                    resendBtn.innerHTML =
+                        '<span class="spinner-small" aria-hidden="true"></span>' +
+                        '<span>در حال ارسال...</span>';
+
+                    const formData = new FormData();
+                    const csrfToken = verifyForm.querySelector(
                         "[name=csrfmiddlewaretoken]"
                     );
 
-
-                if (csrfToken) {
-
-                    formData.append(
-                        "csrfmiddlewaretoken",
-                        csrfToken.value
-                    );
-
-                }
-
-
-                formData.append(
-                    "resend",
-                    "true"
-                );
-
-
-                fetch(
-                    window.location.href,
-                    {
-                        method: "POST",
-
-                        body: formData,
-
-                        credentials: "same-origin",
-
-                        headers: {
-                            "X-Requested-With":
-                                "XMLHttpRequest",
-
-                            "Accept":
-                                "application/json"
-                        }
+                    if (csrfToken) {
+                        formData.append("csrfmiddlewaretoken", csrfToken.value);
                     }
-                )
-                    .then(function (response) {
 
-                        if (!response.ok) {
+                    formData.append("resend", "true");
 
-                            throw new Error(
-                                "HTTP " +
-                                response.status
-                            );
+                    try {
+                        const response = await fetch(window.location.href, {
+                            method: "POST",
+                            body: formData,
+                            credentials: "same-origin",
+                            headers: {
+                                "X-Requested-With": "XMLHttpRequest",
+                                "Accept": "application/json"
+                            }
+                        });
 
+                        const contentType = response.headers.get("content-type") || "";
+
+                        if (!contentType.includes("application/json")) {
+                            throw new Error("پاسخ سرور قابل پردازش نیست.");
                         }
 
+                        const data = await response.json();
 
-                        return response.json();
-
-                    })
-                    .then(function (data) {
-
-                        if (data.success) {
-
-                            timeLeft =
-                                Number(
-                                    data.remaining_seconds
-                                ) || 120;
-
-
-                            updateTimerDisplay();
-
-
-                            if (timerInterval) {
-
-                                clearInterval(
-                                    timerInterval
-                                );
-
-                            }
-
-
-                            startTimer();
-
-
-                            showMessage(
-                                "کد جدید با موفقیت ارسال شد",
-                                false
-                            );
-
-
-                            /*
-                             * پاک کردن OTP
-                             */
-
-                            inputs.forEach(
-                                function (inp) {
-                                    inp.value = "";
-                                    inp.classList.remove(
-                                        "error-otp"
-                                    );
-                                }
-                            );
-
-
-                            /*
-                             * آزاد کردن submit
-                             */
-
-                            isSubmitting = false;
-
-
-                            submitBtn.disabled =
-                                false;
-
-
-                            submitBtn.innerHTML =
-                                '<span>تأیید و ورود به پنل</span>' +
-                                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-                                '<path d="M5 12h14M12 5l7 7-7 7"/>' +
-                                '</svg>';
-
-
-                            inputs[0].focus();
-
-                        } else {
-
-                            showMessage(
-                                data.error ||
-                                "خطا در ارسال مجدد",
+                        if (!response.ok || !data.success) {
+                            showTemporaryMessage(
+                                data.error || "ارسال مجدد کد انجام نشد. دوباره تلاش کنید.",
                                 true
                             );
 
-
                             if (timeLeft <= 0) {
-                                resendBtn.disabled =
-                                    false;
+                                resendBtn.disabled = false;
                             }
 
+                            return;
                         }
 
+                        const newRemainingSeconds = Number(data.remaining_seconds);
 
-                        resendBtn.innerText =
-                            originalText;
+                        timeLeft = Number.isFinite(newRemainingSeconds) &&
+                            newRemainingSeconds > 0
+                            ? newRemainingSeconds
+                            : 120;
 
+                        timerDuration = timeLeft;
 
-                        isResending = false;
+                        inputs.forEach(function (input) {
+                            input.value = "";
+                            input.disabled = false;
+                            input.classList.remove("error-otp", "filled");
+                        });
 
-                    })
-                    .catch(function (error) {
+                        isSubmitting = false;
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalButtonContent;
 
-                        console.error(
-                            "Fetch Error:",
-                            error
-                        );
-
-
-                        showMessage(
-                            "خطا در ارتباط با سرور",
+                        clearClientMessage();
+                        startTimer();
+                        showTemporaryMessage("کد جدید با موفقیت ارسال شد.", false);
+                        inputs[0].focus();
+                    } catch (error) {
+                        showTemporaryMessage(
+                            "ارتباط با سرور برقرار نشد. اتصال خود را بررسی کنید.",
                             true
                         );
 
-
-                        resendBtn.innerText =
-                            originalText;
-
-
-                        resendBtn.disabled =
-                            false;
-
-
-                        isResending = false;
-
-                    });
-
-            }
-        );
-
-    }
-
-
-    /* ============================================================
-       Timer display
-       ============================================================ */
-
-    function updateTimerDisplay() {
-
-        const minutes =
-            Math.floor(
-                timeLeft / 60
-            );
-
-
-        let seconds =
-            timeLeft % 60;
-
-
-        seconds =
-            seconds < 10
-                ? "0" + seconds
-                : seconds;
-
-
-        timerElement.textContent =
-            `${minutes}:${seconds}`;
-
-    }
-
-
-    /* ============================================================
-       Timer
-       ============================================================ */
-
-    function startTimer() {
-
-        if (timerInterval) {
-
-            clearInterval(
-                timerInterval
-            );
-
-        }
-
-
-        timerInterval =
-            setInterval(
-                function () {
-
-                    if (timeLeft <= 0) {
-
-                        clearInterval(
-                            timerInterval
-                        );
-
-                        timerInterval = null;
-
-
-                        timerElement.textContent =
-                            "0:00";
-
-
-                        if (resendBtn) {
-
-                            resendBtn.disabled =
-                                false;
-
+                        if (timeLeft <= 0) {
+                            resendBtn.disabled = false;
                         }
+                    } finally {
+                        isResending = false;
+                        resendBtn.innerHTML = originalResendContent;
 
-
-                        return;
-
+                        if (timeLeft > 0) {
+                            resendBtn.disabled = true;
+                        } else {
+                            resendBtn.disabled = false;
+                        }
                     }
+                });
+            }
 
+            window.addEventListener("pageshow", function () {
+                if (!verifyForm.isConnected) {
+                    return;
+                }
 
-                    timeLeft--;
+                isSubmitting = false;
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalButtonContent;
 
-                    updateTimerDisplay();
+                inputs.forEach(function (input) {
+                    input.disabled = false;
+                });
+            });
 
-
-                    if (
-                        timeLeft === 0 &&
-                        resendBtn
-                    ) {
-
-                        resendBtn.disabled =
-                            false;
-
-                    }
-
-                },
-                1000
-            );
-
-    }
-
-
-    /* ============================================================
-       Initial timer
-       ============================================================ */
-
-    if (
-        timeLeft > 0 &&
-        !isNaN(timeLeft)
-    ) {
-
-        updateTimerDisplay();
-
-        startTimer();
-
-    } else {
-
-        timeLeft = 0;
-
-        timerElement.textContent =
-            "0:00";
-
-
-        if (resendBtn) {
-
-            resendBtn.disabled =
-                false;
-
-        }
-
-    }
-
-});
-</script>
-
+            inputs.forEach(updateInputState);
+            startTimer();
+        });
+    </script>
 </body>
 </html>
