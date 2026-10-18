@@ -1,4 +1,3 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
@@ -1060,57 +1059,11 @@
                         </div>
 
                         <div class="code-inputs" id="otp-container">
-                            <input
-                                type="text"
-                                name="code1"
-                                class="code-input"
-                                maxlength="1"
-                                inputmode="numeric"
-                                autocomplete="one-time-code"
-                                aria-label="رقم اول"
-                                autofocus
-                                required
-                            >
-
-                            <input
-                                type="text"
-                                name="code2"
-                                class="code-input"
-                                maxlength="1"
-                                inputmode="numeric"
-                                aria-label="رقم دوم"
-                                required
-                            >
-
-                            <input
-                                type="text"
-                                name="code3"
-                                class="code-input"
-                                maxlength="1"
-                                inputmode="numeric"
-                                aria-label="رقم سوم"
-                                required
-                            >
-
-                            <input
-                                type="text"
-                                name="code4"
-                                class="code-input"
-                                maxlength="1"
-                                inputmode="numeric"
-                                aria-label="رقم چهارم"
-                                required
-                            >
-
-                            <input
-                                type="text"
-                                name="code5"
-                                class="code-input"
-                                maxlength="1"
-                                inputmode="numeric"
-                                aria-label="رقم پنجم"
-                                required
-                            >
+                            <input type="text" name="code1" class="code-input" inputmode="numeric" pattern="[0-9]*" enterkeyhint="next" autocomplete="one-time-code" aria-label="رقم اول" autofocus required>
+                            <input type="text" name="code2" class="code-input" inputmode="numeric" pattern="[0-9]*" enterkeyhint="next" autocomplete="off" aria-label="رقم دوم" required>
+                            <input type="text" name="code3" class="code-input" inputmode="numeric" pattern="[0-9]*" enterkeyhint="next" autocomplete="off" aria-label="رقم سوم" required>
+                            <input type="text" name="code4" class="code-input" inputmode="numeric" pattern="[0-9]*" enterkeyhint="next" autocomplete="off" aria-label="رقم چهارم" required>
+                            <input type="text" name="code5" class="code-input" inputmode="numeric" pattern="[0-9]*" enterkeyhint="done" autocomplete="off" aria-label="رقم پنجم" required>
                         </div>
 
                         <div class="otp-hint">
@@ -1199,454 +1152,409 @@
     </main>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            "use strict";
+    document.addEventListener("DOMContentLoaded", function () {
+        "use strict";
 
-            const inputs = Array.from(document.querySelectorAll(".code-input"));
-            const verifyForm = document.getElementById("verify-form");
-            const submitBtn = document.getElementById("submit-btn");
-            const clientErrorDiv = document.getElementById("client-error");
-            const resendBtn = document.getElementById("resend-code");
-            const timerElement = document.getElementById("timer");
-            const timerProgress = document.getElementById("timer-progress");
-            const timerTrack = document.getElementById("timer-track");
-            const resendDescription = document.getElementById("resend-description");
+        const inputs = Array.from(document.querySelectorAll(".code-input"));
+        const verifyForm = document.getElementById("verify-form");
+        const submitBtn = document.getElementById("submit-btn");
+        const clientErrorDiv = document.getElementById("client-error");
+        const resendBtn = document.getElementById("resend-code");
+        const timerElement = document.getElementById("timer");
+        const timerProgress = document.getElementById("timer-progress");
+        const timerTrack = document.getElementById("timer-track");
+        const resendDescription = document.getElementById("resend-description");
 
-            const initialSeconds = Math.max(
-                0,
-                Number.parseInt("{{ remaining_seconds|default:'0' }}", 10) || 0
-            );
+        const initialSeconds = Math.max(
+            0,
+            Number.parseInt("{{ remaining_seconds|default:'0' }}", 10) || 0
+        );
 
-            let timeLeft = initialSeconds;
-            let timerDuration = initialSeconds;
-            let isResending = false;
-            let isSubmitting = false;
-            let timerInterval = null;
+        let timeLeft = initialSeconds;
+        let timerDuration = initialSeconds;
+        let isResending = false;
+        let isSubmitting = false;
+        let timerInterval = null;
 
-            const originalButtonContent = submitBtn.innerHTML;
-            const originalResendContent = resendBtn.innerHTML;
+        const originalButtonContent = submitBtn.innerHTML;
+        const originalResendContent = resendBtn.innerHTML;
 
-            function normalizeDigits(value) {
-                return String(value || "")
-                    .replace(/[۰-۹]/g, function (digit) {
-                        return String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit));
-                    })
-                    .replace(/[٠-٩]/g, function (digit) {
-                        return String("٠١٢٣٤٥٦٧٨٩".indexOf(digit));
-                    })
-                    .replace(/[^0-9]/g, "");
+        const PERSIAN = "۰۱۲۳۴۵۶۷۸۹";
+        const ARABIC = "٠١٢٣٤٥٦٧٨٩";
+        const DIGIT_KEY = /^[0-9۰-۹٠-٩]$/;
+
+        /* تبدیل ارقام فارسی/عربی به انگلیسی و حذف هر کاراکتر غیرعددی */
+        function normalizeDigits(value) {
+            return String(value || "")
+                .replace(/[۰-۹]/g, function (d) { return String(PERSIAN.indexOf(d)); })
+                .replace(/[٠-٩]/g, function (d) { return String(ARABIC.indexOf(d)); })
+                .replace(/[^0-9]/g, "");
+        }
+
+        function showClientMessage(message, isError) {
+            if (!clientErrorDiv) return;
+            const box = clientErrorDiv.querySelector(".error-message");
+            if (!box) return;
+            box.textContent = message;
+            box.classList.toggle("success-message", !isError);
+            clientErrorDiv.style.display = "flex";
+        }
+
+        function clearClientMessage() {
+            if (!clientErrorDiv) return;
+            clientErrorDiv.style.display = "none";
+            const box = clientErrorDiv.querySelector(".error-message");
+            if (box) {
+                box.textContent = "";
+                box.classList.remove("success-message");
+            }
+        }
+
+        function updateInputState(input) {
+            input.classList.toggle("filled", Boolean(input.value));
+        }
+
+        function focusNext(index) {
+            if (index < inputs.length - 1) inputs[index + 1].focus();
+        }
+
+        function focusPrev(index) {
+            if (index > 0) inputs[index - 1].focus();
+        }
+
+        function fillCode(value, startIndex) {
+            const start = Math.max(0, Math.min(startIndex, inputs.length - 1));
+            const digits = normalizeDigits(value).slice(0, inputs.length - start);
+            if (!digits) return;
+
+            for (let i = 0; i < digits.length; i++) {
+                const el = inputs[start + i];
+                el.value = digits[i];
+                el.classList.remove("error-otp");
+                updateInputState(el);
             }
 
-            function showClientMessage(message, isError) {
-                if (!clientErrorDiv) {
-                    return;
-                }
+            clearClientMessage();
+            inputs[Math.min(start + digits.length, inputs.length - 1)].focus();
+        }
 
-                const box = clientErrorDiv.querySelector(".error-message");
+        inputs.forEach(function (input, index) {
 
-                if (!box) {
-                    return;
-                }
-
-                box.textContent = message;
-                box.classList.toggle("success-message", !isError);
-                clientErrorDiv.style.display = "flex";
-            }
-
-            function clearClientMessage() {
-                if (clientErrorDiv) {
-                    clientErrorDiv.style.display = "none";
-
-                    const box = clientErrorDiv.querySelector(".error-message");
-
-                    if (box) {
-                        box.textContent = "";
-                        box.classList.remove("success-message");
-                    }
-                }
-            }
-
-            function updateInputState(input) {
-                input.classList.toggle("filled", Boolean(input.value));
-            }
-
-            function focusNext(index) {
-                if (index < inputs.length - 1) {
-                    inputs[index + 1].focus();
-                }
-            }
-
-            function focusPrev(index) {
-                if (index > 0) {
-                    inputs[index - 1].focus();
-                }
-            }
-
-            function fillCode(value, startIndex) {
-                const digits = normalizeDigits(value).slice(0, inputs.length);
-
-                if (!digits) {
-                    return;
-                }
-
-                const start = Math.max(0, Math.min(startIndex, inputs.length - 1));
-
-                for (let i = 0; i < digits.length && start + i < inputs.length; i++) {
-                    inputs[start + i].value = digits[i];
-                    inputs[start + i].classList.remove("error-otp");
-                    updateInputState(inputs[start + i]);
-                }
-
-                clearClientMessage();
-
-                const nextIndex = Math.min(start + digits.length, inputs.length - 1);
-
-                if (digits.length === inputs.length && start === 0) {
-                    inputs[inputs.length - 1].focus();
-                } else {
-                    inputs[nextIndex].focus();
-                }
-            }
-
-            inputs.forEach(function (input, index) {
-                input.addEventListener("input", function () {
-                    if (isSubmitting) {
-                        return;
-                    }
-
-                    const digits = normalizeDigits(input.value);
-
-                    if (digits.length > 1) {
-                        input.value = "";
-                        fillCode(digits, index);
-                        return;
-                    }
-
-                    input.value = digits;
-                    input.classList.remove("error-otp");
-                    updateInputState(input);
-                    clearClientMessage();
-
-                    if (digits) {
-                        focusNext(index);
-                    }
-                });
-
-                input.addEventListener("keydown", function (event) {
-                    if (isSubmitting) {
-                        return;
-                    }
-
-                    if (event.key === "Backspace" && !input.value && index > 0) {
-                        event.preventDefault();
-                        inputs[index - 1].value = "";
-                        updateInputState(inputs[index - 1]);
-                        focusPrev(index);
-                        return;
-                    }
-
-                    if (event.key === "ArrowRight" && index < inputs.length - 1) {
-                        event.preventDefault();
-                        focusNext(index);
-                        return;
-                    }
-
-                    if (event.key === "ArrowLeft" && index > 0) {
-                        event.preventDefault();
-                        focusPrev(index);
-                        return;
-                    }
-
-                    if (event.key === "Enter") {
-                        event.preventDefault();
-                        verifyForm.requestSubmit();
-                    }
-                });
-
-                input.addEventListener("paste", function (event) {
-                    if (isSubmitting) {
-                        return;
-                    }
-
-                    event.preventDefault();
-
-                    const clipboard = event.clipboardData || window.clipboardData;
-
-                    if (!clipboard) {
-                        return;
-                    }
-
-                    const pastedText = normalizeDigits(clipboard.getData("text"));
-
-                    if (pastedText) {
-                        fillCode(pastedText.slice(0, inputs.length), 0);
-
-                        if (pastedText.length >= inputs.length) {
-                            inputs[inputs.length - 1].focus();
-                        }
-                    }
-                });
-
-                input.addEventListener("focus", function () {
-                    if (!isSubmitting) {
-                        input.select();
-                        clearClientMessage();
-                        input.classList.remove("error-otp");
-                    }
-                });
-
-                input.addEventListener("blur", function () {
-                    updateInputState(input);
-                });
-            });
-
-            verifyForm.addEventListener("submit", function (event) {
+            /* بلاک کردن کاراکتر غیرعددی پیش از ثبت در کادر */
+            input.addEventListener("beforeinput", function (event) {
                 if (isSubmitting) {
                     event.preventDefault();
                     return;
                 }
 
-                let otpCode = "";
-                let isValid = true;
+                if (
+                    event.data != null &&
+                    event.inputType &&
+                    event.inputType.indexOf("insert") === 0 &&
+                    event.inputType !== "insertCompositionText"
+                ) {
+                    const digits = normalizeDigits(event.data);
 
-                inputs.forEach(function (input) {
-                    const value = normalizeDigits(input.value).slice(0, 1);
-
-                    input.value = value;
-                    updateInputState(input);
-
-                    if (!value || !/^[0-9]$/.test(value)) {
-                        input.classList.add("error-otp");
-                        isValid = false;
-                    } else {
-                        input.classList.remove("error-otp");
-                        otpCode += value;
-                    }
-                });
-
-                if (!isValid || otpCode.length !== 5) {
-                    event.preventDefault();
-
-                    showClientMessage("کد پنج‌رقمی را کامل و به‌صورت عددی وارد کنید.", true);
-
-                    const firstInvalid = inputs.find(function (input) {
-                        return !input.value;
-                    });
-
-                    if (firstInvalid) {
-                        firstInvalid.focus();
+                    if (!digits) {
+                        event.preventDefault();
+                        return;
                     }
 
+                    /* ارقام فارسی/عربی یا چند رقم همزمان: تبدیل و پر کردن دستی */
+                    if (digits !== event.data || digits.length > 1) {
+                        event.preventDefault();
+                        fillCode(digits, index);
+                    }
+                }
+            });
+
+            /* لایه دوم فیلتر برای کیبوردهای موبایل و حالت‌های ویژه */
+            input.addEventListener("input", function () {
+                if (isSubmitting) return;
+
+                const digits = normalizeDigits(input.value);
+
+                if (digits.length > 1) {
+                    input.value = "";
+                    fillCode(digits, index);
                     return;
                 }
 
-                let hiddenFullCode = verifyForm.querySelector(
-                    'input[name="verification_code"]'
-                );
+                input.value = digits;
+                input.classList.remove("error-otp");
+                updateInputState(input);
+                clearClientMessage();
 
-                if (!hiddenFullCode) {
-                    hiddenFullCode = document.createElement("input");
-                    hiddenFullCode.type = "hidden";
-                    hiddenFullCode.name = "verification_code";
-                    verifyForm.appendChild(hiddenFullCode);
-                }
-
-                hiddenFullCode.value = otpCode;
-
-                isSubmitting = true;
-                submitBtn.disabled = true;
-                inputs.forEach(function (input) {
-                    input.disabled = true;
-                });
-
-                submitBtn.innerHTML =
-                    '<span class="spinner-small" aria-hidden="true"></span>' +
-                    '<span>در حال بررسی کد...</span>';
+                if (digits) focusNext(index);
             });
 
-            function updateTimerDisplay() {
-                const safeTime = Math.max(0, timeLeft);
-                const minutes = Math.floor(safeTime / 60);
-                const seconds = String(safeTime % 60).padStart(2, "0");
+            input.addEventListener("keydown", function (event) {
+                if (isSubmitting) return;
 
-                timerElement.textContent = minutes + ":" + seconds;
-
-                const percentage = timerDuration > 0
-                    ? Math.max(0, Math.min(100, (safeTime / timerDuration) * 100))
-                    : 0;
-
-                timerProgress.style.width = percentage + "%";
-                timerTrack.setAttribute("aria-valuenow", String(Math.round(percentage)));
-
-                const expired = safeTime <= 0;
-
-                timerElement.classList.toggle("expired", expired);
-
-                if (resendBtn && !isResending) {
-                    resendBtn.disabled = !expired;
+                if (event.key === "Backspace" && !input.value && index > 0) {
+                    event.preventDefault();
+                    inputs[index - 1].value = "";
+                    updateInputState(inputs[index - 1]);
+                    focusPrev(index);
+                    return;
                 }
 
-                if (resendDescription) {
-                    resendDescription.textContent = expired
-                        ? "زمان کد به پایان رسیده است؛ کد جدید درخواست کنید."
-                        : "پس از پایان زمان، می‌توانید کد جدید دریافت کنید.";
+                if (event.key === "ArrowRight" && index < inputs.length - 1) {
+                    event.preventDefault();
+                    focusNext(index);
+                    return;
                 }
+
+                if (event.key === "ArrowLeft" && index > 0) {
+                    event.preventDefault();
+                    focusPrev(index);
+                    return;
+                }
+
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    verifyForm.requestSubmit();
+                    return;
+                }
+
+                /* کلیدهای ویژه (Tab, Delete, ...) و میانبرهای Ctrl/Cmd مجازند */
+                if (event.ctrlKey || event.metaKey || event.altKey || event.key.length > 1) {
+                    return;
+                }
+
+                /* هر کلید تک‌کاراکتری که عدد نیست بلاک می‌شود */
+                if (!DIGIT_KEY.test(event.key)) {
+                    event.preventDefault();
+                }
+            });
+
+            input.addEventListener("paste", function (event) {
+                if (isSubmitting) return;
+                event.preventDefault();
+
+                const clipboard = event.clipboardData || window.clipboardData;
+                if (!clipboard) return;
+
+                const pasted = normalizeDigits(clipboard.getData("text"));
+                if (pasted) fillCode(pasted, pasted.length >= inputs.length ? 0 : index);
+            });
+
+            input.addEventListener("drop", function (event) {
+                event.preventDefault();
+                if (isSubmitting) return;
+
+                const text = event.dataTransfer ? event.dataTransfer.getData("text") : "";
+                const dropped = normalizeDigits(text);
+                if (dropped) fillCode(dropped, index);
+            });
+
+            input.addEventListener("focus", function () {
+                if (!isSubmitting) {
+                    input.select();
+                    clearClientMessage();
+                    input.classList.remove("error-otp");
+                }
+            });
+
+            input.addEventListener("blur", function () {
+                updateInputState(input);
+            });
+        });
+
+        verifyForm.addEventListener("submit", function (event) {
+            if (isSubmitting) {
+                event.preventDefault();
+                return;
             }
 
-            function startTimer() {
-                if (timerInterval) {
+            let otpCode = "";
+            let isValid = true;
+
+            inputs.forEach(function (input) {
+                const value = normalizeDigits(input.value).slice(0, 1);
+                input.value = value;
+                updateInputState(input);
+
+                if (!/^[0-9]$/.test(value)) {
+                    input.classList.add("error-otp");
+                    isValid = false;
+                } else {
+                    input.classList.remove("error-otp");
+                    otpCode += value;
+                }
+            });
+
+            if (!isValid || !/^[0-9]{5}$/.test(otpCode)) {
+                event.preventDefault();
+                showClientMessage("کد تأیید فقط باید شامل ۵ رقم عددی باشد.", true);
+
+                const firstInvalid = inputs.find(function (input) {
+                    return !input.value;
+                });
+                if (firstInvalid) firstInvalid.focus();
+                return;
+            }
+
+            let hiddenFullCode = verifyForm.querySelector('input[name="verification_code"]');
+            if (!hiddenFullCode) {
+                hiddenFullCode = document.createElement("input");
+                hiddenFullCode.type = "hidden";
+                hiddenFullCode.name = "verification_code";
+                verifyForm.appendChild(hiddenFullCode);
+            }
+            hiddenFullCode.value = otpCode;
+
+            isSubmitting = true;
+            submitBtn.disabled = true;
+
+            /* readOnly به‌جای disabled تا code1..code5 هم ارسال شوند */
+            inputs.forEach(function (input) {
+                input.readOnly = true;
+            });
+
+            submitBtn.innerHTML =
+                '<span class="spinner-small" aria-hidden="true"></span>' +
+                '<span>در حال بررسی کد...</span>';
+        });
+
+        function updateTimerDisplay() {
+            const safeTime = Math.max(0, timeLeft);
+            const minutes = Math.floor(safeTime / 60);
+            const seconds = String(safeTime % 60).padStart(2, "0");
+
+            timerElement.textContent = minutes + ":" + seconds;
+
+            const percentage = timerDuration > 0
+                ? Math.max(0, Math.min(100, (safeTime / timerDuration) * 100))
+                : 0;
+
+            timerProgress.style.width = percentage + "%";
+            timerTrack.setAttribute("aria-valuenow", String(Math.round(percentage)));
+
+            const expired = safeTime <= 0;
+            timerElement.classList.toggle("expired", expired);
+
+            if (resendBtn && !isResending) resendBtn.disabled = !expired;
+
+            if (resendDescription) {
+                resendDescription.textContent = expired
+                    ? "زمان کد به پایان رسیده است؛ کد جدید درخواست کنید."
+                    : "پس از پایان زمان، می‌توانید کد جدید دریافت کنید.";
+            }
+        }
+
+        function startTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+
+            updateTimerDisplay();
+            if (timeLeft <= 0) return;
+
+            timerInterval = setInterval(function () {
+                if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     timerInterval = null;
-                }
-
-                updateTimerDisplay();
-
-                if (timeLeft <= 0) {
+                    timeLeft = 0;
+                    updateTimerDisplay();
                     return;
                 }
+                timeLeft -= 1;
+                updateTimerDisplay();
+            }, 1000);
+        }
 
-                timerInterval = setInterval(function () {
-                    if (timeLeft <= 0) {
-                        clearInterval(timerInterval);
-                        timerInterval = null;
-                        timeLeft = 0;
-                        updateTimerDisplay();
-                        return;
-                    }
+        function showTemporaryMessage(message, isError) {
+            clearClientMessage();
+            showClientMessage(message, isError);
 
-                    timeLeft -= 1;
-                    updateTimerDisplay();
-                }, 1000);
+            if (!isError) {
+                window.setTimeout(clearClientMessage, 4000);
             }
+        }
 
-            function showTemporaryMessage(message, isError) {
-                clearClientMessage();
-                showClientMessage(message, isError);
+        if (resendBtn) {
+            resendBtn.addEventListener("click", async function () {
+                if (resendBtn.disabled || isResending || isSubmitting) return;
 
-                if (!isError) {
-                    window.setTimeout(function () {
-                        clearClientMessage();
-                    }, 4000);
-                }
-            }
+                isResending = true;
+                resendBtn.disabled = true;
+                resendBtn.innerHTML =
+                    '<span class="spinner-small" aria-hidden="true"></span>' +
+                    '<span>در حال ارسال...</span>';
 
-            if (resendBtn) {
-                resendBtn.addEventListener("click", async function () {
-                    if (resendBtn.disabled || isResending || isSubmitting) {
-                        return;
+                const formData = new FormData();
+                const csrfToken = verifyForm.querySelector("[name=csrfmiddlewaretoken]");
+                if (csrfToken) formData.append("csrfmiddlewaretoken", csrfToken.value);
+                formData.append("resend", "true");
+
+                try {
+                    const response = await fetch(window.location.href, {
+                        method: "POST",
+                        body: formData,
+                        credentials: "same-origin",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest",
+                            "Accept": "application/json"
+                        }
+                    });
+
+                    const contentType = response.headers.get("content-type") || "";
+                    if (!contentType.includes("application/json")) {
+                        throw new Error("پاسخ سرور قابل پردازش نیست.");
                     }
 
-                    isResending = true;
-                    resendBtn.disabled = true;
-                    resendBtn.innerHTML =
-                        '<span class="spinner-small" aria-hidden="true"></span>' +
-                        '<span>در حال ارسال...</span>';
+                    const data = await response.json();
 
-                    const formData = new FormData();
-                    const csrfToken = verifyForm.querySelector(
-                        "[name=csrfmiddlewaretoken]"
-                    );
-
-                    if (csrfToken) {
-                        formData.append("csrfmiddlewaretoken", csrfToken.value);
-                    }
-
-                    formData.append("resend", "true");
-
-                    try {
-                        const response = await fetch(window.location.href, {
-                            method: "POST",
-                            body: formData,
-                            credentials: "same-origin",
-                            headers: {
-                                "X-Requested-With": "XMLHttpRequest",
-                                "Accept": "application/json"
-                            }
-                        });
-
-                        const contentType = response.headers.get("content-type") || "";
-
-                        if (!contentType.includes("application/json")) {
-                            throw new Error("پاسخ سرور قابل پردازش نیست.");
-                        }
-
-                        const data = await response.json();
-
-                        if (!response.ok || !data.success) {
-                            showTemporaryMessage(
-                                data.error || "ارسال مجدد کد انجام نشد. دوباره تلاش کنید.",
-                                true
-                            );
-
-                            if (timeLeft <= 0) {
-                                resendBtn.disabled = false;
-                            }
-
-                            return;
-                        }
-
-                        const newRemainingSeconds = Number(data.remaining_seconds);
-
-                        timeLeft = Number.isFinite(newRemainingSeconds) &&
-                            newRemainingSeconds > 0
-                            ? newRemainingSeconds
-                            : 120;
-
-                        timerDuration = timeLeft;
-
-                        inputs.forEach(function (input) {
-                            input.value = "";
-                            input.disabled = false;
-                            input.classList.remove("error-otp", "filled");
-                        });
-
-                        isSubmitting = false;
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = originalButtonContent;
-
-                        clearClientMessage();
-                        startTimer();
-                        showTemporaryMessage("کد جدید با موفقیت ارسال شد.", false);
-                        inputs[0].focus();
-                    } catch (error) {
+                    if (!response.ok || !data.success) {
                         showTemporaryMessage(
-                            "ارتباط با سرور برقرار نشد. اتصال خود را بررسی کنید.",
+                            data.error || "ارسال مجدد کد انجام نشد. دوباره تلاش کنید.",
                             true
                         );
-
-                        if (timeLeft <= 0) {
-                            resendBtn.disabled = false;
-                        }
-                    } finally {
-                        isResending = false;
-                        resendBtn.innerHTML = originalResendContent;
-
-                        if (timeLeft > 0) {
-                            resendBtn.disabled = true;
-                        } else {
-                            resendBtn.disabled = false;
-                        }
+                        return;
                     }
-                });
-            }
 
-            window.addEventListener("pageshow", function () {
-                if (!verifyForm.isConnected) {
-                    return;
+                    const newRemaining = Number(data.remaining_seconds);
+                    timeLeft = Number.isFinite(newRemaining) && newRemaining > 0 ? newRemaining : 120;
+                    timerDuration = timeLeft;
+
+                    inputs.forEach(function (input) {
+                        input.value = "";
+                        input.readOnly = false;
+                        input.classList.remove("error-otp", "filled");
+                    });
+
+                    isSubmitting = false;
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalButtonContent;
+
+                    clearClientMessage();
+                    startTimer();
+                    showTemporaryMessage("کد جدید با موفقیت ارسال شد.", false);
+                    inputs[0].focus();
+                } catch (error) {
+                    showTemporaryMessage("ارتباط با سرور برقرار نشد. اتصال خود را بررسی کنید.", true);
+                } finally {
+                    isResending = false;
+                    resendBtn.innerHTML = originalResendContent;
+                    resendBtn.disabled = timeLeft > 0;
                 }
-
-                isSubmitting = false;
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalButtonContent;
-
-                inputs.forEach(function (input) {
-                    input.disabled = false;
-                });
             });
+        }
 
-            inputs.forEach(updateInputState);
-            startTimer();
+        window.addEventListener("pageshow", function () {
+            isSubmitting = false;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalButtonContent;
+            inputs.forEach(function (input) {
+                input.readOnly = false;
+            });
         });
+
+        inputs.forEach(updateInputState);
+        startTimer();
+    });
     </script>
 </body>
 </html>
