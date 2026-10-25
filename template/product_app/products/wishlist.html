@@ -479,7 +479,7 @@
     <div class="bulk-actions">
         <button class="bulk-btn add-cart" id="addAllToCartBtn">
             <i class="fas fa-shopping-cart"></i>
-            افزودن همه به سبد خرید
+            افزودن همه به سبد سفارشات
         </button>
         <button class="bulk-btn clear-all" id="clearAllBtn">
             <i class="fas fa-trash-alt"></i>
@@ -550,7 +550,7 @@
                     onclick="addToCart('{{ item.product_id }}', '{{ item.product_slug }}', '{{ item.product_title|escapejs }}', {{ item.current_price }})"
                     {% if item.stock <= 0 %}disabled{% endif %}>
                 <i class="fas fa-shopping-bag"></i>
-                افزودن به سبد خرید
+                افزودن به سبد سفارشات
             </button>
         </div>
     </div>
@@ -597,7 +597,7 @@
 </div>
 
 <!-- Toast Notification -->
-<div id="toastMsg" class="toast-notification">✅ محصول به سبد خرید اضافه شد</div>
+<div id="toastMsg" class="toast-notification">✅ محصول به سبد سفارشات اضافه شد</div>
 
 <!-- Loading Overlay -->
 <div id="loadingOverlay" class="loading-overlay">
@@ -708,10 +708,10 @@ window.removeFromWishlist = async function(itemId) {
 
         localStorage.setItem('cart', JSON.stringify(cart));
 
-        // آپدیت تعداد سبد خرید
+        // آپدیت تعداد سبد سفارشات
         window.dispatchEvent(new CustomEvent('cartUpdated'));
 
-        showToast(`✅ ${title} به سبد خرید اضافه شد`);
+        showToast(`✅ ${title} به سبد سفارشات اضافه شد`);
     };
 
     // Add all to cart
@@ -751,7 +751,7 @@ window.removeFromWishlist = async function(itemId) {
         });
 
         window.dispatchEvent(new CustomEvent('cartUpdated'));
-        showToast(`✅ ${addedCount} محصول به سبد خرید اضافه شد`);
+        showToast(`✅ ${addedCount} محصول به سبد سفارشات اضافه شد`);
         showLoading(false);
     });
 

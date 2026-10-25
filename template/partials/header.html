@@ -7,11 +7,8 @@
         <!-- ========== لوگوی جدید: متن | لوگو ========== -->
         <div class="header-logo">
             <a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
-                <!-- متن برند -->
                 <span class="logo-text">Deco B2B</span>
-                <!-- خط جداکننده -->
                 <span class="logo-separator">|</span>
-                <!-- تصویر لوگو -->
                 <img src="/media/images/deco.png" alt="Logo" class="logo-image">
             </a>
         </div>
@@ -28,12 +25,14 @@
             </div>
             <div class="accordion-item">
                 <div class="accordion-header">
-                    <a style="color: #333; text-decoration: none;" href="/"><i class="fas fa-home"></i> خانه</a>
+                    <a class="nav-link-btn" href="/"><i class="fas fa-home"></i> خانه</a>
                 </div>
             </div>
             <div class="accordion-item">
                 <div class="accordion-header">
-                    <a style="color: #333; text-decoration: none;" href="/pro"><i class="fas fa-chalkboard-user"></i> سفارش چاپی</a>
+                    <a class="nav-link-btn nav-link-green" href="/pro">
+                        <i class="fas fa-chalkboard-user"></i> سفارش چاپی
+                    </a>
                 </div>
             </div>
         </div>
@@ -60,6 +59,164 @@
         </div>
     </div>
 </header>
+
+<style>
+/* ============================================================
+   پاک‌سازی کامل بک‌گراند/سایه/بورد دور همه دکمه‌های هدر
+   فقط دکمه «سفارش چاپی» استایل سبز برجسته داره
+============================================================ */
+
+/* همه آیتم‌های آکاردئون ناوبری */
+.desktop-nav-accordion,
+.desktop-nav-accordion .accordion-item,
+.desktop-nav-accordion .accordion-header,
+.desktop-nav-accordion .accordion-header > a:not(.nav-link-green),
+.desktop-nav-accordion .accordion-header > i,
+.desktop-nav-accordion .accordion-header > span {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
+}
+
+/* لینک‌های عادی (خانه و محصولات) - فقط متن، بدون بک‌گراند/سایه/بورد */
+.desktop-nav-accordion .accordion-header > a:not(.nav-link-green),
+.nav-link-btn:not(.nav-link-green) {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    padding: 8px 10px !important;
+    border-radius: 10px !important;
+    color: #333 !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    line-height: 1 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    transition: color 0.2s ease, opacity 0.2s ease !important;
+    cursor: pointer !important;
+}
+
+/* hover فقط تغییر رنگ متن - بدون بک‌گراند/سایه */
+.desktop-nav-accordion .accordion-header > a:not(.nav-link-green):hover,
+.nav-link-btn:not(.nav-link-green):hover {
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #000 !important;
+    opacity: 0.75 !important;
+}
+
+.nav-link-btn:not(.nav-link-green):active {
+    transform: scale(0.97) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* آیکون‌های داخل دکمه‌های عادی */
+.desktop-nav-accordion .accordion-header > a:not(.nav-link-green) i,
+.nav-link-btn:not(.nav-link-green) i {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    color: inherit !important;
+}
+
+/* ============================================================
+   دکمه سبز برجسته «سفارش چاپی» - تنها دکمه‌ای که استایل داره
+============================================================ */
+.nav-link-green {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    padding: 9px 18px !important;
+    border-radius: 12px !important;
+    color: #fff !important;
+    text-decoration: none !important;
+    font-weight: 700 !important;
+    font-size: 0.9rem !important;
+    line-height: 1 !important;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+    transition: all 0.25s ease !important;
+    cursor: pointer !important;
+}
+
+.nav-link-green:hover {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+    color: #fff !important;
+}
+
+.nav-link-green:active {
+    transform: scale(0.96) !important;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+.nav-link-green i {
+    color: #fff !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* ============================================================
+   تراز افقی سه دکمه در یک خط
+============================================================ */
+.desktop-nav-accordion {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.desktop-nav-accordion .accordion-item {
+    display: flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.desktop-nav-accordion .accordion-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    white-space: nowrap !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* آیتم «محصولات» (بدون لینک، فقط header با آیکون) */
+.desktop-nav-accordion .accordion-item:first-child .accordion-header {
+    padding: 8px 10px !important;
+    border-radius: 10px !important;
+    color: #333 !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    cursor: pointer !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    transition: color 0.2s ease, opacity 0.2s ease !important;
+}
+
+.desktop-nav-accordion .accordion-item:first-child .accordion-header:hover {
+    color: #000 !important;
+    opacity: 0.75 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* حذف هرگونه بک‌گراند/سایه/بورد از خود هدر و کانتینرها (اختیاری برای تمیزی) */
+.main-header .header-right-side,
+.main-header .desktop-nav-accordion {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+</style>
 
 <style>
 /* ========== RESET & BASE ========== */

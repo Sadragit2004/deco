@@ -1204,7 +1204,7 @@
                 </div>
 
                 <button class="sticky-add-btn" id="stickyAddBtn" {% if not has_stock %}disabled{% endif %}>
-                    <i class="fas fa-shopping-bag"></i> {% if has_stock %}افزودن به سبد خرید{% else %}ناموجود{% endif %}
+                    <i class="fas fa-shopping-bag"></i> {% if has_stock %}افزودن به سبد سفارشات{% else %}ناموجود{% endif %}
                 </button>
 
                 <div class="sticky-stock">
@@ -1302,7 +1302,7 @@
     </div>
 </div>
 
-<div id="toastMsg" class="toast-notification">✅ محصول به سبد خرید اضافه شد</div>
+<div id="toastMsg" class="toast-notification">✅ محصول به سبد سفارشات اضافه شد</div>
 
 <script>
 (function() {
@@ -1879,7 +1879,7 @@
 
 
 // ============================================
-// سبد خرید با APIهای /order/ - نسخه نهایی
+// سبد سفارشات با APIهای /order/ - نسخه نهایی
 // ============================================
 
 let cart = [];
@@ -2006,7 +2006,7 @@ async function createOrderAndRedirect() {
     }
 }
 
-// بارگذاری سبد خرید از API
+// بارگذاری سبد سفارشات از API
 async function loadCartFromAPI() {
     try {
         const result = await CartAPI.getData();
@@ -2033,17 +2033,17 @@ async function loadCartFromAPI() {
         }
         renderCart();
     } catch (error) {
-        console.error('خطا در بارگذاری سبد خرید:', error);
+        console.error('خطا در بارگذاری سبد سفارشات:', error);
     }
 }
 
-// رندر سبد خرید
+// رندر سبد سفارشات
 function renderCart() {
     const container = document.getElementById('cartItemsList');
     if (!container) return;
 
     if (!cart || cart.length === 0) {
-        container.innerHTML = `<div class="empty-cart"><i class="fas fa-shopping-bag"></i><p>سبد خرید شما خالی است</p><small>محصولات مورد نظر خود را اضافه کنید</small></div>`;
+        container.innerHTML = `<div class="empty-cart"><i class="fas fa-shopping-bag"></i><p>سبد سفارشات شما خالی است</p><small>محصولات مورد نظر خود را اضافه کنید</small></div>`;
         const cartCountElem = document.getElementById('cartCount');
         if (cartCountElem) cartCountElem.innerText = '0';
         return;
@@ -2097,7 +2097,7 @@ function renderCart() {
     }
 }
 
-// توابع عملیات سبد خرید
+// توابع عملیات سبد سفارشات
 window.changeQuantity = async function(productId, delta) {
     const index = cart.findIndex(item => item.id === productId);
     if (index !== -1) {
@@ -2123,7 +2123,7 @@ window.removeItem = async function(productId) {
         if (result.success) {
             cart = cart.filter(item => item.id !== productId);
             renderCart();
-            showNotification('کالا از سبد خرید حذف شد', 'info');
+            showNotification('کالا از سبد سفارشات حذف شد', 'info');
         } else {
             showNotification(result.message || 'خطا در حذف', 'error');
         }
@@ -2136,7 +2136,7 @@ window.clearCart = async function() {
         if (result.success) {
             cart = [];
             renderCart();
-            showNotification('سبد خرید خالی شد', 'info');
+            showNotification('سبد سفارشات خالی شد', 'info');
         } else {
             showNotification(result.message || 'خطا در خالی کردن سبد', 'error');
         }

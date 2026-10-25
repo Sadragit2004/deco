@@ -407,7 +407,7 @@
             text-align: center;
         }
 
-        /* دکمه افزودن به سبد خرید - چیدمان جدید */
+        /* دکمه افزودن به سبد سفارشات - چیدمان جدید */
         .shp_add_to_cart_btn {
             background: linear-gradient(135deg, #d25f00, #a84c00);
             border: none;
@@ -1039,7 +1039,7 @@
                         </div>
 
                         <button class="shp_add_to_cart_btn" onclick="addProductToCart(event, {{ product.id }}, {{ product.final_price }}, '{{ product.sales_unit_symbol|default:'متر مربع'|escapejs }}', '{{ product.title|escapejs }}')">
-                            <i class="fas fa-plus-circle"></i> افزودن به سبد خرید
+                            <i class="fas fa-plus-circle"></i> افزودن به سبد سفارشات
                         </button>
                     </div>
                 </div>
@@ -1134,7 +1134,7 @@
         }
 
         // ============================================
-        // تابع آپدیت کامل سبد خرید (شمارنده + لیست)
+        // تابع آپدیت کامل سبد سفارشات (شمارنده + لیست)
         // ============================================
         async function refreshCart() {
             try {
@@ -1157,7 +1157,7 @@
                         }, 200);
                     }
 
-                    // آپدیت متغیر سراسری cart و رندر سبد خرید اگر پنل باز است
+                    // آپدیت متغیر سراسری cart و رندر سبد سفارشات اگر پنل باز است
                     if (typeof window.loadCartFromAPI === 'function') {
                         await window.loadCartFromAPI();
                     } else if (typeof window.cart !== 'undefined') {
@@ -1199,7 +1199,7 @@
         }
 
         // ============================================
-        // تابع اضافه کردن به سبد خرید با تعداد انتخابی
+        // تابع اضافه کردن به سبد سفارشات با تعداد انتخابی
         // ============================================
         window.addProductToCart = async function(event, productId, price, unitSymbol, productName) {
             // جلوگیری از propagation به کارت محصول
@@ -1237,7 +1237,7 @@
                 if (data.success) {
                     showToast(`✅ ${quantity} ${unitSymbol} "${productName}" به سبد اضافه شد`);
 
-                    // رفرش کامل سبد خرید (شمارنده و لیست)
+                    // رفرش کامل سبد سفارشات (شمارنده و لیست)
                     await refreshCart();
 
                     // انیمیشن روی دکمه
@@ -1524,7 +1524,7 @@
                                             </div>
                                         </div>
                                         <button class="shp_add_to_cart_btn" onclick="addProductToCart(event, ${p.id}, ${priceNum}, '${p.sales_unit || 'متر مربع'}', '${p.title.replace(/'/g, "\\'")}')">
-                                            <i class="fas fa-plus-circle"></i> افزودن به سبد خرید
+                                            <i class="fas fa-plus-circle"></i> افزودن به سبد سفارشات
                                         </button>
                                     </div>
                                 </div>

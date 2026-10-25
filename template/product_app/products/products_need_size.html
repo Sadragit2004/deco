@@ -50,7 +50,7 @@
                             </div>
 
                             <button class="add-to-cart-btn" data-product-id="{{ product.id }}">
-                                افزودن به سبد خرید
+                                افزودن به سبد سفارشات
                             </button>
                         </div>
                     </div>
@@ -382,7 +382,7 @@
         });
     }
 
-    // اسکریپت افزودن به سبد خرید
+    // اسکریپت افزودن به سبد سفارشات
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const productCard = this.closest('.product-card');
@@ -395,7 +395,7 @@
                 return;
             }
 
-            alert(`محصول با سایز ${selectedSize} به سبد خرید اضافه شد`);
+            alert(`محصول با سایز ${selectedSize} به سبد سفارشات اضافه شد`);
         });
     });
 </script>
