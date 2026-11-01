@@ -4,7 +4,6 @@
             <i style="font-size:20px;" class="fas fa-bars"></i>
         </div>
 
-        <!-- ========== لوگوی جدید: متن | لوگو ========== -->
         <div class="header-logo">
             <a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
                 <span class="logo-text">Deco B2B</span>
@@ -62,159 +61,166 @@
 
 <style>
 /* ============================================================
-   پاک‌سازی کامل بک‌گراند/سایه/بورد دور همه دکمه‌های هدر
-   فقط دکمه «سفارش چاپی» استایل سبز برجسته داره
+   فقط دسکتاپ (بالای 992px): استایل دکمه‌های ناوبری
+   همه‌ی قوانین !important داخل media query هستند تا
+   روی موبایل هیچ‌وقت منو را دوباره نمایان نکنند
 ============================================================ */
+@media (min-width: 993px) {
 
-/* همه آیتم‌های آکاردئون ناوبری */
-.desktop-nav-accordion,
-.desktop-nav-accordion .accordion-item,
-.desktop-nav-accordion .accordion-header,
-.desktop-nav-accordion .accordion-header > a:not(.nav-link-green),
-.desktop-nav-accordion .accordion-header > i,
-.desktop-nav-accordion .accordion-header > span {
-    background: transparent !important;
-    background-color: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-    outline: none !important;
-}
+    .desktop-nav-accordion,
+    .desktop-nav-accordion .accordion-item,
+    .desktop-nav-accordion .accordion-header,
+    .desktop-nav-accordion .accordion-header > a:not(.nav-link-green),
+    .desktop-nav-accordion .accordion-header > i,
+    .desktop-nav-accordion .accordion-header > span {
+        background: transparent !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+        outline: none !important;
+    }
 
-/* لینک‌های عادی (خانه و محصولات) - فقط متن، بدون بک‌گراند/سایه/بورد */
-.desktop-nav-accordion .accordion-header > a:not(.nav-link-green),
-.nav-link-btn:not(.nav-link-green) {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 7px !important;
-    padding: 8px 10px !important;
-    border-radius: 10px !important;
-    color: #333 !important;
-    text-decoration: none !important;
-    font-weight: 600 !important;
-    font-size: 0.9rem !important;
-    line-height: 1 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-    transition: color 0.2s ease, opacity 0.2s ease !important;
-    cursor: pointer !important;
-}
+    .desktop-nav-accordion .accordion-header > a:not(.nav-link-green),
+    .nav-link-btn:not(.nav-link-green) {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 7px !important;
+        padding: 8px 10px !important;
+        border-radius: 10px !important;
+        color: #333 !important;
+        text-decoration: none !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+        line-height: 1 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+        transition: color 0.2s ease, opacity 0.2s ease !important;
+        cursor: pointer !important;
+    }
 
-/* hover فقط تغییر رنگ متن - بدون بک‌گراند/سایه */
-.desktop-nav-accordion .accordion-header > a:not(.nav-link-green):hover,
-.nav-link-btn:not(.nav-link-green):hover {
-    background: transparent !important;
-    box-shadow: none !important;
-    color: #000 !important;
-    opacity: 0.75 !important;
-}
+    .desktop-nav-accordion .accordion-header > a:not(.nav-link-green):hover,
+    .nav-link-btn:not(.nav-link-green):hover {
+        background: transparent !important;
+        box-shadow: none !important;
+        color: #000 !important;
+        opacity: 0.75 !important;
+    }
 
-.nav-link-btn:not(.nav-link-green):active {
-    transform: scale(0.97) !important;
-    background: transparent !important;
-    box-shadow: none !important;
-}
+    .nav-link-btn:not(.nav-link-green):active {
+        transform: scale(0.97) !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
 
-/* آیکون‌های داخل دکمه‌های عادی */
-.desktop-nav-accordion .accordion-header > a:not(.nav-link-green) i,
-.nav-link-btn:not(.nav-link-green) i {
-    background: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-    color: inherit !important;
+    .desktop-nav-accordion .accordion-header > a:not(.nav-link-green) i,
+    .nav-link-btn:not(.nav-link-green) i {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+        color: inherit !important;
+    }
+
+    /* دکمه سبز «سفارش چاپی» */
+    .nav-link-green {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 7px !important;
+        padding: 9px 18px !important;
+        border-radius: 12px !important;
+        color: #fff !important;
+        text-decoration: none !important;
+        font-weight: 700 !important;
+        font-size: 0.9rem !important;
+        line-height: 1 !important;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+        border: none !important;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+        transition: all 0.25s ease !important;
+        cursor: pointer !important;
+    }
+
+    .nav-link-green:hover {
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+        color: #fff !important;
+    }
+
+    .nav-link-green:active {
+        transform: scale(0.96) !important;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .nav-link-green i {
+        color: #fff !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    /* تراز افقی */
+    .desktop-nav-accordion {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+    }
+
+    .desktop-nav-accordion .accordion-item {
+        display: flex !important;
+        align-items: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .desktop-nav-accordion .accordion-header {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        white-space: nowrap !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .desktop-nav-accordion .accordion-item:first-child .accordion-header {
+        padding: 8px 10px !important;
+        border-radius: 10px !important;
+        color: #333 !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+        cursor: pointer !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+        transition: color 0.2s ease, opacity 0.2s ease !important;
+    }
+
+    .desktop-nav-accordion .accordion-item:first-child .accordion-header:hover {
+        color: #000 !important;
+        opacity: 0.75 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .main-header .header-right-side,
+    .main-header .desktop-nav-accordion {
+        background: transparent !important;
+        box-shadow: none !important;
+    }
 }
 
 /* ============================================================
-   دکمه سبز برجسته «سفارش چاپی» - تنها دکمه‌ای که استایل داره
+   موبایل و تبلت (تا 992px): کل منوی دسکتاپ مخفی
 ============================================================ */
-.nav-link-green {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 7px !important;
-    padding: 9px 18px !important;
-    border-radius: 12px !important;
-    color: #fff !important;
-    text-decoration: none !important;
-    font-weight: 700 !important;
-    font-size: 0.9rem !important;
-    line-height: 1 !important;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-    border: none !important;
-    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
-    transition: all 0.25s ease !important;
-    cursor: pointer !important;
-}
-
-.nav-link-green:hover {
-    background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
-    color: #fff !important;
-}
-
-.nav-link-green:active {
-    transform: scale(0.96) !important;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
-}
-
-.nav-link-green i {
-    color: #fff !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-}
-
-/* ============================================================
-   تراز افقی سه دکمه در یک خط
-============================================================ */
-.desktop-nav-accordion {
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-}
-
-.desktop-nav-accordion .accordion-item {
-    display: flex !important;
-    align-items: center !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-.desktop-nav-accordion .accordion-header {
-    display: flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    white-space: nowrap !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-/* آیتم «محصولات» (بدون لینک، فقط header با آیکون) */
-.desktop-nav-accordion .accordion-item:first-child .accordion-header {
-    padding: 8px 10px !important;
-    border-radius: 10px !important;
-    color: #333 !important;
-    font-weight: 600 !important;
-    font-size: 0.9rem !important;
-    cursor: pointer !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-    transition: color 0.2s ease, opacity 0.2s ease !important;
-}
-
-.desktop-nav-accordion .accordion-item:first-child .accordion-header:hover {
-    color: #000 !important;
-    opacity: 0.75 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-}
-
-/* حذف هرگونه بک‌گراند/سایه/بورد از خود هدر و کانتینرها (اختیاری برای تمیزی) */
-.main-header .header-right-side,
-.main-header .desktop-nav-accordion {
-    background: transparent !important;
-    box-shadow: none !important;
+@media (max-width: 992px) {
+    .desktop-nav-accordion,
+    #desktopNavAccordion,
+    .desktop-nav-accordion .accordion-item,
+    .desktop-nav-accordion .accordion-content,
+    .desktop-nav-accordion .mega-3col-menu,
+    .nav-link-green {
+        display: none !important;
+    }
 }
 </style>
 
@@ -250,7 +256,7 @@
     flex: 0 0 auto;
 }
 
-/* ========== لوگوی جدید ========== */
+/* ========== لوگو ========== */
 .header-logo {
     display: flex;
     align-items: center;
@@ -470,30 +476,13 @@
 }
 
 @keyframes suggestionSlideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-12px) scale(0.97);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+    from { opacity: 0; transform: translateY(-12px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.search-suggestions::-webkit-scrollbar {
-    width: 6px;
-}
-
-.search-suggestions::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 10px;
-    margin: 6px 0;
-}
-
-.search-suggestions::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #d25f00, #f59e0b);
-    border-radius: 10px;
-}
+.search-suggestions::-webkit-scrollbar { width: 6px; }
+.search-suggestions::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; margin: 6px 0; }
+.search-suggestions::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #d25f00, #f59e0b); border-radius: 10px; }
 
 .suggestion-item {
     display: flex;
@@ -507,9 +496,7 @@
     position: relative;
 }
 
-.suggestion-item:last-child {
-    border-bottom: none;
-}
+.suggestion-item:last-child { border-bottom: none; }
 
 .suggestion-item:hover {
     background: linear-gradient(135deg, #fef5ed, #fde8d6);
@@ -529,9 +516,7 @@
     transition: all 0.3s ease;
 }
 
-.suggestion-item:hover::before {
-    transform: translateY(-50%) scaleX(1);
-}
+.suggestion-item:hover::before { transform: translateY(-50%) scaleX(1); }
 
 .suggestion-img {
     width: 48px;
@@ -559,9 +544,7 @@
     transition: transform 0.3s ease;
 }
 
-.suggestion-item:hover .suggestion-img img {
-    transform: scale(1.05);
-}
+.suggestion-item:hover .suggestion-img img { transform: scale(1.05); }
 
 .suggestion-img i {
     font-size: 24px;
@@ -569,14 +552,9 @@
     transition: color 0.3s ease;
 }
 
-.suggestion-item:hover .suggestion-img i {
-    color: #d25f00;
-}
+.suggestion-item:hover .suggestion-img i { color: #d25f00; }
 
-.suggestion-info {
-    flex: 1;
-    min-width: 0;
-}
+.suggestion-info { flex: 1; min-width: 0; }
 
 .suggestion-info h4 {
     margin: 0 0 4px;
@@ -586,9 +564,7 @@
     transition: color 0.2s ease;
 }
 
-.suggestion-item:hover .suggestion-info h4 {
-    color: #d25f00;
-}
+.suggestion-item:hover .suggestion-info h4 { color: #d25f00; }
 
 .suggestion-info p {
     margin: 0;
@@ -614,15 +590,13 @@
     color: #d25f00;
 }
 
-/* ========== منوی اصلی ========== */
+/* ========== منوی اصلی (دسکتاپ) ========== */
 .desktop-nav-accordion {
     display: flex;
     gap: 8px;
 }
 
-.accordion-item {
-    position: relative;
-}
+.accordion-item { position: relative; }
 
 .accordion-header {
     padding: 8px 16px;
@@ -641,13 +615,8 @@
     white-space: nowrap;
 }
 
-.accordion-header:hover {
-    background: rgba(226, 232, 240, 0.8) !important;
-}
-
-.accordion-header i:first-child {
-    color: #d25f00;
-}
+.accordion-header:hover { background: rgba(226, 232, 240, 0.8) !important; }
+.accordion-header i:first-child { color: #d25f00; }
 
 .accordion-content {
     position: absolute;
@@ -673,9 +642,7 @@
     transform: translateY(0);
 }
 
-.category-item-menu {
-    position: relative;
-}
+.category-item-menu { position: relative; }
 
 .category-main-link {
     display: flex;
@@ -689,20 +656,9 @@
     transition: all 0.2s;
 }
 
-.category-main-link:hover {
-    background: #fef5ed;
-    color: #d25f00;
-}
-
-.category-main-link i:first-child {
-    width: 24px;
-    color: #94a3b8;
-}
-
-.chevron-left {
-    font-size: 0.7rem;
-    color: #cbd5e1;
-}
+.category-main-link:hover { background: #fef5ed; color: #d25f00; }
+.category-main-link i:first-child { width: 24px; color: #94a3b8; }
+.chevron-left { font-size: 0.7rem; color: #cbd5e1; }
 
 .mega-3col-menu {
     position: absolute;
@@ -720,23 +676,11 @@
     overflow-y: auto;
 }
 
-.category-item-menu:hover .mega-3col-menu {
-    display: block;
-}
+.category-item-menu:hover .mega-3col-menu { display: block; }
 
-.mega-3col-menu::-webkit-scrollbar {
-    width: 6px;
-}
-
-.mega-3col-menu::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-.mega-3col-menu::-webkit-scrollbar-thumb {
-    background: #d25f00;
-    border-radius: 10px;
-}
+.mega-3col-menu::-webkit-scrollbar { width: 6px; }
+.mega-3col-menu::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+.mega-3col-menu::-webkit-scrollbar-thumb { background: #d25f00; border-radius: 10px; }
 
 .mega-3col {
     display: grid;
@@ -754,23 +698,11 @@
     overflow-y: auto;
 }
 
-.mega-col:last-child {
-    border-right: none;
-}
+.mega-col:last-child { border-right: none; }
 
-.mega-col::-webkit-scrollbar {
-    width: 4px;
-}
-
-.mega-col::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 10px;
-}
-
-.mega-col::-webkit-scrollbar-thumb {
-    background: #d25f00;
-    border-radius: 10px;
-}
+.mega-col::-webkit-scrollbar { width: 4px; }
+.mega-col::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+.mega-col::-webkit-scrollbar-thumb { background: #d25f00; border-radius: 10px; }
 
 .mega-col-title {
     font-size: 0.85rem;
@@ -787,13 +719,17 @@
     width: 100%;
 }
 
-.brands-list-mega {
+.brands-list-mega,
+.catalogs-list-mega,
+.bestsellers-list-mega {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.brand-item-mega {
+.brand-item-mega,
+.catalog-item-mega,
+.bestseller-item-mega {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -805,7 +741,9 @@
     border: 1px solid #f0f2f5;
 }
 
-.brand-item-mega:hover {
+.brand-item-mega:hover,
+.catalog-item-mega:hover,
+.bestseller-item-mega:hover {
     background: #fff6ef;
     border-color: #ffe0cc;
     transform: translateX(-2px);
@@ -824,99 +762,16 @@
     padding: 4px;
 }
 
-.brand-img-mega img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
+.brand-img-mega img { width: 100%; height: 100%; object-fit: contain; }
+.brand-img-mega i { font-size: 22px; color: #94a3b8; }
 
-.brand-img-mega i {
-    font-size: 22px;
-    color: #94a3b8;
-}
+.brand-name-mega { font-weight: 700; color: #1e293b; font-size: 0.8rem; margin-bottom: 2px; }
+.brand-count-mega { font-size: 0.55rem; color: #64748b; }
 
-.brand-name-mega {
-    font-weight: 700;
-    color: #1e293b;
-    font-size: 0.8rem;
-    margin-bottom: 2px;
-}
-
-.brand-count-mega {
-    font-size: 0.55rem;
-    color: #64748b;
-}
-
-.catalogs-list-mega {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.catalog-item-mega {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    background: #fafcff;
-    border-radius: 12px;
-    text-decoration: none;
-    transition: all 0.25s;
-    border: 1px solid #f0f2f5;
-}
-
-.catalog-item-mega:hover {
-    background: #fff6ef;
-    border-color: #ffe0cc;
-    transform: translateX(-2px);
-}
-
-.catalog-item-mega i {
-    font-size: 28px;
-    color: #ef4444;
-    flex-shrink: 0;
-}
-
-.catalog-info-mega {
-    flex: 1;
-}
-
-.catalog-title-mega {
-    font-weight: 700;
-    color: #1e293b;
-    font-size: 0.75rem;
-    margin-bottom: 3px;
-    line-height: 1.3;
-}
-
-.catalog-date-mega {
-    font-size: 0.5rem;
-    color: #94a3b8;
-}
-
-.bestsellers-list-mega {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.bestseller-item-mega {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    background: #fafcff;
-    border-radius: 12px;
-    text-decoration: none;
-    transition: all 0.25s;
-    border: 1px solid #f0f2f5;
-}
-
-.bestseller-item-mega:hover {
-    background: #fff6ef;
-    border-color: #ffe0cc;
-    transform: translateX(-2px);
-}
+.catalog-item-mega i { font-size: 28px; color: #ef4444; flex-shrink: 0; }
+.catalog-info-mega { flex: 1; }
+.catalog-title-mega { font-weight: 700; color: #1e293b; font-size: 0.75rem; margin-bottom: 3px; line-height: 1.3; }
+.catalog-date-mega { font-size: 0.5rem; color: #94a3b8; }
 
 .bestseller-img-mega {
     width: 48px;
@@ -931,40 +786,14 @@
     padding: 4px;
 }
 
-.bestseller-img-mega img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.bestseller-img-mega i {
-    font-size: 26px;
-    color: #94a3b8;
-}
-
-.bestseller-info-mega {
-    flex: 1;
-}
-
-.bestseller-title-mega {
-    font-weight: 700;
-    color: #0f172a;
-    font-size: 0.75rem;
-    margin-bottom: 4px;
-    line-height: 1.3;
-}
-
-.bestseller-price-mega {
-    font-size: 0.65rem;
-    color: #d25f00;
-    font-weight: 700;
-}
+.bestseller-img-mega img { width: 100%; height: 100%; object-fit: contain; }
+.bestseller-img-mega i { font-size: 26px; color: #94a3b8; }
+.bestseller-info-mega { flex: 1; }
+.bestseller-title-mega { font-weight: 700; color: #0f172a; font-size: 0.75rem; margin-bottom: 4px; line-height: 1.3; }
+.bestseller-price-mega { font-size: 0.65rem; color: #d25f00; font-weight: 700; }
 
 /* ========== اکشن هدر ========== */
-.header-actions {
-    display: flex;
-    gap: 10px;
-}
+.header-actions { display: flex; gap: 10px; }
 
 .icon-btn-header {
     position: relative;
@@ -981,9 +810,7 @@
     transition: all 0.2s;
 }
 
-.icon-btn-header:hover {
-    background: rgba(226, 232, 240, 0.8) !important;
-}
+.icon-btn-header:hover { background: rgba(226, 232, 240, 0.8) !important; }
 
 .badge-count {
     position: absolute;
@@ -1008,6 +835,7 @@
     font-size: 0.8rem;
 }
 
+/* دکمه همبرگری: در دسکتاپ مخفی، در موبایل نمایش */
 .menu-toggle-mobile {
     display: none;
     font-size: 1.3rem;
@@ -1015,12 +843,7 @@
 }
 
 /* ========== ریسپانسیو ========== */
-
 @media (max-width: 992px) {
-    .desktop-nav-accordion {
-        display: none;
-    }
-
     .menu-toggle-mobile {
         display: flex;
         align-items: center;
@@ -1032,46 +855,6 @@
         -webkit-backdrop-filter: blur(8px);
         border-radius: 12px;
         font-size: 1.2rem;
-    }
-
-    .mega-3col-menu {
-        width: 95vw;
-        right: auto;
-        left: 0;
-        position: fixed;
-        top: auto;
-        max-height: 70vh;
-        z-index: 2000;
-    }
-
-    .mega-3col {
-        grid-template-columns: 1fr;
-        gap: 12px;
-        max-height: 60vh;
-        overflow-y: auto;
-    }
-
-    .mega-col {
-        border-right: none;
-        border-bottom: 1px solid #eef2f7;
-        padding-bottom: 12px;
-        margin-bottom: 5px;
-        max-height: 250px;
-    }
-
-    .mega-col:last-child {
-        border-bottom: none;
-    }
-
-    .accordion-content {
-        position: fixed;
-        top: 70px;
-        right: 0;
-        left: 0;
-        width: 100%;
-        max-height: 80vh;
-        overflow-y: auto;
-        border-radius: 0;
     }
 
     .search-wrapper {
@@ -1088,32 +871,14 @@
         border-width: 1.5px;
     }
 
-    .search-box-header:focus-within {
-        transform: scale(1);
-    }
+    .search-box-header:focus-within { transform: scale(1); }
+    .search-box-header::after { display: none; }
 
-    .search-box-header::after {
-        display: none;
-    }
+    .search-icon-wrapper { width: 38px; height: 38px; }
+    .search-icon-header { font-size: 0.9rem; }
 
-    .search-icon-wrapper {
-        width: 38px;
-        height: 38px;
-    }
-
-    .search-icon-header {
-        font-size: 0.9rem;
-    }
-
-    .search-box-header input {
-        padding: 10px 8px;
-        font-size: 0.85rem;
-        min-width: 60px;
-    }
-
-    .search-box-header input::placeholder {
-        font-size: 15px;
-    }
+    .search-box-header input { padding: 10px 8px; font-size: 0.85rem; min-width: 60px; }
+    .search-box-header input::placeholder { font-size: 15px; }
 
     .search-btn-header {
         padding: 8px 18px 8px 14px;
@@ -1123,14 +888,8 @@
         min-width: 48px;
     }
 
-    .search-btn-text {
-        display: inline;
-        font-size: 0.75rem;
-    }
-
-    .search-btn-header i {
-        font-size: 0.85rem;
-    }
+    .search-btn-text { display: inline; font-size: 0.75rem; }
+    .search-btn-header i { font-size: 0.85rem; }
 
     .search-suggestions {
         top: calc(100% + 8px);
@@ -1139,168 +898,54 @@
         padding: 6px 0;
     }
 
-    .suggestion-item {
-        padding: 12px 16px;
-        gap: 12px;
-    }
+    .suggestion-item { padding: 12px 16px; gap: 12px; }
+    .suggestion-img { width: 44px; height: 44px; border-radius: 12px; }
+    .suggestion-img i { font-size: 20px !important; }
+    .suggestion-info h4 { font-size: 0.82rem; }
 
-    .suggestion-img {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-    }
+    .header-actions { gap: 8px; }
+    .icon-btn-header { width: 66px; height: 59px; }
+    .icon-btn-header i { font-size: 20px; }
 
-    .suggestion-img i {
-        font-size: 20px !important;
-    }
+    .badge-count { width: 18px; height: 18px; font-size: 0.55rem; top: -4px; right: -4px; }
 
-    .suggestion-info h4 {
-        font-size: 0.82rem;
-    }
-
-    .header-actions {
-        gap: 8px;
-    }
-
-    .icon-btn-header {
-        width: 66px;
-        height: 59px;
-    }
-
-    .icon-btn-header i {
-        font-size: 20px;
-    }
-
-    .badge-count {
-        width: 18px;
-        height: 18px;
-        font-size: 0.55rem;
-        top: -4px;
-        right: -4px;
-    }
-
-    /* ===== لوگو ریسپانسیو ===== */
-    .logo-text {
-        font-size: 1.3rem !important;
-    }
-    .logo-separator {
-        font-size: 1.5rem !important;
-    }
-    .logo-image {
-        height: 45px !important;
-    }
+    .logo-text { font-size: 1.3rem !important; }
+    .logo-separator { font-size: 1.5rem !important; }
+    .logo-image { height: 45px !important; }
 }
 
 @media (max-width: 768px) {
-    .main-header {
-        padding: 10px 14px;
-        gap: 8px;
-    }
+    .main-header { padding: 10px 14px; gap: 8px; }
+    .header-right-side { gap: 1px; }
 
-    .header-right-side {
-        gap: 1px;
-    }
+    .menu-toggle-mobile { width: 38px; height: 38px; font-size: 1.1rem; }
 
-    .menu-toggle-mobile {
-        width: 38px;
-        height: 38px;
-        font-size: 1.1rem;
-    }
+    .header-logo a { gap: 8px !important; }
+    .logo-text { font-size: 1.1rem !important; }
+    .logo-separator { font-size: 1.2rem !important; }
+    .logo-image { height: 38px !important; }
 
-    .header-logo a {
-        gap: 8px !important;
-    }
-    .logo-text {
-        font-size: 1.1rem !important;
-    }
-    .logo-separator {
-        font-size: 1.2rem !important;
-    }
-    .logo-image {
-        height: 38px !important;
-    }
+    .search-wrapper { margin-top: 6px; }
+    .search-box-header { padding: 3px 3px 3px 8px; border-radius: 34px; }
+    .search-icon-wrapper { width: 34px; height: 34px; }
+    .search-icon-header { font-size: 0.8rem; }
+    .search-box-header input { padding: 8px 6px; font-size: 0.8rem; }
+    .search-box-header input::placeholder { font-size: 0.75rem; }
 
-    .search-wrapper {
-        margin-top: 6px;
-    }
+    .search-btn-header { padding: 6px 14px; min-width: 42px; font-size: 0.7rem; }
+    .search-btn-text { font-size: 0.7rem; }
+    .search-btn-header i { font-size: 0.75rem; }
 
-    .search-box-header {
-        padding: 3px 3px 3px 8px;
-        border-radius: 34px;
-    }
+    .icon-btn-header { width: 50px; height: 47px; }
+    .icon-btn-header i { font-size: 18px; }
 
-    .search-icon-wrapper {
-        width: 34px;
-        height: 34px;
-    }
+    .badge-count { width: 16px; height: 16px; font-size: 0.5rem; top: -4px; right: -4px; }
 
-    .search-icon-header {
-        font-size: 0.8rem;
-    }
-
-    .search-box-header input {
-        padding: 8px 6px;
-        font-size: 0.8rem;
-    }
-
-    .search-box-header input::placeholder {
-        font-size: 0.75rem;
-    }
-
-    .search-btn-header {
-        padding: 6px 14px;
-        min-width: 42px;
-        font-size: 0.7rem;
-    }
-
-    .search-btn-text {
-        font-size: 0.7rem;
-    }
-
-    .search-btn-header i {
-        font-size: 0.75rem;
-    }
-
-    .icon-btn-header {
-        width: 50px;
-        height: 47px;
-    }
-
-    .icon-btn-header i {
-        font-size: 18px;
-    }
-
-    .badge-count {
-        width: 16px;
-        height: 16px;
-        font-size: 0.5rem;
-        top: -4px;
-        right: -4px;
-    }
-
-    .search-suggestions {
-        max-height: 300px;
-        border-radius: 14px;
-    }
-
-    .suggestion-item {
-        padding: 10px 14px;
-        gap: 10px;
-    }
-
-    .suggestion-img {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-    }
-
-    .suggestion-img i {
-        font-size: 18px !important;
-    }
-
-    .suggestion-info h4 {
-        font-size: 0.75rem;
-    }
+    .search-suggestions { max-height: 300px; border-radius: 14px; }
+    .suggestion-item { padding: 10px 14px; gap: 10px; }
+    .suggestion-img { width: 38px; height: 38px; border-radius: 10px; }
+    .suggestion-img i { font-size: 18px !important; }
+    .suggestion-info h4 { font-size: 0.75rem; }
 }
 
 @media (max-width: 480px) {
@@ -1312,134 +957,41 @@
         -webkit-backdrop-filter: blur(24px) !important;
     }
 
-    .header-right-side {
-        gap: 1px;
-    }
+    .header-right-side { gap: 1px; }
 
-    .menu-toggle-mobile {
-        width: 34px;
-        height: 34px;
-        font-size: 1rem;
-        border-radius: 10px;
-    }
+    .menu-toggle-mobile { width: 34px; height: 34px; font-size: 1rem; border-radius: 10px; }
 
-    .header-logo a {
-        gap: 6px !important;
-    }
-    .logo-text {
-        font-size: 0.9rem !important;
-        font-weight: 800 !important;
-    }
-    .logo-separator {
-        font-size: 1rem !important;
-    }
-    .logo-image {
-        height: 59px !important;
-    }
+    .header-logo a { gap: 6px !important; }
+    .logo-text { font-size: 0.9rem !important; font-weight: 800 !important; }
+    .logo-separator { font-size: 1rem !important; }
+    .logo-image { height: 59px !important; }
 
-    .search-wrapper {
-        margin-top: 4px;
-    }
+    .search-wrapper { margin-top: 4px; }
+    .search-box-header { border-radius: 28px; padding: 2px 2px 2px 6px; border-width: 1px; }
+    .search-icon-wrapper { width: 28px; height: 28px; }
+    .search-icon-header { font-size: 0.7rem; }
+    .search-box-header input { padding: 6px 4px; font-size: 0.7rem; min-width: 40px; }
+    .search-box-header input::placeholder { font-size: 12px; font-weight: 700; }
 
-    .search-box-header {
-        border-radius: 28px;
-        padding: 2px 2px 2px 6px;
-        border-width: 1px;
-    }
+    .search-btn-header { padding: 5px 10px; min-width: 34px; border-radius: 24px; font-size: 0.6rem; }
+    .search-btn-text { display: none; }
+    .search-btn-header i { font-size: 0.7rem; margin: 0; }
 
-    .search-icon-wrapper {
-        width: 28px;
-        height: 28px;
-    }
+    .icon-btn-header { width: 50px; height: 50px; }
+    .icon-btn-header i { font-size: 15px; }
 
-    .search-icon-header {
-        font-size: 0.7rem;
-    }
+    .badge-count { width: 22px; height: 19px; font-size: 10px; top: -13px; right: -3px; }
 
-    .search-box-header input {
-        padding: 6px 4px;
-        font-size: 0.7rem;
-        min-width: 40px;
-    }
-
-    .search-box-header input::placeholder {
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .search-btn-header {
-        padding: 5px 10px;
-        min-width: 34px;
-        border-radius: 24px;
-        font-size: 0.6rem;
-    }
-
-    .search-btn-text {
-        display: none;
-    }
-
-    .search-btn-header i {
-        font-size: 0.7rem;
-        margin: 0;
-    }
-
-    .icon-btn-header {
-        width: 50px;
-        height: 50px;
-    }
-
-    .icon-btn-header i {
-        font-size: 15px;
-    }
-
-    .badge-count {
-        width: 22px;
-        height: 19px;
-        font-size: 10px;
-        top: -13px;
-        right: -3px;
-    }
-
-    .search-suggestions {
-        max-height: 250px;
-        border-radius: 12px;
-        padding: 4px 0;
-        top: calc(100% + 4px);
-    }
-
-    .suggestion-item {
-        padding: 8px 12px;
-        gap: 8px;
-    }
-
-    .suggestion-img {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-    }
-
-    .suggestion-img i {
-        font-size: 14px !important;
-    }
-
-    .suggestion-info h4 {
-        font-size: 0.68rem;
-        margin-bottom: 1px;
-    }
-
-    .suggestion-info p {
-        font-size: 0.5rem;
-    }
-
-    .suggestion-info p .type-badge {
-        font-size: 0.45rem;
-        padding: 0 6px;
-    }
+    .search-suggestions { max-height: 250px; border-radius: 12px; padding: 4px 0; top: calc(100% + 4px); }
+    .suggestion-item { padding: 8px 12px; gap: 8px; }
+    .suggestion-img { width: 32px; height: 32px; border-radius: 8px; }
+    .suggestion-img i { font-size: 14px !important; }
+    .suggestion-info h4 { font-size: 0.68rem; margin-bottom: 1px; }
+    .suggestion-info p { font-size: 0.5rem; }
+    .suggestion-info p .type-badge { font-size: 0.45rem; padding: 0 6px; }
 }
 
-.sidebar {
-    transition: transform 0.3s ease;
-}
+.sidebar { transition: transform 0.3s ease; }
 
 @media (max-width: 992px) {
     .sidebar {
@@ -1454,13 +1006,9 @@
         box-shadow: -2px 0 20px rgba(0,0,0,0.1);
     }
 
-    .sidebar.open-mobile {
-        transform: translateX(0);
-    }
+    .sidebar.open-mobile { transform: translateX(0); }
 }
 </style>
-
-
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -1667,9 +1215,7 @@ function setupSearch() {
 </script>
 
 <script>
-    // ============================================
 // رفع مشکل نوتیف در موبایل
-// ============================================
 document.addEventListener('DOMContentLoaded', function() {
     const notifBtn = document.getElementById('notifIcon');
     const notifPanel = document.getElementById('notifPanel');
@@ -1681,14 +1227,11 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
             e.preventDefault();
 
-            // تoggle کلاس active
             notifPanel.classList.toggle('active');
             if (overlay) overlay.classList.toggle('active');
 
-            // قفل کردن اسکرول
             if (notifPanel.classList.contains('active')) {
                 document.body.style.overflow = 'hidden';
-                // اطمینان از نمایش پنل
                 notifPanel.style.display = 'block';
                 notifPanel.style.left = '0';
             } else {
