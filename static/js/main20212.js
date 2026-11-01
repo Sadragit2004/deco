@@ -569,6 +569,145 @@ async function fetchAndRenderPortfolios() {
 }
 
 // ============================================
+// فلش‌های چپ/راست برای لیست‌های افقی (جدید)
+// هیچ المان موجودی جابه‌جا یا تغییر نمی‌کند؛
+// فقط دو دکمه‌ی فلش کنار هر لیست اضافه می‌شود.
+// ============================================
+function addScrollArrowStyles() {
+    if (document.getElementById('scroll-arrows-styles')) return;
+
+    const styles = document.createElement('style');
+    styles.id = 'scroll-arrows-styles';
+    styles.textContent = `
+        .h-scroll-arrow {
+            position: absolute;
+            transform: translateY(-50%);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.95);
+            color: #d25f00;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 20;
+            padding: 0;
+            transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+        }
+        .h-scroll-arrow:hover {
+            background: #d25f00;
+            color: #fff;
+        }
+        .h-scroll-arrow.is-visible { display: flex; }
+        .h-scroll-arrow.is-disabled { opacity: 0.35; pointer-events: none; }
+        .h-scroll-arrow.arrow-left { left: 6px; }
+        .h-scroll-arrow.arrow-right { right: 6px; }
+        @media (max-width: 768px) {
+            .h-scroll-arrow { width: 34px; height: 34px; font-size: 13px; }
+        }
+    `;
+    document.head.appendChild(styles);
+}
+
+function setupScrollArrows(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container || container.dataset.arrowsReady === '1') return;
+
+    const host = container.parentElement;
+    if (!host) return;
+    container.dataset.arrowsReady = '1';
+
+    // برای اینکه فلش‌ها نسبت به والد جای بگیرند
+    if (getComputedStyle(host).position === 'static') {
+        host.style.position = 'relative';
+    }
+
+    const btnLeft = document.createElement('button');
+    btnLeft.type = 'button';
+    btnLeft.className = 'h-scroll-arrow arrow-left';
+    btnLeft.setAttribute('aria-label', 'اسکرول به چپ');
+    btnLeft.innerHTML = '<i class="fas fa-chevron-left"></i>';
+
+    const btnRight = document.createElement('button');
+    btnRight.type = 'button';
+    btnRight.className = 'h-scroll-arrow arrow-right';
+    btnRight.setAttribute('aria-label', 'اسکرول به راست');
+    btnRight.innerHTML = '<i class="fas fa-chevron-right"></i>';
+
+    host.appendChild(btnLeft);
+    host.appendChild(btnRight);
+
+    function step() {
+        return Math.max(container.clientWidth * 0.8, 200);
+    }
+
+    btnLeft.addEventListener('click', () => {
+        container.scrollBy({ left: -step(), behavior: 'smooth' });
+    });
+    btnRight.addEventListener('click', () => {
+        container.scrollBy({ left: step(), behavior: 'smooth' });
+    });
+
+    function update() {
+        // وسط‌چین عمودی نسبت به خود لیست
+        const top = container.offsetTop + container.offsetHeight / 2;
+        btnLeft.style.top = top + 'px';
+        btnRight.style.top = top + 'px';
+
+        const max = container.scrollWidth - container.clientWidth;
+        if (max <= 2) {
+            btnLeft.classList.remove('is-visible');
+            btnRight.classList.remove('is-visible');
+            return;
+        }
+        btnLeft.classList.add('is-visible');
+        btnRight.classList.add('is-visible');
+
+        const isRtl = getComputedStyle(container).direction === 'rtl';
+        const pos = Math.abs(container.scrollLeft);
+        const atStart = pos <= 2;
+        const atEnd = pos >= max - 2;
+
+        // در RTL شروع لیست سمت راست است
+        const canGoLeft = isRtl ? !atEnd : !atStart;
+        const canGoRight = isRtl ? !atStart : !atEnd;
+
+        btnLeft.classList.toggle('is-disabled', !canGoLeft);
+        btnRight.classList.toggle('is-disabled', !canGoRight);
+    }
+
+    container.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+
+    // وقتی محتوا (کارت‌ها) لود یا عوض شد دوباره محاسبه شود
+    new MutationObserver(() => setTimeout(update, 50))
+        .observe(container, { childList: true, subtree: true });
+    if (window.ResizeObserver) {
+        new ResizeObserver(update).observe(container);
+    }
+
+    // بعد از لود تصاویر هم یک بار دیگر
+    window.addEventListener('load', update);
+    update();
+}
+
+function initScrollArrows() {
+    addScrollArrowStyles();
+    [
+        'categoriesGrid',
+        'newProductsList',
+        'bestsellersList',
+        'brandsList',
+        'catalogVertical',
+        'portfolioList'
+    ].forEach(setupScrollArrows);
+}
+
+// ============================================
 // اجرای اولیه
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
@@ -580,6 +719,8 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchAndRenderPopularBrands();
     fetchAndRenderLatestCatalogs();
     fetchAndRenderPortfolios();
+
+    initScrollArrows();
 
     console.log('✅ تمام سیستم‌ها با موفقیت بارگذاری شدند');
     console.log('✨ اسکرول افقی و کلیک دسته‌بندی‌ها فعال شد');
