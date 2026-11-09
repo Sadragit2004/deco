@@ -3,26 +3,300 @@
 
 {% block content %}
 
+
 {% if not is_pay %}
-<div style="display: flex; justify-content: center; align-items: center; min-height: 60vh; padding: 40px;">
-    <div style="text-align: center; max-width: 400px;">
-        <i class="fas fa-wallet" style="font-size: 64px; color: #e96500; margin-bottom: 20px;"></i>
-        <h2 style="font-size: 1.5rem; margin-bottom: 12px;">افزایش کیف پول الزامی است</h2>
-        <p style="color: #64748b; margin-bottom: 24px;">برای مشاهده قیمت و جزئیات محصولات، لطفاً ابتدا کیف پول خود را افزایش دهید.</p>
-        <a href="/peyment/membership/pay/page/" class="membership-upgrade-btn" style="display: inline-flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #e96500, #b85500); color: white; padding: 12px 28px; border-radius: 40px; text-decoration: none; font-weight: 600;">
-            <i class="fas fa-arrow-up"></i>
-            افزایش کیف پول
-            <i class="fas fa-chevron-left"></i>
+<div class="membership-required-wrapper">
+    <div class="membership-required-card">
+
+        <div class="membership-icon-wrapper">
+            <i class="fas fa-wallet"></i>
+            <span class="membership-icon-badge">
+                <i class="fas fa-lock"></i>
+            </span>
+        </div>
+
+        <span class="membership-eyebrow">
+            <i class="fas fa-crown"></i>
+            فعال‌سازی عضویت دکوبی‌توبی
+        </span>
+
+        <h2>برای دسترسی کامل، کیف پول خود را شارژ کنید</h2>
+
+        <p class="membership-description">
+            با فعال‌سازی عضویت، امکان مشاهده قیمت‌ها، مشخصات کامل محصولات و استفاده از امکانات پلتفرم برای شما فراهم می‌شود.
+        </p>
+
+        <div class="membership-price-box">
+            <span class="membership-price-label">
+                مبلغ موردنیاز برای فعال‌سازی
+            </span>
+
+            <div class="membership-price">
+                ۵,۰۰۰,۰۰۰
+                <small>تومان</small>
+            </div>
+
+            <div class="membership-price-status">
+                <i class="fas fa-check-circle"></i>
+                شارژ کیف پول برای فعال‌سازی عضویت
+            </div>
+        </div>
+
+        <div class="membership-benefit">
+            <div class="membership-benefit-icon">
+                <i class="fas fa-receipt"></i>
+            </div>
+            <div>
+                <strong>مبلغ شارژ شما محفوظ می‌ماند</strong>
+                <p>مبلغ شارژشده در اولین سفارش خرید، از فاکتور شما کسر خواهد شد.</p>
+            </div>
+        </div>
+
+        <a href="/peyment/membership/pay/page/" class="membership-upgrade-btn">
+            <i class="fas fa-wallet"></i>
+            شارژ کیف پول و فعال‌سازی عضویت
+            <i class="fas fa-arrow-left"></i>
         </a>
+
+        <div class="membership-security">
+            <i class="fas fa-shield-alt"></i>
+            فعال‌سازی دسترسی پس از تکمیل شارژ
+        </div>
+
     </div>
 </div>
 
 <style>
-    .mobile-action-bar, .simple-nav, .product-sticky-sidebar, .product-main-content, .related-section {
+    .mobile-action-bar,
+    .simple-nav,
+    .product-sticky-sidebar,
+    .product-main-content,
+    .related-section {
         display: none !important;
     }
+
     body .product-page {
         padding: 0 !important;
+    }
+
+    .membership-required-wrapper {
+        min-height: 75vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 35px 16px;
+        direction: rtl;
+    }
+
+    .membership-required-card {
+        width: 100%;
+        max-width: 470px;
+        padding: 38px 30px 28px;
+        background: #fff;
+        border: 1px solid #f1e6dc;
+        border-radius: 24px;
+        text-align: center;
+        box-shadow: 0 15px 55px rgba(91, 52, 20, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .membership-required-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #b85500, #f28b35, #e96500);
+    }
+
+    .membership-icon-wrapper {
+        width: 82px;
+        height: 82px;
+        border-radius: 25px;
+        background: #fff3e9;
+        color: #e96500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        margin: 0 auto 22px;
+        position: relative;
+    }
+
+    .membership-icon-badge {
+        position: absolute;
+        bottom: -5px;
+        left: -5px;
+        width: 27px;
+        height: 27px;
+        border-radius: 50%;
+        background: #e96500;
+        color: #fff;
+        border: 3px solid #fff;
+        font-size: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .membership-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: #fff4eb;
+        color: #c45a0b;
+        padding: 7px 14px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+    .membership-required-card h2 {
+        color: #292524;
+        font-size: 21px;
+        line-height: 1.8;
+        font-weight: 800;
+        margin: 0 0 10px;
+    }
+
+    .membership-description {
+        color: #78716c;
+        font-size: 13px;
+        line-height: 2.1;
+        margin: 0 0 24px;
+    }
+
+    .membership-price-box {
+        background: linear-gradient(145deg, #fff8f2, #fff1e5);
+        border: 1px solid #f8dfca;
+        border-radius: 18px;
+        padding: 19px 12px;
+        margin-bottom: 18px;
+    }
+
+    .membership-price-label {
+        display: block;
+        color: #8b5e40;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .membership-price {
+        color: #d65d08;
+        font-size: 34px;
+        font-weight: 900;
+        letter-spacing: -1px;
+        direction: rtl;
+    }
+
+    .membership-price small {
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .membership-price-status {
+        color: #8b6a51;
+        font-size: 11px;
+        margin-top: 8px;
+    }
+
+    .membership-price-status i {
+        color: #d66a1b;
+        margin-left: 4px;
+    }
+
+    .membership-benefit {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        text-align: right;
+        padding: 15px;
+        border: 1px solid #e8eee9;
+        background: #f8fbf8;
+        border-radius: 14px;
+        margin-bottom: 22px;
+    }
+
+    .membership-benefit-icon {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e6f2e9;
+        color: #398052;
+        border-radius: 11px;
+    }
+
+    .membership-benefit strong {
+        color: #315b3e;
+        font-size: 12px;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .membership-benefit p {
+        color: #64756a;
+        font-size: 11px;
+        line-height: 1.9;
+        margin: 0;
+    }
+
+    .membership-upgrade-btn {
+        width: 100%;
+        min-height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: linear-gradient(135deg, #ed7b22, #c45100);
+        color: #fff !important;
+        border-radius: 14px;
+        text-decoration: none !important;
+        font-size: 13px;
+        font-weight: 800;
+        box-shadow: 0 7px 18px rgba(201, 87, 7, 0.2);
+        transition: all 0.25s ease;
+    }
+
+    .membership-upgrade-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(201, 87, 7, 0.3);
+    }
+
+    .membership-security {
+        color: #a8a29e;
+        font-size: 10px;
+        margin-top: 17px;
+    }
+
+    .membership-security i {
+        margin-left: 5px;
+        color: #57936a;
+    }
+
+    @media (max-width: 480px) {
+        .membership-required-card {
+            padding: 32px 19px 24px;
+            border-radius: 20px;
+        }
+
+        .membership-required-card h2 {
+            font-size: 18px;
+        }
+
+        .membership-price {
+            font-size: 30px;
+        }
+
+        .membership-upgrade-btn {
+            font-size: 12px;
+            gap: 7px;
+        }
     }
 </style>
 
