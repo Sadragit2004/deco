@@ -342,7 +342,7 @@ class BrandAPIView(View):
         if search:
             queryset = queryset.filter(title__icontains=search)
 
-        page_size = int(request.GET.get('page_size', 100))
+        page_size = int(request.GET.get('page_size', 500))
         page = int(request.GET.get('page', 1))
 
         paginator = Paginator(queryset, page_size)
