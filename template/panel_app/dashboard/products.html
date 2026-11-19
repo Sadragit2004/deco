@@ -249,7 +249,7 @@
     async function mobileLoadOptions() {
         try {
             const [brandsRes, unitsRes] = await Promise.all([
-                fetch('/panel/api/brands/?page_size=100'),
+                fetch('/panel/api/brands/?page_size=500'),
                 fetch('/panel/api/sales-units/')
             ]);
             const brands = await brandsRes.json();
@@ -268,7 +268,7 @@
 
     document.getElementById('mobilePriceScope')?.addEventListener('change', async function() {
         const scope = this.value;
-        const url = scope === 'brand' ? '/panel/api/brands/?page_size=100' : '/panel/api/catalogs/?page_size=100';
+        const url = scope === 'brand' ? '/panel/api/brands/?page_size=500' : '/panel/api/catalogs/?page_size=500';
         try {
             const res = await fetch(url);
             const data = await res.json();
@@ -1194,9 +1194,9 @@
         document.getElementById('productModalTitle').innerHTML = product ? '✏️ ویرایش محصول' : '➕ محصول جدید';
 
         const [brands, catalogs, categories, units, packageUnits] = await Promise.all([
-            fetch('/panel/api/brands/?page_size=100').then(r => r.json()),
-            fetch('/panel/api/catalogs/?page_size=100').then(r => r.json()),
-            fetch('/panel/api/categories/?page_size=100').then(r => r.json()),
+            fetch('/panel/api/brands/?page_size=500').then(r => r.json()),
+            fetch('/panel/api/catalogs/?page_size=500').then(r => r.json()),
+            fetch('/panel/api/categories/?page_size=500').then(r => r.json()),
             fetch('/panel/api/sales-units/').then(r => r.json()),
             fetch('/panel/api/package-units/').then(r => r.json())
         ]);
@@ -1275,7 +1275,7 @@
 
     // ==================== برندها ====================
     async function loadBrands() {
-        const res = await fetch('/panel/api/brands/?page_size=100');
+        const res = await fetch('/panel/api/brands/?page_size=500');
         const data = await res.json();
         if(data.success) {
             document.getElementById('brandsList').innerHTML = data.data.map(b => `
@@ -1485,7 +1485,7 @@
 
     // ==================== دسته‌بندی ====================
     async function loadCategories() {
-        const res = await fetch('/panel/api/categories/?page_size=100');
+        const res = await fetch('/panel/api/categories/?page_size=500');
         const data = await res.json();
         if(data.success) {
             document.getElementById('categoriesList').innerHTML = data.data.map(c => `
@@ -1606,11 +1606,11 @@
         const category = data.data;
 
         // دریافت لیست برندها برای انتخاب
-        const brandsRes = await fetch('/panel/api/brands/?page_size=100');
+        const brandsRes = await fetch('/panel/api/brands/?page_size=500');
         const brandsData = await brandsRes.json();
 
         // دریافت لیست دسته‌بندی‌ها برای والد
-        const catsRes = await fetch('/panel/api/categories/?page_size=100');
+        const catsRes = await fetch('/panel/api/categories/?page_size=500');
         const catsData = await catsRes.json();
 
         const modalHtml = `
@@ -1719,7 +1719,7 @@
         const category = data.data;
         const currentBrands = category.brands || [];
 
-        const brandsRes = await fetch('/panel/api/brands/?page_size=100');
+        const brandsRes = await fetch('/panel/api/brands/?page_size=500');
         const brandsData = await brandsRes.json();
 
         if(!brandsData.success) {
@@ -1776,7 +1776,7 @@
 
     // ==================== کاتالوگ ====================
     async function loadCatalogs() {
-        const res = await fetch('/panel/api/catalogs/?page_size=100');
+        const res = await fetch('/panel/api/catalogs/?page_size=500');
         const data = await res.json();
         if(data.success) {
             document.getElementById('catalogsList').innerHTML = data.data.map(c => `
@@ -2019,7 +2019,7 @@
     async function loadDiscountTargets(scope) {
         const url = { brand: '/panel/api/brands/', category: '/panel/api/categories/', product: '/panel/api/products/' }[scope];
         if(url){
-            const res = await fetch(`${url}?page_size=100`);
+            const res = await fetch(`${url}?page_size=500`);
             const data = await res.json();
             if(data.success) {
                 document.getElementById('discountTarget').innerHTML = '<option value="">انتخاب کنید</option>' +
@@ -2230,7 +2230,7 @@
         const url = { brand: '/panel/api/brands/', catalog: '/panel/api/catalogs/', category: '/panel/api/categories/' }[scope];
         if(url){
             try {
-                const res = await fetch(`${url}?page_size=100`);
+                const res = await fetch(`${url}?page_size=500`);
                 const data = await res.json();
                 if(data.success) {
                     document.getElementById('bulkEditTarget').innerHTML = '<option value="">انتخاب کنید</option>' +
@@ -2305,7 +2305,7 @@
             const url = { brand: '/panel/api/brands/', catalog: '/panel/api/catalogs/', category: '/panel/api/categories/', product: '/panel/api/products/' }[scope];
             if(url){
                 try {
-                    const res = await fetch(`${url}?page_size=100`);
+                    const res = await fetch(`${url}?page_size=500`);
                     const data = await res.json();
                     if(data.success) {
                         document.getElementById('priceTarget').innerHTML = '<option value="">انتخاب کنید</option>' +
@@ -2320,9 +2320,9 @@
     async function loadSelectOptions() {
         try {
             const [brands, categories, catalogs, units, packageUnits] = await Promise.all([
-                fetch('/panel/api/brands/?page_size=100').then(r => r.json()),
-                fetch('/panel/api/categories/?page_size=100').then(r => r.json()),
-                fetch('/panel/api/catalogs/?page_size=100').then(r => r.json()),
+                fetch('/panel/api/brands/?page_size=500').then(r => r.json()),
+                fetch('/panel/api/categories/?page_size=500').then(r => r.json()),
+                fetch('/panel/api/catalogs/?page_size=500').then(r => r.json()),
                 fetch('/panel/api/sales-units/').then(r => r.json()),
                 fetch('/panel/api/package-units/').then(r => r.json())
             ]);
