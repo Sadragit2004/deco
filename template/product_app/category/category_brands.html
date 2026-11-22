@@ -8,253 +8,424 @@
 {% block content %}
 
 <style>
-    /* ============================================
-       استایل‌های جدید - نسخه مدرن و مینیمال
-       ============================================ */
-
-
     .brands-page-modern {
+        --brand-primary: #f46b3f;
+        --brand-primary-light: #fff1eb;
+        --brand-dark: #1b3038;
+        --brand-text: #26343b;
+        --brand-muted: #89969d;
+        --brand-border: #edf0f2;
+
         min-height: 100vh;
-        background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
-        padding: 20px;
+        background: #f5f7f8;
+        padding: 24px 18px 50px;
+        color: var(--brand-text);
     }
 
     .brands-content-modern {
-        max-width: 1400px;
+        width: 100%;
+        max-width: 1350px;
         margin: 0 auto;
     }
 
-    /* ============================================
-       هدر - مینیمال و شیک
-       ============================================ */
     .brands-header-modern {
-        background: linear-gradient(135deg, #1a1a2e, #16213e);
-        border-radius: 24px;
-        padding: 30px 40px;
-        margin-bottom: 30px;
         position: relative;
         overflow: hidden;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        flex-wrap: wrap;
+        justify-content: space-between;
         gap: 20px;
+        flex-wrap: wrap;
+        padding: 28px 32px;
+        margin-bottom: 22px;
+        border-radius: 22px;
+        background: linear-gradient(120deg, #192d35, #29434a);
+        box-shadow: 0 8px 28px rgba(27, 48, 56, 0.10);
     }
 
     .brands-header-modern::before {
-        content: '';
+        content: "";
         position: absolute;
-        top: -50%;
-        right: -20%;
-        width: 400px;
-        height: 400px;
-        background: radial-gradient(circle, rgba(210, 95, 0, 0.15), transparent 70%);
+        width: 300px;
+        height: 300px;
+        top: -170px;
+        right: 15%;
         border-radius: 50%;
+        background: rgba(244, 107, 63, 0.12);
+        pointer-events: none;
     }
 
-    .brands-header-modern .header-left {
+    .brands-header-modern::after {
+        content: "";
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        bottom: -160px;
+        left: 5%;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.04);
+        pointer-events: none;
+    }
+
+    .brands-header-modern .header-left,
+    .brands-header-modern .header-right {
         position: relative;
         z-index: 1;
     }
 
     .brands-header-modern h1 {
-        color: white;
-        font-size: 2rem;
-        font-weight: 800;
-        margin: 0;
-        letter-spacing: -0.5px;
         display: flex;
         align-items: center;
         gap: 12px;
         flex-wrap: wrap;
+        margin: 0;
+        color: #fff;
+        font-size: clamp(1.35rem, 2.5vw, 1.9rem);
+        font-weight: 800;
+        line-height: 1.7;
     }
 
     .brands-header-modern h1 small {
-        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 0.85rem;
         font-weight: 400;
-        color: rgba(255,255,255,0.6);
     }
 
     .brands-header-modern .header-right {
-        position: relative;
-        z-index: 1;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
         flex-wrap: wrap;
     }
 
-    .brands-header-modern .badge-modern {
-        background: rgba(255,255,255,0.1);
-        backdrop-filter: blur(10px);
-        color: white;
-        padding: 8px 20px;
+    .badge-modern {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        padding: 9px 16px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 50px;
+        background: rgba(255, 255, 255, 0.09);
+        color: #fff;
         font-size: 0.85rem;
         font-weight: 500;
-        border: 1px solid rgba(255,255,255,0.1);
-        display: flex;
-        align-items: center;
-        gap: 8px;
+        white-space: nowrap;
+        backdrop-filter: blur(10px);
     }
 
-    .brands-header-modern .badge-modern i {
-        color: #ff6b35;
+    .badge-modern i {
+        color: #ff9a70;
     }
 
-    /* ============================================
-       دکمه دانلود PDF هدر
-       ============================================ */
+    .category-image-thumb {
+        width: 35px;
+        height: 35px;
+        padding: 3px;
+        border-radius: 50%;
+        background: #fff;
+        object-fit: contain;
+    }
+
     .header-pdf-btn {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 8px 20px;
-        background: linear-gradient(135deg, #ff6b35, #e5532c);
-        color: white !important;
+        justify-content: center;
+        gap: 9px;
+        padding: 10px 18px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 50px;
-        font-size: 0.85rem;
-        font-weight: 600;
+        background: var(--brand-primary);
+        color: #fff !important;
+        font-size: 0.83rem;
+        font-weight: 700;
         text-decoration: none;
-        transition: all 0.3s ease;
-        border: 2px solid rgba(255,255,255,0.15);
-        position: relative;
-        z-index: 1;
+        transition: all 0.25s ease;
+        white-space: nowrap;
     }
 
     .header-pdf-btn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
-        color: white !important;
+        background: #e85b30;
+        transform: translateY(-2px);
+        box-shadow: 0 7px 18px rgba(244, 107, 63, 0.25);
     }
 
-    .header-pdf-btn i {
-        font-size: 1rem;
-    }
-
-    /* ============================================
-       بخش جستجو و فیلتر - یکپارچه
-       ============================================ */
     .search-filter-wrapper {
-        background: white;
-        border-radius: 20px;
-        padding: 20px 24px;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        position: relative;
         display: flex;
-        flex-wrap: wrap;
-        gap: 16px;
         align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        padding: 18px 20px;
+        margin-bottom: 22px;
+        border: 1px solid #edf0f2;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 3px 16px rgba(30, 50, 60, 0.035);
+        z-index: 5;
     }
 
     .search-box-modern {
-        flex: 1;
-        min-width: 200px;
         position: relative;
+        flex: 1 1 240px;
+        min-width: 0;
     }
 
     .search-box-modern input {
         width: 100%;
-        padding: 14px 50px 14px 20px;
-        border: 2px solid #e8ecf1;
-        border-radius: 14px;
-        font-size: 0.95rem;
-        background: #f8f9fb;
-        transition: all 0.3s ease;
+        height: 48px;
+        padding: 0 46px 0 45px;
+        border: 1px solid #e8ecef;
+        border-radius: 13px;
         outline: none;
+        background: #f8f9fa;
+        color: #26343b;
+        font-family: inherit;
+        font-size: 0.9rem;
+        transition: all 0.25s ease;
+    }
+
+    .search-box-modern input::placeholder {
+        color: #a1abb1;
     }
 
     .search-box-modern input:focus {
-        border-color: #ff6b35;
-        background: white;
-        box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+        border-color: var(--brand-primary);
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(244, 107, 63, 0.09);
     }
 
-    .search-box-modern .search-icon {
+    .search-icon {
         position: absolute;
-        right: 16px;
         top: 50%;
+        right: 16px;
         transform: translateY(-50%);
-        color: #94a3b8;
-        font-size: 1.1rem;
+        color: #9aa6ad;
+        font-size: 1rem;
+        pointer-events: none;
+    }
+
+    .search-clear {
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        width: 30px;
+        height: 30px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        transform: translateY(-50%);
+        border: none;
+        border-radius: 9px;
+        background: #edf0f2;
+        color: #7b898f;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .search-clear.visible {
+        display: flex;
+    }
+
+    .search-clear:hover {
+        background: #ffe8df;
+        color: var(--brand-primary);
+    }
+
+    .suggestions-modern {
+        position: absolute;
+        top: calc(100% + 9px);
+        right: 0;
+        left: 0;
+        display: none;
+        max-height: 320px;
+        overflow-y: auto;
+        padding: 6px;
+        border: 1px solid #edf0f2;
+        border-radius: 15px;
+        background: #fff;
+        box-shadow: 0 12px 35px rgba(20, 40, 50, 0.13);
+        z-index: 100;
+    }
+
+    .suggestion-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 11px;
+        background: #fff;
+        text-align: right;
+        cursor: pointer;
+        font-family: inherit;
+        transition: background 0.2s ease;
+    }
+
+    .suggestion-item:hover,
+    .suggestion-item:focus-visible {
+        background: #f7f8f9;
+        outline: none;
+    }
+
+    .suggestion-image {
+        flex: 0 0 43px;
+        width: 43px;
+        height: 43px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 13px;
+        background: #f2f4f5;
+    }
+
+    .suggestion-image img {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        object-fit: contain;
+    }
+
+    .suggestion-image i {
+        color: var(--brand-primary);
+        font-size: 21px;
+    }
+
+    .suggestion-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .suggestion-name {
+        display: block;
+        margin-bottom: 4px;
+        color: #27363c;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .suggestion-meta {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: #9aa5aa;
+        font-size: 0.7rem;
+    }
+
+    .suggestion-meta i {
+        font-size: 0.65rem;
+    }
+
+    .suggestion-arrow {
+        color: #bdc5c9;
+        font-size: 0.8rem;
+    }
+
+    .suggestion-highlight {
+        padding: 1px 3px;
+        border-radius: 4px;
+        background: #ffe2d7;
+        color: #e85b30;
+    }
+
+    .suggestion-empty {
+        padding: 18px 12px;
+        color: #929da3;
+        text-align: center;
+        font-size: 0.82rem;
+    }
+
+    .results-count-modern {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        color: #7f8d94;
+        font-size: 0.82rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .results-count-modern i {
+        color: var(--brand-primary);
     }
 
     .filter-buttons-modern {
         display: flex;
-        gap: 8px;
+        align-items: center;
         flex-wrap: wrap;
+        gap: 7px;
     }
 
     .filter-btn-modern {
-        padding: 8px 16px;
-        background: #f1f3f5;
-        border: none;
-        border-radius: 12px;
-        font-size: 0.8rem;
-        font-weight: 500;
-        color: #64748b;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
+        display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 6px;
+        padding: 9px 13px;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        background: #f3f5f6;
+        color: #75838a;
+        font-family: inherit;
+        font-size: 0.76rem;
+        font-weight: 600;
         white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
 
     .filter-btn-modern:hover {
-        background: #e8ecf1;
-        transform: translateY(-1px);
+        border-color: #ffe0d5;
+        background: #fff6f2;
+        color: var(--brand-primary);
     }
 
     .filter-btn-modern.active {
-        background: #ff6b35;
-        color: white;
-        box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        border-color: var(--brand-primary);
+        background: var(--brand-primary);
+        color: #fff;
+        box-shadow: 0 3px 10px rgba(244, 107, 63, 0.16);
     }
 
     .filter-btn-modern i {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
     }
 
-    .results-count-modern {
-        font-size: 0.85rem;
-        color: #94a3b8;
-        margin-right: auto;
-        font-weight: 500;
-    }
-
-    /* ============================================
-       زیردسته‌ها - اسکرول افقی شیک
-       ============================================ */
     .subcategories-modern {
-        background: white;
-        border-radius: 20px;
-        padding: 20px 24px;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        padding: 20px 22px 15px;
+        margin-bottom: 22px;
+        border: 1px solid #edf0f2;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 3px 16px rgba(30, 50, 60, 0.035);
     }
 
-    .subcategories-modern .subcat-title {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #64748b;
-        margin-bottom: 16px;
+    .subcat-title {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 9px;
+        margin-bottom: 16px;
+        color: #52636b;
+        font-size: 0.88rem;
+        font-weight: 700;
     }
 
-    .subcategories-modern .subcat-title i {
-        color: #ff6b35;
+    .subcat-title i {
+        color: var(--brand-primary);
+        font-size: 1rem;
     }
 
     .subcat-scroll {
         display: flex;
-        gap: 16px;
+        gap: 18px;
         overflow-x: auto;
-        padding: 4px 0 12px 0;
+        padding: 3px 2px 12px;
         scroll-behavior: smooth;
         -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: #f4a187 #f2f4f5;
     }
 
     .subcat-scroll::-webkit-scrollbar {
@@ -262,430 +433,555 @@
     }
 
     .subcat-scroll::-webkit-scrollbar-track {
-        background: #f1f3f5;
-        border-radius: 4px;
+        border-radius: 10px;
+        background: #f2f4f5;
     }
 
     .subcat-scroll::-webkit-scrollbar-thumb {
-        background: #ff6b35;
-        border-radius: 4px;
+        border-radius: 10px;
+        background: #f4a187;
     }
 
     .subcat-item-modern {
-        flex: 0 0 auto;
+        flex: 0 0 82px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        text-decoration: none;
         gap: 8px;
-        min-width: 70px;
-        transition: all 0.3s ease;
+        text-decoration: none;
+        transition: transform 0.2s ease;
     }
 
     .subcat-item-modern:hover {
-        transform: translateY(-4px);
+        transform: translateY(-3px);
     }
 
     .subcat-icon-modern {
-        width: 56px;
-        height: 56px;
-        background: linear-gradient(135deg, #f8f9fb, #f1f3f5);
-        border-radius: 16px;
+        width: 58px;
+        height: 58px;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
+        overflow: hidden;
+        border: 1px solid #edf0f2;
+        border-radius: 18px;
+        background: #f7f8f9;
+        transition: all 0.25s ease;
     }
 
     .subcat-item-modern:hover .subcat-icon-modern {
-        border-color: #ff6b35;
-        background: linear-gradient(135deg, #fff5f0, #fff);
-        box-shadow: 0 4px 16px rgba(255, 107, 53, 0.15);
-    }
-
-    .subcat-icon-modern i {
-        font-size: 24px;
-        color: #ff6b35;
+        border-color: #ffd5c6;
+        background: #fff6f2;
+        box-shadow: 0 5px 14px rgba(244, 107, 63, 0.10);
     }
 
     .subcat-icon-modern img {
-        width: 32px;
-        height: 32px;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
         object-fit: contain;
     }
 
-    .subcat-name-modern {
-        font-size: 0.7rem;
-        font-weight: 500;
-        color: #475569;
-        text-align: center;
-        max-width: 70px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    .subcat-icon-modern i {
+        color: var(--brand-primary);
+        font-size: 23px;
     }
 
-    /* ============================================
-       گرید برندها - کارت‌های شیشه‌ای
-       ============================================ */
+    .subcat-name-modern {
+        max-width: 82px;
+        overflow: hidden;
+        color: #64747b;
+        font-size: 0.73rem;
+        font-weight: 600;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
     .brands-grid-modern {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(205px, 1fr));
+        gap: 17px;
+        align-items: stretch;
     }
 
     .brand-card-modern {
-        background: white;
-        border-radius: 20px;
-        padding: 24px 20px;
-        text-decoration: none;
-        text-align: center;
-        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        border: 2px solid transparent;
         position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 0;
+        padding: 23px 17px 16px;
         overflow: hidden;
-        animation: fadeUp 0.5s ease forwards;
+        border: 1px solid #edf0f2;
+        border-radius: 19px;
+        background: #fff;
+        box-shadow: 0 3px 12px rgba(25, 45, 55, 0.035);
+        text-align: center;
         opacity: 0;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        animation: fadeUp 0.45s ease forwards;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
     }
 
     .brand-card-modern::before {
-        content: '';
+        content: "";
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(255, 107, 53, 0.03), rgba(255, 107, 53, 0.01));
+        inset: 0;
+        background: linear-gradient(145deg, rgba(244, 107, 63, 0.045), transparent 60%);
         opacity: 0;
-        transition: all 0.4s ease;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
     }
 
     .brand-card-modern:hover {
-        transform: translateY(-8px);
-        border-color: #ff6b35;
-        box-shadow: 0 12px 40px rgba(255, 107, 53, 0.15);
+        transform: translateY(-5px);
+        border-color: #f6c7b5;
+        box-shadow: 0 10px 25px rgba(40, 55, 60, 0.085);
     }
 
     .brand-card-modern:hover::before {
         opacity: 1;
     }
 
-    .brand-card-modern .brand-logo-wrap {
-        width: 100px;
-        height: 100px;
-        margin: 0 auto 16px;
-        background: #f8f9fb;
-        border-radius: 24px;
+    .brand-main-link {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        text-decoration: none;
+    }
+
+    .brand-logo-wrap {
+        width: 112px;
+        height: 112px;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.4s ease;
-        position: relative;
-        z-index: 1;
+        margin: 0 auto 15px;
+        border: 1px solid #edf0f2;
+        border-radius: 27px;
+        background: #f8f9fa;
+        transition: all 0.3s ease;
     }
 
     .brand-card-modern:hover .brand-logo-wrap {
-        background: linear-gradient(135deg, #fff5f0, #fff);
-        box-shadow: 0 8px 24px rgba(255, 107, 53, 0.1);
-        transform: scale(1.05);
+        border-color: #f8d9ce;
+        background: #fff7f3;
+        transform: translateY(-2px);
     }
 
-    .brand-card-modern .brand-logo-wrap img {
-        width: 70px;
-        height: 70px;
+    .brand-logo-wrap img {
+        width: 88px;
+        height: 88px;
+        padding: 5px;
+        border: 1px solid #f0f1f2;
+        border-radius: 50%;
+        background: #fff;
         object-fit: contain;
-        transition: all 0.4s ease;
+        transition: transform 0.3s ease;
     }
 
     .brand-card-modern:hover .brand-logo-wrap img {
-        transform: scale(1.1);
+        transform: scale(1.06);
     }
 
-    .brand-card-modern .brand-logo-wrap .no-img {
-        font-size: 48px;
-        color: #cbd5e1;
+    .brand-logo-wrap .no-img {
+        color: #c3cdd1;
+        font-size: 43px;
     }
 
-    .brand-card-modern .brand-name {
-        font-size: 1.05rem;
-        font-weight: 700;
-        color: #0f172a;
-        margin: 0 0 8px 0;
-        position: relative;
-        z-index: 1;
-        transition: all 0.3s ease;
+    .brand-name {
+        width: 100%;
+        margin: 0 0 10px;
+        overflow: hidden;
+        color: #293940;
+        font-size: 0.98rem;
+        font-weight: 800;
+        line-height: 1.8;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: color 0.2s ease;
     }
 
     .brand-card-modern:hover .brand-name {
-        color: #ff6b35;
+        color: #e9683e;
     }
 
-    .brand-card-modern .brand-stats {
-        display: flex;
-        justify-content: center;
-        gap: 16px;
-        font-size: 0.75rem;
-        color: #94a3b8;
-        position: relative;
-        z-index: 1;
-    }
-
-    .brand-card-modern .brand-stats span {
+    .brand-stats {
         display: flex;
         align-items: center;
-        gap: 4px;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 13px;
+        color: #98a4a9;
+        font-size: 0.73rem;
     }
 
-    .brand-card-modern .brand-stats i {
-        font-size: 0.7rem;
-    }
-
-    /* ============================================
-       دکمه دانلود PDF روی کارت برند - ساده با تگ a
-       ============================================ */
-    .brand-pdf-link {
+    .brand-stats span {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        margin-top: 12px;
-        padding: 6px 14px;
-        background: #fee9e4;
-        color: #ff6b35;
-        border-radius: 10px;
-        font-size: 0.7rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        text-decoration: none;
+        gap: 5px;
+    }
+
+    .brand-stats i {
+        color: #b0bbc0;
+        font-size: 0.72rem;
+    }
+
+    .brand-pdf-link {
         position: relative;
-        z-index: 1;
-        border: none;
+        z-index: 2;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        margin-top: 15px;
+        padding: 7px 15px;
+        border: 1px solid #ffe0d5;
+        border-radius: 9px;
+        background: #fff5f1;
+        color: #e96b43;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.2s ease;
     }
 
     .brand-pdf-link:hover {
-        background: #ff6b35;
-        color: white !important;
-        transform: scale(1.05);
-        box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
+        border-color: var(--brand-primary);
+        background: var(--brand-primary);
+        color: #fff !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(244, 107, 63, 0.17);
     }
 
-    .brand-pdf-link i {
-        font-size: 0.8rem;
-    }
-
-    /* ============================================
-       حالت خالی
-       ============================================ */
     .empty-modern {
         grid-column: 1 / -1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 270px;
+        padding: 45px 20px;
+        border: 1px solid #edf0f2;
+        border-radius: 20px;
+        background: #fff;
         text-align: center;
-        padding: 80px 20px;
-        background: white;
-        border-radius: 24px;
+    }
+
+    .empty-modern[hidden] {
+        display: none;
     }
 
     .empty-modern i {
-        font-size: 60px;
-        color: #cbd5e1;
-        margin-bottom: 16px;
+        margin-bottom: 18px;
+        color: #cbd4d8;
+        font-size: 53px;
     }
 
     .empty-modern h3 {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #0f172a;
-        margin: 0 0 8px 0;
+        margin: 0 0 8px;
+        color: #34464e;
+        font-size: 1.1rem;
+        font-weight: 800;
     }
 
     .empty-modern p {
-        color: #94a3b8;
         margin: 0;
+        color: #9aa6ab;
+        font-size: 0.85rem;
     }
 
-    /* ============================================
-       انیمیشن‌ها
-       ============================================ */
     @keyframes fadeUp {
         from {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(16px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
         }
     }
 
-    .brand-card-modern:nth-child(1) { animation-delay: 0.05s; }
-    .brand-card-modern:nth-child(2) { animation-delay: 0.1s; }
-    .brand-card-modern:nth-child(3) { animation-delay: 0.15s; }
-    .brand-card-modern:nth-child(4) { animation-delay: 0.2s; }
-    .brand-card-modern:nth-child(5) { animation-delay: 0.25s; }
-    .brand-card-modern:nth-child(6) { animation-delay: 0.3s; }
-    .brand-card-modern:nth-child(7) { animation-delay: 0.35s; }
-    .brand-card-modern:nth-child(8) { animation-delay: 0.4s; }
-    .brand-card-modern:nth-child(9) { animation-delay: 0.45s; }
-    .brand-card-modern:nth-child(10) { animation-delay: 0.5s; }
+    .brand-card-modern:nth-child(1) { animation-delay: 0.03s; }
+    .brand-card-modern:nth-child(2) { animation-delay: 0.06s; }
+    .brand-card-modern:nth-child(3) { animation-delay: 0.09s; }
+    .brand-card-modern:nth-child(4) { animation-delay: 0.12s; }
+    .brand-card-modern:nth-child(5) { animation-delay: 0.15s; }
+    .brand-card-modern:nth-child(6) { animation-delay: 0.18s; }
+    .brand-card-modern:nth-child(7) { animation-delay: 0.21s; }
+    .brand-card-modern:nth-child(8) { animation-delay: 0.24s; }
+    .brand-card-modern:nth-child(9) { animation-delay: 0.27s; }
+    .brand-card-modern:nth-child(10) { animation-delay: 0.30s; }
 
-    /* ============================================
-       ریسپانسیو
-       ============================================ */
-    @media (max-width: 1024px) {
+    @media (min-width: 1400px) {
         .brands-grid-modern {
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 1100px) {
+        .search-filter-wrapper {
+            gap: 12px;
+        }
+
+        .filter-buttons-modern {
+            width: 100%;
+            order: 3;
+        }
+
+        .results-count-modern {
+            margin-right: auto;
         }
     }
 
     @media (max-width: 768px) {
         .brands-page-modern {
-            padding: 12px;
+            padding: 14px 12px 35px;
         }
 
         .brands-header-modern {
-            padding: 20px 24px;
-            flex-direction: column;
             align-items: flex-start;
-            gap: 12px;
+            flex-direction: column;
+            gap: 15px;
+            padding: 22px 20px;
+            border-radius: 18px;
         }
 
         .brands-header-modern h1 {
-            font-size: 1.5rem;
+            gap: 6px;
+            font-size: 1.45rem;
         }
 
         .brands-header-modern h1 small {
-            font-size: 0.8rem;
-            display: block;
-            margin-right: 0;
-            margin-top: 4px;
+            width: 100%;
+            font-size: 0.78rem;
         }
 
         .brands-header-modern .header-right {
             width: 100%;
-            justify-content: flex-start;
-            flex-wrap: wrap;
+            gap: 8px;
         }
 
-        .brands-header-modern .badge-modern {
+        .badge-modern {
+            padding: 7px 12px;
             font-size: 0.75rem;
-            padding: 6px 14px;
         }
 
         .header-pdf-btn {
-            font-size: 0.75rem;
-            padding: 6px 16px;
+            padding: 8px 13px;
+            font-size: 0.74rem;
         }
 
         .search-filter-wrapper {
-            padding: 16px;
-            flex-direction: column;
             gap: 12px;
+            padding: 14px;
+            border-radius: 16px;
+        }
+
+        .search-box-modern {
+            flex-basis: 100%;
+            width: 100%;
         }
 
         .search-box-modern input {
-            padding: 12px 45px 12px 16px;
-            font-size: 0.9rem;
-        }
-
-        .filter-buttons-modern {
-            width: 100%;
-            overflow-x: auto;
-            flex-wrap: nowrap;
-            padding: 4px 0 8px 0;
-            gap: 6px;
-        }
-
-        .filter-btn-modern {
-            padding: 6px 14px;
-            font-size: 0.7rem;
-            white-space: nowrap;
+            height: 46px;
+            font-size: 0.85rem;
         }
 
         .results-count-modern {
-            margin-right: 0;
+            order: 2;
             width: 100%;
-            text-align: center;
+            justify-content: center;
+            margin: 0;
+            font-size: 0.78rem;
+        }
+
+        .filter-buttons-modern {
+            order: 3;
+            flex-wrap: nowrap;
+            width: 100%;
+            overflow-x: auto;
+            padding: 2px 0 7px;
+            scrollbar-width: none;
+        }
+
+        .filter-buttons-modern::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-btn-modern {
+            flex: 0 0 auto;
+            padding: 8px 12px;
+            font-size: 0.7rem;
         }
 
         .subcategories-modern {
-            padding: 16px;
+            padding: 16px 14px 11px;
+            border-radius: 16px;
+        }
+
+        .subcat-title {
+            margin-bottom: 13px;
+            font-size: 0.8rem;
+        }
+
+        .subcat-scroll {
+            gap: 13px;
+        }
+
+        .subcat-item-modern {
+            flex-basis: 74px;
         }
 
         .subcat-icon-modern {
-            width: 48px;
-            height: 48px;
+            width: 53px;
+            height: 53px;
+            border-radius: 16px;
         }
 
-        .subcat-icon-modern i {
-            font-size: 20px;
+        .subcat-icon-modern img {
+            width: 39px;
+            height: 39px;
+        }
+
+        .subcat-name-modern {
+            font-size: 0.68rem;
         }
 
         .brands-grid-modern {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 12px;
         }
 
         .brand-card-modern {
-            padding: 16px 12px;
+            padding: 16px 10px 13px;
+            border-radius: 16px;
         }
 
-        .brand-card-modern .brand-logo-wrap {
+        .brand-logo-wrap {
+            width: 88px;
+            height: 88px;
+            margin-bottom: 11px;
+            border-radius: 22px;
+        }
+
+        .brand-logo-wrap img {
             width: 72px;
             height: 72px;
         }
 
-        .brand-card-modern .brand-logo-wrap img {
-            width: 50px;
-            height: 50px;
+        .brand-logo-wrap .no-img {
+            font-size: 36px;
         }
 
-        .brand-card-modern .brand-name {
-            font-size: 0.9rem;
+        .brand-name {
+            margin-bottom: 7px;
+            font-size: 0.82rem;
         }
 
-        .brand-card-modern .brand-stats {
-            font-size: 0.65rem;
-            gap: 10px;
+        .brand-stats {
+            gap: 8px;
+            font-size: 0.66rem;
         }
 
         .brand-pdf-link {
-            font-size: 0.6rem;
-            padding: 4px 12px;
+            margin-top: 11px;
+            padding: 6px 10px;
+            font-size: 0.65rem;
         }
     }
 
     @media (max-width: 480px) {
+        .brands-page-modern {
+            padding: 11px 9px 30px;
+        }
+
+        .brands-header-modern {
+            padding: 19px 16px;
+            margin-bottom: 15px;
+        }
+
+        .brands-header-modern h1 {
+            font-size: 1.3rem;
+        }
+
+        .brands-header-modern .header-right {
+            gap: 7px;
+        }
+
+        .brands-header-modern .badge-modern {
+            font-size: 0.7rem;
+        }
+
+        .search-filter-wrapper {
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
         .brands-grid-modern {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 10px;
         }
 
-        .brand-card-modern .brand-logo-wrap {
-            width: 60px;
-            height: 60px;
-            border-radius: 16px;
+        .brand-card-modern {
+            padding: 15px 9px 12px;
         }
 
-        .brand-card-modern .brand-logo-wrap img {
-            width: 40px;
-            height: 40px;
+        .brand-logo-wrap {
+            width: 82px;
+            height: 82px;
+            border-radius: 20px;
         }
 
-        .brand-card-modern .brand-name {
-            font-size: 0.8rem;
+        .brand-logo-wrap img {
+            width: 68px;
+            height: 68px;
         }
 
-        .brand-card-modern .brand-stats {
-            font-size: 0.55rem;
-            gap: 6px;
-            flex-wrap: wrap;
+        .brand-name {
+            font-size: 0.79rem;
+        }
+
+        .brand-stats {
+            gap: 7px;
+            font-size: 0.62rem;
+        }
+
+        .brand-pdf-link {
+            padding: 6px 9px;
+            font-size: 0.61rem;
+        }
+
+        .empty-modern {
+            min-height: 230px;
+            padding: 30px 15px;
+        }
+
+        .empty-modern h3 {
+            font-size: 1rem;
+        }
+
+        .empty-modern p {
+            font-size: 0.77rem;
         }
     }
 
-    @media (min-width: 1400px) {
-        .brands-grid-modern {
-            grid-template-columns: repeat(5, 1fr);
+    @media (prefers-reduced-motion: reduce) {
+        .brands-page-modern *,
+        .brands-page-modern *::before,
+        .brands-page-modern *::after {
+            scroll-behavior: auto !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+
+        .brand-card-modern {
+            opacity: 1;
         }
     }
 </style>
@@ -693,274 +989,610 @@
 <div class="brands-page-modern">
     <div class="brands-content-modern">
 
-        <!-- ==========================================
-        هدر مدرن با دکمه دانلود PDF دسته‌بندی
-        ========================================== -->
         <div class="brands-header-modern">
+
             <div class="header-left">
                 <h1>
                     {{ category.title }}
                     <small>دسته‌بندی برندها</small>
                 </h1>
             </div>
+
             <div class="header-right">
+
                 <div class="badge-modern">
                     <i class="fas fa-building"></i>
                     {{ total_brands }} برند
                 </div>
 
-                <!-- ====== دانلود PDF دسته‌بندی ====== -->
                 {% if category_has_pdf %}
-                <a href="{{ category_pdf }}" download="{{ category.title }}.pdf" class="header-pdf-btn">
-                    <i class="fas fa-file-pdf"></i>
-                    دانلود PDF
-                    <i class="fas fa-download"></i>
-                </a>
+                    <a href="{{ category_pdf }}"
+                       download="{{ category.title }}.pdf"
+                       class="header-pdf-btn">
+                        <i class="fas fa-file-pdf"></i>
+                        دانلود PDF
+                        <i class="fas fa-download"></i>
+                    </a>
                 {% endif %}
 
                 {% if category.image %}
-                <div class="badge-modern" style="background: rgba(255,107,53,0.15); border-color: rgba(255,107,53,0.2);">
-                    <img loading="lazy" src="{{ category.image.url }}" alt="{{ category.title }}" style="width: 24px; height: 24px; object-fit: contain; border-radius: 8px;">
-                </div>
+                    <div class="badge-modern">
+                        <img loading="lazy"
+                             src="{{ category.image.url }}"
+                             alt="{{ category.title }}"
+                             class="category-image-thumb">
+                    </div>
                 {% endif %}
+
             </div>
         </div>
 
-        <!-- ==========================================
-        جستجو و فیلتر - یکپارچه
-        ========================================== -->
         <div class="search-filter-wrapper">
+
             <div class="search-box-modern">
-                <input type="text" id="searchInputModern" placeholder="جستجوی برند..." value="{{ search_query }}">
+
                 <i class="fas fa-search search-icon"></i>
-                <div id="suggestionsModern" class="suggestions-modern" style="display:none; position:absolute; top:calc(100% + 8px); left:0; right:0; background:white; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.12); z-index:1000; max-height:300px; overflow-y:auto; border:1px solid #e8ecf1;"></div>
+
+                <input
+                    type="text"
+                    id="searchInputModern"
+                    placeholder="جستجوی نام برند..."
+                    value="{{ search_query|default:'' }}"
+                    autocomplete="off"
+                    aria-label="جستجوی برند"
+                >
+
+                <button
+                    type="button"
+                    id="clearSearchModern"
+                    class="search-clear"
+                    aria-label="پاک کردن جستجو">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <div id="suggestionsModern" class="suggestions-modern"></div>
+
             </div>
 
-            <div class="results-count-modern" id="resultsCountModern">
-                <i class="fas fa-list-ul"></i> {{ total_brands }} برند
+            <div class="results-count-modern" id="resultsCountModern" aria-live="polite">
+                <i class="fas fa-list-ul"></i>
+                {{ total_brands }} برند
             </div>
 
             <div class="filter-buttons-modern">
-                <button class="filter-btn-modern {% if sort_by == 'default' %}active{% endif %}" data-sort="default">
-                    <i class="fas fa-star"></i> پیش‌فرض
+
+                <button
+                    type="button"
+                    class="filter-btn-modern {% if sort_by == 'default' %}active{% endif %}"
+                    data-sort="default">
+                    <i class="fas fa-star"></i>
+                    پیش‌فرض
                 </button>
-                <button class="filter-btn-modern {% if sort_by == 'newest' %}active{% endif %}" data-sort="newest">
-                    <i class="fas fa-clock"></i> جدید
+
+                <button
+                    type="button"
+                    class="filter-btn-modern {% if sort_by == 'newest' %}active{% endif %}"
+                    data-sort="newest">
+                    <i class="fas fa-clock"></i>
+                    جدیدترین
                 </button>
-                <button class="filter-btn-modern {% if sort_by == 'most_content' %}active{% endif %}" data-sort="most_content">
-                    <i class="fas fa-fire"></i> محتوا
+
+                <button
+                    type="button"
+                    class="filter-btn-modern {% if sort_by == 'most_content' %}active{% endif %}"
+                    data-sort="most_content">
+                    <i class="fas fa-fire"></i>
+                    محتوا
                 </button>
-                <button class="filter-btn-modern {% if sort_by == 'most_products' %}active{% endif %}" data-sort="most_products">
-                    <i class="fas fa-box"></i> محصول
+
+                <button
+                    type="button"
+                    class="filter-btn-modern {% if sort_by == 'most_products' %}active{% endif %}"
+                    data-sort="most_products">
+                    <i class="fas fa-box"></i>
+                    محصول
                 </button>
-                <button class="filter-btn-modern {% if sort_by == 'most_catalogs' %}active{% endif %}" data-sort="most_catalogs">
-                    <i class="fas fa-book"></i> کاتالوگ
+
+                <button
+                    type="button"
+                    class="filter-btn-modern {% if sort_by == 'most_catalogs' %}active{% endif %}"
+                    data-sort="most_catalogs">
+                    <i class="fas fa-book"></i>
+                    کاتالوگ
                 </button>
-                <button class="filter-btn-modern {% if sort_by == 'alphabetical' %}active{% endif %}" data-sort="alphabetical">
-                    <i class="fas fa-sort-alpha-down"></i> الفبا
+
+                <button
+                    type="button"
+                    class="filter-btn-modern {% if sort_by == 'alphabetical' %}active{% endif %}"
+                    data-sort="alphabetical">
+                    <i class="fas fa-sort-alpha-down"></i>
+                    الفبا
                 </button>
+
             </div>
+
         </div>
 
-        <!-- ==========================================
-        زیردسته‌ها - اسکرول افقی
-        ========================================== -->
         {% if subcategories %}
-        <div class="subcategories-modern">
-            <div class="subcat-title">
-                <i class="fas fa-layer-group"></i>
-                <span>دسته‌های مرتبط</span>
+            <div class="subcategories-modern">
+
+                <div class="subcat-title">
+                    <i class="fas fa-layer-group"></i>
+                    <span>دسته‌های مرتبط</span>
+                </div>
+
+                <div class="subcat-scroll">
+
+                    {% for subcat in subcategories %}
+
+                        <a
+                            href="{% url 'product:category_brands' subcat.slug %}"
+                            class="subcat-item-modern"
+                            title="{{ subcat.title }}">
+
+                            <div class="subcat-icon-modern">
+
+                                {% if subcat.image %}
+                                    <img
+                                        loading="lazy"
+                                        src="{{ subcat.image.url }}"
+                                        alt="{{ subcat.title }}">
+                                {% else %}
+                                    <i class="fas fa-folder-open"></i>
+                                {% endif %}
+
+                            </div>
+
+                            <span class="subcat-name-modern">
+                                {{ subcat.title|truncatechars:10 }}
+                            </span>
+
+                        </a>
+
+                    {% endfor %}
+
+                </div>
+
             </div>
-            <div class="subcat-scroll">
-                {% for subcat in subcategories %}
-                <a href="{% url 'product:category_brands' subcat.slug %}" class="subcat-item-modern">
-                    <div class="subcat-icon-modern">
-                        {% if subcat.image %}
-                            <img loading="lazy" src="{{ subcat.image.url }}" alt="{{ subcat.title }}">
-                        {% else %}
-                            <i class="fas fa-folder-open"></i>
-                        {% endif %}
-                    </div>
-                    <span class="subcat-name-modern">{{ subcat.title|truncatechars:10 }}</span>
-                </a>
-                {% endfor %}
-            </div>
-        </div>
         {% endif %}
 
-        <!-- ==========================================
-        گرید برندها
-        ========================================== -->
         <div class="brands-grid-modern" id="brandsGridModern">
+
             {% if brands %}
+
                 {% for brand in brands %}
-                <div class="brand-card-modern"
-                     data-name="{{ brand.title|lower }}"
-                     data-products="{{ brand.product_count|default:0 }}"
-                     data-catalogs="{{ brand.catalog_count|default:0 }}">
 
-                    <a href="{% url 'product:brand_catalogs' brand.slug %}" style="text-decoration:none; display:block;">
-                        <div class="brand-logo-wrap">
-                            {% if brand.image %}
-                                <img loading="lazy" src="{{ brand.image.url }}" alt="{{ brand.title }}" loading="lazy">
-                            {% else %}
-                                <i class="fas fa-building no-img"></i>
-                            {% endif %}
-                        </div>
+                    <div
+                        class="brand-card-modern"
+                        data-name="{{ brand.title|lower }}">
 
-                        <h3 class="brand-name">{{ brand.title }}</h3>
+                        <a
+                            href="{% url 'product:brand_catalogs' brand.slug %}"
+                            class="brand-main-link">
 
-                        <div class="brand-stats">
-                            <span><i class="fas fa-box"></i> {{ brand.product_count|default:0 }}</span>
-                            <span><i class="fas fa-book"></i> {{ brand.catalog_count|default:0 }}</span>
-                        </div>
-                    </a>
+                            <div class="brand-logo-wrap">
 
-                    <!-- ====== دانلود PDF برند ====== -->
-                    {% if brand.has_pdf %}
-                    <a href="{{ brand.pdf_file }}" download="{{ brand.title }}.pdf" class="brand-pdf-link">
-                        <i class="fas fa-file-pdf"></i>
-                        دانلود PDF
-                    </a>
-                    {% endif %}
-                </div>
+                                {% if brand.image %}
+
+                                    <img
+                                        loading="lazy"
+                                        src="{{ brand.image.url }}"
+                                        alt="{{ brand.title }}">
+
+                                {% else %}
+
+                                    <i class="fas fa-building no-img"></i>
+
+                                {% endif %}
+
+                            </div>
+
+                            <h3 class="brand-name">
+                                {{ brand.title }}
+                            </h3>
+
+                            <div class="brand-stats">
+
+                                <span>
+                                    <i class="fas fa-box"></i>
+                                    {{ brand.product_count|default:0 }}
+                                </span>
+
+                                <span>
+                                    <i class="fas fa-book"></i>
+                                    {{ brand.catalog_count|default:0 }}
+                                </span>
+
+                            </div>
+
+                        </a>
+
+                        {% if brand.has_pdf %}
+
+                            <a
+                                href="{{ brand.pdf_file }}"
+                                download="{{ brand.title }}.pdf"
+                                class="brand-pdf-link">
+
+                                <i class="fas fa-file-pdf"></i>
+                                دانلود PDF
+
+                            </a>
+
+                        {% endif %}
+
+                    </div>
+
                 {% endfor %}
+
             {% else %}
+
                 <div class="empty-modern">
+
                     <i class="fas fa-box-open"></i>
+
                     <h3>برندی یافت نشد!</h3>
-                    <p>متاسفانه هیچ برندی برای {{ category.title }} وجود ندارد.</p>
+
+                    <p>
+                        متأسفانه هیچ برندی برای {{ category.title }} وجود ندارد.
+                    </p>
+
                 </div>
+
             {% endif %}
+
+            <div class="empty-modern" id="dynamicEmptyState" hidden>
+
+                <i class="fas fa-search"></i>
+
+                <h3>برندی پیدا نشد!</h3>
+
+                <p>
+                    نام برند دیگری را جستجو کنید.
+                </p>
+
+            </div>
+
         </div>
 
     </div>
 </div>
 
 <script>
-// ============================================
-// داده‌های برندها برای جستجو
-// ============================================
-const allBrands = [
-    {% for brand in brands %}
-    {
-        id: {{ brand.id }},
-        title: "{{ brand.title|escapejs }}",
-        slug: "{{ brand.slug|escapejs }}",
-        image: "{% if brand.image %}{{ brand.image.url }}{% endif %}",
-        products: {{ brand.product_count|default:0 }},
-        catalogs: {{ brand.catalog_count|default:0 }},
-        has_pdf: {% if brand.has_pdf %}true{% else %}false{% endif %},
-        pdf_file: "{% if brand.pdf_file %}{{ brand.pdf_file }}{% else %}null{% endif %}"
-    },
-    {% endfor %}
-];
+(function () {
+    "use strict";
 
-// ============================================
-// جستجو با پیشنهادات
-// ============================================
-const searchInput = document.getElementById('searchInputModern');
-const suggestionsBox = document.getElementById('suggestionsModern');
-const resultsCount = document.getElementById('resultsCountModern');
+    const allBrands = [
+        {% for brand in brands %}
+            {% url 'product:brand_catalogs' brand.slug as brand_catalog_url %}
+            {
+                title: "{{ brand.title|escapejs }}",
+                slug: "{{ brand.slug|escapejs }}",
+                url: "{{ brand_catalog_url|escapejs }}",
+                image: "{% if brand.image %}{{ brand.image.url|escapejs }}{% endif %}",
+                products: {{ brand.product_count|default:0 }},
+                catalogs: {{ brand.catalog_count|default:0 }}
+            },
+        {% endfor %}
+    ];
 
-function highlightMatch(text, query) {
-    if (!query) return text;
-    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-    return text.replace(regex, '<span style="background:#ff6b35; color:white; border-radius:4px; padding:0 4px;">$1</span>');
-}
+    const searchInput = document.getElementById("searchInputModern");
+    const suggestionsBox = document.getElementById("suggestionsModern");
+    const resultsCount = document.getElementById("resultsCountModern");
+    const clearSearchButton = document.getElementById("clearSearchModern");
+    const dynamicEmptyState = document.getElementById("dynamicEmptyState");
+    const grid = document.getElementById("brandsGridModern");
 
-function showSuggestions(query) {
-    if (!query.trim()) {
-        suggestionsBox.style.display = 'none';
+    if (
+        !searchInput ||
+        !suggestionsBox ||
+        !resultsCount ||
+        !grid
+    ) {
         return;
     }
 
-    const filtered = allBrands.filter(b =>
-        b.title.toLowerCase().includes(query.toLowerCase())
-    ).slice(0, 6);
+    const brandCards = Array.from(
+        grid.querySelectorAll(".brand-card-modern")
+    );
 
-    if (filtered.length === 0) {
-        suggestionsBox.style.display = 'none';
-        return;
+    let typingTimer = null;
+
+    function updateResultsCount(count) {
+        const icon = document.createElement("i");
+
+        icon.className = "fas fa-list-ul";
+
+        resultsCount.replaceChildren(
+            icon,
+            document.createTextNode(` ${count} برند`)
+        );
     }
 
-    suggestionsBox.innerHTML = filtered.map(b => `
-        <div onclick="window.location.href='/product/brand/${b.slug}/catalogs/'"
-             style="padding:12px 16px; border-bottom:1px solid #f1f3f5; cursor:pointer; display:flex; align-items:center; gap:12px; transition:all 0.2s;">
-            <div style="width:40px; height:40px; background:#f8f9fb; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                ${b.image ?
-                    `<img loading="lazy" src="${b.image}" style="width:28px; height:28px; object-fit:contain;">` :
-                    `<i class="fas fa-building" style="color:#ff6b35; font-size:20px;"></i>`
-                }
-            </div>
-            <div style="flex:1;">
-                <div style="font-weight:700; color:#0f172a; font-size:0.9rem;">${highlightMatch(b.title, query)}</div>
-                <div style="font-size:0.7rem; color:#94a3b8;">
-                    <i class="fas fa-box"></i> ${b.products} | <i class="fas fa-book"></i> ${b.catalogs}
-                </div>
-            </div>
-            <i class="fas fa-chevron-left" style="color:#cbd5e1; font-size:12px;"></i>
-        </div>
-    `).join('');
+    function updateClearButton() {
+        clearSearchButton.classList.toggle(
+            "visible",
+            searchInput.value.length > 0
+        );
+    }
 
-    suggestionsBox.style.display = 'block';
-}
+    function filterBrands(query) {
+        const normalizedQuery = query.trim().toLowerCase();
 
-function filterBrands(query) {
-    const cards = document.querySelectorAll('.brand-card-modern');
-    let visible = 0;
+        let visibleCount = 0;
 
-    cards.forEach(card => {
-        const name = card.dataset.name;
-        if (!query.trim() || (name && name.includes(query.toLowerCase()))) {
-            card.style.display = 'block';
-            visible++;
+        brandCards.forEach((card) => {
+            const brandName = (
+                card.dataset.name || ""
+            ).toLowerCase();
+
+            const isVisible =
+                !normalizedQuery ||
+                brandName.includes(normalizedQuery);
+
+            card.style.display = isVisible ? "" : "none";
+
+            if (isVisible) {
+                visibleCount++;
+            }
+        });
+
+        updateResultsCount(visibleCount);
+
+        if (dynamicEmptyState) {
+            dynamicEmptyState.hidden =
+                brandCards.length === 0 ||
+                visibleCount !== 0;
+        }
+    }
+
+    function appendHighlightedText(container, text, query) {
+        if (!query) {
+            container.appendChild(
+                document.createTextNode(text)
+            );
+
+            return;
+        }
+
+        const lowerText = text.toLowerCase();
+        const lowerQuery = query.toLowerCase();
+
+        let currentPosition = 0;
+        let matchPosition;
+
+        while (
+            (matchPosition = lowerText.indexOf(
+                lowerQuery,
+                currentPosition
+            )) !== -1
+        ) {
+            if (matchPosition > currentPosition) {
+                container.appendChild(
+                    document.createTextNode(
+                        text.slice(currentPosition, matchPosition)
+                    )
+                );
+            }
+
+            const highlight = document.createElement("span");
+
+            highlight.className = "suggestion-highlight";
+            highlight.textContent = text.slice(
+                matchPosition,
+                matchPosition + query.length
+            );
+
+            container.appendChild(highlight);
+
+            currentPosition = matchPosition + query.length;
+        }
+
+        if (currentPosition < text.length) {
+            container.appendChild(
+                document.createTextNode(
+                    text.slice(currentPosition)
+                )
+            );
+        }
+    }
+
+    function createSuggestion(brand, query) {
+        const button = document.createElement("button");
+
+        button.type = "button";
+        button.className = "suggestion-item";
+
+        const imageWrap = document.createElement("div");
+        imageWrap.className = "suggestion-image";
+
+        if (brand.image) {
+            const image = document.createElement("img");
+
+            image.src = brand.image;
+            image.alt = brand.title;
+            image.loading = "lazy";
+
+            image.addEventListener("error", function () {
+                image.replaceWith(
+                    createBrandIcon()
+                );
+            });
+
+            imageWrap.appendChild(image);
         } else {
-            card.style.display = 'none';
+            imageWrap.appendChild(
+                createBrandIcon()
+            );
+        }
+
+        const info = document.createElement("div");
+        info.className = "suggestion-info";
+
+        const name = document.createElement("span");
+        name.className = "suggestion-name";
+
+        appendHighlightedText(
+            name,
+            brand.title,
+            query
+        );
+
+        const meta = document.createElement("span");
+        meta.className = "suggestion-meta";
+
+        const productIcon = document.createElement("i");
+        productIcon.className = "fas fa-box";
+
+        const productCount = document.createTextNode(
+            ` ${brand.products} `
+        );
+
+        const separator = document.createTextNode(" | ");
+
+        const catalogIcon = document.createElement("i");
+        catalogIcon.className = "fas fa-book";
+
+        const catalogCount = document.createTextNode(
+            ` ${brand.catalogs}`
+        );
+
+        meta.append(
+            productIcon,
+            productCount,
+            separator,
+            catalogIcon,
+            catalogCount
+        );
+
+        info.append(name, meta);
+
+        const arrow = document.createElement("i");
+        arrow.className = "fas fa-chevron-left suggestion-arrow";
+
+        button.append(
+            imageWrap,
+            info,
+            arrow
+        );
+
+        button.addEventListener("click", function () {
+            window.location.assign(brand.url);
+        });
+
+        return button;
+    }
+
+    function createBrandIcon() {
+        const icon = document.createElement("i");
+
+        icon.className = "fas fa-building";
+
+        return icon;
+    }
+
+    function showSuggestions(query) {
+        const normalizedQuery = query.trim().toLowerCase();
+
+        suggestionsBox.replaceChildren();
+
+        if (!normalizedQuery) {
+            suggestionsBox.style.display = "none";
+            return;
+        }
+
+        const filteredBrands = allBrands
+            .filter((brand) =>
+                brand.title.toLowerCase().includes(normalizedQuery)
+            )
+            .slice(0, 6);
+
+        if (filteredBrands.length === 0) {
+            const empty = document.createElement("div");
+
+            empty.className = "suggestion-empty";
+            empty.textContent = "برندی با این نام پیدا نشد.";
+
+            suggestionsBox.appendChild(empty);
+            suggestionsBox.style.display = "block";
+
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+
+        filteredBrands.forEach((brand) => {
+            fragment.appendChild(
+                createSuggestion(brand, query.trim())
+            );
+        });
+
+        suggestionsBox.appendChild(fragment);
+        suggestionsBox.style.display = "block";
+    }
+
+    function closeSuggestions() {
+        suggestionsBox.style.display = "none";
+    }
+
+    searchInput.addEventListener("input", function (event) {
+        const value = event.target.value;
+
+        clearTimeout(typingTimer);
+
+        updateClearButton();
+
+        typingTimer = setTimeout(function () {
+            showSuggestions(value);
+            filterBrands(value);
+        }, 150);
+    });
+
+    searchInput.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+            closeSuggestions();
         }
     });
 
-    resultsCount.innerHTML = `<i class="fas fa-list-ul"></i> ${visible} برند`;
-}
+    clearSearchButton.addEventListener("click", function () {
+        searchInput.value = "";
 
-let typingTimer;
-searchInput.addEventListener('input', (e) => {
-    const val = e.target.value;
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(() => {
-        showSuggestions(val);
-        filterBrands(val);
-    }, 200);
-});
+        updateClearButton();
+        closeSuggestions();
+        filterBrands("");
 
-document.addEventListener('click', (e) => {
-    if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
-        suggestionsBox.style.display = 'none';
-    }
-});
-
-// ============================================
-// فیلترها
-// ============================================
-document.querySelectorAll('.filter-btn-modern').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const sort = btn.dataset.sort;
-        const url = new URL(window.location.href);
-        url.searchParams.set('sort', sort);
-        url.searchParams.set('search', searchInput.value);
-        window.location.href = url.toString();
+        searchInput.focus();
     });
-});
 
-// ============================================
-// مقداردهی اولیه - نمایش تعداد برندها
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    const total = document.querySelectorAll('.brand-card-modern:not([style*="display: none"])').length;
-    if (total > 0) {
-        resultsCount.innerHTML = `<i class="fas fa-list-ul"></i> ${total} برند`;
-    }
-});
+    document.addEventListener("click", function (event) {
+        if (
+            !searchInput.contains(event.target) &&
+            !suggestionsBox.contains(event.target)
+        ) {
+            closeSuggestions();
+        }
+    });
+
+    document.querySelectorAll(".filter-btn-modern").forEach((button) => {
+        button.addEventListener("click", function () {
+            const sort = button.dataset.sort;
+
+            const url = new URL(window.location.href);
+
+            url.searchParams.set("sort", sort);
+            url.searchParams.set(
+                "search",
+                searchInput.value.trim()
+            );
+
+            window.location.assign(url.toString());
+        });
+    });
+
+    updateClearButton();
+    filterBrands(searchInput.value);
+
+})();
 </script>
 
 {% endblock %}
