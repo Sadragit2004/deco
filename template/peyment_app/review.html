@@ -1,14 +1,12 @@
 
 {% load humanize %}
-{% load static %}
-
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="referrer" content="no-referrer">
-    <title>بررسی پرداخت | دکو بی تو بی</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#f6f8f7">
+    <title>تأیید پرداخت | دکو B2B</title>
 
     <style>
         * {
@@ -17,240 +15,220 @@
 
         body {
             margin: 0;
+            padding: 24px 16px;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 24px;
-            background: #f4f6f8;
-            color: #263238;
+            background: #f6f8f7;
+            color: #26332f;
             font-family: Tahoma, Arial, sans-serif;
         }
 
-        .review-card {
+        .payment-container {
             width: 100%;
-            max-width: 440px;
-            padding: 32px;
+            max-width: 460px;
             background: #fff;
-            border: 1px solid #e8ecef;
+            border: 1px solid #e8eeeb;
             border-radius: 18px;
-            box-shadow: 0 12px 40px rgba(25, 45, 60, 0.07);
+            padding: 30px 24px;
+            box-shadow: 0 12px 40px rgba(25, 55, 43, 0.06);
         }
 
-        .brand {
-            margin-bottom: 28px;
-            text-align: center;
-            color: #344956;
-            font-size: 19px;
-            font-weight: 700;
-        }
-
-        .icon {
-            width: 58px;
-            height: 58px;
+        .payment-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 18px;
-            border-radius: 50%;
-            background: #edf4f7;
-            color: #344956;
-            font-size: 27px;
+            border-radius: 18px;
+            background: #eaf4ef;
+            color: #2f755b;
+            font-size: 30px;
         }
 
         h1 {
             margin: 0 0 10px;
             text-align: center;
             font-size: 20px;
+            font-weight: 700;
         }
 
         .subtitle {
-            margin: 0 0 28px;
-            color: #7a858d;
-            text-align: center;
+            margin: 0 0 26px;
+            color: #7b8983;
             font-size: 13px;
             line-height: 2;
+            text-align: center;
         }
 
         .details {
             padding: 18px;
-            border: 1px solid #edf0f2;
-            border-radius: 12px;
-            background: #fafbfc;
+            background: #f8faf9;
+            border: 1px solid #edf1ef;
+            border-radius: 13px;
         }
 
         .detail-row {
             display: flex;
+            align-items: flex-start;
             justify-content: space-between;
-            align-items: center;
             gap: 12px;
             padding: 11px 0;
             font-size: 13px;
+            line-height: 1.8;
         }
 
-        .detail-row + .detail-row {
-            border-top: 1px solid #edf0f2;
+        .detail-row:not(:last-child) {
+            border-bottom: 1px solid #e9efec;
         }
 
         .detail-label {
-            color: #7a858d;
+            flex-shrink: 0;
+            color: #84918b;
         }
 
         .detail-value {
-            color: #344956;
-            font-weight: 700;
+            color: #35443d;
+            font-weight: 600;
             text-align: left;
             overflow-wrap: anywhere;
         }
 
-        .amount {
-            margin-top: 18px;
-            padding: 18px;
+        .amount-row {
+            margin-top: 16px;
+            padding: 17px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: #edf6f1;
             border-radius: 12px;
-            background: #f0f5f7;
-            text-align: center;
         }
 
         .amount-label {
-            display: block;
-            margin-bottom: 10px;
-            color: #657781;
+            color: #527364;
             font-size: 13px;
         }
 
         .amount-value {
-            color: #344956;
-            font-size: 25px;
+            color: #24664b;
+            font-size: 20px;
             font-weight: 700;
         }
 
         .currency {
-            margin-right: 5px;
-            font-size: 13px;
+            margin-right: 4px;
+            font-size: 12px;
             font-weight: 400;
         }
 
         .submit-button {
             width: 100%;
-            display: block;
-            margin-top: 24px;
-            padding: 15px;
+            min-height: 52px;
+            margin-top: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border: 0;
-            border-radius: 10px;
-            background: #344956;
+            border-radius: 12px;
+            background: #2f755b;
             color: #fff;
             font-family: inherit;
             font-size: 14px;
             font-weight: 700;
-            text-align: center;
             text-decoration: none;
             cursor: pointer;
             transition: background 0.2s ease;
         }
 
         .submit-button:hover {
-            background: #263943;
-        }
-
-        .submit-button.loading {
-            opacity: 0.7;
-            pointer-events: none;
+            background: #245f49;
         }
 
         .security-note {
             margin: 18px 0 0;
-            color: #929ba1;
-            text-align: center;
+            color: #89958f;
             font-size: 11px;
             line-height: 2;
+            text-align: center;
         }
 
-        @media (max-width: 480px) {
-            .review-card {
-                padding: 24px 20px;
+        @media (max-width: 380px) {
+            .payment-container {
+                padding: 24px 17px;
             }
 
             .amount-value {
-                font-size: 22px;
+                font-size: 17px;
             }
         }
     </style>
 </head>
 
 <body>
-    <main class="review-card">
+    <main class="payment-container">
 
-        <div class="brand">دکو بی تو بی</div>
+        <div class="payment-icon" aria-hidden="true">
+            ◈
+        </div>
 
-        <div class="icon">✓</div>
-
-        <h1>بررسی اطلاعات پرداخت</h1>
+        <h1>تأیید و تکمیل پرداخت</h1>
 
         <p class="subtitle">
-            لطفاً اطلاعات پرداخت خود را بررسی کنید و سپس وارد درگاه بانکی شوید.
+            لطفاً اطلاعات پرداخت را بررسی کنید و برای ورود به درگاه بانکی اقدام نمایید.
         </p>
 
         <section class="details">
 
             <div class="detail-row">
-                <span class="detail-label">شماره تراکنش</span>
+                <span class="detail-label">شماره پرداخت</span>
                 <span class="detail-value">{{ payment.id }}</span>
             </div>
 
-            <div class="detail-row">
-                <span class="detail-label">شرح پرداخت</span>
-                <span class="detail-value">{{ payment.description }}</span>
-            </div>
-
             {% if order_id %}
-                <div class="detail-row">
-                    <span class="detail-label">شماره سفارش</span>
-                    <span class="detail-value">{{ order_id }}</span>
-                </div>
+            <div class="detail-row">
+                <span class="detail-label">شماره سفارش</span>
+                <span class="detail-value">{{ order_id }}</span>
+            </div>
             {% endif %}
 
             <div class="detail-row">
-                <span class="detail-label">نوع پرداخت</span>
+                <span class="detail-label">شرح پرداخت</span>
                 <span class="detail-value">
-                    {% if payment_type == "membership" %}
-                        حق عضویت
-                    {% else %}
-                        پرداخت سفارش
-                    {% endif %}
+                    {{ payment.description|default:"پرداخت آنلاین" }}
                 </span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">روش پرداخت</span>
+                <span class="detail-value">درگاه اینترنتی زرین‌پال</span>
             </div>
 
         </section>
 
-        <section class="amount">
+        <div class="amount-row">
             <span class="amount-label">مبلغ قابل پرداخت</span>
-
             <span class="amount-value">
                 {{ amount_toman|intcomma }}
                 <span class="currency">تومان</span>
             </span>
-        </section>
+        </div>
 
         <a
             href="{{ gateway_url }}"
             class="submit-button"
             id="payBtn"
-            referrerpolicy="no-referrer"
         >
             تأیید و ورود به درگاه پرداخت
         </a>
 
         <p class="security-note">
-            پس از تأیید، برای تکمیل پرداخت به درگاه امن زرین‌پال منتقل می‌شوید.
+            پرداخت شما از طریق درگاه امن زرین‌پال انجام می‌شود.
+            اطلاعات بانکی شما در سایت ذخیره نخواهد شد.
         </p>
 
     </main>
-
-    <script>
-        document.getElementById("payBtn").addEventListener("click", function () {
-            this.classList.add("loading");
-            this.textContent = "در حال انتقال به درگاه پرداخت...";
-        });
-    </script>
 </body>
 </html>

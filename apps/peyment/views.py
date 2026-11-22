@@ -1,5 +1,5 @@
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.views import View
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -518,60 +518,55 @@ def membership_payment_redirect(request):
 
 
 # =============================== صفحه بررسی پرداخت ===============================
+from django.contrib.auth.decorators import login_required
+@login_required
 def payment_review(request, session_key):
-    """نمایش اطلاعات پرداخت و انتقال امن به درگاه زرین‌پال"""
+    from django.http import HttpResponse, HttpResponseNotAllowed
 
-    if not request.user.is_authenticated:
-        messages.error(request, "لطفاً ابتدا وارد حساب کاربری خود شوید.")
-        return redirect("user:login")
+    if request.method != "GET":
+        return HttpResponseNotAllowed(["GET"])
 
     session_data = request.session.get(session_key)
 
-    if not session_data:
-        messages.error(request, "اطلاعات پرداخت معتبر نیست یا منقضی شده است.")
-        return redirect("main:index")
+    if not isinstance(session_data, dict):
+        return HttpResponse("اطلاعات پرداخت معتبر نیست یا منقضی شده است.", status=400)
 
     payment_id = session_data.get("peyment_id")
     authority = session_data.get("authority")
-    amount = session_data.get("amount")
+    session_amount = session_data.get("amount")
 
-    if not payment_id or not authority or not amount:
-        messages.error(request, "اطلاعات پرداخت ناقص است.")
-        return redirect("main:index")
-
-    try:
-        payment = Peyment.objects.get(
-            id=payment_id,
-            customer=request.user,
-            isFinaly=False,
-            payment_method=PaymentMethod.ONLINE.value,
-        )
-    except Peyment.DoesNotExist:
-        messages.error(request, "تراکنش پرداخت معتبر نیست.")
-        return redirect("main:index")
+    if not payment_id or not authority or not session_amount:
+        return HttpResponse("اطلاعات پرداخت ناقص است.", status=400)
 
     try:
-        session_amount = int(amount)
+        payment_id = int(payment_id)
+        session_amount = int(session_amount)
     except (TypeError, ValueError):
-        messages.error(request, "مبلغ پرداخت معتبر نیست.")
-        return redirect("main:index")
+        return HttpResponse("اطلاعات پرداخت معتبر نیست.", status=400)
 
-    if session_amount <= 0 or session_amount != payment.amount:
-        messages.error(request, "مبلغ پرداخت با تراکنش مطابقت ندارد.")
-        return redirect("main:index")
+    if session_amount <= 0:
+        return HttpResponse("مبلغ پرداخت معتبر نیست.", status=400)
 
-    if not authority:
-        messages.error(request, "شناسه پرداخت زرین‌پال معتبر نیست.")
-        return redirect("main:index")
+    payment = get_object_or_404(
+        Peyment,
+        id=payment_id,
+        customer=request.user,
+        isFinaly=False,
+    )
+
+    if int(payment.amount) != session_amount:
+        return HttpResponse("مبلغ پرداخت با اطلاعات سفارش مطابقت ندارد.", status=400)
+
+    gateway_url = ZP_API_STARTPAY.format(authority=authority)
 
     context = {
         "payment": payment,
         "amount": payment.amount,
         "amount_toman": payment.amount // 10,
         "authority": authority,
+        "gateway_url": gateway_url,
         "payment_type": session_data.get("type", "order"),
         "order_id": session_data.get("order_id"),
-        "gateway_url": ZP_API_STARTPAY.format(authority=authority),
     }
 
     response = render(
@@ -580,9 +575,11 @@ def payment_review(request, session_key):
         context,
     )
 
-    response["Referrer-Policy"] = "no-referrer"
+    # ارسال Origin سایت به درگاه در انتقال بین دامنه‌ها
+    response["Referrer-Policy"] = "strict-origin-when-cross-origin"
 
     return response
+
 
 # =============================== تایید پرداخت زرین‌پال ===============================
 
