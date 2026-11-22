@@ -7,6 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
     <title>بررسی پرداخت | دکو بی تو بی</title>
 
     <style>
@@ -131,6 +132,7 @@
 
         .submit-button {
             width: 100%;
+            display: block;
             margin-top: 24px;
             padding: 15px;
             border: 0;
@@ -140,12 +142,19 @@
             font-family: inherit;
             font-size: 14px;
             font-weight: 700;
+            text-align: center;
+            text-decoration: none;
             cursor: pointer;
             transition: background 0.2s ease;
         }
 
         .submit-button:hover {
             background: #263943;
+        }
+
+        .submit-button.loading {
+            opacity: 0.7;
+            pointer-events: none;
         }
 
         .security-note {
@@ -170,6 +179,7 @@
 
 <body>
     <main class="review-card">
+
         <div class="brand">دکو بی تو بی</div>
 
         <div class="icon">✓</div>
@@ -181,6 +191,7 @@
         </p>
 
         <section class="details">
+
             <div class="detail-row">
                 <span class="detail-label">شماره تراکنش</span>
                 <span class="detail-value">{{ payment.id }}</span>
@@ -208,27 +219,38 @@
                     {% endif %}
                 </span>
             </div>
+
         </section>
 
         <section class="amount">
             <span class="amount-label">مبلغ قابل پرداخت</span>
+
             <span class="amount-value">
                 {{ amount_toman|intcomma }}
                 <span class="currency">تومان</span>
             </span>
         </section>
 
-        <form method="post" action="">
-            {% csrf_token %}
-
-            <button type="submit" class="submit-button">
-                تأیید و ورود به درگاه پرداخت
-            </button>
-        </form>
+        <a
+            href="{{ gateway_url }}"
+            class="submit-button"
+            id="payBtn"
+            referrerpolicy="no-referrer"
+        >
+            تأیید و ورود به درگاه پرداخت
+        </a>
 
         <p class="security-note">
             پس از تأیید، برای تکمیل پرداخت به درگاه امن زرین‌پال منتقل می‌شوید.
         </p>
+
     </main>
+
+    <script>
+        document.getElementById("payBtn").addEventListener("click", function () {
+            this.classList.add("loading");
+            this.textContent = "در حال انتقال به درگاه پرداخت...";
+        });
+    </script>
 </body>
 </html>

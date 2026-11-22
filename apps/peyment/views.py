@@ -518,9 +518,8 @@ def membership_payment_redirect(request):
 
 
 # =============================== صفحه بررسی پرداخت ===============================
-
 def payment_review(request, session_key):
-    """نمایش اطلاعات پرداخت قبل از ورود به درگاه زرین‌پال"""
+    """نمایش اطلاعات پرداخت و انتقال امن به درگاه زرین‌پال"""
 
     if not request.user.is_authenticated:
         messages.error(request, "لطفاً ابتدا وارد حساب کاربری خود شوید.")
@@ -545,21 +544,25 @@ def payment_review(request, session_key):
             id=payment_id,
             customer=request.user,
             isFinaly=False,
+            payment_method=PaymentMethod.ONLINE.value,
         )
     except Peyment.DoesNotExist:
         messages.error(request, "تراکنش پرداخت معتبر نیست.")
         return redirect("main:index")
 
-    if int(amount) != int(payment.amount):
+    try:
+        session_amount = int(amount)
+    except (TypeError, ValueError):
         messages.error(request, "مبلغ پرداخت معتبر نیست.")
         return redirect("main:index")
 
-    if request.method == "POST":
-        response = redirect(
-            ZP_API_STARTPAY.format(authority=authority)
-        )
-        response["Referrer-Policy"] = "no-referrer"
-        return response
+    if session_amount <= 0 or session_amount != payment.amount:
+        messages.error(request, "مبلغ پرداخت با تراکنش مطابقت ندارد.")
+        return redirect("main:index")
+
+    if not authority:
+        messages.error(request, "شناسه پرداخت زرین‌پال معتبر نیست.")
+        return redirect("main:index")
 
     context = {
         "payment": payment,
@@ -568,6 +571,7 @@ def payment_review(request, session_key):
         "authority": authority,
         "payment_type": session_data.get("type", "order"),
         "order_id": session_data.get("order_id"),
+        "gateway_url": ZP_API_STARTPAY.format(authority=authority),
     }
 
     response = render(
@@ -575,9 +579,10 @@ def payment_review(request, session_key):
         "peyment_app/review.html",
         context,
     )
-    response["Referrer-Policy"] = "no-referrer"
-    return response
 
+    response["Referrer-Policy"] = "no-referrer"
+
+    return response
 
 # =============================== تایید پرداخت زرین‌پال ===============================
 
