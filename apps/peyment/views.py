@@ -24,7 +24,7 @@ MERCHANT_ID = "9f39aedf-f67b-487a-9911-ea3832f99eb8"
 ZP_API_REQUEST = "https://api.zarinpal.com/pg/v4/payment/request.json"
 ZP_API_VERIFY = "https://api.zarinpal.com/pg/v4/payment/verify.json"
 ZP_API_STARTPAY = "https://www.zarinpal.com/pg/StartPay/{authority}"
-CALLBACK_URL = "https://decob2b.net/peyment/verify/"
+CALLBACK_URL = "https://www.decob2b.net/peyment/verify/"
 
 
 def send_request(request, order_id):

@@ -3,7 +3,7 @@ import json
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-CallbackURL = 'https://decob2b.net/peyment/verify/'
+CallbackURL = 'https://www.decob2b.net/peyment/verify/'
 
 
 class ZarinPal(LoginRequiredMixin):
