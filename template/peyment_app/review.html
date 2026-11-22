@@ -1,0 +1,234 @@
+
+{% load humanize %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>بررسی پرداخت | دکو بی تو بی</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: #f4f6f8;
+            color: #263238;
+            font-family: Tahoma, Arial, sans-serif;
+        }
+
+        .review-card {
+            width: 100%;
+            max-width: 440px;
+            padding: 32px;
+            background: #fff;
+            border: 1px solid #e8ecef;
+            border-radius: 18px;
+            box-shadow: 0 12px 40px rgba(25, 45, 60, 0.07);
+        }
+
+        .brand {
+            margin-bottom: 28px;
+            text-align: center;
+            color: #344956;
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .icon {
+            width: 58px;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px;
+            border-radius: 50%;
+            background: #edf4f7;
+            color: #344956;
+            font-size: 27px;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .subtitle {
+            margin: 0 0 28px;
+            color: #7a858d;
+            text-align: center;
+            font-size: 13px;
+            line-height: 2;
+        }
+
+        .details {
+            padding: 18px;
+            border: 1px solid #edf0f2;
+            border-radius: 12px;
+            background: #fafbfc;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 0;
+            font-size: 13px;
+        }
+
+        .detail-row + .detail-row {
+            border-top: 1px solid #edf0f2;
+        }
+
+        .detail-label {
+            color: #7a858d;
+        }
+
+        .detail-value {
+            color: #344956;
+            font-weight: 700;
+            text-align: left;
+            overflow-wrap: anywhere;
+        }
+
+        .amount {
+            margin-top: 18px;
+            padding: 18px;
+            border-radius: 12px;
+            background: #f0f5f7;
+            text-align: center;
+        }
+
+        .amount-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #657781;
+            font-size: 13px;
+        }
+
+        .amount-value {
+            color: #344956;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .currency {
+            margin-right: 5px;
+            font-size: 13px;
+            font-weight: 400;
+        }
+
+        .submit-button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 15px;
+            border: 0;
+            border-radius: 10px;
+            background: #344956;
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .submit-button:hover {
+            background: #263943;
+        }
+
+        .security-note {
+            margin: 18px 0 0;
+            color: #929ba1;
+            text-align: center;
+            font-size: 11px;
+            line-height: 2;
+        }
+
+        @media (max-width: 480px) {
+            .review-card {
+                padding: 24px 20px;
+            }
+
+            .amount-value {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="review-card">
+        <div class="brand">دکو بی تو بی</div>
+
+        <div class="icon">✓</div>
+
+        <h1>بررسی اطلاعات پرداخت</h1>
+
+        <p class="subtitle">
+            لطفاً اطلاعات پرداخت خود را بررسی کنید و سپس وارد درگاه بانکی شوید.
+        </p>
+
+        <section class="details">
+            <div class="detail-row">
+                <span class="detail-label">شماره تراکنش</span>
+                <span class="detail-value">{{ payment.id }}</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">شرح پرداخت</span>
+                <span class="detail-value">{{ payment.description }}</span>
+            </div>
+
+            {% if order_id %}
+                <div class="detail-row">
+                    <span class="detail-label">شماره سفارش</span>
+                    <span class="detail-value">{{ order_id }}</span>
+                </div>
+            {% endif %}
+
+            <div class="detail-row">
+                <span class="detail-label">نوع پرداخت</span>
+                <span class="detail-value">
+                    {% if payment_type == "membership" %}
+                        حق عضویت
+                    {% else %}
+                        پرداخت سفارش
+                    {% endif %}
+                </span>
+            </div>
+        </section>
+
+        <section class="amount">
+            <span class="amount-label">مبلغ قابل پرداخت</span>
+            <span class="amount-value">
+                {{ amount_toman|intcomma }}
+                <span class="currency">تومان</span>
+            </span>
+        </section>
+
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="submit-button">
+                تأیید و ورود به درگاه پرداخت
+            </button>
+        </form>
+
+        <p class="security-note">
+            پس از تأیید، برای تکمیل پرداخت به درگاه امن زرین‌پال منتقل می‌شوید.
+        </p>
+    </main>
+</body>
+</html>
