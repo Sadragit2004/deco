@@ -7,7 +7,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="referrer" content="no-referrer">
     <title>بررسی پرداخت | دکو بی تو بی</title>
 
     <style>
@@ -219,8 +218,9 @@
             </span>
         </section>
 
-        <form method="post">
+        <form method="post" action="">
             {% csrf_token %}
+
             <button type="submit" class="submit-button">
                 تأیید و ورود به درگاه پرداخت
             </button>
