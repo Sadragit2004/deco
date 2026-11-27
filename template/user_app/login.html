@@ -1,4 +1,3 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
@@ -627,6 +626,76 @@
             transform: scale(.98);
         }
 
+        /* ===== راه‌های ارتباطی ===== */
+        .contact-block {
+            margin-top: 4px;
+        }
+
+        .contact-row {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .contact-tile {
+            min-width: 0;
+            min-height: 88px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 4px 10px;
+            border: 1px solid #eadccd;
+            border-radius: 17px;
+            background: #fffaf4;
+            color: #6e4b36;
+            font-size: 11px;
+            font-weight: 900;
+            text-decoration: none;
+            transition: transform .18s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
+        }
+
+        .contact-tile:active {
+            transform: scale(.95);
+        }
+
+        .contact-tile:focus-visible {
+            outline: 3px solid rgba(217, 119, 50, .35);
+            outline-offset: 2px;
+        }
+
+        @media (hover: hover) {
+            .contact-tile:hover {
+                transform: translateY(-3px);
+                border-color: #e5b48c;
+                background: #fff;
+                box-shadow: 0 12px 24px rgba(115, 70, 37, .11);
+            }
+        }
+
+        .contact-ico {
+            width: 46px;
+            height: 46px;
+            display: grid;
+            place-items: center;
+            border-radius: 15px;
+            color: #fff;
+            font-size: 23px;
+            box-shadow: 0 7px 16px rgba(0, 0, 0, .14);
+        }
+
+        .contact-ico svg {
+            width: 24px;
+            height: 24px;
+            display: block;
+        }
+
+        .ico-rubika { background: linear-gradient(135deg, #8b5cf6, #4f46e5); }
+        .ico-whatsapp { background: linear-gradient(135deg, #3ddc84, #1faa59); }
+        .ico-telegram { background: linear-gradient(135deg, #38b6f0, #1d8ccf); }
+        .ico-instagram { background: linear-gradient(45deg, #f9a03f 0%, #e1306c 50%, #833ab4 100%); }
+
         .footer-section {
             margin-top: 21px;
             padding-top: 16px;
@@ -884,6 +953,23 @@
             .auth-header {
                 margin-bottom: 22px;
             }
+
+            .contact-tile {
+                min-height: 96px;
+                gap: 9px;
+            }
+
+            .contact-ico {
+                width: 52px;
+                height: 52px;
+                border-radius: 17px;
+                font-size: 26px;
+            }
+
+            .contact-ico svg {
+                width: 27px;
+                height: 27px;
+            }
         }
 
         @media (max-width: 420px) {
@@ -919,6 +1005,21 @@
             .btn-guide {
                 padding-inline: 5px;
                 font-size: 10px;
+            }
+
+            .contact-row {
+                gap: 7px;
+            }
+
+            .contact-tile {
+                padding-inline: 2px;
+                font-size: 10px;
+                border-radius: 15px;
+            }
+
+            .contact-ico {
+                width: 48px;
+                height: 48px;
             }
 
             .trust-seal-img {
@@ -1093,6 +1194,37 @@
                             <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
                             <span>راهنمایی عضویت</span>
                         </button>
+                    </div>
+
+                    <!-- راه‌های ارتباطی -->
+                    <div class="contact-block">
+                        <div class="divider">
+                            <span>در پیام‌رسان‌ها با ما در ارتباط باشید</span>
+                        </div>
+
+                        <nav class="contact-row" aria-label="راه‌های ارتباطی">
+                            <a class="contact-tile" href="https://rubika.ir/+989007099029" target="_blank" rel="noopener noreferrer" aria-label="گفتگو در روبیکا">
+                                <span class="contact-ico ico-rubika" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 20V5h5.2a3.9 3.9 0 0 1 0 7.8H8M13 12.8 17 20"/></svg>
+                                </span>
+                                <span>روبیکا</span>
+                            </a>
+
+                            <a class="contact-tile" href="https://wa.me/989007099029" target="_blank" rel="noopener noreferrer" aria-label="گفتگو در واتساپ">
+                                <span class="contact-ico ico-whatsapp" aria-hidden="true"><i class="fa-brands fa-whatsapp"></i></span>
+                                <span>واتساپ</span>
+                            </a>
+
+                            <a class="contact-tile" href="https://t.me/+989007099029" target="_blank" rel="noopener noreferrer" aria-label="گفتگو در تلگرام">
+                                <span class="contact-ico ico-telegram" aria-hidden="true"><i class="fa-brands fa-telegram"></i></span>
+                                <span>تلگرام</span>
+                            </a>
+
+                            <a class="contact-tile" href="https://www.instagram.com/decob2b.net/" target="_blank" rel="noopener noreferrer" aria-label="صفحه اینستاگرام">
+                                <span class="contact-ico ico-instagram" aria-hidden="true"><i class="fa-brands fa-instagram"></i></span>
+                                <span>اینستاگرام</span>
+                            </a>
+                        </nav>
                     </div>
 
                     <div class="footer-section">

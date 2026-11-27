@@ -3,11 +3,10 @@
 
 {% block content %}
 
-<!-- بخش بنر: ساعت دیجیتال + اسلایدر حرفه‌ای + اسلایدر حراجی -->
+<!-- بخش بنر: اسلایدر حرفه‌ای + اسلایدر حراجی -->
 <div class="banner-desktop-wrapper">
     <div class="banner-slider-container">
         <div class="banner-slider" id="mainSlider">
-
             <div class="loading-slider">در حال بارگذاری...</div>
         </div>
         <button class="slider-btn prev" id="prevBtn" style="display: none;">❮</button>
@@ -28,28 +27,32 @@
     </div>
 </div>
 
-<!-- پنل ارتباطی -->
-<div class="contact-bar">
-    <div class="contact-title">
-        <i class="fas fa-headset"></i>
-        <span>پشتیبانی سریع</span>
-        <i class="fas fa-circle" style="font-size: 0.45rem; color: var(--success);"></i>
-    </div>
-    <div class="contact-content">
-        <div class="contact-numbers">
-            <a href="tel:+982191234567" class="contact-number-item">
-                <i class="fas fa-phone-alt"></i>
-                <span class="label">ثابت:</span>
-                <span class="number">۰۲۱-۹۱۲۳۴۵۶۷</span>
-            </a>
-            <a href="tel:+989123456789" class="contact-number-item">
-                <i class="fas fa-mobile-alt"></i>
-                <span class="label">همراه:</span>
-                <span class="number">۰۹۱۲-۳۴۵-۶۷۸۹</span>
-            </a>
+<!-- پشتیبانی سریع -->
+<section class="sp-bar" aria-label="پشتیبانی سریع">
+    <div class="sp-info">
+        <span class="sp-icon"><i class="fas fa-headset"></i><span class="sp-pulse"></span></span>
+        <div class="sp-text">
+            <strong>پشتیبانی سریع</strong>
+            <span>برای مشاوره و ثبت سفارش با ما تماس بگیرید</span>
         </div>
     </div>
-</div>
+    <div class="sp-actions">
+        <a href="tel:+982128429029" class="sp-btn sp-landline">
+            <span class="sp-btn-ico"><i class="fas fa-phone-alt"></i></span>
+            <span class="sp-btn-txt">
+                <small>تلفن ثابت</small>
+                <b dir="ltr">۰۲۱-۲۸۴۲۹۰۲۹</b>
+            </span>
+        </a>
+        <a href="tel:+989007099029" class="sp-btn sp-mobile">
+            <span class="sp-btn-ico"><i class="fas fa-mobile-alt"></i></span>
+            <span class="sp-btn-txt">
+                <small>همراه</small>
+                <b dir="ltr">۰۹۰۰-۷۰۹-۹۰۲۹</b>
+            </span>
+        </a>
+    </div>
+</section>
 
 <!-- موج تزیینی -->
 <div class="wave-separator">
@@ -70,7 +73,6 @@
 
 <div class="section-header">
     <h3><i class="fas fa-fire" style="color:#e96500;"></i> پرفروش‌ترین محصولات</h3>
-
 </div>
 <div class="products-scroll" id="bestsellersList"></div>
 
@@ -113,11 +115,9 @@
             const result = await response.json();
 
             if(result.status === 'success' && result.data.length > 0) {
-                // جدا کردن اسلایدر حراجی از بقیه
                 const normalSliders = result.data.filter(s => !s.isdiscount);
                 const discountSliders = result.data.filter(s => s.isdiscount === true);
 
-                // اسلایدر اصلی
                 if(normalSliders.length > 0) {
                     renderSliders(normalSliders);
                     showSliderControls(true);
@@ -126,7 +126,6 @@
                     showSliderControls(false);
                 }
 
-                // اسلایدر حراجی (چندتایی)
                 if(discountSliders.length > 0) {
                     renderSaleSliders(discountSliders);
                 } else {
@@ -227,18 +226,13 @@
             sliderContainer.appendChild(saleItem);
         });
 
-        // نمایش اسلایدر حراجی
         document.getElementById('saleSliderWrapper').style.display = 'block';
-
-        // ایجاد دات‌ها
         createSaleDots();
 
-        // اگر بیش از یک اسلایدر حراجی وجود دارد، اسلایدر را فعال کن
         if(saleSlides.length > 1) {
             startSaleSlider();
             attachSaleSliderEvents();
         } else {
-            // مخفی کردن دکمه‌های ناوبری اگر فقط یک اسلایدر وجود دارد
             const prevBtn = document.getElementById('salePrevBtn');
             const nextBtn = document.getElementById('saleNextBtn');
             if(prevBtn) prevBtn.style.display = 'none';
@@ -278,13 +272,8 @@
         resetSaleInterval();
     }
 
-    function nextSaleSlide() {
-        goToSaleSlide(currentSaleIndex + 1);
-    }
-
-    function prevSaleSlide() {
-        goToSaleSlide(currentSaleIndex - 1);
-    }
+    function nextSaleSlide() { goToSaleSlide(currentSaleIndex + 1); }
+    function prevSaleSlide() { goToSaleSlide(currentSaleIndex - 1); }
 
     function resetSaleInterval() {
         if(saleInterval) clearInterval(saleInterval);
@@ -316,8 +305,6 @@
         }
 
         if(sliderContainer && saleSlides.length > 1) {
-            sliderContainer.removeEventListener('mouseenter', () => clearInterval(saleInterval));
-            sliderContainer.removeEventListener('mouseleave', startSaleSlider);
             sliderContainer.addEventListener('mouseenter', () => clearInterval(saleInterval));
             sliderContainer.addEventListener('mouseleave', startSaleSlider);
         }
@@ -341,12 +328,11 @@
         const lightboxSlider = document.getElementById('lightboxSlider');
         const lightboxPrev = document.getElementById('lightboxPrev');
         const lightboxNext = document.getElementById('lightboxNext');
-        const lightboxCounter = document.getElementById('lightboxCounter');
 
         if(!slides.length) return;
 
         lightboxSlider.innerHTML = '';
-        slides.forEach((slide, i) => {
+        slides.forEach((slide) => {
             const pcImage = slide.image_pc || '/static/images/default-slider.jpg';
             const mobileImage = slide.image_mobile || pcImage;
             const tabletImage = slide.image_tablet || pcImage;
@@ -414,11 +400,6 @@
             lightboxNext.onclick = null;
         };
 
-        document.getElementById('closeLightbox').onclick = closeLightbox;
-        lightbox.onclick = (e) => {
-            if(e.target === lightbox) closeLightbox();
-        };
-
         const onKeyDown = (e) => {
             if(e.key === 'Escape') closeLightbox();
             if(e.key === 'ArrowLeft') goPrev();
@@ -438,9 +419,7 @@
 
     function updateLightboxCounter(current, total) {
         const counter = document.getElementById('lightboxCounter');
-        if(counter) {
-            counter.textContent = `${current} / ${total}`;
-        }
+        if(counter) counter.textContent = `${current} / ${total}`;
     }
 
     function createDots() {
@@ -475,13 +454,8 @@
         resetInterval();
     }
 
-    function nextSlide() {
-        goToSlide(currentIndex + 1);
-    }
-
-    function prevSlide() {
-        goToSlide(currentIndex - 1);
-    }
+    function nextSlide() { goToSlide(currentIndex + 1); }
+    function prevSlide() { goToSlide(currentIndex - 1); }
 
     function resetInterval() {
         if(slideInterval) clearInterval(slideInterval);
@@ -513,8 +487,6 @@
         }
 
         if(sliderContainer) {
-            sliderContainer.removeEventListener('mouseenter', () => clearInterval(slideInterval));
-            sliderContainer.removeEventListener('mouseleave', startSlider);
             sliderContainer.addEventListener('mouseenter', () => clearInterval(slideInterval));
             sliderContainer.addEventListener('mouseleave', startSlider);
         }
@@ -536,14 +508,97 @@
         }
     }
 
-    // اجرای اولیه
     document.addEventListener('DOMContentLoaded', function() {
         loadSlidersFromAPI();
     });
 </script>
 
 <style>
-    /* استایل‌های اضافی برای اسلایدر */
+    /* ==================== پشتیبانی سریع ==================== */
+    .sp-bar {
+        direction: rtl;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin: 0 0 22px;
+        padding: 12px 14px;
+        border-radius: 20px;
+        color: #fff;
+        background: linear-gradient(135deg, #1e2a3e 0%, #2a3b55 100%);
+        box-shadow: 0 10px 28px rgba(30, 42, 62, 0.18);
+        position: relative;
+        overflow: hidden;
+    }
+    .sp-bar::before {
+        content: "";
+        position: absolute;
+        top: -50px;
+        left: -40px;
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(233, 101, 0, 0.35), transparent 70%);
+        pointer-events: none;
+    }
+    .sp-info { display: flex; align-items: center; gap: 12px; position: relative; min-width: 0; }
+    .sp-icon {
+        width: 44px; height: 44px; flex-shrink: 0;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.1);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.15rem; color: #ffb27a;
+        position: relative;
+    }
+    .sp-pulse {
+        position: absolute; top: -3px; left: -3px;
+        width: 12px; height: 12px; border-radius: 50%;
+        background: #22c55e; border: 2px solid #1e2a3e;
+    }
+    .sp-pulse::after {
+        content: ""; position: absolute; inset: -2px; border-radius: 50%;
+        border: 2px solid #22c55e; animation: spPulse 1.8s ease-out infinite;
+    }
+    @keyframes spPulse { from { transform: scale(.8); opacity: .9; } to { transform: scale(2.2); opacity: 0; } }
+    .sp-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .sp-text strong { font-size: 1rem; font-weight: 800; }
+    .sp-text span { font-size: .76rem; color: rgba(255, 255, 255, 0.7); line-height: 1.6; }
+
+    .sp-actions { display: flex; gap: 10px; position: relative; flex-shrink: 0; }
+    .sp-btn {
+        display: flex; align-items: center; gap: 10px;
+        padding: 8px 14px 8px 12px;
+        border-radius: 14px;
+        text-decoration: none !important;
+        color: #fff !important;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        transition: transform .15s, background .2s;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .sp-btn:active { transform: scale(.97); }
+    @media (hover: hover) { .sp-btn:hover { background: rgba(255, 255, 255, 0.18); } }
+    .sp-btn-ico {
+        width: 38px; height: 38px; flex-shrink: 0; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center; font-size: .95rem;
+    }
+    .sp-landline .sp-btn-ico { background: linear-gradient(135deg, #f28b35, #e96500); }
+    .sp-mobile .sp-btn-ico { background: linear-gradient(135deg, #34d399, #059669); }
+    .sp-btn-txt { display: flex; flex-direction: column; line-height: 1.5; text-align: right; }
+    .sp-btn-txt small { font-size: .66rem; color: rgba(255, 255, 255, 0.65); }
+    .sp-btn-txt b { font-size: .95rem; font-weight: 800; letter-spacing: .3px; unicode-bidi: isolate; }
+
+    @media (max-width: 768px) {
+        .sp-bar { flex-direction: column; align-items: stretch; gap: 12px; padding: 14px; border-radius: 18px; margin-bottom: 18px; }
+        .sp-actions { width: 100%; gap: 8px; }
+        .sp-btn { flex: 1; min-width: 0; flex-direction: column; justify-content: center; gap: 6px; padding: 11px 6px; text-align: center; }
+        .sp-btn-txt { align-items: center; text-align: center; }
+        .sp-btn-txt b { font-size: .88rem; }
+        .sp-text span { font-size: .72rem; }
+    }
+    @media (prefers-reduced-motion: reduce) { .sp-pulse::after { animation: none; } }
+
+    /* ==================== اسلایدر ==================== */
     .banner-desktop-wrapper {
         display: flex;
         gap: 20px;
@@ -561,11 +616,7 @@
     }
 
     /* ==================== اسلایدر مربعی حراجی ==================== */
-    .sale-slider-wrapper {
-        flex: 1;
-        min-width: 280px;
-        max-width: 380px;
-    }
+    .sale-slider-wrapper { flex: 1; min-width: 280px; max-width: 380px; }
 
     .sale-slider-container {
         position: relative;
@@ -575,12 +626,7 @@
         border-radius: 20px;
     }
 
-    .sale-slider {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        min-height: 400px;
-    }
+    .sale-slider { position: relative; width: 100%; height: 100%; min-height: 400px; }
 
     .sale-card {
         position: absolute;
@@ -591,32 +637,16 @@
         border-radius: 20px;
         overflow: hidden;
         box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-        transition: all 0.4s ease;
         opacity: 0;
         visibility: hidden;
         transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
     }
 
-    .sale-card.active {
-        opacity: 1;
-        visibility: visible;
-        z-index: 1;
-    }
+    .sale-card.active { opacity: 1; visibility: visible; z-index: 1; }
 
-    .sale-card-link {
-        display: block;
-        width: 100%;
-        height: 100%;
-        text-decoration: none;
-        position: relative;
-    }
+    .sale-card-link { display: block; width: 100%; height: 100%; text-decoration: none; position: relative; }
 
-    .sale-image {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        border-radius: 20px;
-    }
+    .sale-image { width: 100%; height: 100%; overflow: hidden; border-radius: 20px; }
 
     .sale-image picture,
     .sale-image img {
@@ -626,11 +656,8 @@
         transition: transform 0.5s ease;
     }
 
-    .sale-card:hover .sale-image img {
-        transform: scale(1.05);
-    }
+    .sale-card:hover .sale-image img { transform: scale(1.05); }
 
-    /* استایل کپشن اسلایدر حراجی */
     .sale-caption {
         position: absolute;
         bottom: 0;
@@ -650,7 +677,6 @@
         direction: rtl;
     }
 
-    /* دکمه‌های ناوبری اسلایدر حراجی */
     .sale-slider-btn {
         position: absolute;
         top: 50%;
@@ -670,20 +696,10 @@
         justify-content: center;
     }
 
-    .sale-slider-btn:hover {
-        background: rgba(0,0,0,0.8);
-        transform: translateY(-50%) scale(1.1);
-    }
+    .sale-slider-btn:hover { background: rgba(0,0,0,0.8); transform: translateY(-50%) scale(1.1); }
+    .sale-prev { left: 10px; }
+    .sale-next { right: 10px; }
 
-    .sale-prev {
-        left: 10px;
-    }
-
-    .sale-next {
-        right: 10px;
-    }
-
-    /* دات‌های اسلایدر حراجی */
     .sale-slider-dots {
         position: absolute;
         bottom: 60px;
@@ -703,23 +719,10 @@
         transition: all 0.3s;
     }
 
-    .sale-dot:hover {
-        background: rgba(255,255,255,0.9);
-        transform: scale(1.2);
-    }
+    .sale-dot:hover { background: rgba(255,255,255,0.9); transform: scale(1.2); }
+    .sale-dot.active { background: #ff6b00; width: 20px; border-radius: 10px; }
 
-    .sale-dot.active {
-        background: #ff6b00;
-        width: 20px;
-        border-radius: 10px;
-    }
-
-    .banner-slider {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        min-height: 300px;
-    }
+    .banner-slider { position: relative; width: 100%; height: 100%; min-height: 300px; }
 
     .banner-item {
         position: absolute;
@@ -732,16 +735,8 @@
         cursor: pointer;
     }
 
-    .banner-item.active {
-        opacity: 1;
-        z-index: 1;
-    }
-
-    .banner-item img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
+    .banner-item.active { opacity: 1; z-index: 1; }
+    .banner-item img { width: 100%; height: 100%; object-fit: cover; }
 
     .banner-caption {
         position: absolute;
@@ -775,11 +770,7 @@
         justify-content: center;
     }
 
-    .slider-btn:hover {
-        background: rgba(0,0,0,0.8);
-        transform: translateY(-50%) scale(1.05);
-    }
-
+    .slider-btn:hover { background: rgba(0,0,0,0.8); transform: translateY(-50%) scale(1.05); }
     .prev { left: 10px; }
     .next { right: 10px; }
 
@@ -802,16 +793,8 @@
         transition: all 0.3s;
     }
 
-    .dot:hover {
-        background: rgba(255,255,255,0.9);
-        transform: scale(1.2);
-    }
-
-    .dot.active {
-        background: var(--primary, #e87a1f);
-        width: 25px;
-        border-radius: 10px;
-    }
+    .dot:hover { background: rgba(255,255,255,0.9); transform: scale(1.2); }
+    .dot.active { background: var(--primary, #e87a1f); width: 25px; border-radius: 10px; }
 
     .loading-slider, .no-slider, .error-slider {
         display: flex;
@@ -834,7 +817,7 @@
         100% { background-position: -200% 0; }
     }
 
-    /* استایل لایت باکس */
+    /* لایت باکس */
     .slider-lightbox {
         position: fixed;
         top: 0;
@@ -883,11 +866,7 @@
     }
 
     .lightbox-slide picture,
-    .lightbox-slide img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-    }
+    .lightbox-slide img { width: 100%; height: 100%; object-fit: contain; }
 
     .lightbox-caption {
         position: absolute;
@@ -923,11 +902,7 @@
         justify-content: center;
     }
 
-    .lightbox-nav:hover {
-        background: rgba(255,255,255,0.4);
-        transform: translateY(-50%) scale(1.1);
-    }
-
+    .lightbox-nav:hover { background: rgba(255,255,255,0.4); transform: translateY(-50%) scale(1.1); }
     .lightbox-nav.prev { left: 20px; }
     .lightbox-nav.next { right: 20px; }
 
@@ -949,10 +924,7 @@
         background: rgba(0,0,0,0.5);
     }
 
-    .lightbox-close:hover {
-        background: rgba(255,255,255,0.2);
-        transform: rotate(90deg);
-    }
+    .lightbox-close:hover { background: rgba(255,255,255,0.2); transform: rotate(90deg); }
 
     .lightbox-counter {
         position: absolute;
@@ -967,12 +939,9 @@
         direction: ltr;
     }
 
-    /* استایل پی‌سی */
+    /* پی‌سی */
     @media (min-width: 1025px) {
-        .banner-slider-container {
-            min-height: auto;
-            aspect-ratio: 2880 / 600;
-        }
+        .banner-slider-container { min-height: auto; aspect-ratio: 2880 / 600; }
         .banner-slider { min-height: auto; aspect-ratio: 2880 / 600; }
         .banner-caption h3 { font-size: 24px; margin: 0 0 5px 0; }
         .banner-caption p { font-size: 16px; margin: 0; }
@@ -984,21 +953,16 @@
         .sale-slider-dots { bottom: 70px; }
     }
 
-    /* استایل موبایل */
+    /* موبایل */
     @media (max-width: 768px) {
-        .banner-desktop-wrapper {
-            flex-direction: column;
-        }
+        .banner-desktop-wrapper { flex-direction: column; }
         .banner-slider-container {
             width: 100%;
             margin-bottom: 15px;
             min-height: auto;
             aspect-ratio: 1080 / 540;
         }
-        .sale-slider-wrapper {
-            max-width: 100%;
-            width: 100%;
-        }
+        .sale-slider-wrapper { max-width: 100%; width: 100%; }
         .banner-caption h3 { font-size: 12px; margin: 0 0 3px 0; }
         .banner-caption p { font-size: 9px; margin: 0; }
         .slider-btn { padding: 5px 8px; font-size: 12px; }
@@ -1012,7 +976,7 @@
         .lightbox-close { top: 10px; right: 15px; font-size: 36px; width: 40px; height: 40px; }
     }
 
-    /* استایل تبلت */
+    /* تبلت */
     @media (min-width: 769px) and (max-width: 1024px) {
         .banner-slider-container { aspect-ratio: 16 / 9; }
         .banner-caption h3 { font-size: 18px; }
@@ -1022,17 +986,14 @@
         .sale-slider-dots { bottom: 60px; }
     }
 
-
     .product-card-item h4 {
-  font-size: 1rem;
-  margin-top: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: 700;
-
-}
-
+        font-size: 1rem;
+        margin-top: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 700;
+    }
 </style>
 
 {% endblock %}
